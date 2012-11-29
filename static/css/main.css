@@ -1,0 +1,10 @@
+@import url(http://fonts.googleapis.com/css?family=Share+Tech);
+
+#cvs-data,  #xls-data{
+	font-family: 'Share Tech', sans-serif;
+}
+
+#cvs-data td {
+	border-right: 1px solid orange;
+	margin-right: 5px;
+}

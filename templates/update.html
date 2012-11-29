@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Actualización de datos:</title>
+	<link rel="stylesheet" type="text/css" href="/css/main.css" />
+</head>
+
+
+<body>
+
+<form method="post">
+	<table id="data-selector">
+		<tr>
+			<td><label for="option">Tipo de combustible: </label></td><td>
+								<select name="option" id="option">
+								{% for o in options %}
+								<option value="{{o}}">{{options[o][1]}}</option>
+								{% endfor %}
+								</select></td>
+		</tr><tr>
+			<td></td><td><input type="submit" value="Obtener datos"></td>
+		</tr>
+
+	</table>
+</form>
+
+<div id="cvs-data">
+	<h2>Archivo: {{filename}}</h2>
+	<table>
+	<tr><th>#</th><th>Lat</th><th>Lon</th><th>Info</th></tr>
+	{% for data in csv_data %}
+	<tr><td>{{loop.index}}</td><td>{{data[0]}}</td><td>{{data[1]}}</td><td>{{data[2]}}</td></tr>
+	{% endfor %}
+	</table>
+</div>
+<div id="xls-data">
+	<h2>Archivo: {{filename}}</h2>
+	<table>
+	<tr>
+		<th>#</th>
+		{% for h in xls_data_h %}
+		<th>{{h}}</th>
+		{% endfor %}
+	</tr>
+	{% for data in xls_data_d %}
+	<tr>
+		<td>{{loop.index}}</td>
+		{% for d in data %}
+		<td>{{d}}</td>
+		{% endfor %}
+	</tr>
+	{% endfor %}
+	</table>
+</div>
+
+</body>
+</html>
