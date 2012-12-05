@@ -17,6 +17,10 @@
 #
 from gasole_base import *
 from gas_update import *
+from gas_maps import *
+from gas_db import *
+import logging
+
 
 
 class MainHandler(webapp2.RequestHandler):
@@ -26,19 +30,66 @@ class MainHandler(webapp2.RequestHandler):
 class Update(BaseHandler):
     def get(self):
         self.render("update.html",
-        	options=FUEL_OPTIONS)
+        	options=FUEL_OPTIONS,       
+            csv_data={},
+            xls_data={})
     def post(self):
     	option = self.request.get("option")
-    	csv_data = gas_update_csv(FUEL_OPTIONS[option][0])
+    	csv_data = gas_update_csv(option)
     	xls_data = gas_update_xls(option)
+        if self.request.get("updatedb"):
+            gas_store_result(xls_data)
         self.render("update.html",
         	options=FUEL_OPTIONS,
-        	filename=csv_data["filename"],
-        	csv_data=csv_data["data"],
-        	xls_data_h=xls_data["headers"],
-        	xls_data_d=xls_data["data"])
+        	csv_data=csv_data,
+        	xls_data=xls_data)
+
+class Search(BaseHandler):
+    def get(self):
+        self.render("search.html",
+            options=FUEL_OPTIONS,
+            provs=PROVS)
+    def post(self):
+        option = self.request.get("option")
+        prov = self.request.get("prov")
+        data = gas_update_search(option=option, prov=prov)
+        if data:
+            markers = filter(None, [info[-1] for info in data["data"]])
+            static_map = get_static_map(markers[:50])
+        else:
+            static_map = ""
+        if self.request.get("updatedb"):
+            gas_store_result(data, location=True)
+        self.render("search.html",
+            options=FUEL_OPTIONS,
+            provs=PROVS,
+            search_data=data,
+            static_map=static_map)
+class Research(BaseHandler):
+    def get(self):
+        pass
+        
+class Test(BaseHandler):
+    def get(self):
+
+        class Entidad(db.Model):
+            historia = db.StringListProperty()
+        d = date.today()
+        values = [1, 4, 2.5, 8, 1.90]
+        info = d.isoformat()+";".join(map(str, values))
+        logging.info(info)
+        e = Entidad();
+        for i in range(400):
+            e.historia.append(info)
+        e.put()
+        pass
+
+
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
-    ('/update/?', Update)
+    ('/update/?', Update),
+    ('/search/?', Search),
+    ('/research/?', Research),
+    ('/test/?', Test)
 ], debug=True)
