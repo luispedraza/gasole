@@ -4,6 +4,10 @@
 	<meta charset="utf-8" />
 	<title>Actualización de datos</title>
 	<link rel="stylesheet" type="text/css" href="/css/main.css" />
+	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+	<script type="text/javascript" src="/js/jquery.tablesorter.min.js"></script>
+	<script type="text/javascript" src="/js/jquery.tablesorter.pager.js"></script>
+	<script type="text/javascript" src="/js/gas_data.js"></script>
 </head>
 
 
@@ -14,6 +18,7 @@
 		<tr>
 			<td><label for="option">Tipo de combustible: </label></td><td>
 								<select name="option" id="option">
+								<option value="0">Todas</option>
 								{% for o in options|sort %}
 								<option value="{{o}}">{{options[o]["name"]}}</option>
 								{% endfor %}
@@ -29,15 +34,18 @@
 
 <div id="csv-data">
 {% if csv_data %}
-	<h2>Datos CSV {{csv_data["option"]}}: {{csv_data["date"].day}}/{{csv_data["date"].month}}/{{csv_data["date"].year}}</h2>
-	<table>
+	<h2>Datos CSV para {{options[csv_data.option]["name"]}}: {{csv_data.date.day}}/{{csv_data.date.month}}/{{csv_data.date.year}}</h2>
+	<table id="csv-table">
+	<thead>
 	<tr>
 		<th>#</th>
-		{% for h in csv_data["headers"] %}
+		{% for h in csv_data.headers %}
 		<th>{{h}}</th>
 		{% endfor %}
 	</tr>
-	{% for data in csv_data["data"] %}
+	</thead>
+	<tbody>
+	{% for data in csv_data.data %}
 	<tr>
 		<td>{{loop.index}}</td>
 		{% for d in data %}
@@ -45,7 +53,9 @@
 		{% endfor %}
 	</tr>
 	{% endfor %}
+	</tbody>
 	</table>
+	<div id="csv-pager"></div>
 {% else %}
 	<h2>No hay datos CSV</h2>
 {% endif %}
@@ -54,15 +64,18 @@
 
 <div id="xls-data">
 {% if xls_data %}
-	<h2>Datos Excel {{xls_data["option"]}}: {{xls_data["date"].day}}/{{xls_data["date"].month}}/{{xls_data["date"].year}}</h2>
-	<table>
+	<h2>Datos Excel para {{options[xls_data.option]["name"]}}: {{xls_data.date.day}}/{{xls_data.date.month}}/{{xls_data.date.year}}</h2>
+	<table id="xls-table">
+	<thead>
 	<tr>
 		<th>#</th>
-		{% for h in xls_data["headers"] %}
+		{% for h in xls_data.headers %}
 		<th>{{h}}</th>
 		{% endfor %}
 	</tr>
-	{% for data in xls_data["data"] %}
+	</thead>
+	<tbody>
+	{% for data in xls_data.data %}
 	<tr>
 		<td>{{loop.index}}</td>
 		{% for d in data %}
@@ -70,6 +83,7 @@
 		{% endfor %}
 	</tr>
 	{% endfor %}
+	</tbody>
 	</table>
 {% else %}
 	<h2>No hay datos Excel</h2>

@@ -10,6 +10,8 @@ handlers:
   upload: favicon\.ico
 - url: /css
   static_dir: static/css
+- url: /js
+  static_dir: static/js
 
 - url: .*
   script: main.app
@@ -19,3 +21,4 @@ libraries:
   version: "2.5.1"
 - name: jinja2
   version: latest
+  

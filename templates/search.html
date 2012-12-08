@@ -4,6 +4,10 @@
 	<meta charset="utf-8" />
 	<title>Actualización de datos:</title>
 	<link rel="stylesheet" type="text/css" href="/css/main.css" />
+	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+	<script type="text/javascript" src="/js/jquery.tablesorter.min.js"></script>
+	<script type="text/javascript" src="/js/jquery.tablesorter.pager.js"></script>
+	<script type="text/javascript" src="/js/gas_data.js"></script>
 </head>
 
 
@@ -34,18 +38,21 @@
 	</table>
 </form>
 
-{% if search_data %}
+{% if data %}
 <div id="search-data">
-	<h2>Datos encontrados: {{search_data["option"]}} en {{search_data["prov"]}} ({{search_data["day"]}}/{{search_data["month"]}}/{{search_data["year"]}})</h2>
+	<h2>Datos encontrados: {{options[data.option]["name"]}} en {{provs[data.prov]}} {{data.date.day}}/{{data.date.month}}/{{data.date.year}}</h2>
 	<img src={{static_map}} />
 	<table>
+	<thead>
 	<tr>
 		<th>#</th>
-		{% for h in search_data["headers"] %}
+		{% for h in data.headers %}
 		<th>{{h}}</th>
 		{% endfor %}
-	</tr>
-	{% for data in search_data["data"] %}
+	</tr>	
+	</thead>
+	<tbody>
+	{% for data in data.data %}
 	<tr>
 		<td>{{loop.index}}</td>
 		{% for d in data %}
@@ -53,6 +60,7 @@
 		{% endfor %}
 	</tr>
 	{% endfor %}
+	</tbody>
 	</table>
 </div>
 {% else %}

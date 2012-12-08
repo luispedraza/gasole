@@ -20,25 +20,33 @@ from gas_update import *
 from gas_maps import *
 from gas_db import *
 import logging
+from google.appengine.api import users
 
-
-
-class MainHandler(webapp2.RequestHandler):
+class MainHandler(BaseHandler):
     def get(self):
-        self.response.write('Hello world!')
+        log_url = users.create_login_url(self.request.uri)
+        log_text = 'Login'
+        if self.user:
+            log_url = users.create_logout_url(self.request.uri)
+            log_text = 'Logout'
+        self.render("main.html",
+            log_url = log_url,
+            log_text = log_text)
 
 class Update(BaseHandler):
     def get(self):
+        self.check_user_name()
         self.render("update.html",
         	options=FUEL_OPTIONS,       
-            csv_data={},
-            xls_data={})
+            csv_data=None,
+            xls_data=None)
     def post(self):
+        self.check_user_name()
     	option = self.request.get("option")
     	csv_data = gas_update_csv(option)
     	xls_data = gas_update_xls(option)
         if self.request.get("updatedb"):
-            gas_store_result(xls_data)
+            data2store(xls_data)
         self.render("update.html",
         	options=FUEL_OPTIONS,
         	csv_data=csv_data,
@@ -46,50 +54,28 @@ class Update(BaseHandler):
 
 class Search(BaseHandler):
     def get(self):
+        self.check_user_name()
         self.render("search.html",
-            options=FUEL_OPTIONS,
-            provs=PROVS)
+            options = FUEL_OPTIONS,
+            provs = PROVS)
     def post(self):
+        self.check_user_name()
         option = self.request.get("option")
         prov = self.request.get("prov")
-        data = gas_update_search(option=option, prov=prov)
+        update = self.request.get("updatedb")
+        data = get_data(prov=prov, option=option, update=update)
+        static_map = ""
         if data:
-            markers = filter(None, [info[-1] for info in data["data"]])
+            markers = filter(None, [info[-1] for info in data.data])
             static_map = get_static_map(markers[:50])
-        else:
-            static_map = ""
-        if self.request.get("updatedb"):
-            gas_store_result(data, location=True)
         self.render("search.html",
-            options=FUEL_OPTIONS,
-            provs=PROVS,
-            search_data=data,
-            static_map=static_map)
-class Research(BaseHandler):
-    def get(self):
-        pass
-        
-class Test(BaseHandler):
-    def get(self):
-
-        class Entidad(db.Model):
-            historia = db.StringListProperty()
-        d = date.today()
-        values = [1, 4, 2.5, 8, 1.90]
-        info = d.isoformat()+";".join(map(str, values))
-        logging.info(info)
-        e = Entidad();
-        for i in range(400):
-            e.historia.append(info)
-        e.put()
-        pass
-
-
+            options = FUEL_OPTIONS,
+            provs = PROVS,
+            data = data,
+            static_map = static_map)
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/update/?', Update),
-    ('/search/?', Search),
-    ('/research/?', Research),
-    ('/test/?', Test)
+    ('/search/?', Search)
 ], debug=True)

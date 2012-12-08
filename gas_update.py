@@ -12,7 +12,7 @@
 # http://geoportal.mityc.es/hidrocarburos/eess/searchTotal.do?tipoCons=1&tipoBusqueda=0&tipoCarburante=1&textoCarburante=Gasolina%2095
 import urllib2
 import urllib
-# from urllib2 import HTTPError
+from urllib2 import HTTPError
 import zipfile
 # import os
 import time
@@ -22,9 +22,10 @@ from bs4 import BeautifulSoup
 import re
 # import time
 from google.appengine.api import urlfetch
+import logging
 
 FUEL_OPTIONS = {"1": {"short": u"G95", "name": u"Gasolina 95"},
-				"2": {"short": u"G97", "name": u"Gasolina 97"},
+				#"2": {"short": u"G97", "name": u"Gasolina 97"},
 				"3": {"short": u"G98", "name": u"Gasolina 98"},
 				"4": {"short": u"GOA", "name": u"Gasóleo Automoción"},
 				"5": {"short": u"NGO", "name": u"Nuevo Gasóleo A"},
@@ -37,11 +38,23 @@ PROVS = {"00":"TODAS LAS PROVINCIAS","01":u"ÁLAVA","02":u"ALBACETE","03":u"ALIC
 URL_CSV = 'http://geoportal.mityc.es/hidrocarburos/files/'
 URL_XLS = 'http://geoportal.mityc.es/hidrocarburos/eess/searchTotal.do?tipoCons=1&tipoBusqueda=0&tipoCarburante='
 URL_SEARCH = 'http://geoportal.mityc.es/hidrocarburos/eess/searchAddress.do'
+
+# Resultado de una actualizacion de Internet (csv, xls, search)
+class Result:
+	def __init__(self, prov, option, headers=[], data=[]):
+		self.date = date.today()
+		self.prov = prov
+		self.option = option
+		self.headers = headers
+		self.data = data
+
+# Actualización por descarga de archivo CSV
 def gas_update_csv(option="1"):
+	if option == "0":
+		return
 	# file path:
-	d = date.today()
 	o = FUEL_OPTIONS[option]["short"]
-	zipFileURL = URL_CSV+'eess_'+o+'_'+d.strftime("%d%m%Y")+'.zip'
+	zipFileURL = URL_CSV+'eess_'+o+'_'+date.today().strftime("%d%m%Y")+'.zip'
 	# download new data
 	try:
 		response = urllib2.urlopen(zipFileURL)
@@ -50,48 +63,47 @@ def gas_update_csv(option="1"):
 	zippedFile = StringIO.StringIO(response.read())
 	# extract data
 	zfobj = zipfile.ZipFile(zippedFile)
-	result = {
-		"date": d,
-		"option": option,
-		"headers": ["Lat.", "Lon.", "Info", "Precio"],
-		"data":[]
-		}
 	name = zfobj.namelist()[0]
-	data = StringIO.StringIO(zfobj.read(name))
+	csv_data = StringIO.StringIO(zfobj.read(name))
+	data = []
 	while True:
-		line = data.readline()
+		line = csv_data.readline()
 		if line:
 			if len(line)>5 and not line.startswith(";"):
 				info = line.decode('utf8').split(", ")
-				precio = re.search("(?<=\s)[\d,]+(?=\se)", info[2])
-				if precio:
-					precio = precio.group(0)
-					result["data"].append(info[0:2]+[re.sub(" %s e" %precio, "", info[2]), precio])
+				price = re.search("(?<=\s)[\d,]+(?=\se)", info[2])
+				if price:
+					price = price.group(0)
+					fprice = float(re.sub(",", ".", price))
+					data.append(info[0:2]+[re.sub(" %s e" %price, "", info[2]), fprice])
 		else:
 			break
-	return result
+	headers = ["Lat.", "Lon.", "Info", "Precio"]
+	return Result(prov="", option=option, headers=headers, data=data)
 
-def gas_update_xls(option="1"):
+# Actualización por descarga de archivo xls
+def gas_update_xls(option="1", result=None):
+	if option == "0":
+		for o in FUEL_OPTIONS.keys():
+			result = gas_update_xls(option=o, result=result)
+		return result
 	# file path:
-	d = date.today()
 	xlsFileURL = URL_XLS + option
-	result = {
-		"date": d,
-		"option": FUEL_OPTIONS[option]["short"],
-		"headers": [],
-		"data":[]
-		}
 	# download new data
 	try:
 		response = urllib2.urlopen(xlsFileURL)
 	except HTTPError as e:
-		return False 
+		return False
 	xlsFile = StringIO.StringIO(response.read())
 	# obtain data
 	soup = BeautifulSoup(xlsFile)
 	table = soup.find('table')
 	rows = table.findAll('tr')
-	headers = False
+	columns = [0, 1, 2, 4, 5, 6, 9]
+	data = []
+	headers = []
+	if result:
+		data = result.data
 	for tr in rows:
 		if not headers:
 			bolds = tr.findAll('b')
@@ -104,16 +116,25 @@ def gas_update_xls(option="1"):
 					# result["month"] = int(ddmmyyyy[1])
 					# result["day"] = int(ddmmyyyy[0])
 				if re.match(u'Provincia', info[1]):
-					result["headers"] = [h.text for h in tr.findAll('td')]
-					headers = True
+					trs = tr.findAll('td')
+					headers = [trs[i].text for i in columns]
 		else:
-			data = tr.findAll('td')
-			if data[7].text == "P":	# guardo sólo gaslineras de venta público
-				result["data"].append([d.text for d in data])
-	return result
+			table_data = [td.text for td in tr.findAll('td')]
+			if table_data[7] == "P":	# guardo sólo gaslineras de venta público
+				province = table_data[0].title()
+				town = table_data[1].title()
+				address = table_data[2] + " ["+table_data[3]+"]"		# dirección de la gasolinera
+				price = float(re.sub(",", ".", table_data[5]))
+				if result:
+					
+							d[4][option] = table_data[5]	# agregamos el nuevo precio
+				else:
+					table_data[5] = {option: table_data[5]}
+					data.append([table_data[i] for i in columns])
+	return Result(prov="00", option=option, headers=headers, data=data)
 
+# Actualización por búsqueda directa
 def gas_update_search(option="1", prov="01"):
-	province_name = PROVS[prov]
 	if prov=="00":
 		prov = ""
 	values = {
@@ -139,18 +160,10 @@ def gas_update_search(option="1", prov="01"):
 		ndata = int(match.group())
 	else:
 		return False
-	d = date.today()
-	result = {
-		"date": d,
-		"option": FUEL_OPTIONS[option]["name"],
-		"headers": [],
-		"data":[],
-		"prov": province_name,
-		"timestamp": time.time()
-		}
-	headers = soup.findAll('th')
-	for h in headers:
-		result["headers"].append(h.text)
+	xls_headers = soup.findAll('th')
+	columns = [0, 1, 2, 4, 5, 6, 9, 10]
+	headers = [xls_headers[i].text for i in columns]
+	data = []
 	
 	def handle_result(rpc):
 		rpc_result = rpc.get_result()
@@ -161,20 +174,23 @@ def gas_update_search(option="1", prov="01"):
 		rows = table.findAll('tr')
 		for row in rows[1:]:
 			if row.has_attr('class'):
-				data = [None]*len(headers)
 				cells = row.findAll('td')
 				for c in range(len(cells)):
-					if c == 5:				# precio
-						price = float(re.sub(",",  ".", cells[c].text))
-						data[c] = price
-					if c == (len(cells)-1):	# coordenadas
-						centrar = re.search("(?<=centrar\().+(?=\))", cells[c].prettify())
+					if c == 2:
+						cells[2] = cells[2].text + " [" + re.sub("\s+", "", cells[3].text) + "]"
+					elif c == 5:				# precio
+						cells[5] = float(re.sub(",",  ".", cells[5].text))
+					elif c == (len(cells)-1):	# coordenadas
+						centrar = re.search("(?<=centrar\().+(?=\))", cells[-1].prettify())
 						if centrar:
 							centrar = centrar.group().split(",")
-							data[c] = ",".join([centrar[1], centrar[0]])
+							cells[-1] = ",".join([centrar[1], centrar[0]])
+						else:
+							cells[-1] = None
 					else:
-						data[c] = cells[c].text
-				result["data"].append(data)
+						cells[c] = cells[c].text
+				data_xls = [cells[i] for i in columns]
+				data.append(data_xls)
 
 	def create_callback(rpc):
 		return lambda: handle_result(rpc)
@@ -187,9 +203,9 @@ def gas_update_search(option="1", prov="01"):
 		rpc.callback = create_callback(rpc)
 		urlfetch.make_fetch_call(rpc, URL_SEARCH+"?"+params)
 		rpcs.append(rpc)
-		time.sleep(.2)
+		time.sleep(.1)
 		pos += 10
 	for rpc in rpcs:
 		rpc.wait()
-	return result
+	return Result(prov=prov, option=option, headers=headers, data=data)
 

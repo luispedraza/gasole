@@ -3,12 +3,13 @@
 import webapp2
 import jinja2
 import os
+from google.appengine.api import users
+import logging
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 #styles_dir = os.path.join(os.path.dirname(__file__), 'styles')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
 	autoescape = False)
-
 
 # Basic handler with common functions
 class BaseHandler(webapp2.RequestHandler):
@@ -20,4 +21,12 @@ class BaseHandler(webapp2.RequestHandler):
 		return t.render(params)
 
 	def render(self, template, **kw):
-		self.write(self.render_str(template, **kw))	
+		self.write(self.render_str(template, **kw))
+
+	def check_user_name(self):
+		if self.user.nickname() != "luispedraza":
+			self.redirect("/")
+
+	def initialize(self, *a, **kw):
+		webapp2.RequestHandler.initialize(self, *a, **kw)
+		self.user = users.get_current_user()
