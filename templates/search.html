@@ -52,12 +52,10 @@
 	</tr>	
 	</thead>
 	<tbody>
-	{% for data in data.data %}
+	{% for item in data.as_table() %}
 	<tr>
 		<td>{{loop.index}}</td>
-		{% for d in data %}
-		<td>{{d}}</td>
-		{% endfor %}
+		{{item}}
 	</tr>
 	{% endfor %}
 	</tbody>

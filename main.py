@@ -19,7 +19,6 @@ from gasole_base import *
 from gas_update import *
 from gas_maps import *
 from gas_db import *
-import logging
 from google.appengine.api import users
 
 class MainHandler(BaseHandler):
@@ -63,10 +62,11 @@ class Search(BaseHandler):
         option = self.request.get("option")
         prov = self.request.get("prov")
         update = self.request.get("updatedb")
-        data = get_data(prov=prov, option=option, update=update)
+        #data = get_data(prov=prov, option=option, update=update)
+        data = gas_update_search(prov=prov, option=option)
         static_map = ""
         if data:
-            markers = filter(None, [info[-1] for info in data.data])
+            markers = filter(None, [d[-1] for d in data])
             static_map = get_static_map(markers[:50])
         self.render("search.html",
             options = FUEL_OPTIONS,

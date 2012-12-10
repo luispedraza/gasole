@@ -10,3 +10,36 @@
 	color: white;
 	margin-right: 5px;
 }
+
+#legend > div {
+	display: inline-block;
+}
+
+.op1 {
+	/* G95 */
+	background-color: #FF7C00;
+}
+.op3 {
+	/* G98 */
+	background-color: #04859D;
+}
+.op4 {
+	/* Gasoleo Automoción */
+	background-color:  #DF004F;
+}
+.op5 {
+	/* Nuevo Gasóleo A */
+	background-color: #FFCE00;
+}
+.op6 {
+	/* Gasóleo B */
+	background-color: #00B74A;
+}
+.op7 {
+	/* Gasóleo C */
+	background-color: #C6F500;
+}
+.op8 {
+	/* Biodiésel */
+	background-color: #FF3100;
+}

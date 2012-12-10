@@ -15,13 +15,12 @@ HEADERS = [u"Provincia", u"Localidad", u"Dirección", u"Precio", u"Rótulo", u"H
 
 ## Modelo de provincia
 class Province(db.Model):
-	name = db.StringProperty(required=True)
+	pass
 
 class Town(db.Model):
-	name = db.StringProperty(required=True)
+	pass
 
 class GasStation(db.Expando):
-	address = db.PostalAddressProperty(required=True)
 	label = db.StringProperty(required=True)
 	phone = db.PhoneNumberProperty()
 	email = db.EmailProperty()
@@ -51,7 +50,7 @@ def data2store(data, location=False):
 	provinces = {}
 	towns = {}
 	stations = {}
-	for item in data.data:
+	for item in data:
 		prov_kname = generate_kname(item[0].split("/")[0])
 		town_kname = generate_kname(item[1])
 		station_kname = generate_kname(item[1]+item[2])
