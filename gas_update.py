@@ -42,7 +42,7 @@ def make_clean_name(s):
 
 # Resultado de una actualizacion de Internet (csv, xls, search)
 class Result(object):
-	def __init__(self, prov, option, headers, data):
+	def __init__(self, prov="", option="", headers=[], data=[]):
 		self.date = date.today()
 		self.prov = prov
 		self.option = option
@@ -53,8 +53,8 @@ class Result(object):
 			yield d
 
 class ResultIter(Result):
-	def __init__(self, prov, option):
-		headers = [u"Provincia", u"Localidad", u"Dirección", u"Toma de Datos", u"Precio", u"Rótulo", u"Horario", u"Lat.,Lon."]
+	def __init__(self, prov="", option=""):
+		headers = [u"Provincia", u"Localidad", u"Dirección", u"Fecha", u"Precio", u"Rótulo", u"Horario", u"Lat.,Lon."]
 		Result.__init__(self, prov, option, headers, data={})
 
 	def __iter__(self):
@@ -86,7 +86,7 @@ class ResultIter(Result):
 			p = data[province] = {}		
 		t = p.get(town)
 		if not t:
-			t = p[town] = {}	
+			t = p[town] = {}
 		s = t.get(station)
 		if not s:
 			s = t[station] = {}
@@ -100,8 +100,6 @@ class ResultIter(Result):
 
 # Actualización por descarga de archivo CSV
 def gas_update_csv(option="1"):
-	if option == "0":
-		return
 	# file path:
 	o = FUEL_OPTIONS[option]["short"]
 	zipFileURL = URL_CSV+'eess_'+o+'_'+date.today().strftime("%d%m%Y")+'.zip'
@@ -148,25 +146,22 @@ def gas_update_xls(option="1", result=None):
 			if not tr.findAll('b'):
 				table_data = [td.text for td in tr.findAll('td')]
 				if table_data[7] == "P":	# guardo sólo gaslineras de venta público
-					province = table_data[0]
-					town = table_data[1] = table_data[1]
-					price = float(re.sub(",", ".", table_data[5]))
 					result.add_item(
-						province=province,
-						town=town,
+						province=table_data[0],
+						town=table_data[1],
 						station=[table_data[2], table_data[3]],
 						date=table_data[4],
 						label=table_data[6],
 						hours=table_data[9],
-						option={o: price})
+						option={o: float(re.sub(",", ".", table_data[5]))})
 
 	def create_xls_callback(rpc, o):
 		return lambda: handle_xls_result(rpc, o)
 
 	rpcs = []
 	for o in option:
-		logging.info("Buscando %s" %FUEL_OPTIONS[o]["name"])
-		rpc = urlfetch.create_rpc(deadline=30)
+		logging.info("Obteniendo %s" %FUEL_OPTIONS[o]["name"])
+		rpc = urlfetch.create_rpc(deadline=50)
 		rpc.callback = create_xls_callback(rpc, o)
 		urlfetch.make_fetch_call(rpc, URL_XLS + o)
 		rpcs.append(rpc)

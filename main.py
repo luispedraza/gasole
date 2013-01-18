@@ -73,9 +73,18 @@ class Search(BaseHandler):
             provs = PROVS,
             data = data,
             static_map = static_map)
+class Map(BaseHandler):
+    def get(self):
+        self.render("map.html")
+
+class Stats(BaseHandler):
+    def get(self):
+        self.render("stats.html")
+
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/update/?', Update),
-    ('/search/?', Search)
+    ('/search/?', Search),
+    ('/map/?', Map)
 ], debug=True)

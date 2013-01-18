@@ -1,0 +1,25 @@
+#map {
+	width: 800px;
+	height: 600px;
+	position: relative;
+}
+#map svg {
+	position: absolute;
+	width: 100%;
+}
+.province {
+	opacity: 0.5;
+	cursor: pointer;
+}
+.province:hover {
+	opacity: 1.0;
+}
+
+.province:hover .area {
+	stroke-width: 1;
+}
+
+.province:hover text {
+	-webkit-transition: all .2s;
+	font-size: 10px !important;
+}

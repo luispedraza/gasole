@@ -4,14 +4,7 @@
 from google.appengine.ext import db
 from google.appengine.api import memcache
 from gas_update import *
-import time
 import logging
-import unicodedata
-import hashlib
-import time
-from gas_update import *
-
-HEADERS = [u"Provincia", u"Localidad", u"Dirección", u"Precio", u"Rótulo", u"Horario", u"Mapa"]
 
 ## Modelo de provincia
 class Province(db.Model):
@@ -33,41 +26,26 @@ class PriceData(db.Model):
 	updated = db.DateTimeProperty(auto_now = True)
 	data = db.StringListProperty()
 
-def generate_kname(s):
-	s = ''.join((c for c in unicodedata.normalize('NFD', unicode(s)) if unicodedata.category(c) != 'Mn'))
-	#return hashlib.md5(re.sub("\W", "", s).lower()).hexdigest()
-	return re.sub("\W", "", s).lower()
-
-def generate_prov_kname(prov):
-	return generate_kname(PROVS[prov].split("/")[0])
-
-def generate_town_kname(prov):
-	return generate_prov_kname(prov)
-
 # No actualiza datos de combustible, puesto que sólos on para un tipo, y es
 # más económico hacerlo con todos juntos (desde caché)
-def data2store(data, location=False):
+def data2store(data):
 	provinces = {}
 	towns = {}
 	stations = {}
 	for item in data:
-		prov_kname = generate_kname(item[0].split("/")[0])
-		town_kname = generate_kname(item[1])
-		station_kname = generate_kname(item[1]+item[2])
+		prov_kname = item[0]
+		town_kname = item[1]
+		station_kname = item[2]
 		# buscamos la provincia:
 		province = provinces.get(prov_kname)
 		if not province:
-			province = Province(
-				key_name = prov_kname,
-				name = item[0].title())
+			province = Province(key_name = prov_kname)
 			provinces[prov_kname] = province
 		# buscamos la ciudad:
-		town = towns.get("town_kname")
+		town = towns.get(town_kname)
 		if not town:
-			town = Town(
-				key_name = town_kname,
-				parent = province,
-				name = item[1].title())
+			town = Town(key_name = town_kname,
+						parent = province)
 			towns[town_kname] = town
 		# buscamos la estación:
 		station = stations.get(station_kname)
@@ -75,70 +53,62 @@ def data2store(data, location=False):
 			station = GasStation(
 				key_name = station_kname,
 				parent = town,
-				address = item[2],
 				label = item[5],
 				hours = item[6])
-			if location and item[-1]:
-				lonlat = item[-1].split(",")
-				station.geopt = db.GeoPt(lat=lonlat[1], lon=lonlat[0])
+			if item[-1]:
+				lonlat = item[-1]
+				station.geopt = db.GeoPt(lat=lonlat[0], lon=lonlat[1])
 			stations[station_kname] = station
 	logging.info("Almacenadas %s provincias, %s ciudades, %s estaciones" %(len(provinces), len(towns), len(stations)))
 	entities = provinces.values()+towns.values()+stations.values()
 	db.put(entities)
 
-def store2data(prov, option):
-	prov_kname = generate_prov_kname(prov)
+def store2data(prov_kname, option):
 	province = Province.get_by_key_name(prov_kname)
 	q = GasStation.all().ancestor(province)
-	#q = db.GqlQuery("SELECT * FROM GasStation WHERE ANCESTOR IS KEY('Province', :1)", prov_kname)
-	data = []
+	result = ResultIter(prov=prov, option=option)
 	for station in q:
 		geopt = None
 		if station.geopt:
 			geopt = ",".join(map(str,[station.geopt.lon, station.geopt.lat]))
-		data.append([
-			province.name,
-			station.parent().name,
-			station.address,
-			1.0,
-			station.label,
-			station.hours,
-			geopt])
-	return Result(prov=prov, option=option, headers=HEADERS, data=data)
+		data.add_item(province=province.key().id_or_name(), 
+			town=station.parent().key().id_or_name(),
+			station=station.key().id_or_name(), 
+			label=station.label, 
+			option=option,
+			hours=station.hours, 
+			latlon=geopt)
+	return result
 
 # convierte información obtenida de internet a estructura caché
-def data2cache(data, update = False, location=False):
-	prov_kname = generate_prov_kname(data.prov)
-	cache = memcache.get(prov_kname)
-	if not cache:
-		cache = {}
-		cache["name"] = PROVS[data.prov]
-	towns = cache.get("towns")
-	if not towns:
-		cache["towns"] = {}
-		towns = cache["towns"]
-	for d in data.data:
-		town_kname = generate_kname(d[1])
-		town = towns.get(town_kname)
-		if not town:
-			towns[town_kname] = {}
-			town = towns[town_kname]
-			town["name"] = d[1]
-			town["stations"] = {}
-		station_kname = generate_kname(d[1]+d[2])
-		station = town["stations"].get(station_kname)
-		if not station:
-			station = {}
-			station["address"] = d[2]
-			station["label"] = d[5]
-			station["hours"] = d[6]
-			if location:
-				station["map"] = d[-1]
-			station["options"] = dict.fromkeys(FUEL_OPTIONS, None)
-			town["stations"][station_kname] = station
-		# la lectura de precio:
-		station["options"][data.option] = d[4]
-	memcache.set(prov_kname, cache)
+def data2cache(data):
+	for prov_kname in data.data:
+		cache = memcache.get(prov_kname) or {}
+		c_result = ResultIter()
+		c_result.data = cache
+
+
+
+
+
+		d_prov = data.data[prov_kname]
+		c_prov = memcache.get(prov_kname) or {}		
+		for town_kname in d_prov:
+			d_town = d_prov[town_kname]
+			c_town = c_prov.get(town_kname)
+			if not c_town:
+				town = c_prov[town_kname] = {}			
+			for station_kname in d_town:
+				d_station = d_town[station_kname]
+				c_station = c_town.get(station_kname)
+				if not c_station:
+					c_station = c_town[station_kname] = {}
+					c_station["label"] = d_station["label"]
+					c_station["hours"] = d_station["hours"]
+					c_station["latlon"] = d_station["latlon"]
+					c_station["options"] = {}
+				c_station["options"].update(d_station["options"])
+		memcache.set(prov_kname, c_prov)
 
 def cache2data(prov, option):
 	prov_kname = generate_prov_kname(prov)
@@ -175,13 +145,11 @@ def get_data(prov, option, update = False):
 			if province is None:
 				logging.info("Buscando datos en Internet")
 				data = gas_update_search(option=option, prov=prov)
-				location = True
 			else:
 				logging.info("Actualizando datos de Internet")
 				data = gas_update_xls(option=option, prov=prov)
-				location = False
-			data2cache(data, location=location)
-			data2store(data, location=location)
+			data2cache(data)
+			data2store(data)
 			return data
 		else:
 			logging.info("Actualizando desde la base de datos")
