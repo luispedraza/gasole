@@ -86,5 +86,6 @@ app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/update/?', Update),
     ('/search/?', Search),
-    ('/map/?', Map)
+    ('/map/?', Map),
+    ('/stats/?', Stats)
 ], debug=True)

@@ -1,14 +1,21 @@
 @import url(http://fonts.googleapis.com/css?family=Share+Tech);
 
-#csv-data,  #xls-data, #search-data {
+#csv-data,  #xls-data, #search-dataa, #data {
 	font-family: 'Share Tech', sans-serif;
 }
 
 
-#csv-data td, #xls-data td, #search-data td {
+#csv-data td, #xls-data td, #search-data td, #data td {
 	background-color: orange;
 	color: white;
 	margin-right: 5px;
+}
+
+#csv-data th, #xls-data th, #search-data th, #data th {
+	background-color: green;
+	color: white;
+	margin-right: 5px;
+	font-weight: bold;
 }
 
 #legend > div {
