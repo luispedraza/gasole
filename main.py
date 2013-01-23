@@ -33,23 +33,34 @@ class MainHandler(BaseHandler):
             log_text = log_text)
 
 class Update(BaseHandler):
-    def get(self):
+    def get(self, method):
         self.check_user_name()
-        self.render("update.html",
-        	options=FUEL_OPTIONS,       
-            csv_data=None,
-            xls_data=None)
-    def post(self):
+        if method and method=="csv":
+            self.render("update_csv.html",
+            	options=FUEL_OPTIONS,
+                csv_data=None)
+        elif not method or method and method=="xls":
+            self.render("update_xls.html",
+                options=FUEL_OPTIONS,
+                xls_data=None)
+        else:
+            self.redirect("/")
+
+    def post(self, method):
         self.check_user_name()
     	option = self.request.get("option")
-    	csv_data = gas_update_csv(option)
-    	xls_data = gas_update_xls(option)
+        if method and method=="csv":
+            data = gas_update_csv(option)
+            self.render("update_csv.html",
+                options=FUEL_OPTIONS,
+                data=data)
+        elif not method or method and method=="xls":
+            data = gas_update_xls(option)
+            self.render("update_xls.html",
+                options=FUEL_OPTIONS,
+                data=data)
         if self.request.get("updatedb"):
-            data2store(xls_data)
-        self.render("update.html",
-        	options=FUEL_OPTIONS,
-        	csv_data=csv_data,
-        	xls_data=xls_data)
+                data2store(data)
 
 class Search(BaseHandler):
     def get(self):
@@ -84,7 +95,7 @@ class Stats(BaseHandler):
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
-    ('/update/?', Update),
+    ('/update/?(\w+)?', Update),
     ('/search/?', Search),
     ('/map/?', Map),
     ('/stats/?', Stats)

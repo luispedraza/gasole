@@ -21,7 +21,7 @@ import re
 from google.appengine.api import urlfetch
 import logging
 
-FUEL_OPTIONS = {"0": {"name": u"Todos los tipos"},
+FUEL_OPTIONS = {"0": {"short": u"Todos", "name": u"Todos los tipos"},
 				"1": {"short": u"G95", "name": u"Gasolina 95"},
 				#"2": {"short": u"G97", "name": u"Gasolina 97"},
 				"3": {"short": u"G98", "name": u"Gasolina 98"},
@@ -42,10 +42,8 @@ def make_clean_name(s):
 
 # Resultado de una actualizacion de Internet (csv, xls, search)
 class Result(object):
-	def __init__(self, prov="", option="", headers=[], data=[]):
+	def __init__(self, headers=[], data=[]):
 		self.date = date.today()
-		self.prov = prov
-		self.option = option
 		self.headers = headers
 		self.data = data
 	def __iter__(self):
@@ -53,9 +51,9 @@ class Result(object):
 			yield d
 
 class ResultIter(Result):
-	def __init__(self, prov="", option=""):
+	def __init__(self):
 		headers = [u"Provincia", u"Localidad", u"Dirección", u"Fecha", u"Precio", u"Rótulo", u"Horario", u"Lat.,Lon."]
-		Result.__init__(self, prov, option, headers, data={})
+		Result.__init__(self, headers, data={})
 
 	def __iter__(self):
 		a_data = []
@@ -69,6 +67,7 @@ class ResultIter(Result):
 	def as_table(self):
 		for item in self:
 			row = [i or "" for i in item]
+			row[3] = "/".join(row[3].isoformat().split("-")[1:])
 			options = ""
 			for o in row[4]:
 				options += "<div class=op%s>%s</div>" %(o, row[4][o])
@@ -80,10 +79,13 @@ class ResultIter(Result):
 		data = self.data
 		province = make_clean_name(province)
 		town = make_clean_name(town)
-		station = station[0] + " [" + re.sub("\s+", "", station[1]) + "]"
+		stat = station[0]
+		if (station[1]):
+			stat += " [" + re.sub("\s+", "", station[1]) + "]"
+		station = stat
 		p = data.get(province)
 		if not p:
-			p = data[province] = {}		
+			p = data[province] = {}
 		t = p.get(town)
 		if not t:
 			t = p[town] = {}
@@ -97,6 +99,8 @@ class ResultIter(Result):
 			s["latlon"] = latlon
 		else:
 			s["options"].update(option)
+			if date > s["date"]:
+				s["date"] = date
 
 # Actualización por descarga de archivo CSV
 def gas_update_csv(option="1"):
@@ -126,11 +130,11 @@ def gas_update_csv(option="1"):
 		else:
 			break
 	headers = ["Lat.", "Lon.", "Info", "Precio"]
-	return Result(prov="", option=option, headers=headers, data=data)
+	return Result(headers=headers, data=data)
 
 # Actualización por descarga de archivo xls
 def gas_update_xls(option="1", result=None):
-	result = ResultIter(prov="00", option=option)
+	result = ResultIter()
 	if type(option) == str or type(option) == unicode:
 		if option == "0":
 			option = sorted(FUEL_OPTIONS.keys())[1:]
@@ -146,14 +150,15 @@ def gas_update_xls(option="1", result=None):
 			if not tr.findAll('b'):
 				table_data = [td.text for td in tr.findAll('td')]
 				if table_data[7] == "P":	# guardo sólo gaslineras de venta público
+					thedate = table_data[4].split("/")
 					result.add_item(
-						province=table_data[0],
-						town=table_data[1],
-						station=[table_data[2], table_data[3]],
-						date=table_data[4],
-						label=table_data[6],
-						hours=table_data[9],
-						option={o: float(re.sub(",", ".", table_data[5]))})
+						province = table_data[0],
+						town     = table_data[1],
+						station  = [table_data[2], table_data[3]],
+						date     = date(int(thedate[2]), int(thedate[1]), int(thedate[0])),
+						label    = table_data[6],
+						hours    = table_data[9],
+						option   = {o: float(re.sub(",", ".", table_data[5]))})
 
 	def create_xls_callback(rpc, o):
 		return lambda: handle_xls_result(rpc, o)
@@ -171,7 +176,7 @@ def gas_update_xls(option="1", result=None):
 
 # Actualización por búsqueda directa
 def gas_update_search(option="1", prov="01"):
-	result = ResultIter(prov=prov, option=option)
+	result = ResultIter()
 	if prov=="00":
 		prov = ""
 	values = {
@@ -201,15 +206,16 @@ def gas_update_search(option="1", prov="01"):
 				latlon = re.search("(?<=centrar\().+(?=\))", cells[-1].prettify())
 				if latlon:
 					latlon = latlon.group().split(",")[:2]
+				thedate = cells[4].text.split("/")
 				result.add_item(
-					province=cells[0].text,
-					town=cells[1].text,
-					station=[cells[2].text, cells[3].text],
-					date=cells[4].text,
-					label=cells[6].text,
-					hours=cells[9].text,
-					latlon=latlon,
-					option={option: float(re.sub(",", ".",cells[5].text))})
+					province = cells[0].text,
+					town     = cells[1].text,
+					station  = [cells[2].text, cells[3].text],
+					date     = date(int(thedate[2]), int(thedate[1]), int(thedate[0])),
+					label    = cells[6].text,
+					hours    = cells[9].text,
+					latlon   = latlon,
+					option   = {option: float(re.sub(",", ".",cells[5].text))})
 
 	def create_search_callback(rpc):
 		return lambda: handle_search_result(rpc)

@@ -13,71 +13,98 @@ class Province(db.Model):
 class Town(db.Model):
 	pass
 
-class GasStation(db.Expando):
+class GasStation(db.Model):
 	label = db.StringProperty(required=True)
 	phone = db.PhoneNumberProperty()
 	email = db.EmailProperty()
-	geopt = db.GeoPtProperty()
-	link = db.LinkProperty()	
+	link = db.LinkProperty()
 	hours = db.StringProperty()
-	created = db.DateTimeProperty(auto_now_add = True)
 
-class PriceData(db.Model):
-	updated = db.DateTimeProperty(auto_now = True)
-	data = db.StringListProperty()
+class GeoData(db.Model):
+	geopt = db.GeoPtProperty()
+
+class PriceData(db.Expando):
+	date = db.DateProperty()
+
+class HistoryData(db.Expando):
+	date = db.DateProperty()
 
 # No actualiza datos de combustible, puesto que sólos on para un tipo, y es
 # más económico hacerlo con todos juntos (desde caché)
 def data2store(data):
+	data = data.data
 	provinces = {}
 	towns = {}
 	stations = {}
-	for item in data:
-		prov_kname = item[0]
-		town_kname = item[1]
-		station_kname = item[2]
-		# buscamos la provincia:
-		province = provinces.get(prov_kname)
+	geodata = []
+	prices = []
+	# recorremos las provincias
+	for p in data.keys():
+		datap = data[p]
+		province = provinces.get(p)
 		if not province:
-			province = Province(key_name = prov_kname)
-			provinces[prov_kname] = province
-		# buscamos la ciudad:
-		town = towns.get(town_kname)
-		if not town:
-			town = Town(key_name = town_kname,
-						parent = province)
-			towns[town_kname] = town
-		# buscamos la estación:
-		station = stations.get(station_kname)
-		if not station:
-			station = GasStation(
-				key_name = station_kname,
-				parent = town,
-				label = item[5],
-				hours = item[6])
-			if item[-1]:
-				lonlat = item[-1]
-				station.geopt = db.GeoPt(lat=lonlat[0], lon=lonlat[1])
-			stations[station_kname] = station
-	logging.info("Almacenadas %s provincias, %s ciudades, %s estaciones" %(len(provinces), len(towns), len(stations)))
-	entities = provinces.values()+towns.values()+stations.values()
+			province = Province(key_name = p)
+			provinces[p] = province
+		# recorremos las ciudades
+		for t in datap.keys():
+			datat = datap[t]
+			town = towns.get(t)
+			if not town:
+				town = Town(key_name = t,
+					parent = province)
+				towns[t] = town
+			# recorremos las estaciones
+			for s in datat.keys():
+				datas = datat[s]
+				station = stations.get(s)
+				if not station:
+					station = GasStation(
+						key_name = s,
+						parent = town,
+						label = datas["label"],
+						hours = datas["hours"])
+					if datas["latlon"]:
+						lonlat = GeoData(parent = station)
+						lonlat.geopt = db.GeoPt(lat=item[-1][0], lon=item[-1][1])
+						geodata.append(lonlat)
+					price = PriceData.get_or_insert("None", parent = station)
+					for o in datas["options"]:
+						setattr(price, FUEL_OPTIONS[o]["short"], datas["options"][o])
+					price.date = datas["date"]
+					prices.append(price)
+					stations[s] = station
+	entities = provinces.values()+towns.values()+stations.values()+geodata+prices
 	db.put(entities)
+	logging.info("Almacenadas %s provincias" %(len(provinces)))
+	logging.info("Almacenadas %s ciudades" %(len(towns)))
+	logging.info("Almacenadas %s estaciones" %(len(stations)))
+	logging.info("Almacenadas %s posiciones" %(len(geodata)))
+	logging.info("Almacenados %s precios" %(len(prices)))
 
-def store2data(prov_kname, option):
-	province = Province.get_by_key_name(prov_kname)
-	q = GasStation.all().ancestor(province)
-	result = ResultIter(prov=prov, option=option)
-	for station in q:
-		geopt = None
-		if station.geopt:
-			geopt = ",".join(map(str,[station.geopt.lon, station.geopt.lat]))
-		data.add_item(province=province.key().id_or_name(), 
-			town=station.parent().key().id_or_name(),
-			station=station.key().id_or_name(), 
-			label=station.label, 
-			option=option,
-			hours=station.hours, 
-			latlon=geopt)
+# obtenemos información de la base de datos
+def store2data(option=None, prov_kname=None):
+	q = PriceData.all()
+	if prov_kname:
+		q.ancestor(Key.from_path('Province', prov_kname))
+	result = ResultIter()
+	if option:
+		option = [option]
+	else:
+		option = sorted(FUEL_OPTIONS.keys())[1:]
+	for price in q:
+		prices = {}
+		for o in option:
+			if hasattr(price, FUEL_OPTIONS[o]["short"]):
+				prices[o] = getattr(price, FUEL_OPTIONS[o]["short"])
+		result.add_item(
+			province = price.parent().parent().parent().key().id_or_name(),
+			town     = price.parent().parent().key().id_or_name(),
+			station  = price.parent().key().id_or_name(), 
+			label    = price.parent().label, 
+			date     = price.date,
+			option   = prices,
+			hours    = price.parent().hours, 
+			latlon   = None)
 	return result
 
 # convierte información obtenida de internet a estructura caché
@@ -86,9 +113,6 @@ def data2cache(data):
 		cache = memcache.get(prov_kname) or {}
 		c_result = ResultIter()
 		c_result.data = cache
-
-
-
 
 
 		d_prov = data.data[prov_kname]
@@ -129,7 +153,7 @@ def cache2data(prov, option):
 				station["hours"],
 				station["map"]
 				])
-	return Result(prov=prov, option=option, headers=HEADERS, data=data)
+	return Result(headers=HEADERS, data=data)
 
 def get_data(prov, option, update = False):
 	# buscamos primero en cache:

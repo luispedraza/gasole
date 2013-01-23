@@ -1,0 +1,8 @@
+cron:
+- description: periodic update
+  url: /tasks/update
+  schedule: every 10 minutes
+- description: history update
+  url: /tasks/history
+  schedule: every day 13:30
+  timezone: Europe/Brussels

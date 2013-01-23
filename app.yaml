@@ -5,6 +5,12 @@ api_version: 1
 threadsafe: yes
 
 handlers:
+- url: /tasks/history
+  script: cron_update.app
+  login: admin
+- url: /tasks/update
+  script: cron_update.app
+  login: admin
 - url: /favicon\.ico
   static_files: favicon.ico
   upload: favicon\.ico
@@ -12,7 +18,6 @@ handlers:
   static_dir: static/css
 - url: /js
   static_dir: static/js
-
 - url: .*
   script: main.app
 

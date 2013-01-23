@@ -21,7 +21,25 @@
 #legend > div {
 	display: inline-block;
 }
+#legend {
+	width: 200px;
+	padding-left: 0;
+}
 
+li.op {
+	cursor: pointer;
+	list-style: none;
+	margin-bottom: 1px;
+}
+li.op:hover {
+	padding-left: 10px;
+}
+li.op.off {
+	opacity: .5;
+}
+div.off {
+	display: none;
+}
 .op1 {
 	/* G95 */
 	background-color: #FF7C00;
