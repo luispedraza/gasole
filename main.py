@@ -58,7 +58,7 @@ class Update(BaseHandler):
             data = gas_update_xls(option)
             self.render("update_xls.html",
                 options=FUEL_OPTIONS,
-                data=data)
+                data=None)
         if self.request.get("updatedb"):
                 data2store(data)
 

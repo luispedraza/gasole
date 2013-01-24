@@ -51,9 +51,9 @@ class Result(object):
 			yield d
 
 class ResultIter(Result):
-	def __init__(self):
+	def __init__(self, data={}):
 		headers = [u"Provincia", u"Localidad", u"Dirección", u"Fecha", u"Precio", u"Rótulo", u"Horario", u"Lat.,Lon."]
-		Result.__init__(self, headers, data={})
+		Result.__init__(self, headers, data=data)
 
 	def __iter__(self):
 		a_data = []
