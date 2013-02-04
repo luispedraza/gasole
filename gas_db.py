@@ -32,84 +32,71 @@ class HistoryData(db.Expando):
 # No actualiza datos de combustible, puesto que sólos on para un tipo, y es
 # más económico hacerlo con todos juntos (desde caché)
 def data2store(data):
-	data = data.data
-	provinces = {}	# provincias a ser almacenadas
-	towns = {}		# ciudades a ser almacenadas
-	stations = {}	# estaciones a ser almacenadas
-	geodata = []	# localizaciones a ser almacenadas
-	prices = []		# precios a ser almacenados
-	# recorremos las provincias
-	for p in data.keys():
-		cache = memcache.get(p) or store2data(prov_kname=p).data
+	for p in data.keys(): 	# recorremos las provincias
 		datap = data[p]
-		if not cache and not provinces.get(p):
-			province = Province(key_name = p)
-			provinces[p] = province
-		# recorremos las ciudades
-		for t in datap.keys():
+		cache = memcache.get(p) or store2data(prov_kname=p).get(p)
+		if not cache: 		# nueva provincia
+			memcache.set(p, cache)
+			province = Province(key_name=p)
+			db.put_async(province)
+		for t in datap.keys(): # recorremos las ciudades
 			datat = datap[t]
-			town = towns.get(t)
-			if not cache.has_key(t) and not town:
-				town = Town(key_name = t,
-					parent = db.Key.from_path('Province', p))
-				towns[t] = town
-			# recorremos las estaciones
-			for s in datat.keys():
+			if not cache or not cache.has_key(t):
+				cache[t] = datat
+				insert = True
+				town = Town(key_name = t, parent = db.Key.from_path('Province', p))
+				db.put_async(town)
+			for s in datat.keys(): # recorremos las estaciones
 				datas = datat[s]
-				station = stations.get(s)
-				if (not cache.has_key(t) or not cache[t].has_key(s)) and not station:
+				update_price = False
+				if not cache[t].has_key(s) or insert: # nueva estación
+					cache[t][s] = datas
 					station = GasStation(
 						key_name = s,
 						parent = db.Key.from_path('Province', p, 'Town', t),
 						label = datas["label"],
 						hours = datas["hours"])
+					db.put_async(station)
+					update_price = True
 					# if datas["latlon"]:
 					# 	lonlat = GeoData(parent = station)
 					# 	lonlat.geopt = db.GeoPt(lat=item[-1][0], lon=item[-1][1])
 					# 	geodata.append(lonlat)
-					stations[s] = station
-					#actualización del precio
-					price = PriceData.get_or_insert("None",
-						parent = db.Key.from_path('Province', p, 'Town', t, 'Station', s))
-					for o in datas["options"]:
-						setattr(price, FUEL_OPTIONS[o]["short"], datas["options"][o])
-					price.date = datas["date"]
-					prices.append(price)
-					
-	entities = provinces.values()+towns.values()+stations.values()+geodata+prices
-	db.put(entities)
-	logging.info("Almacenadas %s provincias" %(len(provinces)))
-	logging.info("Almacenadas %s ciudades" %(len(towns)))
-	logging.info("Almacenadas %s estaciones" %(len(stations)))
-	logging.info("Almacenadas %s posiciones" %(len(geodata)))
-	logging.info("Almacenados %s precios" %(len(prices)))
-	for p in data:
-		memcache.set(p, data[p])
+				elif len(cache[t][s]["options"])<len(datas["options"]) or cache[t][s]["date"]<datas["date"]:
+					cache[t][s]["options"].update(datas["options"])
+					cache[t][s]["date"] = datas["date"]
+					update_price = True
+				if update_price:
+					price = PriceData(key_name="None",
+						parent = db.Key.from_path('Province', p, 'Town', t, 'GasStation', s))
+					for o in cache[t][s]["options"]:
+						setattr(price, FUEL_OPTIONS[o]["short"], cache[t][s]["options"][o])
+					price.date = cache[t][s]["date"]
+					db.put_async(price)
+		memcache.set(p, cache)
 
 # obtenemos información de la base de datos
 def store2data(option=None, prov_kname=None):
 	q = PriceData.all()
 	if prov_kname:
 		q.ancestor(db.Key.from_path('Province', prov_kname))
-	result = ResultIter()
+	info = ResultIter()
 	option = sorted(FUEL_OPTIONS.keys())[1:]
 	for price in q:
 		prices = {}
 		for o in option:
 			prices[o] = getattr(price, FUEL_OPTIONS[o]["short"], None)
 		station = price.parent()
-		result.add_item(
+		info.add_item(
 			province = price.key().parent().parent().parent().id_or_name(),
 			town     = price.key().parent().parent().id_or_name(),
-			station  = price.key().parent().id_or_name(), 
-			label    = station.label, 
+			station  = price.key().parent().id_or_name(),
+			label    = station.label,
 			date     = price.date,
 			option   = prices,
 			hours    = station.hours, 
 			latlon   = None)
-	for p in result.data:
-		memcache.set(p, result.data[p])
-	return result
+	return info.data
 
 # # convierte información obtenida de internet a estructura caché
 # def data2cache(data):

@@ -51,9 +51,9 @@ class Result(object):
 			yield d
 
 class ResultIter(Result):
-	def __init__(self, data={}):
+	def __init__(self):
 		headers = [u"Provincia", u"Localidad", u"Dirección", u"Fecha", u"Precio", u"Rótulo", u"Horario", u"Lat.,Lon."]
-		Result.__init__(self, headers, data=data)
+		Result.__init__(self, headers, data={})
 
 	def __iter__(self):
 		a_data = []
@@ -79,10 +79,6 @@ class ResultIter(Result):
 		data = self.data
 		province = make_clean_name(province)
 		town = make_clean_name(town)
-		stat = station[0]
-		if (station[1]):
-			stat += " [" + re.sub("\s+", "", station[1]) + "]"
-		station = stat
 		p = data.get(province)
 		if not p:
 			p = data[province] = {}
@@ -154,7 +150,7 @@ def gas_update_xls(option="1", result=None):
 					result.add_item(
 						province = table_data[0],
 						town     = table_data[1],
-						station  = [table_data[2], table_data[3]],
+						station  = table_data[2] + " [" + re.sub("\s+", "", table_data[3]) + "]",
 						date     = date(int(thedate[2]), int(thedate[1]), int(thedate[0])),
 						label    = table_data[6],
 						hours    = table_data[9],
@@ -210,7 +206,7 @@ def gas_update_search(option="1", prov="01"):
 				result.add_item(
 					province = cells[0].text,
 					town     = cells[1].text,
-					station  = [cells[2].text, cells[3].text],
+					station  = cells[2].text + " [" + re.sub("\s+", "", cells[3].text) + "]",
 					date     = date(int(thedate[2]), int(thedate[1]), int(thedate[0])),
 					label    = cells[6].text,
 					hours    = cells[9].text,

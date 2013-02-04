@@ -39,7 +39,7 @@ class Update(BaseHandler):
             self.render("update_csv.html",
             	options=FUEL_OPTIONS,
                 csv_data=None)
-        elif not method or method and method=="xls":
+        elif not method or method=="xls":
             self.render("update_xls.html",
                 options=FUEL_OPTIONS,
                 xls_data=None)
@@ -54,13 +54,13 @@ class Update(BaseHandler):
             self.render("update_csv.html",
                 options=FUEL_OPTIONS,
                 data=data)
-        elif not method or method and method=="xls":
+        elif not method or method=="xls":
             data = gas_update_xls(option)
             self.render("update_xls.html",
                 options=FUEL_OPTIONS,
-                data=None)
+                data=data)
         if self.request.get("updatedb"):
-                data2store(data)
+                data2store(data.data)
 
 class Search(BaseHandler):
     def get(self):
