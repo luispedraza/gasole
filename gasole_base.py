@@ -5,6 +5,7 @@ import jinja2
 import os
 from google.appengine.api import users
 import logging
+import json
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 #styles_dir = os.path.join(os.path.dirname(__file__), 'styles')
@@ -31,3 +32,8 @@ class BaseHandler(webapp2.RequestHandler):
 	def initialize(self, *a, **kw):
 		webapp2.RequestHandler.initialize(self, *a, **kw)
 		self.user = users.get_current_user()
+
+	def render_json(self, d):
+		json_txt = json.dumps(d)
+		self.response.headers['Content-Type'] = 'application/json; charset=UTF-8'
+		self.write(json_txt)

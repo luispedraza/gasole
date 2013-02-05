@@ -32,6 +32,8 @@ class MainHandler(BaseHandler):
             log_url = log_url,
             log_text = log_text)
 
+
+
 class Update(BaseHandler):
     def get(self, method):
         self.check_user_name()
@@ -92,11 +94,17 @@ class Stats(BaseHandler):
     def get(self):
         self.render("stats.html")
 
+class Data(BaseHandler):
+    def get(self, option, province):
+        # data = {"province": province, "option": option}
+        data = get_means(option)
+        self.render_json(data)
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/update/?(\w+)?', Update),
     ('/search/?', Search),
     ('/map/?', Map),
-    ('/stats/?', Stats)
+    ('/stats/?', Stats),
+    ('/data/(\w+)/(\w+)', Data)
 ], debug=True)
