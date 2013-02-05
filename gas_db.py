@@ -67,7 +67,7 @@ def data2store(data):
 					price.date = cachep[t][s]["date"]
 					_prices.append(price)
 		memcache.set(p, cachep)
-	db.put_async(_provinces + _towns + _stations + _prices)
+	db.put(_provinces + _towns + _stations + _prices)
 	logging.info("Actualizadas %s provincias" % len(_provinces))
 	logging.info("Actualizadas %s ciudades" % len(_towns))
 	logging.info("Actualizadas %s estaciones" % len(_stations))
