@@ -19,7 +19,8 @@
 	stroke-width: 1;
 }
 
-.province:hover text {
-	-webkit-transition: all .2s;
-	font-size: 10px !important;
+#label {
+	opacity: 1.0;
+	display: none;
+	z-index: 500;
 }

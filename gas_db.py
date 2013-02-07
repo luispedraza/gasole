@@ -27,7 +27,7 @@ class PriceData(db.Expando):
 	date = db.DateProperty()
 
 class HistoryData(db.Expando):
-	date = db.DateProperty()
+	date = db.DateProperty(auto_now_add=True)
 
 # No actualiza datos de combustible, puesto que sólos on para un tipo, y es
 # más económico hacerlo con todos juntos (desde caché)
@@ -68,10 +68,18 @@ def data2store(data):
 					_prices.append(price)
 		memcache.set(p, cachep)
 	db.put(_provinces + _towns + _stations + _prices)
-	logging.info("Actualizadas %s provincias" % len(_provinces))
-	logging.info("Actualizadas %s ciudades" % len(_towns))
-	logging.info("Actualizadas %s estaciones" % len(_stations))
+	logging.info("Insertadas %s provincias" % len(_provinces))
+	for e in _provinces:
+		logging.info(e.key().name())
+	logging.info("Insertadas %s ciudades" % len(_towns))
+	for e in _towns:
+		logging.info(e.key().name())
+	logging.info("Insertadas %s estaciones" % len(_stations))
+	for e in _stations:
+		logging.info("%s, %s" %(e.key().name(), e.key().parent().name()))
 	logging.info("Actualizados %s precios" % len(_prices))
+	for e in _prices:
+		logging.info("%s, %s, %s" %(e.date, e.key().parent().name(), e.key().parent().parent().name()))
 
 # obtenemos información de la base de datos
 def store2data(option=None, prov_kname=None):
@@ -86,9 +94,9 @@ def store2data(option=None, prov_kname=None):
 			prices[o] = getattr(price, FUEL_OPTIONS[o]["short"], None)
 		station = price.parent()
 		info.add_item(
-			province = price.key().parent().parent().parent().id_or_name(),
-			town     = price.key().parent().parent().id_or_name(),
-			station  = price.key().id_or_name(),
+			province = price.key().parent().parent().parent().name(),
+			town     = price.key().parent().parent().name(),
+			station  = price.key().name(),
 			label    = station.label,
 			date     = price.date,
 			option   = prices,
@@ -104,7 +112,7 @@ def get_means(option):
 		q = Province.all()
 		for province in q:
 			values = []
-			p = province.key().id_or_name()
+			p = province.key().name()
 			datap = memcache.get(p) or store2data(prov_kname=p).get(p)
 			for t in datap.keys():
 				for s in datap[t].keys():
