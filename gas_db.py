@@ -27,7 +27,7 @@ class PriceData(db.Expando):
 	date = db.DateProperty()
 
 class HistoryData(db.Expando):
-	date = db.DateProperty(auto_now_add=True)
+	date = db.DateProperty()
 
 # No actualiza datos de combustible, puesto que sólos on para un tipo, y es
 # más económico hacerlo con todos juntos (desde caché)
@@ -36,6 +36,7 @@ def data2store(data):
 	_towns = []
 	_stations = []
 	_prices = []
+	_history = []
 	for p in data.keys(): 	# recorremos las provincias
 		cachep = memcache.get(p) or store2data(prov_kname=p).get(p)
 		if not cachep: 		# nueva provincia
@@ -60,14 +61,15 @@ def data2store(data):
 					cachep[t][s]["date"] = data[p][t][s]["date"]
 					update_price = True
 				if update_price:
-					price = PriceData(key_name = s,
-						parent = db.Key.from_path('Province', p, 'Town', t, 'GasStation', s))
-					for o in cachep[t][s]["options"]:
-						setattr(price, FUEL_OPTIONS[o]["short"], cachep[t][s]["options"][o])
-					price.date = cachep[t][s]["date"]
-					_prices.append(price)
+					parent_key = db.Key.from_path('Province', p, 'Town', t, 'GasStation', s)
+					props = dict((FUEL_OPTIONS[o]["short"], cachep[t][s]["options"][o]) for o in cachep[t][s]["options"])
+					_prices.append(PriceData(key_name = s, 
+						parent = parent_key, 
+						date=cachep[t][s]["date"], **props))
+					_history.append(HistoryData(parent = parent_key, 
+						date=cachep[t][s]["date"], **props))
 		memcache.set(p, cachep)
-	db.put(_provinces + _towns + _stations + _prices)
+	db.put(_provinces + _towns + _stations + _prices + _history)
 	logging.info("Insertadas %s provincias" % len(_provinces))
 	for e in _provinces:
 		logging.info(e.key().name())
@@ -80,6 +82,7 @@ def data2store(data):
 	logging.info("Actualizados %s precios" % len(_prices))
 	for e in _prices:
 		logging.info("%s, %s, %s" %(e.date, e.key().parent().name(), e.key().parent().parent().name()))
+	logging.info("Guardando %s históricos" % len(_history))
 
 # obtenemos información de la base de datos
 def store2data(option=None, prov_kname=None):
