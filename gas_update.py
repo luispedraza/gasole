@@ -79,24 +79,14 @@ class ResultIter(Result):
 		data = self.data
 		province = make_clean_name(province)
 		town = make_clean_name(town)
-		p = data.get(province)
-		if not p:
-			p = data[province] = {}
-		t = p.get(town)
-		if not t:
-			t = p[town] = {}
+		p = data[province] = data.get(province) or {}
+		t = p[town] = p.get(town) or {}
 		s = t.get(station)
 		if not s:
-			s = t[station] = {}
-			s["date"] = date
-			s["label"] = label
-			s["hours"] = hours
-			s["options"] = option
-			s["latlon"] = latlon
+			s = t[station] = {"date":date,"label":label,"hours":hours,"options":option,"latlon":latlon}
 		else:
 			s["options"].update(option)
-			if date > s["date"]:
-				s["date"] = date
+			s["date"] = date
 
 # Actualización por descarga de archivo CSV
 def gas_update_csv(option="1"):
@@ -142,13 +132,12 @@ def gas_update_xls(option="1", result=None):
 		xlsFile = StringIO.StringIO(rpc_result.content)
 		# obtain data
 		rows = BeautifulSoup(xlsFile).find('table').findAll('tr')
-		for tr in rows[2:]: 
+		for tr in rows[2:]:
 			if not tr.findAll('b'):
 				table_data = [td.text for td in tr.findAll('td')]
 				if table_data[7] == "P":	# guardo sólo gaslineras de venta público
 					thedate = table_data[4].split("/")
-					result.add_item(
-						province = table_data[0],
+					result.add_item(province = table_data[0],
 						town     = table_data[1],
 						station  = table_data[2] + " [" + re.sub("\s+", "", table_data[3]) + "]",
 						date     = date(int(thedate[2]), int(thedate[1]), int(thedate[0])),
@@ -162,7 +151,7 @@ def gas_update_xls(option="1", result=None):
 	rpcs = []
 	for o in option:
 		logging.info("Obteniendo %s" %FUEL_OPTIONS[o]["name"])
-		rpc = urlfetch.create_rpc(deadline=50)
+		rpc = urlfetch.create_rpc(deadline=55)
 		rpc.callback = create_xls_callback(rpc, o)
 		urlfetch.make_fetch_call(rpc, URL_XLS + o)
 		rpcs.append(rpc)
