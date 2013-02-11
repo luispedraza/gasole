@@ -9,12 +9,11 @@
 	<script type="text/javascript" src="/js/jquery.tablesorter.min.js"></script>
 	<script type="text/javascript" src="/js/jquery.tablesorter.pager.js"></script>
 	<script type="text/javascript" src="/js/gas_data.js"></script>
+	<script type="text/javascript" src="/js/list.js"></script>
 </head>
 
 
 <body>
-
-
 <header id="header">
 	<h1>Gasolé</h1>
 	<p>Toda la información sobre gasolinas y otros combustibles</p>
@@ -33,64 +32,63 @@
 	</ul>
 </nav>
 
-<main>{{content}}</main>
+<div id="content">{{content}}</div>
 
 <footer>
 <div class="footer_section">
 	<ul>
 		<li><a href="/gasolineras/Álava">Álava</a></li>
-		<li>Albacete</li>
-		<li>Alicante</li>
-		<li>Almería</li>
-		<li>Asturias</li>
-		<li>Ávila</li>
-		<li>Ávila</li>
-		<li>Badajoz</li>
-		<li>Balears (Illes)</li>
-		<li>Barcelona</li>
-		<li>Burgos</li>
-		<li>Cáveres</li>
-		<li>Cádiz</li>
-		<li>Cantabria</li>
-		<li>Castellón /Castelló</li>
-		<li>Ceuta</li>
-		<li>Ciudad Real</li>
-		<li>Córdoba</li>
-		<li>Coruña (A)</li>
-		<li>Cuenca</li>
-		<li>Girona</li>
-		<li>Granada</li>
-		<li>Guadalajara</li>
-		<li>Guipúzcoa</li>
-		<li>Huelva</li>
-		<li>Huesca</li>
-		<li>Jaén</li>
-		<li>León</li>
-		<li>Lleida</li>
-		<li>Lugo</li>
-		<li>Madrid</li>
-		<li>Málaga</li>
-		<li>Melilla</li>
-		<li>Murcia</li>
-		<li>Navarra</li>
-		<li>Ourense</li>
-		<li>Palencia</li>
-		<li>Palmas, Las</li>
-		<li>Pontevedra</li>
-		<li>Rioja, La</li>
-		<li>Salamanca</li>
-		<li>Santa Cruz de Tenerife</li>
-		<li>Segovia</li>
-		<li>Sevilla</li>
-		<li>Soria</li>
-		<li>Tarragona</li>
-		<li>Teruel</li>
-		<li>Toledo</li>
-		<li>Valencia / València</li>
-		<li>Valladolid</li>
-		<li>Vizcaya</li>
-		<li>Zamora</li>
-		<li>Zaragoza</li>
+		<li><a href="/gasolineras/Albacete">Albacete</a></li>
+		<li><a href="/gasolineras/Alicante">Alicante</a></li>
+		<li><a href="/gasolineras/Almería">Almería</a></li>
+		<li><a href="/gasolineras/Asturias">Asturias</a></li>
+		<li><a href="/gasolineras/Ávila">Ávila</a></li>
+		<li><a href="/gasolineras/Badajoz">Badajoz</a></li>
+		<li><a href="/gasolineras/Badajoz">Balears_(Illes)</a></li>
+		<li><a href="/gasolineras/Barcelona">Barcelona</li>
+		<li><a href="/gasolineras/Burgos">Burgos</li>
+		<li><a href="/gasolineras/Cáceres">Cáceres</li>
+		<li><a href="/gasolineras/Cádiz">Cádiz</li>
+		<li><a href="/gasolineras/Cantabria">Cantabria</li>
+		<li><a href="/gasolineras/Castellón_-_Castelló">Castellón / Castelló</li>
+		<li><a href="/gasolineras/Ceuta">Ceuta</li>
+		<li><a href="/gasolineras/Ciudad_Real">Ciudad Real</li>
+		<li><a href="/gasolineras/Córdoba">Córdoba</li>
+		<li><a href="/gasolineras/Coruña_(A)">Coruña (A)</li>
+		<li><a href="/gasolineras/Cuenca">Cuenca</li>
+		<li><a href="/gasolineras/Girona">Girona</li>
+		<li><a href="/gasolineras/Granada">Granada</li>
+		<li><a href="/gasolineras/Guadalajara">Guadalajara</li>
+		<li><a href="/gasolineras/Guipúzcoa">Guipúzcoa</li>
+		<li><a href="/gasolineras/Huelva">Huelva</li>
+		<li><a href="/gasolineras/Huesca">Huesca</li>
+		<li><a href="/gasolineras/Jaén">Jaén</li>
+		<li><a href="/gasolineras/León">León</li>
+		<li><a href="/gasolineras/Lleida">Lleida</li>
+		<li><a href="/gasolineras/Lugo">Lugo</li>
+		<li><a href="/gasolineras/Madrid">Madrid</li>
+		<li><a href="/gasolineras/Málaga">Málaga</li>
+		<li><a href="/gasolineras/Melilla">Melilla</li>
+		<li><a href="/gasolineras/Murcia">Murcia</li>
+		<li><a href="/gasolineras/Navarra">Navarra</li>
+		<li><a href="/gasolineras/Ourense">Ourense</li>
+		<li><a href="/gasolineras/Palencia">Palencia</li>
+		<li><a href="/gasolineras/Palmas_(Las)">Palmas, Las</li>
+		<li><a href="/gasolineras/Pontevedra">Pontevedra</li>
+		<li><a href="/gasolineras/Rioja_(La)">Rioja, La</li>
+		<li><a href="/gasolineras/Salamanca">Salamanca</li>
+		<li><a href="/gasolineras/Santa_Cruz_de_Tenerife">Santa Cruz de Tenerife</li>
+		<li><a href="/gasolineras/Segovia">Segovia</li>
+		<li><a href="/gasolineras/Sevilla">Sevilla</li>
+		<li><a href="/gasolineras/Soria">Soria</li>
+		<li><a href="/gasolineras/Tarragona">Tarragona</li>
+		<li><a href="/gasolineras/Teruel">Teruel</li>
+		<li><a href="/gasolineras/Toledo">Toledo</li>
+		<li><a href="/gasolineras/Valencia_-_València">Valencia / València</li>
+		<li><a href="/gasolineras/Valladolid">Valladolid</li>
+		<li><a href="/gasolineras/Vizcaya">Vizcaya</li>
+		<li><a href="/gasolineras/Zamora">Zamora</li>
+		<li><a href="/gasolineras/Zaragoza">Zaragoza</li>
 	</ul>
 </div>
 

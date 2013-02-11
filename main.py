@@ -32,8 +32,6 @@ class MainHandler(BaseHandler):
             log_url = log_url,
             log_text = log_text)
 
-
-
 class Update(BaseHandler):
     def get(self, method):
         self.check_user_name()
@@ -100,12 +98,26 @@ class Data(BaseHandler):
         self.render_json(data)
 class List(BaseHandler):
     def get(self, province, city, station):
-        data = ResultIter({
-            province: memcache.get(province) or store2data(prov_kname=province).get(province)
-            })
-        logging.info(data.data)
         self.render("base.html", 
-            content=jinja_env.get_template("list.html").render(data=data))
+            content=jinja_env.get_template("list.html").render())
+class Api(BaseHandler):
+    def get(self, province, city, station):
+        if province:
+            logging.info(province)
+            province = province.replace("_", " ").replace("-", "/")
+            logging.info(province)
+
+            data = memcache.get(province) or store2data(prov_kname=province).get(province)
+            if not city or city == "Todas":
+                info = {province: data or {"error": "Provincia no encontrada"}}
+            elif data and city:
+                data = data.get(city)
+                info = {province: {city: data or {"error": "Ciudad no encontrada"}}}
+                if data and station:
+                    data = data.get(station)
+                    info = {province: {city: {station: data or {"error": "Estación no encontrada"}}}}
+        self.render_json(info)
+
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
@@ -114,5 +126,6 @@ app = webapp2.WSGIApplication([
     ('/map/?', Map),
     ('/stats/?', Stats),
     ('/data/(\w+)/(\w+)', Data),
-    ('/gasolineras/?([\wáéíóúÁÉÍÓÚñÑàèìòù]+)/?(\w+)?/?(\w+)?', List)
+    ('/gasolineras/?([\wáéíóúÁÉÍÓÚñÑàèìòù_\-,\(\)]+)/?(\w+)?/?(\w+)?', List),
+    ('/api/?([\wáéíóúÁÉÍÓÚñÑàèìòù_\-,\(\)]+)/?(\w+)?/?(\w+)?', Api)
 ], debug=True)

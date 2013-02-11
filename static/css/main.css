@@ -1,7 +1,5 @@
 @import url(http://fonts.googleapis.com/css?family=Share+Tech);
 
-@import url(http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic);
-
 #csv-data,  #xls-data, #search-dataa, #data {
 	font-family: 'Share Tech', sans-serif;
 }

@@ -12,6 +12,14 @@ template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = Environment(loader = FileSystemLoader(template_dir),
 	autoescape = False)
 
+def dumper(o):
+	if hasattr(o, 'isoformat'):
+		return o.isoformat()
+	else:
+		raise TypeError, 'Object of type %s with value of %s is not JSON serializable' % (type(obj), repr(obj)) 
+
+
+
 # Basic handler with common functions
 class BaseHandler(webapp2.RequestHandler):
 	def write(self, *a, **kw):
@@ -34,6 +42,6 @@ class BaseHandler(webapp2.RequestHandler):
 		self.user = users.get_current_user()
 
 	def render_json(self, d):
-		json_txt = json.dumps(d)
+		json_txt = json.dumps(d, default=dumper)
 		self.response.headers['Content-Type'] = 'application/json; charset=UTF-8'
 		self.write(json_txt)

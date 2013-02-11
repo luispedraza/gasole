@@ -42,7 +42,6 @@ def data2store(data):
 	_history = []
 	for p in data.keys(): 	# recorremos las provincias
 		cachep = memcache.get(p) or store2data(prov_kname=p).get(p)
-		logging.info(cachep)
 		if not cachep: 		# nueva provincia
 			cachep = {}
 			_provinces.append(Province(key_name=p))

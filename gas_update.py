@@ -119,7 +119,7 @@ def gas_update_csv(option="1"):
 	return Result(headers=headers, data=data)
 
 # Actualización por descarga de archivo xls
-def gas_update_xls(option="1", result=None):
+def gas_update_xls(option="1"):
 	result = ResultIter()
 	if type(option) == str or type(option) == unicode:
 		if option == "0":
@@ -130,7 +130,6 @@ def gas_update_xls(option="1", result=None):
 	def handle_xls_result(rpc, o, result=result):
 		rpc_result = rpc.get_result()
 		xlsFile = StringIO.StringIO(rpc_result.content)
-		# obtain data
 		rows = BeautifulSoup(xlsFile).find('table').findAll('tr')
 		for tr in rows[2:]:
 			if not tr.findAll('b'):
