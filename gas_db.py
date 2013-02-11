@@ -6,6 +6,9 @@ from google.appengine.api import memcache
 from gas_update import *
 import logging
 
+import os
+DEBUG = os.environ['SERVER_SOFTWARE'].startswith('Dev')
+
 ## Modelo de provincia
 class Province(db.Model):
 	pass
@@ -39,6 +42,7 @@ def data2store(data):
 	_history = []
 	for p in data.keys(): 	# recorremos las provincias
 		cachep = memcache.get(p) or store2data(prov_kname=p).get(p)
+		logging.info(cachep)
 		if not cachep: 		# nueva provincia
 			cachep = {}
 			_provinces.append(Province(key_name=p))
@@ -69,19 +73,22 @@ def data2store(data):
 					_history.append(HistoryData(parent = parent_key, 
 						date=cachep[t][s]["date"], **props))
 		memcache.set(p, cachep)
-	db.put(_provinces + _towns + _stations + _prices + _history)
+	if DEBUG:
+		db.put(_provinces + _towns + _stations + _prices + _history)
+	else:
+		db.put_async(_provinces + _towns + _stations + _prices + _history)
 	logging.info("Insertadas %s provincias" % len(_provinces))
-	for e in _provinces:
-		logging.info(e.key().name())
+	# for e in _provinces:
+	# 	logging.info(e.key().name())
 	logging.info("Insertadas %s ciudades" % len(_towns))
-	for e in _towns:
-		logging.info(e.key().name())
+	# for e in _towns:
+	# 	logging.info(e.key().name())
 	logging.info("Insertadas %s estaciones" % len(_stations))
-	for e in _stations:
-		logging.info("%s, %s" %(e.key().name(), e.key().parent().name()))
+	# for e in _stations:
+	# 	logging.info("%s, %s" %(e.key().name(), e.key().parent().name()))
 	logging.info("Actualizados %s precios" % len(_prices))
-	for e in _prices:
-		logging.info("%s, %s, %s" %(e.date, e.key().parent().name(), e.key().parent().parent().name()))
+	# for e in _prices:
+	# 	logging.info("%s, %s, %s" %(e.date, e.key().parent().name(), e.key().parent().parent().name()))
 	logging.info("Guardando %s históricos" % len(_history))
 
 # obtenemos información de la base de datos

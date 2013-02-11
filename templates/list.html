@@ -1,0 +1,27 @@
+<div id="list">
+{% if data %}
+	<h2>Gasolineras en </h2>
+	<table id="table">
+	<thead>
+	<tr>
+		<th>#</th>
+		{% for h in data.headers %}
+		<th>{{h}}</th>
+		{% endfor %}
+	</tr>
+	</thead>
+	<tbody>
+	{% for item in data.as_table() %}
+			<tr>
+				<td>{{loop.index}}</td>
+				{{item}}
+			</tr>
+	{% endfor %}
+	</tbody>
+	</table>
+
+
+{% else %}
+	<h2>No hay datos que mostrar</h2>
+{% endif %}
+</div>

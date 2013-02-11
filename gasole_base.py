@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import webapp2
-import jinja2
+from jinja2 import Environment, FileSystemLoader
 import os
 from google.appengine.api import users
 import logging
@@ -9,7 +9,7 @@ import json
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 #styles_dir = os.path.join(os.path.dirname(__file__), 'styles')
-jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
+jinja_env = Environment(loader = FileSystemLoader(template_dir),
 	autoescape = False)
 
 # Basic handler with common functions

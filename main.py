@@ -92,13 +92,20 @@ class Map(BaseHandler):
 
 class Stats(BaseHandler):
     def get(self):
-        self.render("stats.html")
+        self.render("base.html", content=jinja_env.get_template("stats.html").render())
 
 class Data(BaseHandler):
     def get(self, option, province):
-        # data = {"province": province, "option": option}
         data = get_means(option)
         self.render_json(data)
+class List(BaseHandler):
+    def get(self, province, city, station):
+        data = ResultIter({
+            province: memcache.get(province) or store2data(prov_kname=province).get(province)
+            })
+        logging.info(data.data)
+        self.render("base.html", 
+            content=jinja_env.get_template("list.html").render(data=data))
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
@@ -106,5 +113,6 @@ app = webapp2.WSGIApplication([
     ('/search/?', Search),
     ('/map/?', Map),
     ('/stats/?', Stats),
-    ('/data/(\w+)/(\w+)', Data)
+    ('/data/(\w+)/(\w+)', Data),
+    ('/gasolineras/?([\wáéíóúÁÉÍÓÚñÑàèìòù]+)/?(\w+)?/?(\w+)?', List)
 ], debug=True)

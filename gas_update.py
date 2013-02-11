@@ -51,9 +51,9 @@ class Result(object):
 			yield d
 
 class ResultIter(Result):
-	def __init__(self):
+	def __init__(self, data={}):
 		headers = [u"Provincia", u"Localidad", u"Dirección", u"Fecha", u"Precio", u"Rótulo", u"Horario", u"Lat.,Lon."]
-		Result.__init__(self, headers, data={})
+		Result.__init__(self, headers, data)
 
 	def __iter__(self):
 		a_data = []
@@ -70,7 +70,7 @@ class ResultIter(Result):
 			row[3] = "/".join(row[3].isoformat().split("-")[1:])
 			options = ""
 			for o in row[4]:
-				options += "<div class=op%s>%s</div>" %(o, row[4][o])
+				options += "<td class=op%s>%s</td>" %(o, row[4][o] or "")
 			row[4] = options
 			row[-1] = "("+",".join(row[-1])+")"
 			yield "<td>"+"</td><td>".join(row)+"</td>"
