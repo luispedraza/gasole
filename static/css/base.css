@@ -7,11 +7,11 @@ header, footer {
 	background-color: #333;
 	color: white;
 	font-size: 30px;
-	height: 100px;
 	font-weight: bold;
 	padding: 20px;
 }
 header {
+	height: 80px;
 	text-align: right;
 }
 header h1 {
@@ -23,7 +23,11 @@ header h1 {
 	text-indent: 1000px;
 	overflow: hidden;
 }
-
+nav {
+	position: absolute;
+	top: 0;
+	right: 100px;
+}
 nav li {
 	list-style: none;
 	width: 200px;
@@ -97,15 +101,34 @@ footer a:hover{
 
 #content {
 	position: relative;
+	width: 1000px;
 }
 #list {
-	width: 700px;
+	width: 600px;
+	border: 1px dotted black;
+	font-size: 10px;
+	height: 800px;
+	overflow-x: scroll; 
+}
+#filters {
+	width: 400px;
+	height: 80px;
+	position: absolute;
+	right: 0;
+	top: 0;
 	border: 1px dotted black;
 }
+#ads {
+	border: 1px solid black;
+	width: 400px;
+	height: 400px;
+
+}
 #google_map {
-	width: 300px;
+	width: 400px;
 	height: 300px;
 	border: 1px dotted black;
 	position: absolute;
 	right: 0;
+	top: 80px;
 }

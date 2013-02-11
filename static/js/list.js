@@ -30,9 +30,9 @@ window.addEventListener("load", function(){
 		data = JSON.parse(r.target.responseText);
 		var list = document.getElementById("list");
 		var path = window.location.pathname.split("/");
-		for (i in data) {
+		for (p in data) {
 			var h1 = document.getElementById("title");
-			var province = i;
+			var province = p;
 			place = province;
 			if (province.match(",")){
 				province = province.split(", ").reverse().join(" ");
@@ -42,11 +42,18 @@ window.addEventListener("load", function(){
 			}
 			h1.innerText = "Todas las gasolineras de la provincia de " + province;
 			var table = document.getElementById("table");
-			for (j in data[i]) {
-				var tr = document.createElement("tr");
-				var td = document.createElement("td");
-				td.innerText = j;
-				tr.appendChild(td);
+			for (c in data[p]) {
+				for (s in data[p][c]) {
+					var tr = document.createElement("tr");
+					var td = document.createElement("td");
+					var a = document.createElement("a");
+					a.href = "/gasolineras/" + p + "/" + c;
+					a.innerText = c;
+					tr.appendChild(a);
+					td = document.createElement("td");
+					td.innerText = s;
+					tr.appendChild(td);
+				}
 				table.appendChild(tr);
 			}
 		}
