@@ -23,6 +23,9 @@ function initMap() {
 	});
 }
 
+function toTitle(s) {
+ return s.toLowerCase().replace(/(^| )\w(?=\S)/g, function(t){return t.toUpperCase()});
+}
 
 window.addEventListener("load", function(){
 	var req = new XMLHttpRequest()
@@ -44,7 +47,8 @@ window.addEventListener("load", function(){
 			var table = document.getElementById("table");
 			for (c in data[p]) {
 				for (s in data[p][c]) {
-					p = p.replace(" ", "_").replace("/", "*");
+					p = p.replace(/ /g, "_").replace(/\//g, "*");
+					c = c.replace(/ /g, "_").replace("/", "*");
 					var tr = document.createElement("tr");
 					var td = document.createElement("td");
 					var a = document.createElement("a");
@@ -52,10 +56,19 @@ window.addEventListener("load", function(){
 					a.innerText = c;
 					tr.appendChild(a);
 					td = document.createElement("td");
-					td.innerText = s;
+					station = s.replace(/CL\./, "").replace(/\.(?=\w)/g, ". ")
+					station = toTitle(s);
+					station = station.replace("Carretera", "Ctra")
+						.replace("Avenida", "Avda")
+						.replace("Calle", "")
+						.replace("Avda.Avda.", "Avda")
+						.replace("Cr ", "Ctra ")
+						.replace("[n]", "");
+					td.innerText = station;
 					tr.appendChild(td);
+					table.appendChild(tr);
 				}
-				table.appendChild(tr);
+				
 			}
 		}
 		var script = document.createElement("script");

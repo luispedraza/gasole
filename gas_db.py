@@ -40,7 +40,7 @@ def data2store(data):
 	_stations = []
 	_prices = []
 	_history = []
-	for p in data.keys(): 	# recorremos las provincias
+	for p in data.keys(): # recorremos las provincias
 		cachep = memcache.get(p) or store2data(prov_kname=p).get(p)
 		if not cachep: 		# nueva provincia
 			cachep = {}
@@ -76,6 +76,7 @@ def data2store(data):
 		db.put(_provinces + _towns + _stations + _prices + _history)
 	else:
 		db.put_async(_provinces + _towns + _stations + _prices + _history)
+
 	logging.info("Insertadas %s provincias" % len(_provinces))
 	# for e in _provinces:
 	# 	logging.info(e.key().name())
@@ -95,14 +96,14 @@ def store2data(option=None, prov_kname=None):
 	q = PriceData.all()
 	if prov_kname:
 		q.ancestor(db.Key.from_path('Province', prov_kname))
-	info = ResultIter()
+	result = ResultIter()
 	option = sorted(FUEL_OPTIONS.keys())[1:]
 	for price in q:
 		prices = {}
 		for o in option:
 			prices[o] = getattr(price, FUEL_OPTIONS[o]["short"], None)
 		station = price.parent()
-		info.add_item(
+		result.add_item(
 			province = price.key().parent().parent().parent().name(),
 			town     = price.key().parent().parent().name(),
 			station  = price.key().name(),
@@ -111,7 +112,8 @@ def store2data(option=None, prov_kname=None):
 			option   = prices,
 			hours    = station.hours,
 			latlon   = None)
-	return info.data
+	memcache.set(prov_kname, result.data.get(prov_kname))
+	return result.data
 
 # precios medios de combustible por provincia
 def get_means(option):
