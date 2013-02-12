@@ -23,6 +23,10 @@ from google.appengine.api import users
 
 class MainHandler(BaseHandler):
     def get(self):
+        self.render("base.html")
+
+class AdminHandler(BaseHandler):
+    def get(self):
         log_url = users.create_login_url(self.request.uri)
         log_text = 'Login'
         if self.user:
@@ -103,10 +107,10 @@ class List(BaseHandler):
 class Api(BaseHandler):
     def get(self, province, city, station):
         if province:
+            logging.info(type(province.decode('utf-8')))
             logging.info(province)
-            province = province.replace("_", " ").replace("-", "/")
+            province = province.replace("_", " ").replace("*", "/")
             logging.info(province)
-
             data = memcache.get(province) or store2data(prov_kname=province).get(province)
             if not city or city == "Todas":
                 info = {province: data or {"error": "Provincia no encontrada"}}
@@ -118,9 +122,20 @@ class Api(BaseHandler):
                     info = {province: {city: {station: data or {"error": "Estación no encontrada"}}}}
         self.render_json(info)
 
+def handle_404(request, response, exception):
+    #http://webapp-improved.appspot.com/guide/exceptions.html
+    logging.exception(exception)
+    t = jinja_env.get_template("404.html")
+    response.write(t.render())
+    response.set_status(404)
+def handle_500(request, response, exception):
+    logging.exception(exception)
+    response.write('Error en el servidor.')
+    response.set_status(500)
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
+    ('/admin/?', AdminHandler),
     ('/update/?(\w+)?', Update),
     ('/search/?', Search),
     ('/map/?', Map),
@@ -129,3 +144,6 @@ app = webapp2.WSGIApplication([
     ('/gasolineras/?([\wáéíóúÁÉÍÓÚñÑàèìòù_\-,\(\)]+)/?(\w+)?/?(\w+)?', List),
     ('/api/?([\wáéíóúÁÉÍÓÚñÑàèìòù_\-,\(\)]+)/?(\w+)?/?(\w+)?', Api)
 ], debug=True)
+
+app.error_handlers[404] = handle_404
+app.error_handlers[500] = handle_500

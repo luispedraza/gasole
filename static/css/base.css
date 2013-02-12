@@ -106,7 +106,7 @@ footer a:hover{
 #list {
 	width: 600px;
 	border: 1px dotted black;
-	font-size: 10px;
+	font-size: 11px;
 	height: 800px;
 	overflow-x: scroll; 
 }

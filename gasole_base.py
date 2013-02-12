@@ -17,9 +17,6 @@ def dumper(o):
 		return o.isoformat()
 	else:
 		raise TypeError, 'Object of type %s with value of %s is not JSON serializable' % (type(obj), repr(obj)) 
-
-
-
 # Basic handler with common functions
 class BaseHandler(webapp2.RequestHandler):
 	def write(self, *a, **kw):

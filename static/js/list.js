@@ -44,6 +44,7 @@ window.addEventListener("load", function(){
 			var table = document.getElementById("table");
 			for (c in data[p]) {
 				for (s in data[p][c]) {
+					p = p.replace(" ", "_").replace("/", "*");
 					var tr = document.createElement("tr");
 					var td = document.createElement("td");
 					var a = document.createElement("a");
