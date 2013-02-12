@@ -73,6 +73,7 @@ class Search(BaseHandler):
             options = FUEL_OPTIONS,
             provs = PROVS)
     def post(self):
+        logging.info(self.request)
         self.check_user_name()
         option = self.request.get("option")
         prov = self.request.get("prov")
@@ -88,6 +89,23 @@ class Search(BaseHandler):
             provs = PROVS,
             data = data,
             static_map = static_map)
+        if update:
+            logging.info("guardando datos")
+            _geodata = []
+            data = data.data
+            for p in data.keys():
+                for t in data[p].keys():
+                    for s in data[p][t].keys():
+                        if data[p][t][s]["latlon"]:
+                            _geodata.append(GeoData(
+                                key_name = s,
+                                parent = db.Key.from_path('Province', p, 'Town', t, 'GasStation', s),
+                                geopt = db.GeoPt(lat = data[p][t][s]["latlon"][1],
+                                    lon = data[p][t][s]["latlon"][0])
+                                ))
+            db.put(_geodata)
+            logging.info("guardadas %s posiciones" %len(_geodata))
+
 class Map(BaseHandler):
     def get(self):
         self.render("map.html")
