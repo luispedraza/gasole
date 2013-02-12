@@ -31,6 +31,7 @@ window.addEventListener("load", function(){
 	var req = new XMLHttpRequest()
 	req.onload = function(r) {
 		data = JSON.parse(r.target.responseText);
+		console.log(data)
 		var list = document.getElementById("list");
 		var path = window.location.pathname.split("/");
 		for (p in data) {
@@ -47,12 +48,12 @@ window.addEventListener("load", function(){
 			var table = document.getElementById("table");
 			for (c in data[p]) {
 				for (s in data[p][c]) {
-					p = p.replace(/ /g, "_").replace(/\//g, "*");
-					c = c.replace(/ /g, "_").replace("/", "*");
+					p_link = p.replace(/ \/ /g, "__").replace(/ /g, "_");
+					c_link = c.replace(/ \/ /g, "__").replace(/ /g, "_");
 					var tr = document.createElement("tr");
 					var td = document.createElement("td");
 					var a = document.createElement("a");
-					a.href = "/gasolineras/" + p + "/" + c;
+					a.href = "/gasolineras/" + p_link + "/" + c_link;
 					a.innerText = c;
 					tr.appendChild(a);
 					td = document.createElement("td");
@@ -63,12 +64,12 @@ window.addEventListener("load", function(){
 						.replace("Calle", "")
 						.replace("Avda.Avda.", "Avda")
 						.replace("Cr ", "Ctra ")
-						.replace("[n]", "");
+						.replace("[n]", "")
+						.replace("Plaza", "Pl");
 					td.innerText = station;
 					tr.appendChild(td);
 					table.appendChild(tr);
 				}
-				
 			}
 		}
 		var script = document.createElement("script");

@@ -108,14 +108,14 @@ class Api(BaseHandler):
     def get(self, province, city, station):
         if province:
             province = province.decode('utf-8')
-            province = province.replace("_", " ").replace("*", "/")
+            province = province.replace("__", " / ").replace("_", " ")
             logging.info(province)
             data = memcache.get(province) or store2data(prov_kname=province).get(province)
             if not city or city == "Todas":
                 info = {province: data or {"error": "Provincia no encontrada"}}
             elif data and city:
                 city = city.decode('utf-8')
-                city = city.replace("_", " ").replace("*", "/")
+                city = city.replace("__", " / ").replace("_", " ")
                 data = data.get(city)
                 info = {province: {city: data or {"error": "Ciudad no encontrada"}}}
                 if data and station:
@@ -142,8 +142,8 @@ app = webapp2.WSGIApplication([
     ('/map/?', Map),
     ('/stats/?', Stats),
     ('/data/(\w+)/(\w+)', Data),
-    ('/gasolineras/?([\wáéíóúÁÉÍÓÚñÑàèìòù_\-,\(\)]+)/?(\w+)?/?(\w+)?', List),
-    ('/api/?([\wáéíóúÁÉÍÓÚñÑàèìòù_\-,\(\)]+)/?(\w+)?/?(\w+)?', Api)
+    ('/gasolineras/?([^ \/]+)/?([^ \/]+)?/?([^ \/]+)?', List),
+    ('/api/?([^ \/]+)/?([^ \/]+)?/?([^ \/]+)?', Api)
 ], debug=True)
 
 app.error_handlers[404] = handle_404
