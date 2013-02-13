@@ -117,11 +117,33 @@ def store2data(option=None, prov_kname=None):
 			label    = station.label,
 			date     = price.date,
 			option   = prices,
-			hours    = station.hours,
-			latlon   = None)
+			hours    = station.hours)
 	memcache.set(prov_kname, result.data.get(prov_kname))
 	# db.put(_clean)
 	return result.data
+
+def get_latlon(prov, town=None, station=None):
+	latlon_cache = memcache.get("latlon_" + prov) or {}
+	if not latlon_cache:
+		q = GeoData.all().ancestor(db.Key.from_path('Province', prov))
+		for g in q:
+			latlon_cache.setdefault(g.key().parent().name(), {})[g.key().name()] = [g.geopt.lat, g.geopt.lon]
+		memcache.set("latlon_" + prov, latlon_cache)
+	if station:
+		station_latlon = latlon_cache.get(town, {}).get(station)
+		if station_latlon:
+			return {prov: {town: {station: station_latlon}}}
+	elif town:
+		logging.info("buscando ciudad %s" %town)
+		town_latlon = latlon_cache.get(town)
+		if town_latlon:
+			logging.info("devolviendo ciudad")
+			return {prov: {town: town_latlon}}
+	if latlon_cache:
+		return {prov: latlon_cache}
+	return {"error": "Datos no encontrados"}
+
+
 
 # precios medios de combustible por provincia
 def get_means(option):
@@ -145,82 +167,4 @@ def get_means(option):
 				data[p] = None
 		memcache.set("means_"+option, data)
 	return data
-
-# # convierte información obtenida de internet a estructura caché
-# def data2cache(data):
-# 	for prov_kname in data.data:
-# 		cache = memcache.get(prov_kname) or {}
-# 		c_result = ResultIter()
-# 		c_result.data = cache
-
-
-# 		d_prov = data.data[prov_kname]
-# 		c_prov = memcache.get(prov_kname) or {}		
-# 		for town_kname in d_prov:
-# 			d_town = d_prov[town_kname]
-# 			c_town = c_prov.get(town_kname)
-# 			if not c_town:
-# 				town = c_prov[town_kname] = {}			
-# 			for station_kname in d_town:
-# 				d_station = d_town[station_kname]
-# 				c_station = c_town.get(station_kname)
-# 				if not c_station:
-# 					c_station = c_town[station_kname] = {}
-# 					c_station["label"] = d_station["label"]
-# 					c_station["hours"] = d_station["hours"]
-# 					c_station["latlon"] = d_station["latlon"]
-# 					c_station["options"] = {}
-# 				c_station["options"].update(d_station["options"])
-# 		memcache.set(prov_kname, c_prov)
-
-# def cache2data(prov, option):
-# 	prov_kname = generate_prov_kname(prov)
-# 	cache = memcache.get(prov_kname)
-# 	if not cache:
-# 		return
-# 	logging.info("Obtenido cache para la provincia")
-# 	data = []
-# 	towns = cache["towns"]
-# 	for town in towns.values():
-# 		for station in town["stations"].values():
-# 			data.append([
-# 				cache["name"],
-# 				town["name"],
-# 				station["address"],
-# 				station["options"][option],
-# 				station["label"],
-# 				station["hours"],
-# 				station["map"]
-# 				])
-# 	return Result(headers=HEADERS, data=data)
-
-# def get_data(prov, option, update = False):
-# 	# buscamos primero en cache:
-# 	logging.info("Buscando datos en cache")
-# 	prov_kname = generate_prov_kname(prov)
-# 	cache = memcache.get(prov_kname)
-# 	if cache is None or update:
-# 		# buscamos en la base de datos
-# 		logging.info("Buscando en la base de datos")
-# 		province = Province.get_by_key_name(prov_kname)
-# 		if province is None or update:
-# 			# buscamos en la red
-# 			if province is None:
-# 				logging.info("Buscando datos en Internet")
-# 				data = gas_update_search(option=option, prov=prov)
-# 			else:
-# 				logging.info("Actualizando datos de Internet")
-# 				data = gas_update_xls(option=option, prov=prov)
-# 			data2cache(data)
-# 			data2store(data)
-# 			return data
-# 		else:
-# 			logging.info("Actualizando desde la base de datos")
-# 			data = store2data(prov=prov, option=option)
-# 			return data
-# 	else:
-# 		return cache2data(prov, option)
-
-
-
 

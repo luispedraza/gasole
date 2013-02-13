@@ -99,7 +99,7 @@ class Search(BaseHandler):
                         if data[p][t][s]["latlon"]:
                             _geodata.append(GeoData(
                                 key_name = s,
-                                parent = db.Key.from_path('Province', p, 'Town', t, 'GasStation', s),
+                                parent = db.Key.from_path('Province', p, 'Town', t),
                                 geopt = db.GeoPt(lat = data[p][t][s]["latlon"][1],
                                     lon = data[p][t][s]["latlon"][0])
                                 ))
@@ -123,23 +123,21 @@ class List(BaseHandler):
         self.render("base.html", 
             content=jinja_env.get_template("list.html").render())
 class Api(BaseHandler):
-    def get(self, province, city, station):
-        if province:
-            province = province.decode('utf-8')
-            province = province.replace("__", " / ").replace("_", " ")
-            logging.info(province)
-            data = memcache.get(province) or store2data(prov_kname=province).get(province)
-            if not city or city == "Todas":
-                info = {province: data or {"error": "Provincia no encontrada"}}
-            elif data and city:
-                city = city.decode('utf-8')
-                city = city.replace("__", " / ").replace("_", " ")
-                data = data.get(city)
-                info = {province: {city: data or {"error": "Ciudad no encontrada"}}}
+    def get(self, prov, town, station):
+        if prov:
+            prov = prov.decode('utf-8').replace("__", " / ").replace("_", " ")
+            data = memcache.get(prov) or store2data(prov_kname=prov).get(prov)
+            if not town or town == "Todas":
+                info = {prov: data or {"error": "Provincia no encontrada"}}
+            elif data and town:
+                town = town.decode('utf-8').replace("__", " / ").replace("_", " ")
+                data = data.get(town)
+                info = {prov: {town: data or {"error": "Ciudad no encontrada"}}}
                 if data and station:
+                    station = station.decode('utf-8').replace("__", " / ").replace("_", " ")
                     data = data.get(station)
-                    info = {province: {city: {station: data or {"error": "Estación no encontrada"}}}}
-        self.render_json(info)
+                    info = {prov: {city: {station: data or {"error": "Estación no encontrada"}}}}
+        self.render_json({"info": info, "latlon": get_latlon(prov=prov, town=town, station=station)})
 
 def handle_404(request, response, exception):
     #http://webapp-improved.appspot.com/guide/exceptions.html

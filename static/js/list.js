@@ -31,10 +31,12 @@ window.addEventListener("load", function(){
 	var req = new XMLHttpRequest()
 	req.onload = function(r) {
 		data = JSON.parse(r.target.responseText);
-		console.log(data)
+		console.log(data);
+		var info = data.info;
+		var latlon = data.latlon;
 		var list = document.getElementById("list");
 		var path = window.location.pathname.split("/");
-		for (p in data) {
+		for (p in info) {
 			var h1 = document.getElementById("title");
 			var province = p;
 			place = province;
@@ -46,8 +48,8 @@ window.addEventListener("load", function(){
 			}
 			h1.innerText = "Todas las gasolineras de la provincia de " + province;
 			var table = document.getElementById("table");
-			for (c in data[p]) {
-				for (s in data[p][c]) {
+			for (c in info[p]) {
+				for (s in info[p][c]) {
 					p_link = p.replace(/ \/ /g, "__").replace(/ /g, "_");
 					c_link = c.replace(/ \/ /g, "__").replace(/ /g, "_");
 					var tr = document.createElement("tr");
