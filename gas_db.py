@@ -97,18 +97,18 @@ def store2data(option=None, prov_kname=None):
 	if prov_kname:
 		q.ancestor(db.Key.from_path('Province', prov_kname))
 	result = ResultIter()
-	option = sorted(FUEL_OPTIONS.keys())[1:]
-	_clean = []
+	# option = sorted(FUEL_OPTIONS.keys())[1:]
+	# _clean = []
 	for price in q:
 		prices = {}
 		# for o in option:
 		# 	prices[o] = getattr(price, FUEL_OPTIONS[o]["short"], None)
 		for o in price.dynamic_properties():
 			prices[FUEL_REVERSE[o]] = getattr(price, o)
-			if prices[FUEL_REVERSE[o]] == None:
-				delattr(price, o)
-				del(prices[FUEL_REVERSE[o]])
-		_clean.append(price)
+		# 	if prices[FUEL_REVERSE[o]] == None:
+		# 		delattr(price, o)
+		# 		del(prices[FUEL_REVERSE[o]])
+		# _clean.append(price)
 		station = price.parent()
 		result.add_item(
 			province = price.key().parent().parent().parent().name(),
@@ -120,7 +120,7 @@ def store2data(option=None, prov_kname=None):
 			hours    = station.hours,
 			latlon   = None)
 	memcache.set(prov_kname, result.data.get(prov_kname))
-	db.put(_clean)
+	# db.put(_clean)
 	return result.data
 
 # precios medios de combustible por provincia
