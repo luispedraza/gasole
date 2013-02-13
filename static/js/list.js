@@ -1,7 +1,19 @@
 var data;
 var map;
-var place = "Madrid";
+var province = "";
+var town = "";
+
+var FUEL_OPTIONS = {"1": {"short": "G95", "name": "Gasolina 95"},
+				// "2": {"short": "G97", "name": "Gasolina 97"},
+				"3": {"short": "G98", "name": "Gasolina 98"},
+				"4": {"short": "GOA", "name": "Gasóleo Automoción"},
+				"5": {"short": "NGO", "name": "Nuevo Gasóleo A"},
+				"6": {"short": "GOB", "name": "Gasóleo B"},
+				"7": {"short": "GOC", "name": "Gasóleo C"},
+				"8": {"short": "BIOD", "name": "Biodiésel"}}
+
 function initMap() {
+	var place = ((town) ? (town + ", " + province) : (province));
 	var mapOptions = {
 		center: new google.maps.LatLng(40.400, 3.6833),
 		zoom: 8,
@@ -13,7 +25,7 @@ function initMap() {
 	geocoder.geocode({'address': place}, function (res, stat){
 		if (stat == google.maps.GeocoderStatus.OK) {
 			map.setCenter(res[0].geometry.location)
-			var marker = new google.maps.Marker({
+			var center = new google.maps.Marker({
             	map: map,
             	position: res[0].geometry.location
 			});
@@ -21,6 +33,45 @@ function initMap() {
 			alert("Geocode ha fallado: " + stat);
 		}
 	});
+	var latlon = data.latlon;
+	var image = "/icon/pump_r.png";
+	for (p in latlon) {
+		for (t in latlon[p]) {
+			for (s in latlon[p][t]) {
+				var pos = new google.maps.LatLng(latlon[p][t][s][0], latlon[p][t][s][1]);
+				var mark = new google.maps.Marker({
+					map: map,
+					position: pos,
+					icon: image
+				})
+			}
+		}
+	}
+}
+
+function initControl() {
+	console.log("init controls")
+	// Filtro de tipo de gasolina
+	var filterT = document.getElementById("fuel_type").getElementsByTagName("li");
+	for (var f=0; f<filterT.length; f++) {
+		filterT[f].addEventListener("click", function(e) {
+			var disp = "table-cell";
+			var cname = "";
+			if (e.target.className.match(" off")) {
+				e.target.className = e.target.className.replace(" off", "");
+				cname = e.target.className;
+			}
+			else {
+				cname = e.target.className;
+				e.target.className += " off";
+				disp = "none";
+			}
+			var tds = document.getElementById("table").getElementsByClassName(cname);
+			for (var td=0; td<tds.length; td++) {
+				tds[td].style.display = disp;
+			}
+		})
+	}
 }
 
 function toTitle(s) {
@@ -33,51 +84,69 @@ function toTitle(s) {
 	// 					.replace("[n]", "")
 	// 					.replace("Plaza", "Pl");
 }
-
+function cleanName(s) {
+	var r = s.replace("___", "/").replace("__", "/").replace(/_/g, " ");
+	if (r.match("/")) {
+		r = r.split("/")[1];
+	}
+	if (r.match(/\)$/)) {
+		r = r.match(/\(.+\)$/g)[0]
+			.replace("(", "").replace(")", " ") + r.split(" (")[0];
+	}
+	return r;
+}
 window.addEventListener("load", function(){
-	var req = new XMLHttpRequest()
+	var req = new XMLHttpRequest();
 	req.onload = function(r) {
 		data = JSON.parse(r.target.responseText);
+		var path = document.location.pathname.split("/");
+		province = cleanName(decodeURI(path[2]));
+		if (path[3]) {
+			town = cleanName(decodeURI(path[3]));
+		}
+		var h1 = document.getElementById("title");
+		h1.innerText = "Todas las gasolineras de " + ((town) ? (town + ", en ") : ("")) + "la provincia de " + province;
+		var script = document.createElement("script");
+  		script.type = "text/javascript";
+  		script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyD5XZNFlQsyWtYDeKual-OcqmP_5pgwbds&sensor=false&region=ES&callback=initMap";
+  		document.body.appendChild(script);
+		
 		console.log(data);
 		var info = data.info;
 		var latlon = data.latlon;
 		var list = document.getElementById("list");
 		var path = window.location.pathname.split("/");
-		for (p in info) {
-			var h1 = document.getElementById("title");
-			var province = p;
-			place = province;
-			if (province.match(",")){
-				province = province.split(", ").reverse().join(" ");
-			}
-			if (province.match("/")){
-				province = province.split(" /")[0];
-			}
-			h1.innerText = "Todas las gasolineras de la provincia de " + province;
+		for (var p in info) {
 			var table = document.getElementById("table");
-			for (c in info[p]) {
-				for (s in info[p][c]) {
-					p_link = p.replace(/ \/ /g, "__").replace(/ /g, "_");
-					c_link = c.replace(/ \/ /g, "__").replace(/ /g, "_");
+			for (var t in info[p]) {
+				for (var s in info[p][t]) {
+					p_link = p.replace(/ \/ /g, "___").replace(/\//g, "__").replace(/ /g, "_");
+					t_link = t.replace(/ \/ /g, "___").replace(/\//g, "__").replace(/ /g, "_");
 					var tr = document.createElement("tr");
 					var td = document.createElement("td");
 					var a = document.createElement("a");
-					a.href = "/gasolineras/" + p_link + "/" + c_link;
-					a.innerText = c;
+					a.href = "/gasolineras/" + p_link + "/" + t_link;
+					a.innerText = t;
 					tr.appendChild(a);
 					td = document.createElement("td");
 					station = s;
 					td.innerText = station;
 					tr.appendChild(td);
+					for (var o in FUEL_OPTIONS) {
+						var otd = document.createElement("td");
+						otd.className = "T_" + FUEL_OPTIONS[o]["short"];
+						otd.innerText = info[p][t][s]["options"][o] || "";
+						tr.appendChild(otd);
+					}
 					table.appendChild(tr);
 				}
 			}
 		}
-		var script = document.createElement("script");
-  		script.type = "text/javascript";
-  		script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyD5XZNFlQsyWtYDeKual-OcqmP_5pgwbds&sensor=false&region=ES&callback=initMap";
-  		document.body.appendChild(script);
+
+		initControl();
 	}
 	req.open("GET", document.URL.replace("gasolineras", "api"), true);
 	req.send();
+
+	
 })

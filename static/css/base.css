@@ -138,3 +138,48 @@ footer a:hover{
 	right: 0;
 	top: 80px;
 }
+
+
+
+/* Filtros */
+.T_G95 {
+	background-color: #6699FF;
+}
+.T_G98 {
+	background-color: #CC9933;
+}
+.T_GOA {
+	background-color: #CC3333;
+}
+.T_NGO {
+	background-color: #FFCC33;
+}
+.T_GOB {
+	background-color: #FF9966;
+}
+.T_GOC {
+	background-color: #00FF33;
+}
+.T_BIOD {
+	background-color: #009933;
+}
+#fuel_type {
+	list-style: none;
+	padding: 0;
+}
+#fuel_type li {
+	display: inline-block;
+	width: 40px;
+	border: 1px solid black;
+	color: white;
+	text-align: center;
+	cursor: pointer;
+}
+
+
+
+
+
+
+
+

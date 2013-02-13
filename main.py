@@ -123,18 +123,19 @@ class List(BaseHandler):
 class Api(BaseHandler):
     def get(self, prov, town, station):
         if prov:
-            prov = prov.decode('utf-8').replace("__", " / ").replace("_", " ")
+            prov = prov.decode('utf-8').replace("___", " / ").replace("__", "/").replace("_", " ")
             data = memcache.get(prov) or store2data(prov_kname=prov).get(prov)
             if not town or town == "Todas":
                 info = {prov: data or {"error": "Provincia no encontrada"}}
             elif data and town:
-                town = town.decode('utf-8').replace("__", " / ").replace("_", " ")
+                town = town.decode('utf-8').replace("___", " / ").replace("__", "/").replace("_", " ")
                 data = data.get(town)
                 info = {prov: {town: data or {"error": "Ciudad no encontrada"}}}
                 if data and station:
-                    station = station.decode('utf-8').replace("__", " / ").replace("_", " ")
+                    station = station.decode('utf-8').replace("___", " / ").replace("__", "/").replace("_", " ")
                     data = data.get(station)
                     info = {prov: {city: {station: data or {"error": "Estación no encontrada"}}}}
+        logging.info(prov)
         self.render_json({"info": info, "latlon": get_latlon(prov=prov, town=town, station=station)})
 
 def handle_404(request, response, exception):
