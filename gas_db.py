@@ -59,7 +59,7 @@ def data2store(data):
 						label = data[p][t][s]["label"],
 						hours = data[p][t][s]["hours"]))
 					update_price = True
-				elif len(cachep[t][s]["options"])<len(data[p][t][s]["options"]) or cachep[t][s]["date"]<data[p][t][s]["date"]:
+				elif cachep[t][s]["date"]<data[p][t][s]["date"]:
 					cachep[t][s]["options"].update(data[p][t][s]["options"])
 					cachep[t][s]["date"] = data[p][t][s]["date"]
 					update_price = True
@@ -69,7 +69,7 @@ def data2store(data):
 					_prices.append(PriceData(key_name = s, 
 						parent = parent_key, 
 						date=cachep[t][s]["date"], **props))
-					_history.append(HistoryData(parent = parent_key, 
+					_history.append(HistoryData(parent = parent_key,
 						date=cachep[t][s]["date"], **props))
 		memcache.set(p, cachep)
 	if DEBUG:
@@ -100,8 +100,10 @@ def store2data(option=None, prov_kname=None):
 	option = sorted(FUEL_OPTIONS.keys())[1:]
 	for price in q:
 		prices = {}
-		for o in option:
-			prices[o] = getattr(price, FUEL_OPTIONS[o]["short"], None)
+		# for o in option:
+		# 	prices[o] = getattr(price, FUEL_OPTIONS[o]["short"], None)
+		for o in price.dynamic_properties():
+			prices[FUEL_REVERSE[o]] = getattr(price, o)
 		station = price.parent()
 		result.add_item(
 			province = price.key().parent().parent().parent().name(),
