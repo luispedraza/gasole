@@ -50,7 +50,6 @@ function initMap() {
 }
 
 function initControl() {
-	console.log("init controls")
 	// Filtro de tipo de gasolina
 	var filterT = document.getElementById("fuel_type").getElementsByTagName("li");
 	for (var f=0; f<filterT.length; f++) {
@@ -71,6 +70,45 @@ function initControl() {
 				tds[td].style.display = disp;
 			}
 		})
+	}
+	// Filtro de contenido de texto
+	document.getElementById("contains").onkeyup = function(e) {
+		function cleanFilter(s) {
+			return s.toLowerCase()
+				.replace("/áàä/g", "a")
+				.replace("/éèë/g", "e")
+				.replace("/íìï/g", "i")
+				.replace("/óòö/g", "o")
+				.replace("/úùü/g", "u")
+		}
+		var filtervalue = e.target.value;
+		var terms = filtervalue.split(" ");
+		var files = document.getElementById("table").getElementsByTagName("tr");
+		for (var f=1; f<files.length; f++) {
+			file = files[f];
+			var found = false;
+			for (var t=0; t<terms.length; t++) {
+				term = terms[t];
+				if (term.length!=0) {
+					var expected = (term[0]!="-");
+					if (!expected) {
+						term = term.substr(1);
+						if (term.length == 0) continue;
+					}
+					var cells = file.getElementsByTagName("td");
+					for (var c=0; c<2; c++) {
+						var cell = cells[c];
+						console.log(term, cleanFilter(cell.innerText))
+						found = found || (RegExp(term, "i").exec(cleanFilter(cell.innerText)) != null);
+					}
+					if (found != expected) 
+						file.style.display = "none";
+					else 
+						file.style.display = "table-row"
+				}
+			}
+		}
+
 	}
 }
 
@@ -127,7 +165,8 @@ window.addEventListener("load", function(){
 					var a = document.createElement("a");
 					a.href = "/gasolineras/" + p_link + "/" + t_link;
 					a.innerText = t;
-					tr.appendChild(a);
+					td.appendChild(a)
+					tr.appendChild(td);
 					td = document.createElement("td");
 					station = s;
 					td.innerText = station;
