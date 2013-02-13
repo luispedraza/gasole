@@ -25,6 +25,13 @@ function initMap() {
 
 function toTitle(s) {
  return s.toLowerCase().replace(/(^| )\w(?=\S)/g, function(t){return t.toUpperCase()});
+ // .replace("Carretera", "Ctra")
+	// 					.replace("Avenida", "Avda")
+	// 					.replace("Calle", "")
+	// 					.replace("Avda.Avda.", "Avda")
+	// 					.replace("Cr ", "Ctra ")
+	// 					.replace("[n]", "")
+	// 					.replace("Plaza", "Pl");
 }
 
 window.addEventListener("load", function(){
@@ -59,15 +66,7 @@ window.addEventListener("load", function(){
 					a.innerText = c;
 					tr.appendChild(a);
 					td = document.createElement("td");
-					station = s.replace(/CL\./, "").replace(/\.(?=\w)/g, ". ")
-					station = toTitle(s);
-					station = station.replace("Carretera", "Ctra")
-						.replace("Avenida", "Avda")
-						.replace("Calle", "")
-						.replace("Avda.Avda.", "Avda")
-						.replace("Cr ", "Ctra ")
-						.replace("[n]", "")
-						.replace("Plaza", "Pl");
+					station = s;
 					td.innerText = station;
 					tr.appendChild(td);
 					table.appendChild(tr);

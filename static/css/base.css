@@ -98,6 +98,9 @@ footer a:hover{
 	text-decoration: underline;
 	font-weight: bold;
 }
+.footer_section {
+	display: inline-block;
+}
 
 #content {
 	position: relative;
@@ -107,7 +110,7 @@ footer a:hover{
 	width: 600px;
 	border: 1px dotted black;
 	font-size: 11px;
-	height: 800px;
+	height: 600px;
 	overflow-x: scroll; 
 }
 #filters {
@@ -121,7 +124,10 @@ footer a:hover{
 #ads {
 	border: 1px solid black;
 	width: 400px;
-	height: 400px;
+	height: 200px;
+	position: absolute;
+	right: 0;
+	top: 400px;
 
 }
 #google_map {
