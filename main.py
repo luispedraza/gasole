@@ -73,12 +73,10 @@ class Search(BaseHandler):
             options = FUEL_OPTIONS,
             provs = PROVS)
     def post(self):
-        logging.info(self.request)
         self.check_user_name()
         option = self.request.get("option")
         prov = self.request.get("prov")
         update = self.request.get("updatedb")
-        #data = get_data(prov=prov, option=option, update=update)
         data = gas_update_search(prov=prov, option=option)
         static_map = ""
         if data:
@@ -96,7 +94,7 @@ class Search(BaseHandler):
             for p in data.keys():
                 for t in data[p].keys():
                     for s in data[p][t].keys():
-                        if data[p][t][s]["latlon"]:
+                        if data[p][t][s].has_key("latlon"):
                             _geodata.append(GeoData(
                                 key_name = s,
                                 parent = db.Key.from_path('Province', p, 'Town', t),

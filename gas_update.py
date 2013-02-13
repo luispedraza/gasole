@@ -74,7 +74,7 @@ class ResultIter(Result):
 				town = prov[t]
 				for s in town:
 					st = town[s]
-					yield [p, t, s, st["date"], st["options"], st["label"], st["hours"], st.get("latlon", "-")]
+					yield [p, t, s, st["date"], st["options"], st["label"], st["hours"], st.get("latlon")]
 	def as_table(self):
 		for item in self:
 			row = [i or "" for i in item]

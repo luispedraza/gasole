@@ -130,15 +130,9 @@ def get_latlon(prov, town=None, station=None):
 			latlon_cache.setdefault(g.key().parent().name(), {})[g.key().name()] = [g.geopt.lat, g.geopt.lon]
 		memcache.set("latlon_" + prov, latlon_cache)
 	if station:
-		station_latlon = latlon_cache.get(town, {}).get(station)
-		if station_latlon:
-			return {prov: {town: {station: station_latlon}}}
+		return {prov: {town: {station: latlon_cache.get(town, {}).get(station)}}}
 	elif town:
-		logging.info("buscando ciudad %s" %town)
-		town_latlon = latlon_cache.get(town)
-		if town_latlon:
-			logging.info("devolviendo ciudad")
-			return {prov: {town: town_latlon}}
+		return {prov: {town: latlon_cache.get(town)}}
 	if latlon_cache:
 		return {prov: latlon_cache}
 	return {"error": "Datos no encontrados"}
