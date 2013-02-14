@@ -113,7 +113,19 @@ function initControl() {
 }
 
 function toTitle(s) {
- return s.toLowerCase().replace(/(^| )\w(?=\S)/g, function(t){return t.toUpperCase()});
+	s = s.replace(" [N]", "")
+		.replace(/^CARRETERA ?|^CR\.? ?/, "CTRA. ")
+		.replace(/(CTRA. )+/, "CTRA. ")
+		.replace(/^AVENIDA ?|^AV. ?/, "AVDA. ")
+		.replace(/^POLIGONO INDUSTRIAL ?|POLIGONO ?|P\.I\. ?/, "POL. IND. ")
+		.replace(/^CALLE |^CL\.? ?|C\/ ?/, "C/ ")
+		.replace(/^RONDA |^RD /, "RDA. ")
+		.replace(/^AUTOPISTA ?(AUTOPISTA ?)?/, "AU. ")
+		.replace(/^PLAZA ?/, "PZA. ")
+		.replace(/^PASEO (PASEO ?)?/, "Pº ")
+		.replace(/^TRAVESS?[IÍ]A /, "TRAV. ")
+		.replace(/(\B[^\d- ]+\b)/g, function(t) {return t.toLowerCase()})
+ // return s.toLowerCase().replace(/(^| )\w(?=\S)/g, function(t){return t.toUpperCase()});
  // .replace("Carretera", "Ctra")
 	// 					.replace("Avenida", "Avda")
 	// 					.replace("Calle", "")
@@ -121,6 +133,7 @@ function toTitle(s) {
 	// 					.replace("Cr ", "Ctra ")
 	// 					.replace("[n]", "")
 	// 					.replace("Plaza", "Pl");
+	return s;
 }
 function cleanName(s) {
 	var r = s.replace("___", "/").replace("__", "/").replace(/_/g, " ");
@@ -143,7 +156,7 @@ window.addEventListener("load", function(){
 			town = cleanName(decodeURI(path[3]));
 		}
 		var h1 = document.getElementById("title");
-		h1.innerText = "Todas las gasolineras de " + ((town) ? (town + ", en ") : ("")) + "la provincia de " + province;
+		h1.innerText = "Gasolineras en " + ((town) ? (town + ", ") : ("la ")) + "provincia de " + province;
 		var script = document.createElement("script");
   		script.type = "text/javascript";
   		script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyD5XZNFlQsyWtYDeKual-OcqmP_5pgwbds&sensor=false&region=ES&callback=initMap";
@@ -168,7 +181,7 @@ window.addEventListener("load", function(){
 					td.appendChild(a)
 					tr.appendChild(td);
 					td = document.createElement("td");
-					station = s;
+					station = toTitle(s);
 					td.innerText = station;
 					tr.appendChild(td);
 					for (var o in FUEL_OPTIONS) {
