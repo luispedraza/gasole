@@ -54,20 +54,23 @@ function initControl() {
 	var filterT = document.getElementById("fuel_type").getElementsByTagName("li");
 	for (var f=0; f<filterT.length; f++) {
 		filterT[f].addEventListener("click", function(e) {
-			var disp = "table-cell";
-			var cname = "";
-			if (e.target.className.match(" off")) {
-				e.target.className = e.target.className.replace(" off", "");
-				cname = e.target.className;
+			var cname = e.target.className.split(" ")[0];
+			if (e.target.className.match("off")) {
+				e.target.className = e.target.className.replace("off", "on");
 			}
 			else {
-				cname = e.target.className;
-				e.target.className += " off";
-				disp = "none";
+				e.target.className = e.target.className.replace("on", "off");
 			}
-			var tds = document.getElementById("table").getElementsByClassName(cname);
-			for (var td=0; td<tds.length; td++) {
-				tds[td].style.display = disp;
+			var trs = document.getElementById("table").getElementsByTagName("tr");
+			for (var tr=0; tr<trs.length; tr++) {
+				var row = trs[tr];
+				row.getElementsByClassName(cname)[0].className = e.target.className;
+				var tds = row.getElementsByClassName("on");
+				var st_aux = ""
+				for (var td=0; td<tds.length; td++) {
+					st_aux+=tds[td].innerText;
+				}
+				row.className = (st_aux.length) ? ("") : "off";
 			}
 		})
 	}
@@ -113,7 +116,7 @@ function initControl() {
 }
 
 function toTitle(s) {
-	s = s.replace(" [N]", "")
+	return s.replace(" [N]", "")
 		.replace(/^CARRETERA ?|^CR\.? ?/, "CTRA. ")
 		.replace(/(CTRA. )+/, "CTRA. ")
 		.replace(/^AVENIDA ?|^AV. ?/, "AVDA. ")
@@ -124,16 +127,7 @@ function toTitle(s) {
 		.replace(/^PLAZA ?/, "PZA. ")
 		.replace(/^PASEO (PASEO ?)?/, "Pº ")
 		.replace(/^TRAVESS?[IÍ]A /, "TRAV. ")
-		.replace(/(\B[^\d- ]+\b)/g, function(t) {return t.toLowerCase()})
- // return s.toLowerCase().replace(/(^| )\w(?=\S)/g, function(t){return t.toUpperCase()});
- // .replace("Carretera", "Ctra")
-	// 					.replace("Avenida", "Avda")
-	// 					.replace("Calle", "")
-	// 					.replace("Avda.Avda.", "Avda")
-	// 					.replace("Cr ", "Ctra ")
-	// 					.replace("[n]", "")
-	// 					.replace("Plaza", "Pl");
-	return s;
+		.replace(/\B[^\d- ]+[ $]/g, function(t) {return t.toLowerCase()})
 }
 function cleanName(s) {
 	var r = s.replace("___", "/").replace("__", "/").replace(/_/g, " ");
@@ -186,7 +180,7 @@ window.addEventListener("load", function(){
 					tr.appendChild(td);
 					for (var o in FUEL_OPTIONS) {
 						var otd = document.createElement("td");
-						otd.className = "T_" + FUEL_OPTIONS[o]["short"];
+						otd.className = "T_" + FUEL_OPTIONS[o]["short"] + " on";
 						otd.innerText = info[p][t][s]["options"][o] || "";
 						tr.appendChild(otd);
 					}

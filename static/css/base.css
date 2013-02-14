@@ -167,8 +167,17 @@ footer a:hover{
 	list-style: none;
 	padding: 0;
 }
-.off {
+li.off {
 	background-color: #bbb;
+}
+th.off, td.off {
+	display: none;
+}
+#table {
+	width: 100%;
+}
+#table tr.off {
+	display: none;
 }
 #fuel_type li {
 	display: inline-block;
