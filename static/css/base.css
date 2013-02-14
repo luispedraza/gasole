@@ -176,6 +176,9 @@ th.off, td.off {
 #table {
 	width: 100%;
 }
+#table tr:hover {
+	font-weight: bold;
+}
 #table tr.off {
 	display: none;
 }

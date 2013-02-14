@@ -39,11 +39,19 @@ function initMap() {
 		for (t in latlon[p]) {
 			for (s in latlon[p][t]) {
 				var pos = new google.maps.LatLng(latlon[p][t][s][0], latlon[p][t][s][1]);
-				var mark = new google.maps.Marker({
+				var marker = new google.maps.Marker({
 					map: map,
 					position: pos,
-					icon: image
+					icon: image,
+					// animation: google.maps.Animation.DROP
 				})
+				google.maps.event.addListener(marker, 'click', function(e) {
+					var infowindow = new google.maps.InfoWindow({
+						content: "contenido"
+					})
+					console.log(this);
+					infowindow.open(map, this);
+				});
 			}
 		}
 	}
@@ -101,7 +109,6 @@ function initControl() {
 					var cells = file.getElementsByTagName("td");
 					for (var c=0; c<2; c++) {
 						var cell = cells[c];
-						console.log(term, cleanFilter(cell.innerText))
 						found = found || (RegExp(term, "i").exec(cleanFilter(cell.innerText)) != null);
 					}
 					if (found != expected) 
@@ -112,6 +119,13 @@ function initControl() {
 			}
 		}
 
+	}
+	// Interactividad con la tabla 
+	var rows = document.getElementById("table_data").getElementsByTagName("tr");
+	for (var r=0; r<rows.length; r++) {
+		rows[r].addEventListener("mouseover", function() {
+
+		})
 	}
 }
 
@@ -161,8 +175,8 @@ window.addEventListener("load", function(){
 		var latlon = data.latlon;
 		var list = document.getElementById("list");
 		var path = window.location.pathname.split("/");
+		var table = document.getElementById("table_data");
 		for (var p in info) {
-			var table = document.getElementById("table");
 			for (var t in info[p]) {
 				for (var s in info[p][t]) {
 					p_link = p.replace(/ \/ /g, "___").replace(/\//g, "__").replace(/ /g, "_");
