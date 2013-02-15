@@ -5,11 +5,12 @@
 	<title>Stadísticas</title>
 	<link rel="stylesheet" type="text/css" href="/css/base.css" />
 	<link rel="stylesheet" type="text/css" href="/css/main.css" />
-	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-	<script type="text/javascript" src="/js/jquery.tablesorter.min.js"></script>
-	<script type="text/javascript" src="/js/jquery.tablesorter.pager.js"></script>
-	<script type="text/javascript" src="/js/gas_data.js"></script>
-	<script type="text/javascript" src="/js/list.js"></script>
+	{% for css in styles %}
+		<link rel="stylesheet" type="text/css" href="/css/{{css}}" />
+	{% endfor %}
+	{% for sc in scripts %}
+		<script type="text/javascript" src="/js/{{sc}}"></script>
+	{% endfor %}
 </head>
 
 

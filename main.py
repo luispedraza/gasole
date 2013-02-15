@@ -32,19 +32,19 @@ class AdminHandler(BaseHandler):
         if self.user:
             log_url = users.create_logout_url(self.request.uri)
             log_text = 'Logout'
-        self.render("main.html",
+        self.render("admin_main.html",
             log_url = log_url,
             log_text = log_text)
 
-class Update(BaseHandler):
+class AdminUpdate(BaseHandler):
     def get(self, method):
         self.check_user_name()
         if method and method=="csv":
-            self.render("update_csv.html",
+            self.render("admin_update_csv.html",
             	options=FUEL_OPTIONS,
                 csv_data=None)
         elif not method or method=="xls":
-            self.render("update_xls.html",
+            self.render("admin_update_xls.html",
                 options=FUEL_OPTIONS,
                 xls_data=None)
         else:
@@ -55,21 +55,21 @@ class Update(BaseHandler):
     	option = self.request.get("option")
         if method and method=="csv":
             data = gas_update_csv(option)
-            self.render("update_csv.html",
+            self.render("admin_update_csv.html",
                 options=FUEL_OPTIONS,
                 data=data)
         elif not method or method=="xls":
             data = gas_update_xls(option)
-            self.render("update_xls.html",
+            self.render("admin_update_xls.html",
                 options=FUEL_OPTIONS,
                 data=data)
         if self.request.get("updatedb"):
                 data2store(data.data)
 
-class Search(BaseHandler):
+class AdminSearch(BaseHandler):
     def get(self):
         self.check_user_name()
-        self.render("search.html",
+        self.render("admin_search.html",
             options = FUEL_OPTIONS,
             provs = PROVS)
     def post(self):
@@ -82,7 +82,7 @@ class Search(BaseHandler):
         if data:
             markers = filter(None, [d[-1] for d in data])
             static_map = get_static_map(markers[:50])
-        self.render("search.html",
+        self.render("admin_search.html",
             options = FUEL_OPTIONS,
             provs = PROVS,
             data = data,
@@ -117,27 +117,44 @@ class Data(BaseHandler):
         data = get_means(option)
         self.render_json(data)
 class List(BaseHandler):
+    def get(self, province, city):
+        self.render("base.html", 
+            scripts=['utils.js', 'list.js'],
+            content=jinja_env.get_template("list.html").render())
+class Detail(BaseHandler):
     def get(self, province, city, station):
         self.render("base.html", 
-            content=jinja_env.get_template("list.html").render())
+            styles=['detail.css'],
+            scripts=['utils.js', 'detail.js'],
+            content=jinja_env.get_template("detail.html").render())
 class Api(BaseHandler):
+    def decode_param(self, s):
+        return s.decode('utf-8').replace("_", " ").replace("|", "/")
     def get(self, prov, town, station):
         if prov:
-            prov = prov.decode('utf-8').replace("___", " / ").replace("__", "/").replace("_", " ")
+            prov = self.decode_param(prov)
             data = memcache.get(prov) or store2data(prov_kname=prov).get(prov)
             if not town or town == "Todas":
                 info = {prov: data or {"error": "Provincia no encontrada"}}
             elif data and town:
-                town = town.decode('utf-8').replace("___", " / ").replace("__", "/").replace("_", " ")
+                town = self.decode_param(town)
                 data = data.get(town)
                 info = {prov: {town: data or {"error": "Ciudad no encontrada"}}}
                 if data and station:
-                    station = station.decode('utf-8').replace("___", " / ").replace("__", "/").replace("_", " ")
+                    station = self.decode_param(station)
                     data = data.get(station)
-                    info = {prov: {city: {station: data or {"error": "Estación no encontrada"}}}}
+                    info = {prov: {town: {station: data or {"error": "Estación no encontrada"}}}}
         logging.info(prov)
         self.render_json({"info": info, "latlon": get_latlon(prov=prov, town=town, station=station)})
-
+class GeoApi(BaseHandler):
+    def get(self):
+        self.render_json({"info": "hola"})
+class Search(BaseHandler):
+    def get(self):
+        self.render("base.html", 
+            scripts=['search.js'],
+            content=jinja_env.get_template("search.html").render())
+        
 def handle_404(request, response, exception):
     #http://webapp-improved.appspot.com/guide/exceptions.html
     logging.exception(exception)
@@ -152,13 +169,17 @@ def handle_500(request, response, exception):
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/admin/?', AdminHandler),
-    ('/update/?(\w+)?', Update),
-    ('/search/?', Search),
+    ('/admin/update/?(\w+)?', AdminUpdate),
+    ('/admin/search/?', AdminSearch),
     ('/map/?', Map),
     ('/stats/?', Stats),
     ('/data/(\w+)/(\w+)', Data),
-    ('/gasolineras/?([^ \/]+)/?([^ \/]+)?/?([^ \/]+)?', List),
-    ('/api/?([^ \/]+)/?([^ \/]+)?/?([^ \/]+)?', Api)
+    ('/gasolineras/?([^ \/]+)/?([^ \/]+)?/?', List),
+    ('/ficha/?([^ \/]+)/?([^ \/]+)?/?([^ \/]+)?', Detail),
+    ('/api/?([^ \/]+)/?([^ \/]+)?/?([^ \/]+)?', Api),
+    ('/buscador/?', Search),
+    ('/geo/?', GeoApi),
+
 ], debug=True)
 
 app.error_handlers[404] = handle_404

@@ -144,24 +144,31 @@ footer a:hover{
 /* Filtros */
 .T_G95 {
 	background-color: #6699FF;
+	color: white;
 }
 .T_G98 {
 	background-color: #CC9933;
+	color: white;
 }
 .T_GOA {
 	background-color: #CC3333;
+	color: white;
 }
 .T_NGO {
 	background-color: #FFCC33;
+	color: white;
 }
 .T_GOB {
 	background-color: #FF9966;
+	color: white;
 }
 .T_GOC {
 	background-color: #00FF33;
+	color: white;
 }
 .T_BIOD {
 	background-color: #009933;
+	color: white;
 }
 #fuel_type {
 	list-style: none;
@@ -175,6 +182,10 @@ th.off, td.off {
 }
 #table {
 	width: 100%;
+}
+#table th.on {
+	padding-right: 15px;
+	cursor: pointer;
 }
 #table tr:hover {
 	font-weight: bold;

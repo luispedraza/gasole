@@ -127,41 +127,55 @@ function initControl() {
 
 		})
 	}
+	// Ordenación de la tabla
+	var heads = document.getElementById("table").getElementsByTagName("th");
+	for (var h=0; h<heads.length; h++) {
+		
+	}
+}
+function populateTable(id) {
+	var info = data.info;
+	var table = document.getElementById(id);
+	var path = document.location.pathname.split("/");
+	for (var p in info) {
+		for (var t in info[p]) {
+			for (var s in info[p][t]) {
+				p_link = path[2] || encodeName(p);
+				t_link = path[3] || encodeName(t);
+				var tr = document.createElement("tr");
+				var td_town = document.createElement("td");
+				var a_town = document.createElement("a");
+				a_town.href = "/gasolineras/" + p_link + "/" + t_link;
+				a_town.innerText = t;
+				td_town.appendChild(a_town);
+				tr.appendChild(td_town);
+				td_s = document.createElement("td");
+				a_s = document.createElement("a");
+				a_s.href = "/ficha/" + p_link + "/" + t_link + "/" + encodeName(s);
+				a_s.innerText = toTitle(s);
+				td_s.appendChild(a_s);
+				tr.appendChild(td_s);
+				for (var o in FUEL_OPTIONS) {
+					var otd = document.createElement("td");
+					otd.className = "T_" + FUEL_OPTIONS[o]["short"] + " on";
+					otd.innerText = info[p][t][s]["options"][o] || "";
+					tr.appendChild(otd);
+				}
+				table.appendChild(tr);
+			}
+		}
+	}
 }
 
-function toTitle(s) {
-	return s.replace(" [N]", "")
-		.replace(/^CARRETERA ?|^CR\.? ?/, "CTRA. ")
-		.replace(/(CTRA. )+/, "CTRA. ")
-		.replace(/^AVENIDA ?|^AV. ?/, "AVDA. ")
-		.replace(/^POLIGONO INDUSTRIAL ?|POLIGONO ?|P\.I\. ?/, "POL. IND. ")
-		.replace(/^CALLE |^CL\.? ?|C\/ ?/, "C/ ")
-		.replace(/^RONDA |^RD /, "RDA. ")
-		.replace(/^AUTOPISTA ?(AUTOPISTA ?)?/, "AU. ")
-		.replace(/^PLAZA ?/, "PZA. ")
-		.replace(/^PASEO (PASEO ?)?/, "Pº ")
-		.replace(/^TRAVESS?[IÍ]A /, "TRAV. ")
-		.replace(/\B[^\d- ]+[ $]/g, function(t) {return t.toLowerCase()})
-}
-function cleanName(s) {
-	var r = s.replace("___", "/").replace("__", "/").replace(/_/g, " ");
-	if (r.match("/")) {
-		r = r.split("/")[1];
-	}
-	if (r.match(/\)$/)) {
-		r = r.match(/\(.+\)$/g)[0]
-			.replace("(", "").replace(")", " ") + r.split(" (")[0];
-	}
-	return r;
-}
 window.addEventListener("load", function(){
 	var req = new XMLHttpRequest();
 	req.onload = function(r) {
 		data = JSON.parse(r.target.responseText);
-		var path = document.location.pathname.split("/");
-		province = cleanName(decodeURI(path[2]));
-		if (path[3]) {
-			town = cleanName(decodeURI(path[3]));
+		console.log(data);
+		var pts = decodeArray(document.location.pathname.split("/").splice(2));
+		province = prettyName(pts[0]);
+		if (pts[1]) {
+			town = prettyName(pts[1]);
 		}
 		var h1 = document.getElementById("title");
 		h1.innerText = "Gasolineras en " + ((town) ? (town + ", ") : ("la ")) + "provincia de " + province;
@@ -169,40 +183,7 @@ window.addEventListener("load", function(){
   		script.type = "text/javascript";
   		script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyD5XZNFlQsyWtYDeKual-OcqmP_5pgwbds&sensor=false&region=ES&callback=initMap";
   		document.body.appendChild(script);
-		
-		console.log(data);
-		var info = data.info;
-		var latlon = data.latlon;
-		var list = document.getElementById("list");
-		var path = window.location.pathname.split("/");
-		var table = document.getElementById("table_data");
-		for (var p in info) {
-			for (var t in info[p]) {
-				for (var s in info[p][t]) {
-					p_link = p.replace(/ \/ /g, "___").replace(/\//g, "__").replace(/ /g, "_");
-					t_link = t.replace(/ \/ /g, "___").replace(/\//g, "__").replace(/ /g, "_");
-					var tr = document.createElement("tr");
-					var td = document.createElement("td");
-					var a = document.createElement("a");
-					a.href = "/gasolineras/" + p_link + "/" + t_link;
-					a.innerText = t;
-					td.appendChild(a)
-					tr.appendChild(td);
-					td = document.createElement("td");
-					station = toTitle(s);
-					td.innerText = station;
-					tr.appendChild(td);
-					for (var o in FUEL_OPTIONS) {
-						var otd = document.createElement("td");
-						otd.className = "T_" + FUEL_OPTIONS[o]["short"] + " on";
-						otd.innerText = info[p][t][s]["options"][o] || "";
-						tr.appendChild(otd);
-					}
-					table.appendChild(tr);
-				}
-			}
-		}
-
+		populateTable("table_data");
 		initControl();
 	}
 	req.open("GET", document.URL.replace("gasolineras", "api"), true);
@@ -210,3 +191,4 @@ window.addEventListener("load", function(){
 
 	
 })
+
