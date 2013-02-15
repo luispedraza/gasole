@@ -130,7 +130,33 @@ function initControl() {
 	// Ordenación de la tabla
 	var heads = document.getElementById("table").getElementsByTagName("th");
 	for (var h=0; h<heads.length; h++) {
-		
+		heads[h].addEventListener("click", function(e) {
+			function quickSort(a) {
+				if (a.length<=1) return a;
+				var pivot = a.splice(Math.floor(Math.random()*a.length), 1);
+				var less = [];
+				var greater = [];
+				for (var i=0; i<a.length; i++) {
+					if (a[i][0]<pivot[0]) less.push(a[i]);
+					else greater.push(a[i]);
+				}
+				return quickSort(less).concat(pivot, quickSort(greater));
+			}
+			var cname = e.target.className.match(/T_.+/);
+			var table_data = document.getElementById("table_data");
+			var values = table_data.getElementsByClassName(cname);
+			var array = [];
+			for (var v=0; v<values.length; v++)
+				if (values[v].innerText)
+					array.push([values[v].innerText, v]);
+			array = quickSort(array);
+			console.log(array)
+			var rows = table_data.getElementsByTagName("tr");
+			for (var e=0; e<array.length; e++) {
+				table_data.insertBefore(rows[array[e][1]], rows[e+1]);
+				alert("hola");
+			}
+		})
 	}
 }
 function populateTable(id) {
