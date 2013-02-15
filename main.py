@@ -125,7 +125,7 @@ class Detail(BaseHandler):
     def get(self, province, city, station):
         self.render("base.html", 
             styles=['detail.css'],
-            scripts=['utils.js', 'detail.js'],
+            scripts=['utils.js', 'detail.js', 'raphael-min.js', 'g.raphael-min.js', 'g.line-min.js'],
             content=jinja_env.get_template("detail.html").render())
 class Api(BaseHandler):
     def decode_param(self, s):
@@ -143,7 +143,9 @@ class Api(BaseHandler):
                 if data and station:
                     station = self.decode_param(station)
                     data = data.get(station)
-                    info = {prov: {town: {station: data or {"error": "Estación no encontrada"}}}}
+                    info = {prov: {town: {station: data or {"error": "Estación no encontrada"}}},
+                    "history": get_history(prov, town, station)
+                    }
         logging.info(prov)
         self.render_json({"info": info, "latlon": get_latlon(prov=prov, town=town, station=station)})
 class GeoApi(BaseHandler):

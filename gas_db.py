@@ -137,6 +137,12 @@ def get_latlon(prov, town=None, station=None):
 		return {prov: latlon_cache}
 	return {"error": "Datos no encontrados"}
 
+def get_history(prov, town, station):
+	result = {}
+	q = HistoryData.all().ancestor(db.Key.from_path('Province', prov, 'Town', town, 'GasStation', station))
+	for h in q:
+		result[h.date.isoformat()] = {k: getattr(h, k) for k in h.dynamic_properties()}
+	return result
 
 
 # precios medios de combustible por provincia
