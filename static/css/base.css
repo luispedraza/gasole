@@ -203,8 +203,12 @@ th.off, td.off {
 }
 
 
-
-
+.pivot {
+	background-color: red;
+}
+.moving {
+	background-color: blue;
+}
 
 
 

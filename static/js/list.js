@@ -137,7 +137,7 @@ function initControl() {
 				var less = [];
 				var greater = [];
 				for (var i=0; i<a.length; i++) {
-					if (a[i][0]<pivot[0]) less.push(a[i]);
+					if (a[i][0]<=pivot[0]) less.push(a[i]);
 					else greater.push(a[i]);
 				}
 				return quickSort(less).concat(pivot, quickSort(greater));
@@ -150,11 +150,11 @@ function initControl() {
 				if (values[v].innerText)
 					array.push([values[v].innerText, v]);
 			array = quickSort(array);
-			console.log(array)
 			var rows = table_data.getElementsByTagName("tr");
+			var static_rows = [];
+			for (var r=0; r<rows.length; r++) static_rows.push(rows[r]);
 			for (var e=0; e<array.length; e++) {
-				table_data.insertBefore(rows[array[e][1]], rows[e+1]);
-				alert("hola");
+				table_data.insertBefore(static_rows[array[e][1]], table_data.children[e]);
 			}
 		})
 	}
