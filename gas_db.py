@@ -97,7 +97,6 @@ def store2data(option=None, prov_kname=None):
 	if prov_kname:
 		q.ancestor(db.Key.from_path('Province', prov_kname))
 	result = ResultIter()
-	# option = sorted(FUEL_OPTIONS.keys())[1:]
 	# _clean = []
 	for price in q:
 		prices = {FUEL_REVERSE[o]: getattr(price, o) for o in price.dynamic_properties()}

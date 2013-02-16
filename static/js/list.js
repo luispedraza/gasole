@@ -133,7 +133,10 @@ function initControl() {
 		heads[h].addEventListener("click", function(e) {
 			function quickSort(a) {
 				if (a.length<=1) return a;
-				var pivot = a.splice(Math.floor(Math.random()*a.length), 1);
+				var npivot = Math.floor(Math.random()*a.length);
+				for (var p=npivot+1; p<a.length; p++)
+					if (a[p][0]!=a[npivot][0]) break;
+				var pivot = a.splice(p-1, 1);
 				var less = [];
 				var greater = [];
 				for (var i=0; i<a.length; i++) {
