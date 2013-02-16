@@ -100,11 +100,7 @@ def store2data(option=None, prov_kname=None):
 	# option = sorted(FUEL_OPTIONS.keys())[1:]
 	# _clean = []
 	for price in q:
-		prices = {}
-		# for o in option:
-		# 	prices[o] = getattr(price, FUEL_OPTIONS[o]["short"], None)
-		for o in price.dynamic_properties():
-			prices[FUEL_REVERSE[o]] = getattr(price, o)
+		prices = {FUEL_REVERSE[o]: getattr(price, o) for o in price.dynamic_properties()}
 		# 	if prices[FUEL_REVERSE[o]] == None:
 		# 		delattr(price, o)
 		# 		del(prices[FUEL_REVERSE[o]])
@@ -139,7 +135,7 @@ def get_latlon(prov, town=None, station=None):
 
 def get_history(prov, town, station):
 	result = {}
-	q = HistoryData.all().ancestor(db.Key.from_path('Province', prov, 'Town', town, 'GasStation', station))
+	q = HistoryData.all().ancestor(db.Key.from_path('Province', prov, 'Town', town, 'GasStation', station)).order('date')
 	for h in q:
 		result[h.date.isoformat()] = {k: getattr(h, k) for k in h.dynamic_properties()}
 	return result
