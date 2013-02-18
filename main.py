@@ -21,6 +21,10 @@ from gas_maps import *
 from gas_db import *
 from google.appengine.api import users
 
+
+def decode_param(s):
+    return s.decode('utf-8').replace("_", " ").replace("|", "/")
+
 class MainHandler(BaseHandler):
     def get(self):
         self.render("base.html")
@@ -123,28 +127,41 @@ class List(BaseHandler):
             content=jinja_env.get_template("list.html").render())
 class Detail(BaseHandler):
     def get(self, province, city, station):
+        # Vista de detalle de una gasolinera
         self.render("base.html", 
             styles=['detail.css'],
             scripts=['utils.js', 'detail.js', 'raphael-min.js', 'g.raphael-min.js', 'g.line-min.js'],
             content=jinja_env.get_template("detail.html").render())
+    def post(self, province, city, station):
+        # Creación de un nuevo comentario sobre una estación
+        title=self.request.get("title")
+        content=self.request.get("content")
+        if title and content:
+            comment = Comment(title=title, content=content,
+                parent=db.Key.from_path('Province', decode_param(province), 
+                    'Town', decode_param(city), 
+                    'GasStation', decode_param(station)))
+            comment.put()
+            logging.info(self.request)
+            self.get(province=province, city=city, station=station)
+
 class Api(BaseHandler):
-    def decode_param(self, s):
-        return s.decode('utf-8').replace("_", " ").replace("|", "/")
     def get(self, prov, town, station):
         if prov:
-            prov = self.decode_param(prov)
+            prov = decode_param(prov)
             data = memcache.get(prov) or store2data(prov_kname=prov).get(prov)
             if not town or town == "Todas":
                 info = {prov: data or {"error": "Provincia no encontrada"}}
             elif data and town:
-                town = self.decode_param(town)
+                town = decode_param(town)
                 data = data.get(town)
                 info = {prov: {town: data or {"error": "Ciudad no encontrada"}}}
                 if data and station:
-                    station = self.decode_param(station)
+                    station = decode_param(station)
                     data = data.get(station)
                     info = {prov: {town: {station: data or {"error": "Estación no encontrada"}}},
-                    "history": get_history(prov, town, station)
+                    "history": get_history(prov, town, station),
+                    "comments" : get_comments(prov, town, station)
                     }
         logging.info(prov)
         self.render_json({"info": info, "latlon": get_latlon(prov=prov, town=town, station=station)})

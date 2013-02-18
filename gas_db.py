@@ -32,6 +32,11 @@ class PriceData(db.Expando):
 class HistoryData(db.Expando):
 	date = db.DateProperty()
 
+class Comment(db.Model):
+	title = db.StringProperty(required=True)
+	content = db.StringProperty(required=True, multiline=True)
+	date = db.DateTimeProperty(auto_now_add=True)
+
 # No actualiza datos de combustible, puesto que sólos on para un tipo, y es
 # más económico hacerlo con todos juntos (desde caché)
 def data2store(data):
@@ -137,6 +142,14 @@ def get_history(prov, town, station):
 	q = HistoryData.all().ancestor(db.Key.from_path('Province', prov, 'Town', town, 'GasStation', station)).order('date')
 	for h in q:
 		result[h.date.isoformat()] = {k: getattr(h, k) for k in h.dynamic_properties()}
+	return result
+def get_comments(prov, town, station):
+	result = {}
+	q = Comment.all().ancestor(db.Key.from_path('Province', prov, 'Town', town, 'GasStation', station)).order('date')
+	for c in q:
+		result[c.key().id()] = {"title": c.title, 
+			"content": c.content,
+			"date": c.date.isoformat()}
 	return result
 
 
