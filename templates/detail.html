@@ -1,0 +1,42 @@
+<div id="detail">
+<h1>Detalle de la gasolinera</h1>
+
+<table id="detail_table">
+<tr>
+	<td>Rótulo</td><td id="sign"></td>
+</tr>
+<tr>
+	<td>Provincia</td><td id="province"></td>
+</tr>
+<tr>
+	<td>Localidad</td><td id="town"></td>
+</tr>
+<tr>
+	<td>Dirección</td><td id="address"></td>
+</tr>
+<tr>
+	<td></td><td id="logo"></td>
+</tr>
+</table>
+
+<div id="map"></div>
+
+<div id="history"></div>
+</div>
+
+<div id="comments">
+	<h1>Opiniones de los usuarios</h1>
+	<p>Identifícate para dejar un comentario</p>
+	<form method="post">
+		<label><div>Título</div><input type="text" name="title" value="{{title}}"></label>
+		<label><div>Contenido</div><textarea name="content" value="{{content}}"></textarea></label>
+		<div class="error">{{error}}</div>
+		<input type="submit" value="Enviar">
+	</form>
+
+	<div id="old_comments">
+	</div>
+
+	<hr>
+
+</div>

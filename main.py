@@ -123,14 +123,19 @@ class Data(BaseHandler):
 class List(BaseHandler):
     def get(self, province, city):
         self.render("base.html", 
-            scripts=['utils.js', 'list.js'],
+            scripts=['/js/utils.js', '/js/list.js'],
             content=jinja_env.get_template("list.html").render())
 class Detail(BaseHandler):
     def get(self, province, city, station):
         # Vista de detalle de una gasolinera
         self.render("base.html", 
             styles=['detail.css'],
-            scripts=['utils.js', 'detail.js', 'raphael-min.js', 'g.raphael-min.js', 'g.line-min.js'],
+            scripts=['/js/utils.js', 
+                '/js/detail.js', 
+                '/js/raphael-min.js', 
+                '/js/g.raphael-min.js', 
+                '/js/g.line-min.js',
+                'https://www.google.com/jsapi'],
             content=jinja_env.get_template("detail.html").render())
     def post(self, province, city, station):
         # Creación de un nuevo comentario sobre una estación
@@ -171,7 +176,7 @@ class GeoApi(BaseHandler):
 class Search(BaseHandler):
     def get(self):
         self.render("base.html", 
-            scripts=['search.js'],
+            scripts=['/js/search.js'],
             content=jinja_env.get_template("search.html").render())
 
 # class Temp(BaseHandler):
