@@ -21,31 +21,62 @@ window.addEventListener("load", function(){
 			commentsDiv.appendChild(newComment);
 		}
 
-
-
 		// Gráficos
-		var r = Raphael(document.getElementById("history"), 640, 480);
-		// Creates pie chart at with center at 320, 200,	
-		// radius 100 and data: [55, 20, 13, 32, 5, 1, 2]
+		// var r = Raphael(document.getElementById("history"), 640, 480);
+		// // Creates pie chart at with center at 320, 200,	
+		// // radius 100 and data: [55, 20, 13, 32, 5, 1, 2]
 	
+		// var history = data.info.history;
+		// xval = []
+		// ytemp = {};
+		// var ndata = 0;
+		// for (var h in history) {
+		// 	ndata++;
+		// 	xval.push(ndata);
+		// 	for (var o in history[h]) {
+		// 		if (!ytemp[o]) ytemp[o] = [];
+		// 		ytemp[o].push(history[h][o]);
+		// 	}
+		// }
+
+		// yval = [];
+		// for (var y in ytemp) yval.push(ytemp[y]);
+		// console.log(yval);
+
+		// r.linechart(0, 0, 400, 400, xval, yval, {smooth: false});
+		
+
+		var chart_data = new google.visualization.DataTable();
+		chart_data.addColumn('date', 'Fecha');
 		var history = data.info.history;
-		xval = []
-		ytemp = {};
-		var ndata = 0;
-		for (var h in history) {
-			ndata++;
-			xval.push(ndata);
-			for (var o in history[h]) {
-				if (!ytemp[o]) ytemp[o] = [];
-				ytemp[o].push(history[h][o]);
+		var init = false;
+		for (var h in history){
+			if (!init) {
+				for (var o in history[h]) {
+					chart_data.addColumn('number', o);
+				}
+				init = true;
 			}
+			var date = h.split("-");
+			var values = [];
+			for (var o in history[h]) {
+					values.push(history[h][o]);
+				}
+
+			chart_data.addRows([
+				[new Date(date[0], date[1]-1, date[2])].concat(values),
+			]);
 		}
+		chart_data.sort(0);
+		// var annotatedtimeline = new google.visualization.AnnotatedTimeLine(
+		// 	document.getElementById('chart'));
+		// annotatedtimeline.draw(chart_data, {'displayAnnotations': true});
 
-		yval = [];
-		for (var y in ytemp) yval.push(ytemp[y]);
-		console.log(yval);
-
-		r.linechart(0, 0, 400, 400, xval, yval, {smooth: false});
+		var options = {
+          title: 'Precios'
+        };
+		var chart = new google.visualization.LineChart(document.getElementById('chart'));
+        chart.draw(chart_data, options);
 	}
 	req.open("GET", document.URL.replace("ficha", "api"), true);
 	req.send();
