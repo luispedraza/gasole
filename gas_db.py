@@ -137,6 +137,19 @@ def get_latlon(prov, town=None, station=None):
 		return {prov: latlon_cache}
 	return {"error": "Datos no encontrados"}
 
+def get_near(lat, lon, dist):
+	near = {}
+	distance = dist*0.01271;
+	logging.info(distance)
+	ne = db.GeoPt(lat=lat+distance, lon=lon+distance)
+	sw = db.GeoPt(lat=lat-distance, lon=lon-distance)
+	q = GeoData.all().filter('geopt >', sw).filter('geopt <', ne)
+	for g in q:
+		logging.info("kk")
+		near.setdefault(g.key().parent().name(), {})[g.key().name()] = [g.geopt.lat, g.geopt.lon]
+	return near
+
+
 def get_history(prov, town, station):
 	result = {}
 	q = HistoryData.all().ancestor(db.Key.from_path('Province', prov, 'Town', town, 'GasStation', station))

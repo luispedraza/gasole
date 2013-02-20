@@ -1,16 +1,12 @@
 function findLocation (loc) {
-	var lat = loc.geometry.location.hb;
-	var lon = loc.geometry.location.ib;
-	window.location = "/geo/"+lat+"/"+lon+"/"+5
-	// var req = new XMLHttpRequest();
-	// req.open("POST", "/", false);
-	// req.setRequestHeader("content-type", "application/x-www-form-urlencoded; charset=utf-8");
-	// var data = "formatted_address="+loc.formatted_address;
-	// data+="&lat="+loc.geometry.location.hb;
-	// data+="&lon="+loc.geometry.location.ib;
-	// req.send(data);
+	var req = new XMLHttpRequest();
+	req.open("POST", "/", false);
+	req.setRequestHeader("content-type", "application/x-www-form-urlencoded; charset=utf-8");
+	var data = "formatted_address="+loc.formatted_address;
+	data+="&lat="+loc.geometry.location.hb;
+	data+="&lon="+loc.geometry.location.ib;
+	req.send(data);
 }
-
 
 function geoCode() {
 	var a = document.getElementById("address").value;

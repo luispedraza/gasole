@@ -21,6 +21,8 @@ from gas_maps import *
 from gas_db import *
 from google.appengine.api import users
 
+GOOGLE_MAPS_API = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyD5XZNFlQsyWtYDeKual-OcqmP_5pgwbds&sensor=false&region=ES'
+GOOGLE_VIS_API = 'https://www.google.com/jsapi?autoload={modules:[{name:visualization,version:1,packages:[corechart,AnnotatedTimeLine]}]}'
 
 def decode_param(s):
     return s.decode('utf-8').replace("_", " ").replace("|", "/")
@@ -119,19 +121,16 @@ class Data(BaseHandler):
 class List(BaseHandler):
     def get(self, province, city):
         self.render("base.html", 
-            scripts=['/js/utils.js', '/js/list.js'],
+            scripts=['/js/utils.js', '/js/list.js', GOOGLE_MAPS_API],
             content=jinja_env.get_template("list.html").render())
 class Detail(BaseHandler):
     def get(self, province, city, station):
         # Vista de detalle de una gasolinera
         self.render("base.html", 
             styles=['detail.css', 'chart.css'],
-            scripts=['https://www.google.com/jsapi?autoload={modules:[{name:visualization,version:1,packages:[corechart,AnnotatedTimeLine]}]}',
+            scripts=[GOOGLE_VIS_API,
                 '/js/utils.js', 
-                '/js/detail.js', 
-                # '/js/raphael-min.js', 
-                # '/js/g.raphael-min.js', 
-                # '/js/g.line-min.js',
+                '/js/detail.js'
                 ],
             content=jinja_env.get_template("detail.html").render())
     def post(self, province, city, station):
@@ -168,12 +167,14 @@ class Api(BaseHandler):
         logging.info(prov)
         self.render_json({"info": info, "latlon": get_latlon(prov=prov, town=town, station=station)})
 class GeoApi(BaseHandler):
-    def get(self):
-        self.render_json({"info": "hola"})
+    def get(self, lat, lon, dist):
+        latlon = get_near(lat=float(lat), lon=float(lon), dist=float(dist))
+        self.render_json({"info": {}, "latlon": {"varios": latlon}})
 class Search(BaseHandler):
     def get(self):
         self.render("base.html", 
-            scripts=['/js/geocode.js'],
+            styles =['search.css'],
+            scripts=[GOOGLE_MAPS_API, '/js/geocode.js'],
             content=jinja_env.get_template("search.html").render())
 
 # class Temp(BaseHandler):
@@ -218,7 +219,7 @@ app = webapp2.WSGIApplication([
     ('/ficha/?([^ \/]+)/?([^ \/]+)?/?([^ \/]+)?', Detail),
     ('/api/?([^ \/]+)/?([^ \/]+)?/?([^ \/]+)?', Api),
     ('/buscador/?', Search),
-    ('/geo/?', GeoApi)
+    ('/geo/(.+)/(.+)/(.+)/?', GeoApi)
     # ('/temp/(\d+)/?', Temp)
 
 ], debug=True)

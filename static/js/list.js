@@ -208,16 +208,11 @@ window.addEventListener("load", function(){
 		}
 		var h1 = document.getElementById("title");
 		h1.textContent = "Gasolineras en " + ((town) ? (town + ", ") : ("la ")) + "provincia de " + province;
-		var script = document.createElement("script");
-  		script.type = "text/javascript";
-  		script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyD5XZNFlQsyWtYDeKual-OcqmP_5pgwbds&sensor=false&region=ES&callback=initMap";
-  		document.body.appendChild(script);
 		populateTable("table_data");
+		initMap();
 		initControl();
 	}
 	req.open("GET", document.URL.replace("gasolineras", "api"), true);
 	req.send();
-
-	
 })
 
