@@ -167,15 +167,21 @@ class Api(BaseHandler):
         logging.info(prov)
         self.render_json({"info": info, "latlon": get_latlon(prov=prov, town=town, station=station)})
 class GeoApi(BaseHandler):
-    def get(self, lat, lon, dist):
+    def get(self, place, lat, lon, dist):
         latlon = get_near(lat=float(lat), lon=float(lon), dist=float(dist))
-        self.render_json({"info": {}, "latlon": {"varios": latlon}})
+        self.render_json({"info": {}, "latlon": {place: latlon}})
 class Search(BaseHandler):
     def get(self):
         self.render("base.html", 
             styles =['search.css'],
             scripts=[GOOGLE_MAPS_API, '/js/geocode.js'],
             content=jinja_env.get_template("search.html").render())
+
+class SearchResults(BaseHandler):
+    def get(self, place, lat, lon, dist):
+        self.render("base.html", 
+            scripts=['/js/utils.js', '/js/list.js', GOOGLE_MAPS_API],
+            content=jinja_env.get_template("list.html").render())
 
 # class Temp(BaseHandler):
 #     #functión temporal para limpiar históricos de valores nulos no asignados
@@ -219,7 +225,9 @@ app = webapp2.WSGIApplication([
     ('/ficha/?([^ \/]+)/?([^ \/]+)?/?([^ \/]+)?', Detail),
     ('/api/?([^ \/]+)/?([^ \/]+)?/?([^ \/]+)?', Api),
     ('/buscador/?', Search),
-    ('/geo/(.+)/(.+)/(.+)/?', GeoApi)
+    ('/geo/(.+)/(.+)/(.+)/(.+)/?', GeoApi),
+    ('/resultados/(.+)/(.+)/(.+)/(.+)/?', SearchResults),
+
     # ('/temp/(\d+)/?', Temp)
 
 ], debug=True)

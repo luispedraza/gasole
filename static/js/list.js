@@ -212,7 +212,13 @@ window.addEventListener("load", function(){
 		initMap();
 		initControl();
 	}
-	req.open("GET", document.URL.replace("gasolineras", "api"), true);
+	var url = document.URL;
+	if (url.match("gasolineras")) {
+		req.open("GET", document.URL.replace("gasolineras", "api"), true)
+	}
+	else if (url.match("resultados")) {
+		req.open("GET", document.URL.replace("resultados", "geo"), true);
+	}
 	req.send();
 })
 

@@ -5,6 +5,7 @@ from google.appengine.ext import db
 from google.appengine.api import memcache
 from gas_update import *
 import logging
+from math import fabs
 
 import os
 DEBUG = os.environ['SERVER_SOFTWARE'].startswith('Dev')
@@ -145,8 +146,8 @@ def get_near(lat, lon, dist):
 	sw = db.GeoPt(lat=lat-distance, lon=lon-distance)
 	q = GeoData.all().filter('geopt >', sw).filter('geopt <', ne)
 	for g in q:
-		logging.info("kk")
-		near.setdefault(g.key().parent().name(), {})[g.key().name()] = [g.geopt.lat, g.geopt.lon]
+		if abs(g.geopt.lon-lon) < distance:
+			near.setdefault(g.key().parent().name(), {})[g.key().name()] = [g.geopt.lat, g.geopt.lon]
 	return near
 
 
