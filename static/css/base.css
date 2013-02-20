@@ -177,11 +177,26 @@ footer a:hover{
 li.off {
 	background-color: #bbb;
 }
+th {
+	border-bottom: 1px dotted red;
+	padding: 0;
+	margin: 0;
+}
 th.off, td.off {
 	display: none;
 }
 #table {
-	width: 100%;
+	margin-right: 10px;
+}
+#table td {
+	border: 0;
+}
+#table a {
+	text-decoration: none;
+	color: black;
+}
+#table a:hover {
+	text-decoration: underline;
 }
 #table th.on {
 	padding-right: 15px;
@@ -189,6 +204,7 @@ th.off, td.off {
 }
 #table tr:hover {
 	font-weight: bold;
+	background-color: #eee;
 }
 #table tr.off {
 	display: none;
@@ -201,6 +217,8 @@ th.off, td.off {
 	text-align: center;
 	cursor: pointer;
 }
-
+col:hover {
+	font-weight: bold;
+}
 
 

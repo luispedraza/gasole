@@ -177,7 +177,7 @@ class GeoApi(BaseHandler):
 class Search(BaseHandler):
     def get(self):
         self.render("base.html", 
-            scripts=['/js/search.js'],
+            scripts=['/js/geocode.js'],
             content=jinja_env.get_template("search.html").render())
 
 # class Temp(BaseHandler):

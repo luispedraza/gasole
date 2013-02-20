@@ -76,7 +76,7 @@ function initControl() {
 				var tds = row.getElementsByClassName("on");
 				var st_aux = ""
 				for (var td=0; td<tds.length; td++) {
-					st_aux+=tds[td].innerText;
+					st_aux+=tds[td].textContent;
 				}
 				row.className = (st_aux.length) ? ("") : "off";
 			}
@@ -109,7 +109,7 @@ function initControl() {
 					var cells = file.getElementsByTagName("td");
 					for (var c=0; c<2; c++) {
 						var cell = cells[c];
-						found = found || (RegExp(term, "i").exec(cleanFilter(cell.innerText)) != null);
+						found = found || (RegExp(term, "i").exec(cleanFilter(cell.textContent)) != null);
 					}
 					if (found != expected) 
 						file.style.display = "none";
@@ -150,8 +150,8 @@ function initControl() {
 			var values = table_data.getElementsByClassName(cname);
 			var array = [];
 			for (var v=0; v<values.length; v++)
-				if (values[v].innerText)
-					array.push([values[v].innerText, v]);
+				if (values[v].textContent)
+					array.push([values[v].textContent, v]);
 			array = quickSort(array);
 			var rows = table_data.getElementsByTagName("tr");
 			var static_rows = [];
@@ -175,19 +175,19 @@ function populateTable(id) {
 				var td_town = document.createElement("td");
 				var a_town = document.createElement("a");
 				a_town.href = "/gasolineras/" + p_link + "/" + t_link;
-				a_town.innerText = t;
+				a_town.textContent = t;
 				td_town.appendChild(a_town);
 				tr.appendChild(td_town);
 				td_s = document.createElement("td");
 				a_s = document.createElement("a");
 				a_s.href = "/ficha/" + p_link + "/" + t_link + "/" + encodeName(s);
-				a_s.innerText = toTitle(s);
+				a_s.textContent = toTitle(s);
 				td_s.appendChild(a_s);
 				tr.appendChild(td_s);
 				for (var o in FUEL_OPTIONS) {
 					var otd = document.createElement("td");
 					otd.className = "T_" + FUEL_OPTIONS[o]["short"] + " on";
-					otd.innerText = info[p][t][s]["options"][o] || "";
+					otd.textContent = info[p][t][s]["options"][o] || "";
 					tr.appendChild(otd);
 				}
 				table.appendChild(tr);
@@ -207,7 +207,7 @@ window.addEventListener("load", function(){
 			town = prettyName(pts[1]);
 		}
 		var h1 = document.getElementById("title");
-		h1.innerText = "Gasolineras en " + ((town) ? (town + ", ") : ("la ")) + "provincia de " + province;
+		h1.textContent = "Gasolineras en " + ((town) ? (town + ", ") : ("la ")) + "provincia de " + province;
 		var script = document.createElement("script");
   		script.type = "text/javascript";
   		script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyD5XZNFlQsyWtYDeKual-OcqmP_5pgwbds&sensor=false&region=ES&callback=initMap";
