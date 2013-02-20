@@ -30,9 +30,8 @@ class BaseHandler(webapp2.RequestHandler):
 		self.write(self.render_str(template, **kw))
 
 	def check_user_name(self):
-		# if self.user.nickname() != "luispedraza":
-		# 	self.redirect("/")
-			pass
+		if self.user.nickname() != "luispedraza":
+			self.redirect("/")
 
 	def initialize(self, *a, **kw):
 		webapp2.RequestHandler.initialize(self, *a, **kw)
