@@ -140,13 +140,15 @@ def get_latlon(prov, town=None, station=None):
 
 def get_near(lat, lon, dist):
 	near = {}
-	distance = dist*0.01271;
+	# http://www.csgnetwork.com/degreelenllavcalc.html
+	dlat = dist/111.03461
+	dlon = dist/85.39383
 	logging.info(distance)
-	ne = db.GeoPt(lat=lat+distance, lon=lon+distance)
-	sw = db.GeoPt(lat=lat-distance, lon=lon-distance)
+	ne = db.GeoPt(lat=lat+dlat, lon=lon+dlon)
+	sw = db.GeoPt(lat=lat-dlat, lon=lon-dlon)
 	q = GeoData.all().filter('geopt >', sw).filter('geopt <', ne)
 	for g in q:
-		if abs(g.geopt.lon-lon) < distance:
+		if abs(g.geopt.lon-lon) < dlon:
 			near.setdefault(g.key().parent().name(), {})[g.key().name()] = [g.geopt.lat, g.geopt.lon]
 	return near
 
