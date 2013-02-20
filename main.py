@@ -42,7 +42,6 @@ class AdminHandler(BaseHandler):
 
 class AdminUpdate(BaseHandler):
     def get(self, method):
-        self.check_user_name()
         if method and method=="csv":
             self.render("admin_update_csv.html",
             	options=FUEL_OPTIONS,
@@ -55,7 +54,6 @@ class AdminUpdate(BaseHandler):
             self.redirect("/")
 
     def post(self, method):
-        self.check_user_name()
     	option = self.request.get("option")
         if method and method=="csv":
             data = gas_update_csv(option)
@@ -72,12 +70,10 @@ class AdminUpdate(BaseHandler):
 
 class AdminSearch(BaseHandler):
     def get(self):
-        self.check_user_name()
         self.render("admin_search.html",
             options = FUEL_OPTIONS,
             provs = PROVS)
     def post(self):
-        self.check_user_name()
         option = self.request.get("option")
         prov = self.request.get("prov")
         update = self.request.get("updatedb")
@@ -110,28 +106,23 @@ class AdminSearch(BaseHandler):
 
 class Map(BaseHandler):
     def get(self):
-        self.check_user_name()
         self.render("map.html")
 
 class Stats(BaseHandler):
     def get(self):
-        self.check_user_name()
         self.render("base.html", content=jinja_env.get_template("stats.html").render())
 
 class Data(BaseHandler):
     def get(self, option, province):
-        self.check_user_name()
         data = get_means(option)
         self.render_json(data)
 class List(BaseHandler):
     def get(self, province, city):
-        self.check_user_name()
         self.render("base.html", 
             scripts=['/js/utils.js', '/js/list.js'],
             content=jinja_env.get_template("list.html").render())
 class Detail(BaseHandler):
     def get(self, province, city, station):
-        self.check_user_name()
         # Vista de detalle de una gasolinera
         self.render("base.html", 
             styles=['detail.css', 'chart.css'],
@@ -144,7 +135,6 @@ class Detail(BaseHandler):
                 ],
             content=jinja_env.get_template("detail.html").render())
     def post(self, province, city, station):
-        self.check_user_name()
         # Creación de un nuevo comentario sobre una estación
         title=self.request.get("title")
         content=self.request.get("content")
@@ -159,7 +149,6 @@ class Detail(BaseHandler):
 
 class Api(BaseHandler):
     def get(self, prov, town, station):
-        self.check_user_name()
         if prov:
             prov = decode_param(prov)
             data = memcache.get(prov) or store2data(prov_kname=prov).get(prov)
@@ -180,11 +169,9 @@ class Api(BaseHandler):
         self.render_json({"info": info, "latlon": get_latlon(prov=prov, town=town, station=station)})
 class GeoApi(BaseHandler):
     def get(self):
-        self.check_user_name()
         self.render_json({"info": "hola"})
 class Search(BaseHandler):
     def get(self):
-        self.check_user_name()
         self.render("base.html", 
             scripts=['/js/geocode.js'],
             content=jinja_env.get_template("search.html").render())
