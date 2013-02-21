@@ -143,7 +143,6 @@ def get_near(lat, lon, dist):
 	# http://www.csgnetwork.com/degreelenllavcalc.html
 	dlat = dist/111.03461
 	dlon = dist/85.39383
-	logging.info(distance)
 	ne = db.GeoPt(lat=lat+dlat, lon=lon+dlon)
 	sw = db.GeoPt(lat=lat-dlat, lon=lon-dlon)
 	q = GeoData.all().filter('geopt >', sw).filter('geopt <', ne)

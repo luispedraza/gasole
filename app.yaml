@@ -6,8 +6,13 @@ threadsafe: yes
 
 builtins:
 - remote_api: on
+- deferred: on
 
 handlers:
+- url: /clean_history
+  script: clean_history.app
+  login: admin
+  secure: always
 - url: /robots.txt
   static_files: static/txt/robots.txt
   upload: static/txt/robots.txt

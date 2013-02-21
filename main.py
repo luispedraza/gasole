@@ -183,25 +183,6 @@ class SearchResults(BaseHandler):
             scripts=['/js/utils.js', '/js/list.js', GOOGLE_MAPS_API],
             content=jinja_env.get_template("list.html").render())
 
-# class Temp(BaseHandler):
-#     #functión temporal para limpiar históricos de valores nulos no asignados
-#     def get(self, offset):
-#         _clean = []
-#         q = HistoryData.all()
-#         result = q.fetch(limit=1000, offset=int(offset))
-#         for h in result:
-#             modified = False
-#             for p in h.dynamic_properties():
-#                 if getattr(h, p) == None:
-#                     delattr(h, p)
-#                     modified = True
-#             if modified: 
-#                 _clean.append(h)
-#         db.put_async(_clean)
-#         logging.info("limpiados %s históricos de %s" %(len(_clean), len(result)))
-        
-
-
 def handle_404(request, response, exception):
     #http://webapp-improved.appspot.com/guide/exceptions.html
     logging.exception(exception)
@@ -226,10 +207,7 @@ app = webapp2.WSGIApplication([
     ('/api/?([^ \/]+)/?([^ \/]+)?/?([^ \/]+)?', Api),
     ('/buscador/?', Search),
     ('/geo/(.+)/(.+)/(.+)/(.+)/?', GeoApi),
-    ('/resultados/(.+)/(.+)/(.+)/(.+)/?', SearchResults),
-
-    # ('/temp/(\d+)/?', Temp)
-
+    ('/resultados/(.+)/(.+)/(.+)/(.+)/?', SearchResults)
 ], debug=True)
 
 app.error_handlers[404] = handle_404
