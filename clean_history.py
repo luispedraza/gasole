@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # https://developers.google.com/appengine/articles/update_schema
 import webapp2
-import models
+from gas_db import *
 import logging
 from google.appengine.ext import deferred
 from google.appengine.ext import db
