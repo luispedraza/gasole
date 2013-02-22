@@ -103,13 +103,8 @@ def store2data(option=None, prov_kname=None):
 	if prov_kname:
 		q.ancestor(db.Key.from_path('Province', prov_kname))
 	result = ResultIter()
-	# _clean = []
 	for price in q:
 		prices = {FUEL_REVERSE[o]: getattr(price, o) for o in price.dynamic_properties()}
-		# 	if prices[FUEL_REVERSE[o]] == None:
-		# 		delattr(price, o)
-		# 		del(prices[FUEL_REVERSE[o]])
-		# _clean.append(price)
 		station = price.parent()
 		result.add_item(
 			province = price.key().parent().parent().parent().name(),
@@ -120,7 +115,6 @@ def store2data(option=None, prov_kname=None):
 			option   = prices,
 			hours    = station.hours)
 	memcache.set(prov_kname, result.data.get(prov_kname))
-	# db.put(_clean)
 	return result.data
 
 def get_latlon(prov, town=None, station=None):

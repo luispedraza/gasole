@@ -9,8 +9,8 @@ builtins:
 - deferred: on
 
 handlers:
-- url: /clean_history
-  script: clean_history.app
+# - url: /clean
+#   script: clean_history.app
 - url: /robots.txt
   static_files: static/txt/robots.txt
   upload: static/txt/robots.txt

@@ -7,10 +7,11 @@ import logging
 from google.appengine.ext import deferred
 from google.appengine.ext import db
 
-BATCH_SIZE = 500  # ideal batch size may vary based on entity size.
+BATCH_SIZE = 1000  # ideal batch size may vary based on entity size.
 
-def CleanHistory(cursor=None, num_updated=0):
-	query = models.HistoryData.all()
+def Clean(cursor=None, num_updated=0):
+	# query = PriceData.all()
+	query = HistoryData.all()
 	if cursor:
 		query.with_cursor(cursor)
 	to_put = []
@@ -32,14 +33,16 @@ def CleanHistory(cursor=None, num_updated=0):
 			len(to_put), num_updated)
 	if counter:
 		deferred.defer(
-			CleanHistory, cursor=query.cursor(), num_updated=num_updated)
+			Clean, cursor=query.cursor(), num_updated=num_updated)
 	else:
 		logging.debug(
 			'UpdateSchema complete with %d updates!', num_updated)
 
-class CleanHistoryHandler(webapp2.RequestHandler):
+class CleanHandler(webapp2.RequestHandler):
     def get(self):
-        deferred.defer(UpdateSchema)
+        deferred.defer(Clean)
         self.response.out.write('Schema migration successfully initiated.')
 
-app = webapp2.WSGIApplication([('/clean_history', CleanHistoryHandler)])
+app = webapp2.WSGIApplication([
+	('/clean', CleanHandler)
+	])

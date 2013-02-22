@@ -120,7 +120,9 @@ class Data(BaseHandler):
         self.render_json(data)
 class List(BaseHandler):
     def get(self, province, city):
+        title = "Gasolineras en " + (decode_param(city)+ ", " if city else "la ") + "provincia de " + decode_param(province)
         self.render("base.html", 
+            title = title,
             scripts=['/js/utils.js', '/js/list.js', GOOGLE_MAPS_API],
             content=jinja_env.get_template("list.html").render())
 class Detail(BaseHandler):
