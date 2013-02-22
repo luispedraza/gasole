@@ -1,12 +1,14 @@
-<div id="search_location">
-	<h1>Buscador de Gasolineras</h1>
+<h1>Buscador de Gasolineras</h1>
+<div id="search_form">
+	<h2>Búsqueda Directa</h2>
+	<div class="wrapper">
 	<form action="javascript:geoCode()">
-		<input type="text" id="address" palceholder="hola">
-		<input type="submit" id="search" value="Buscar">
+		<input type="text" id="address" name="address" placeholder="Dirección, ciudad, provincia…" />
+		<button type="submit" id="search" value="Buscar"><img src="/icon/search_icon.png" title="¡Buscar!"/></button>
 	</form>
-	<ol id="results">
-		
-	</ol>
+	</div>
+	
+	<ol id="results"></ol>
 
 
 </div>
