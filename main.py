@@ -128,7 +128,11 @@ class List(BaseHandler):
 class Detail(BaseHandler):
     def get(self, province, city, station):
         # Vista de detalle de una gasolinera
+        logging.info(station)
+        station = station.replace("_[D]", "(margen derecho)").replace("_[I]", " (margen izquierdo)").replace("_[N]", "")
+        title = "Gasolinera en " + decode_param(city) + ", " + decode_param(station)
         self.render("base.html", 
+            title = title,
             styles=['detail.css', 'chart.css'],
             scripts=[GOOGLE_VIS_API,
                 '/js/utils.js', 
@@ -166,7 +170,6 @@ class Api(BaseHandler):
                     "history": get_history(prov, town, station),
                     "comments" : get_comments(prov, town, station)
                     }
-        logging.info(prov)
         self.render_json({"info": info, "latlon": get_latlon(prov=prov, town=town, station=station)})
 class GeoApi(BaseHandler):
     def get(self, place, lat, lon, dist):

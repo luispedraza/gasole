@@ -175,6 +175,7 @@ function populateTable(id) {
 				var td_town = document.createElement("td");
 				var a_town = document.createElement("a");
 				a_town.href = "/gasolineras/" + p_link + "/" + t_link;
+				a_town.title = "Todas las gasolineras de " + t;
 				a_town.textContent = t;
 				td_town.appendChild(a_town);
 				tr.appendChild(td_town);
@@ -182,6 +183,7 @@ function populateTable(id) {
 				a_s = document.createElement("a");
 				a_s.href = "/ficha/" + p_link + "/" + t_link + "/" + encodeName(s);
 				a_s.textContent = toTitle(s);
+				a_s.title = "Detalles de la gasolinera en " + t + ", " + a_s.textContent;
 				td_s.appendChild(a_s);
 				tr.appendChild(td_s);
 				for (var o in FUEL_OPTIONS) {
