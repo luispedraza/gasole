@@ -45,6 +45,10 @@ nav ul {
 	padding: 0;
 	font-size: 20px;
 }
+nav a {
+	text-decoration: none;
+	color: white;
+}
 .menu_search {
 	background-color: #2daddc;
 	border-color: #176c8c;
