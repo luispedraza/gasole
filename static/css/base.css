@@ -108,121 +108,13 @@ footer a:hover{
 
 #content {
 	position: relative;
-	width: 1000px;
-}
-#list {
-	width: 600px;
-	border: 1px dotted black;
-	font-size: 11px;
-	height: 600px;
-	overflow-x: scroll; 
-}
-#filters {
-	width: 400px;
-	height: 80px;
-	position: absolute;
-	right: 0;
-	top: 0;
-	border: 1px dotted black;
-}
-#ads {
-	border: 1px solid black;
-	width: 400px;
-	height: 200px;
-	position: absolute;
-	right: 0;
-	top: 400px;
-
-}
-#google_map {
-	width: 400px;
-	height: 300px;
-	border: 1px dotted black;
-	position: absolute;
-	right: 0;
-	top: 80px;
+	width: 100%;
 }
 
 
 
-/* Filtros */
-.T_G95 {
-	background-color: #6699FF;
-	color: white;
-}
-.T_G98 {
-	background-color: #CC9933;
-	color: white;
-}
-.T_GOA {
-	background-color: #CC3333;
-	color: white;
-}
-.T_NGO {
-	background-color: #FFCC33;
-	color: white;
-}
-.T_GOB {
-	background-color: #FF9966;
-	color: white;
-}
-.T_GOC {
-	background-color: #00FF33;
-	color: white;
-}
-.T_BIOD {
-	background-color: #009933;
-	color: white;
-}
-#fuel_type {
-	list-style: none;
-	padding: 0;
-}
-li.off {
-	background-color: #bbb;
-}
-th {
-	border-bottom: 1px dotted red;
-	padding: 0;
-	margin: 0;
-}
-th.off, td.off {
-	display: none;
-}
-#table {
-	margin-right: 10px;
-}
-#table td {
-	border: 0;
-}
-#table a {
-	text-decoration: none;
-	color: black;
-}
-#table a:hover {
-	text-decoration: underline;
-}
-#table th.on {
-	padding-right: 15px;
-	cursor: pointer;
-}
-#table tr:hover {
-	font-weight: bold;
-	background-color: #eee;
-}
-#table tr.off {
-	display: none;
-}
-#fuel_type li {
-	display: inline-block;
-	width: 40px;
-	border: 1px solid black;
-	color: white;
-	text-align: center;
-	cursor: pointer;
-}
-col:hover {
-	font-weight: bold;
-}
+
+
+
 
 

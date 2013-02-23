@@ -22,7 +22,7 @@ from gas_db import *
 from google.appengine.api import users
 
 GOOGLE_MAPS_API = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyD5XZNFlQsyWtYDeKual-OcqmP_5pgwbds&sensor=false&region=ES'
-GOOGLE_VIS_API = 'https://www.google.com/jsapi?autoload={modules:[{name:visualization,version:1,packages:[corechart,AnnotatedTimeLine]}]}'
+GOOGLE_VIS_API = 'https://www.google.com/jsapi?autoload={modules:[{name:visualization,version:1,packages:[corechart]}]}'
 
 def decode_param(s):
     return s.decode('utf-8').replace("_", " ").replace("|", "/")
@@ -123,6 +123,7 @@ class List(BaseHandler):
         title = "Gasolineras en " + (decode_param(city)+ ", " if city else "la ") + "provincia de " + decode_param(province)
         self.render("base.html", 
             title = title,
+            styles=["list.css"],
             scripts=['/js/utils.js', '/js/list.js', GOOGLE_MAPS_API],
             content=jinja_env.get_template("list.html").render())
 class Detail(BaseHandler):
@@ -180,7 +181,8 @@ class Search(BaseHandler):
         self.render("base.html", 
             styles =['search.css'],
             scripts=[GOOGLE_MAPS_API, '/js/geocode.js'],
-            content=jinja_env.get_template("search.html").render())
+            content=jinja_env.get_template("search.html").render(
+                map=jinja_env.get_template("spain.svg").render()))
 
 class SearchResults(BaseHandler):
     def get(self, place, lat, lon, dist):

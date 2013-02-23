@@ -28,10 +28,13 @@
 	color:#333; 
 	font:bold 24px Helvetica, Arial, sans-serif; 
 	width:510px; 
+	outline: none;
+	padding: 0;
 }
 
 #search_form button {
 	background:-moz-linear-gradient(top, #453e26, #000);
+	background:-webkit-linear-gradient(top, #453e26, #000);
 	border:1px solid #000;
 	-moz-border-radius:2px;
 	-webkit-border-radius:2px;
@@ -40,8 +43,8 @@
 	cursor:pointer;
 	height:45px;
 	position:absolute;
-	right:2px;
-	top:2px;
+	right:5px;
+	top:5px;
 	width:45px;
 }
 

@@ -1,0 +1,173 @@
+#list {
+	width: 60%;
+	font-size: 1em;
+	height: 600px;
+	overflow-x: scroll; 
+}
+
+#google_map {
+	width: 40%;
+	height: 300px;
+	border: 1px dotted black;
+	position: absolute;
+	right: 0;
+	top: 80px;
+}
+#filters {
+	border: 1px dotted black;
+}
+#ads {
+	border: 1px solid black;
+}
+
+/* Tipos de combustible */
+/*.T_G95 {
+	background-color: #6699FF;
+	color: white;
+}
+th.T_G95 {
+	background:-moz-linear-gradient(top, #6699FF, #4D73BF);
+    background:-webkit-gradient(linear, 0 0, 0 100%, from(#6699FF), to(#4D73BF));
+    border:1px solid #334C7E;
+}*/
+li.T_G95 {
+	background-color: #009933;
+	color: white;
+}
+th.T_G95 {
+	background:-moz-linear-gradient(top, #009933, #007527);
+    background:-webkit-gradient(linear, 0 0, 0 100%, from(#009933), to(#007527));
+    border-color:1px solid #004D1A;
+}
+li.T_G98 {
+	background-color: #CC9933;
+	color: white;
+}
+th.T_G98 {
+	background:-moz-linear-gradient(top, #CC9933, #B7882D);
+    background:-webkit-gradient(linear, 0 0, 0 100%, from(#CC9933), to(#B7882D));
+    border:1px solid #805F1F;
+}
+li.T_GOA {
+	background-color: #FF6633;
+	color: white;
+}
+th.T_GOA {
+	background:-moz-linear-gradient(top, #FF6633, #E25A2C);
+    background:-webkit-gradient(linear, 0 0, 0 100%, from(#FF6633), to(#E25A2C));
+    border:1px solid #9C3E1E;
+}
+li.T_NGO {
+	background-color: #FFCC33;
+	color: white;
+}
+th.T_NGO {
+	background:-moz-linear-gradient(top, #FFCC33, #EABB2E);
+    background:-webkit-gradient(linear, 0 0, 0 100%, from(#FFCC33), to(#EABB2E));
+    border:1px solid #AD8A22;
+}
+li.T_GOB {
+	background-color: #003399;
+	color: white;
+}
+th.T_GOB {
+	background:-moz-linear-gradient(top, #004CED, #0041C5);
+    background:-webkit-gradient(linear, 0 0, 0 100%, from(#004CED), to(#0041C5));
+    border-color:1px solid #003399;
+}
+li.T_GOC {
+	background-color: #CC3333;
+	color: white;
+}
+th.T_GOC {
+	background:-moz-linear-gradient(top, #CC3333, #A42828);
+    background:-webkit-gradient(linear, 0 0, 0 100%, from(#CC3333), to(#A42828));
+    border-color:1px solid #7C1D1D;
+}
+li.T_BIOD {
+	background-color: #009933;
+	color: white;
+}
+th.T_BIOD {
+	background:-moz-linear-gradient(top, #009933, #007527);
+    background:-webkit-gradient(linear, 0 0, 0 100%, from(#009933), to(#007527));
+    border-color:1px solid #004D1A;
+}
+#fuel_type {
+	list-style: none;
+	padding: 0;
+}
+li.off {
+	background-color: #bbb;
+}
+th {
+	font-size: 1.2em;
+	-moz-border-radius:3px;
+    -webkit-border-radius:3px;
+    text-align: center;
+    position: relative;
+}
+th svg {
+	padding: 0;
+	height: 15px;
+	width: 15px;
+	position: absolute;
+	bottom: 3px;
+	right: 3px;
+}
+th svg .arrow {
+	fill: none;
+}
+th svg .arrow_down, th svg .arrow_up {
+	fill: #FF5555;
+}
+
+th.off, td.off {
+	display: none;
+}
+tr {
+	margin-top: 5px;
+}
+#table {
+	margin-right: 10px;
+	width: 100%;
+}
+#table td {
+	padding-bottom: 4px;
+	padding-top: 4px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	-o-text-overflow: ellipsis;
+	white-space: nowrap;
+	max-width: 150px;
+}
+
+#table a {
+	text-decoration: none;
+	color: black;
+}
+#table a:hover {
+	text-decoration: underline;
+}
+#table th.on {
+	padding-right: 15px;
+	cursor: pointer;
+}
+#table tr:hover {
+	font-weight: bold;
+	background-color: #eee;
+}
+#table tr.off {
+	display: none;
+}
+#fuel_type li {
+	display: inline-block;
+	width: 40px;
+	border: 1px solid black;
+	color: white;
+	text-align: center;
+	cursor: pointer;
+}
+col:hover {
+	font-weight: bold;
+}

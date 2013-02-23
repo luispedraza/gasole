@@ -130,7 +130,7 @@ function initControl() {
 	// Ordenación de la tabla
 	var heads = document.getElementById("table").getElementsByTagName("th");
 	for (var h=0; h<heads.length; h++) {
-		heads[h].addEventListener("click", function(e) {
+		heads[h].addEventListener("click", function(ev) {
 			function quickSort(a) {
 				if (a.length<=1) return a;
 				var npivot = Math.floor(Math.random()*a.length);
@@ -145,7 +145,7 @@ function initControl() {
 				}
 				return quickSort(less).concat(pivot, quickSort(greater));
 			}
-			var cname = e.target.className.match(/T_.+/);
+			var cname = ev.target.className.match(/T_.+/);
 			var table_data = document.getElementById("table_data");
 			var values = table_data.getElementsByClassName(cname);
 			var array = [];
@@ -159,6 +159,14 @@ function initControl() {
 			for (var e=0; e<array.length; e++) {
 				table_data.insertBefore(static_rows[array[e][1]], table_data.children[e]);
 			}
+			var arrows = document.getElementsByClassName("arrow_down");
+			for (var a=0; a< arrows.length; a++)
+				arrows[a].setAttribute("class", "arrow");
+			arrows = document.getElementsByClassName("arrow_up");
+			for (var a=0; a< arrows.length; a++)
+				arrows[a].setAttribute("class", "arrow");
+			ev.target.getElementsByClassName("arrow")[0]
+				.setAttribute("class", "arrow_down");
 		})
 	}
 }
@@ -176,7 +184,7 @@ function populateTable(id) {
 				var a_town = document.createElement("a");
 				a_town.href = "/gasolineras/" + p_link + "/" + t_link;
 				a_town.title = "Todas las gasolineras de " + t;
-				a_town.textContent = t;
+				a_town.textContent = t.toUpperCase();
 				td_town.appendChild(a_town);
 				tr.appendChild(td_town);
 				td_s = document.createElement("td");
