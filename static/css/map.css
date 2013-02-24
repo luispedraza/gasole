@@ -24,3 +24,23 @@
 	display: none;
 	z-index: 500;
 }
+
+
+.linea_canarias {
+	fill-rule:evenodd;
+	clip-rule:evenodd;
+	fill:none;
+	stroke:#CCCCCC;
+	stroke-linecap:round;
+	stroke-linejoin:round;
+	stroke-miterlimit:3;
+}
+.provincia {
+/*	fill-rule:evenodd;
+	clip-rule:evenodd;*/
+	fill:#F00;
+	cursor: pointer;
+}
+.provincia:hover {
+	opacity: 0.5;
+}

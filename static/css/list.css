@@ -131,6 +131,7 @@ tr {
 #table {
 	margin-right: 10px;
 	width: 100%;
+	border-collapse: collapse;
 }
 #table td {
 	padding-bottom: 4px;
@@ -140,6 +141,7 @@ tr {
 	-o-text-overflow: ellipsis;
 	white-space: nowrap;
 	max-width: 150px;
+	margin-left: 2px;
 }
 
 #table a {
@@ -154,8 +156,7 @@ tr {
 	cursor: pointer;
 }
 #table tr:hover {
-	font-weight: bold;
-	background-color: #eee;
+	background-color: #FFAAAA;
 }
 #table tr.off {
 	display: none;

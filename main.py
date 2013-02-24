@@ -179,8 +179,8 @@ class GeoApi(BaseHandler):
 class Search(BaseHandler):
     def get(self):
         self.render("base.html", 
-            styles =['search.css'],
-            scripts=[GOOGLE_MAPS_API, '/js/geocode.js'],
+            styles =['search.css', 'map.css'],
+            scripts=['/js/search.js'],
             content=jinja_env.get_template("search.html").render(
                 map=jinja_env.get_template("spain.svg").render()))
 
