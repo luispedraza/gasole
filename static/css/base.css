@@ -55,7 +55,8 @@ body {
 body h1 {
 	font-size: 1.8em;
 	margin-top: 1em;
-	margin-bottom: 1.5em;
+	margin-bottom: 1em;
+	border-bottom: 10px solid black;
 }
 body h2 {
 	font-size: 1.4em;
@@ -63,7 +64,7 @@ body h2 {
 	margin-bottom: 1.5em;
 }
 body p {
-	margin-top: .5em;
+	margin-bottom: .5em;
 }
 header, footer {
 	background-color: #333;
@@ -114,8 +115,8 @@ nav a {
 	color: white;
 }
 .menu_search, .submenu_search li {
-	background-color: #2daddc;
-	border-color: #176c8c;
+	background-color: #3399CC;
+	border-color: #006699;
 }
 .submenu_search li {
 	width: 500px;
@@ -144,6 +145,8 @@ nav a {
 	height: 0;
 	overflow: hidden;
 	-webkit-transition: all .5s;
+	-moz-transition: all .5s;
+	transition: all .5s;
 }
 .submenu li {
 	margin-top:  10px;
@@ -191,6 +194,9 @@ footer a:hover{
 #content {
 	position: relative;
 	width: 100%;
+	padding: 10px;
+	width: 1100px;
+	margin: auto;
 }
 
 

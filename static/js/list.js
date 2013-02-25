@@ -169,11 +169,30 @@ function initControl() {
 				.setAttribute("class", "arrow_down");
 		})
 	}
+	// Tamaño del mapa 
+	document.getElementById("zoom_google_map").addEventListener("click", function() {
+		var mapDiv = document.getElementById("google_map");
+		mapDiv.className = ((mapDiv.className) ? "" : "big");
+		setTimeout(function() {
+			google.maps.event.trigger(map, 'resize');
+		}, 1000);
+	})
+	// Control de resultados
+	var controls = document.getElementsByClassName("c_item");
+	for (var c=0; c<controls.length; c++) {
+		controls[c].addEventListener("click", function(ev) {
+			var c_contents = document.getElementsByClassName("c_content");
+			for (var cc=0; cc<c_contents.length; cc++)
+				c_contents[cc].className = c_contents[cc].className.replace(" on", "");
+			document.getElementById(ev.target.id.replace("c_", "")).className += " on";
+		})
+	}
 }
 function populateTable(id) {
 	var info = data.info;
 	var table = document.getElementById(id);
 	var path = document.location.pathname.split("/");
+	var nTotal = nG95 = nG98 = nGOA = nGO = nGOB = nGOC = nBIOD = 0;
 	for (var p in info) {
 		for (var t in info[p]) {
 			for (var s in info[p][t]) {
@@ -185,6 +204,7 @@ function populateTable(id) {
 				a_town.href = "/gasolineras/" + p_link + "/" + t_link;
 				a_town.title = "Todas las gasolineras de " + t;
 				a_town.textContent = t.toUpperCase();
+				td_town.className = "T_LOC";
 				td_town.appendChild(a_town);
 				tr.appendChild(td_town);
 				td_s = document.createElement("td");
@@ -193,6 +213,7 @@ function populateTable(id) {
 				a_s.textContent = toTitle(s);
 				a_s.title = "Detalles de la gasolinera en " + t + ", " + a_s.textContent;
 				td_s.appendChild(a_s);
+				td_s.className = "T_ADDR";
 				tr.appendChild(td_s);
 				for (var o in FUEL_OPTIONS) {
 					var otd = document.createElement("td");
@@ -201,9 +222,12 @@ function populateTable(id) {
 					tr.appendChild(otd);
 				}
 				table.appendChild(tr);
+				nTotal++;
 			}
 		}
 	}
+	var divInfo = document.getElementById("info");
+	divInfo.innerHTML = "<p>Se han encontrado " + nTotal + " gasolineras en " + ((town)?(town):(province)).bold() + ".</p>";
 }
 
 window.addEventListener("load", function(){

@@ -1,97 +1,116 @@
 #list {
-	width: 60%;
+	width: 730px;
 	font-size: 1em;
-	height: 600px;
-	overflow-x: scroll; 
+}
+#control {
+	position: relative;
+	height: 100px;
+}
+#control_items li {
+	width: 30px;
+	height: 30px;
+	cursor: pointer;
+}
+#control .c_content {
+	position: absolute;
+	left: 40px;
+	top: 0;
+	display: none;
+}
+#control .c_content.on {
+	display: block;
+}
+#c_info {
+	background-image: url("/img/info.svg");
+	background-repeat: no-repeat;
+	background-size: 30px;
+}
+#c_filter {
+	background-image: url("/img/filter.svg");
+	background-repeat: no-repeat;
+	background-size: 30px;
+}
+#c_types {
+	background-image: url("/img/pump.svg");
+	background-repeat: no-repeat;
+	background-size: 30px;
 }
 
 #google_map {
-	width: 40%;
+	width: 370px;
 	height: 300px;
 	border: 1px dotted black;
 	position: absolute;
 	right: 0;
 	top: 80px;
+	-webkit-transition: all .5s;
+	-moz-transition: all .5s;
+	transition: all .5s;
+
 }
-#filters {
+#zoom_google_map {
+	width: 370px;
+	position: absolute;
+	right: 0;
+	top: 0;
 	border: 1px dotted black;
+	cursor: pointer;
 }
+
+#google_map.big {
+	width: 1000px;
+	height: 600px;
+}
+
 #ads {
 	border: 1px solid black;
 }
-
-/* Tipos de combustible */
-/*.T_G95 {
-	background-color: #6699FF;
-	color: white;
+th.T_LOC, th.T_ADDR {
+	background-color: #3399CC;
+	border-color: #006699;
+}
+li.T_G95, th.T_G95 {
+	background-color: #006633;
 }
 th.T_G95 {
-	background:-moz-linear-gradient(top, #6699FF, #4D73BF);
-    background:-webkit-gradient(linear, 0 0, 0 100%, from(#6699FF), to(#4D73BF));
-    border:1px solid #334C7E;
-}*/
-li.T_G95 {
-	background-color: #009933;
-	color: white;
+	border-color: #004924;
 }
-th.T_G95 {
-	background:-moz-linear-gradient(top, #009933, #007527);
-    background:-webkit-gradient(linear, 0 0, 0 100%, from(#009933), to(#007527));
-    border-color:1px solid #004D1A;
-}
-li.T_G98 {
-	background-color: #CC9933;
-	color: white;
+li.T_G98, th.T_G98 {
+	background-color: #339933;
 }
 th.T_G98 {
-	background:-moz-linear-gradient(top, #CC9933, #B7882D);
-    background:-webkit-gradient(linear, 0 0, 0 100%, from(#CC9933), to(#B7882D));
-    border:1px solid #805F1F;
+	border-color: #257125;
 }
-li.T_GOA {
-	background-color: #FF6633;
-	color: white;
+li.T_GOA, th.T_GOA {
+	background-color: #000;
 }
 th.T_GOA {
-	background:-moz-linear-gradient(top, #FF6633, #E25A2C);
-    background:-webkit-gradient(linear, 0 0, 0 100%, from(#FF6633), to(#E25A2C));
-    border:1px solid #9C3E1E;
+	border-color: #333;
 }
-li.T_NGO {
-	background-color: #FFCC33;
-	color: white;
+li.T_NGO, th.T_NGO {
+	background-color: #555;
 }
 th.T_NGO {
-	background:-moz-linear-gradient(top, #FFCC33, #EABB2E);
-    background:-webkit-gradient(linear, 0 0, 0 100%, from(#FFCC33), to(#EABB2E));
-    border:1px solid #AD8A22;
+	border-color: #222;
 }
-li.T_GOB {
-	background-color: #003399;
-	color: white;
+li.T_GOB, th.T_GOB {
+	background-color: #CC3333;
 }
 th.T_GOB {
-	background:-moz-linear-gradient(top, #004CED, #0041C5);
-    background:-webkit-gradient(linear, 0 0, 0 100%, from(#004CED), to(#0041C5));
-    border-color:1px solid #003399;
+	border-color: #A52828;
 }
-li.T_GOC {
-	background-color: #CC3333;
-	color: white;
+li.T_GOC, th.T_GOC {
+	background-color: #FF3300;
 }
+
 th.T_GOC {
-	background:-moz-linear-gradient(top, #CC3333, #A42828);
-    background:-webkit-gradient(linear, 0 0, 0 100%, from(#CC3333), to(#A42828));
-    border-color:1px solid #7C1D1D;
+	border-color: #CB2800;
 }
-li.T_BIOD {
-	background-color: #009933;
-	color: white;
+li.T_BIOD, th.T_BIOD {
+	background-color: #FFCC33;
 }
 th.T_BIOD {
-	background:-moz-linear-gradient(top, #009933, #007527);
-    background:-webkit-gradient(linear, 0 0, 0 100%, from(#009933), to(#007527));
-    border-color:1px solid #004D1A;
+	border-color: #D7AB2A;
 }
 #fuel_type {
 	list-style: none;
@@ -101,11 +120,15 @@ li.off {
 	background-color: #bbb;
 }
 th {
+	padding: 3px 3px 3px 15px;
 	font-size: 1.2em;
-	-moz-border-radius:3px;
-    -webkit-border-radius:3px;
-    text-align: center;
-    position: relative;
+	border-bottom-width: 10px;
+	border-bottom-style: solid;
+	color: white;
+	background-image: url('/img/sorting.svg');
+	background-repeat: no-repeat;
+	background-size: 10px;
+	border-spacing: 30px;
 }
 th svg {
 	padding: 0;
@@ -128,20 +151,26 @@ th.off, td.off {
 tr {
 	margin-top: 5px;
 }
+tr:nth-child(odd) {
+	background-color: #EEF;
+}
 #table {
 	margin-right: 10px;
 	width: 100%;
-	border-collapse: collapse;
+	height: 500px;
+	overflow-y: scroll;
+	width: 100%;
+}
+#table table {
+	margin-right: 20x;
 }
 #table td {
-	padding-bottom: 4px;
-	padding-top: 4px;
+	padding: 4px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	-o-text-overflow: ellipsis;
 	white-space: nowrap;
 	max-width: 150px;
-	margin-left: 2px;
 }
 
 #table a {
@@ -151,24 +180,23 @@ tr {
 #table a:hover {
 	text-decoration: underline;
 }
-#table th.on {
-	padding-right: 15px;
+#table th {
 	cursor: pointer;
 }
-#table tr:hover {
-	background-color: #FFAAAA;
+#table tr:hover, #table tr:hover a {
+	background-color: #006699;
+	color: white;
 }
 #table tr.off {
 	display: none;
 }
 #fuel_type li {
+	padding: 3px;
 	display: inline-block;
-	width: 40px;
-	border: 1px solid black;
+	width: 80px;
+	height: 30px;
 	color: white;
 	text-align: center;
 	cursor: pointer;
-}
-col:hover {
-	font-weight: bold;
+	font-size: .8em;
 }
