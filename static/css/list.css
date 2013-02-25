@@ -4,7 +4,7 @@
 }
 #control {
 	position: relative;
-	height: 100px;
+	height: 130px;
 }
 #control_items li {
 	width: 30px;
@@ -32,6 +32,11 @@
 }
 #c_types {
 	background-image: url("/img/pump.svg");
+	background-repeat: no-repeat;
+	background-size: 30px;
+}
+#c_distance {
+	background-image: url("/img/distance.svg");
 	background-repeat: no-repeat;
 	background-size: 30px;
 }

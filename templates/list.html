@@ -20,6 +20,7 @@
 	<li id="c_info" class="c_item" title="Resumen de los resultados"></li>
 	<li id="c_types" class="c_item" title="Filtro de combustible"></li>
 	<li id="c_filter" class="c_item" title="Búsqueda de texto"></li>
+	<li id="c_distance" class="c_item" title="Distancia a un punto"></li>
 </ul> <!-- control_items -->
 	<div id="info" class="c_content on"></div>
 	<div id="types" class="c_content">
@@ -37,6 +38,12 @@
 	<div id="filter" class="c_content">
 		<p>Refina la búsqueda introduciendo un texto para filtrar los resultados obtenidos:</p>
 		<input id="contains" type="text">
+	</div>
+	<div id="distance" class="c_content">
+		<p>Encuentra las gasolineras más cercanas a una dirección:</p>
+		<form action="javascript:Distance()">
+		<input id="from" type="text">
+		</form>
 	</div>
 </div> <!-- control -->
 
