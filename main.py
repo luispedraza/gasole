@@ -189,6 +189,18 @@ class SearchResults(BaseHandler):
         self.render("base.html", 
             scripts=['/js/utils.js', '/js/list.js', GOOGLE_MAPS_API],
             content=jinja_env.get_template("list.html").render())
+class Info(BaseHandler):
+    def get(self, section):
+        content_html = ""
+        if section=="combustibles":
+            content_html="info_combustibles.html"
+        elif section=="tarjetas":
+            content_html="info_tarjetas.html"
+        elif section=="noticias":
+            content_html="info_noticias.html"
+        self.render("base.html",
+            content=jinja_env.get_template(content_html).render())
+
 
 def handle_404(request, response, exception):
     #http://webapp-improved.appspot.com/guide/exceptions.html
@@ -214,7 +226,8 @@ app = webapp2.WSGIApplication([
     ('/api/?([^ \/]+)/?([^ \/]+)?/?([^ \/]+)?', Api),
     ('/buscador/?', Search),
     ('/geo/(.+)/(.+)/(.+)/(.+)/?', GeoApi),
-    ('/resultados/(.+)/(.+)/(.+)/(.+)/?', SearchResults)
+    ('/resultados/(.+)/(.+)/(.+)/(.+)/?', SearchResults),
+    ('/info/(noticias|tarjetas|combustibles)/?', Info)
 ], debug=True)
 
 app.error_handlers[404] = handle_404

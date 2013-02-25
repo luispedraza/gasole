@@ -1,7 +1,69 @@
+/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+/* Fin Reset Meyer */
 @import url(http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic);
 body {
 	font-family: 'Lato', sans-serif;
-	font-size: 12px;
+	font-size: 14px;
+}
+body h1 {
+	font-size: 1.8em;
+	margin-top: 1em;
+	margin-bottom: 1.5em;
+}
+body h2 {
+	font-size: 1.4em;
+	margin-top: 1em;
+	margin-bottom: 1.5em;
+}
+body p {
+	margin-top: .5em;
 }
 header, footer {
 	background-color: #333;
@@ -36,7 +98,9 @@ nav li {
 	cursor: pointer;
 	padding: 5px;
 	height: 30px;
+	text-align: left;
 }
+
 nav .menu > li {
 	border-bottom-width: 10px;
 	border-bottom-style: solid;
@@ -49,32 +113,50 @@ nav a {
 	text-decoration: none;
 	color: white;
 }
-.menu_search {
+.menu_search, .submenu_search li {
 	background-color: #2daddc;
 	border-color: #176c8c;
 }
-.menu_stats, .menu_stats .submenu {
+.submenu_search li {
+	width: 500px;
+}
+.submenu_search input { 
+	border:none; 
+	color:#333; 
+	font:bold 24px Helvetica, Arial, sans-serif; 
+	width:510px; 
+	outline: none;
+	padding: 0;
+}
+.menu_stats, .submenu_stats li {
 	background-color: #d24e33;
 	border-color: #7e2516;
 }
-.menu_news {
+.menu_news, .submenu_news li {
 	background-color: #f1aa41;
 	border-color: #be770e;
 }
 
-.menu li {
-	position: relative;
-}
 .submenu {
 	left: 0;
 	top: 50px;
 	position: absolute;
-	opacity: 0;
+	height: 0;
+	overflow: hidden;
 	-webkit-transition: all .5s;
 }
+.submenu li {
+	margin-top:  10px;
+}
+.submenu li:hover {
+	text-decoration: underline;
+}
 
-.menu li:hover > .submenu {
-	opacity: 1;
+.menu li:hover + .submenu {
+	height: 50px;
+}
+.submenu:hover {
+	height: 50px;
 }
 
 footer {

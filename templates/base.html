@@ -29,19 +29,31 @@
 
 <body>
 <header id="header">
-	<h1>Gasolé</h1>
+	<a href="/"><h1>Gasolé</h1></a>
 	<p>Toda la información sobre gasolinas y otros combustibles</p>
 	<nav>
 	<ul class="menu">
 		<li class="menu_search"><a href="/buscador">BUSCADOR</a></li>
-		<li class="menu_stats">ESTADÍSTICAS
-			<ul class="submenu">
-			<li>Precio</li>
-			<li>Cantidad</li>
+			<ul class="submenu submenu_search">
+				<li>
+					<form id="fast_search" action="javascript:fastSearch()">
+					<input type="text" id="search" name="search" placeholder="Búsqueda rápida…" />
+					</form>
+				</li>
+			</ul>
+		<li class="menu_stats">ESTADÍSTICAS</li>
+			<ul class="submenu submenu_stats">
+			<li><a href="/" title="Los precios del combustible en España">Precio</a></li>
+			<li><a href="/">Cantidad</a></li>
 			<li>Variedad</li>
 			</ul>
-		</li>
-		<li class="menu_news">NOTICIAS</li>
+		
+		<li class="menu_news">INFORMACIÓN</li>
+			<ul class="submenu submenu_news">
+				<li><a href="/info/combustibles" title="Información sobre combustibles comercializados en España">Combustibles</a></li>
+				<li><a href="/info/tarjetas" title="Información sobre tarjetas para ahorrar en combustible">Tarjetas Descuento</a></li>
+				<li><a href="/info/noticias" title="Noticias sobre combustibles e hidrocarburos en España">Noticias</a></li>
+			</ul> 
 	</ul>
 	</nav>
 </header>

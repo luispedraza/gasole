@@ -58,5 +58,23 @@
 	font-size: 20px;
 }
 
+ul.droplist  {
+	list-style: none;
+	font-size: 1.4em;
+	height: 1.4em;
+	width: 300px;
+	overflow: hidden;
+	padding: 0;
+}
+ul.droplist li {
+	border: 1px dotted black;
+}
+ul.droplist a {
+	text-decoration: none;
+}
+ul.droplist:hover {
+	height: 300px;
+	overflow-y: scroll;
+}
 
 
