@@ -2,6 +2,7 @@ var data;
 var map;
 var province = "";
 var town = "";
+var markerCenter;
 
 var FUEL_OPTIONS = {"1": {"short": "G95", "name": "Gasolina 95"},
 				// "2": {"short": "G97", "name": "Gasolina 97"},
@@ -12,7 +13,36 @@ var FUEL_OPTIONS = {"1": {"short": "G95", "name": "Gasolina 95"},
 				"7": {"short": "GOC", "name": "Gasóleo C"},
 				"8": {"short": "BIOD", "name": "Biodiésel"}}
 
-function initMap() {
+function newDistance() {
+	var location = document.getElementById("from").value + 
+		((town) ? (", " + town ) : ("")) + 
+		", " + province + ", " + "Spain";
+	var geocoder = new google.maps.Geocoder();
+	geocoder.geocode({'address': location}, function (res, stat){
+		if (stat == google.maps.GeocoderStatus.OK) {
+			markerCenter.setPosition(res[0].geometry.location);
+			calcDistances();
+		} else {
+			alert("Geocode ha fallado: " + stat);
+		}
+	});
+}
+
+function calcDistances() {
+	var rows = document.getElementById("table_data").getElementsByTagName("tr");
+	for (var r=0; r<rows.length; r++) {
+		try {
+			var latlon = rows[r].id.split(",");
+			var dlat = (latlon[0] - markerCenter.position.lat()) * 111.03461;
+			var dlon = (latlon[1] - markerCenter.position.lng()) * 85.39383;
+			var dist = Math.sqrt(dlat*dlat+dlon*dlon).toFixed(1);
+			rows[r].getElementsByClassName("T_DIST")[0].textContent = dist;
+		}
+		catch(e) {};
+	}
+}
+
+function initMap(callback) {
 	var place = ((town) ? (town + ", " + province) : (province));
 	var mapOptions = {
 		center: new google.maps.LatLng(40.400, 3.6833),
@@ -25,13 +55,15 @@ function initMap() {
 	geocoder.geocode({'address': place}, function (res, stat){
 		if (stat == google.maps.GeocoderStatus.OK) {
 			map.setCenter(res[0].geometry.location)
-			var center = new google.maps.Marker({
+			markerCenter = new google.maps.Marker({
             	map: map,
-            	position: res[0].geometry.location
+            	position: res[0].geometry.location,
+            	draggable: true
 			});
 		} else {
 			alert("Geocode ha fallado: " + stat);
 		}
+		callback();
 	});
 	var latlon = data.latlon;
 	var image = "/icon/pump_r.png";
@@ -49,7 +81,6 @@ function initMap() {
 					var infowindow = new google.maps.InfoWindow({
 						content: "contenido"
 					})
-					console.log(this);
 					infowindow.open(map, this);
 				});
 			}
@@ -207,20 +238,36 @@ function populateTable(id) {
 				td_town.className = "T_LOC";
 				td_town.appendChild(a_town);
 				tr.appendChild(td_town);
-				td_s = document.createElement("td");
-				a_s = document.createElement("a");
+				var td_s = document.createElement("td");
+				var a_s = document.createElement("a");
 				a_s.href = "/ficha/" + p_link + "/" + t_link + "/" + encodeName(s);
 				a_s.textContent = toTitle(s);
 				a_s.title = "Detalles de la gasolinera en " + t + ", " + a_s.textContent;
 				td_s.appendChild(a_s);
 				td_s.className = "T_ADDR";
 				tr.appendChild(td_s);
+				// Distancia al marcador
+				var td_dist = document.createElement("td");
+				try {
+					var dlat = (data.latlon[p][t][s][0] - markerCenter.position.lat()) * 111.03461;
+					var dlon = (data.latlon[p][t][s][1] - markerCenter.position.lng()) * 85.39383;
+					td_dist.textContent = Math.sqrt(dlat*dlat+dlon*dlon).toFixed(1);
+				}
+				catch(e) {
+					console.log(e);
+					td_dist.textContent = "";
+				}
+				td_dist.className = "T_DIST";
+				tr.appendChild(td_dist);
 				for (var o in FUEL_OPTIONS) {
 					var otd = document.createElement("td");
 					otd.className = "T_" + FUEL_OPTIONS[o]["short"] + " on";
 					otd.textContent = info[p][t][s]["options"][o] || "";
 					tr.appendChild(otd);
 				}
+				// ID de fila, que coincide con lat,lon
+				try {tr.id = data.latlon[p][t][s].join(",");}
+				catch (e){}
 				table.appendChild(tr);
 				nTotal++;
 			}
@@ -242,8 +289,7 @@ window.addEventListener("load", function(){
 		}
 		var h1 = document.getElementById("title");
 		h1.textContent = "Gasolineras en " + ((town) ? (town + ", ") : ("la ")) + "provincia de " + province;
-		populateTable("table_data");
-		initMap();
+		initMap(function() {populateTable("table_data");});
 		initControl();
 	}
 	var url = document.URL;

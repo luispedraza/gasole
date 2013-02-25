@@ -180,7 +180,7 @@ class Search(BaseHandler):
     def get(self):
         self.render("base.html", 
             styles =['search.css', 'map.css'],
-            scripts=['/js/search.js'],
+            scripts=['/js/geocode.js', GOOGLE_MAPS_API],
             content=jinja_env.get_template("search.html").render(
                 map=jinja_env.get_template("spain.svg").render()))
 

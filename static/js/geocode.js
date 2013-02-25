@@ -4,7 +4,6 @@ function findLocation (loc) {
 	window.location = "/resultados/"+encodeURI(loc.formatted_address)+"/"+lat+"/"+lon+"/"+2;
 }
 
-
 function geoCode() {
 	var a = document.getElementById("address").value;
 	var geocoder = new google.maps.Geocoder();

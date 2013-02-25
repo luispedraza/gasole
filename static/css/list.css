@@ -70,7 +70,7 @@
 #ads {
 	border: 1px solid black;
 }
-th.T_LOC, th.T_ADDR {
+th.T_LOC, th.T_ADDR, th.T_DIST {
 	background-color: #3399CC;
 	border-color: #006699;
 }
