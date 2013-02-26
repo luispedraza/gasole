@@ -23,6 +23,7 @@ from google.appengine.api import users
 
 GOOGLE_MAPS_API = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyD5XZNFlQsyWtYDeKual-OcqmP_5pgwbds&sensor=false&region=ES'
 GOOGLE_VIS_API = 'https://www.google.com/jsapi?autoload={modules:[{name:visualization,version:1,packages:[corechart]}]}'
+GOOGLE_MAPS_VIS_API = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyD5XZNFlQsyWtYDeKual-OcqmP_5pgwbds&sensor=false&libraries=visualization'
 
 def decode_param(s):
     return s.decode('utf-8').replace("_", " ").replace("|", "/")
@@ -111,8 +112,12 @@ class Map(BaseHandler):
         self.render("map.html")
 
 class Stats(BaseHandler):
-    def get(self):
-        self.render("base.html", content=jinja_env.get_template("stats.html").render())
+    def get(self, province, city):
+        self.render("base.html", 
+            title=u"Estadísticas",
+            scripts=[GOOGLE_MAPS_VIS_API, '/js/stats.js'],
+            styles=["stats.css"],
+            content=jinja_env.get_template("stats.html").render())
 
 class Data(BaseHandler):
     def get(self, option, province):
@@ -219,7 +224,7 @@ app = webapp2.WSGIApplication([
     ('/admin/update/?(\w+)?', AdminUpdate),
     ('/admin/search/?', AdminSearch),
     ('/map/?', Map),
-    ('/stats/?', Stats),
+    ('/stats/?([^ \/]+)?/?([^ \/]+)?/?', Stats),
     ('/data/(\w+)/(\w+)', Data),
     ('/gasolineras/?([^ \/]+)/?([^ \/]+)?/?', List),
     ('/ficha/?([^ \/]+)/?([^ \/]+)?/?([^ \/]+)?', Detail),
