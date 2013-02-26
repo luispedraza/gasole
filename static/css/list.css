@@ -25,6 +25,11 @@
 	background-repeat: no-repeat;
 	background-size: 30px;
 }
+#c_cities {
+	background-image: url("/img/city.svg");
+	background-repeat: no-repeat;
+	background-size: 30px;
+}
 #c_filter {
 	background-image: url("/img/filter.svg");
 	background-repeat: no-repeat;
@@ -249,6 +254,7 @@ tr:nth-child(odd) {
 }
 #pager_links div.current {
 	background-color: white;
+	border: 2px solid black;
 }
 #pager img {
 	width: 30px;

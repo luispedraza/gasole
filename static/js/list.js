@@ -1,6 +1,8 @@
 var data;
 var map;
+var markers = [];
 var province = "";
+var infoWindow = null;
 var town = "";
 var markerCenter;
 var pagerN = 20;
@@ -100,20 +102,24 @@ function initMap(callback) {
 			for (s in latlon[p][t]) {
 				var pos = new google.maps.LatLng(latlon[p][t][s][0], latlon[p][t][s][1]);
 				var marker = new google.maps.Marker({
-					map: map,
+					// map: map,
 					position: pos,
 					icon: image,
 					// animation: google.maps.Animation.DROP
 				})
 				google.maps.event.addListener(marker, 'click', function(e) {
-					var infowindow = new google.maps.InfoWindow({
+					if (infoWindow) infoWindow.close();
+					infoWindow = new google.maps.InfoWindow({
 						content: "contenido"
 					})
-					infowindow.open(map, this);
+					infoWindow.open(map, this);
 				});
+				markers.push(marker);
 			}
 		}
 	}
+	// para cambiar la imagen http://stackoverflow.com/questions/4416089/google-maps-api-v3-custom-cluster-icon
+	var markerCluster = new MarkerClusterer(map, markers);
 }
 function sortTable(cname, reverse) {
 	if (typeof reverse == "undefined")

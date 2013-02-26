@@ -124,7 +124,7 @@ class List(BaseHandler):
         self.render("base.html", 
             title = title,
             styles=["list.css"],
-            scripts=['/js/utils.js', '/js/list.js', GOOGLE_MAPS_API],
+            scripts=['/js/utils.js', '/js/list.js', GOOGLE_MAPS_API, '/js/google/markerclusterer_compiled.js'],
             content=jinja_env.get_template("list.html").render())
 class Detail(BaseHandler):
     def get(self, province, city, station):
