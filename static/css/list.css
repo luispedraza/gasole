@@ -168,6 +168,8 @@ tr:nth-child(odd) {
 }
 #table table {
 	margin-right: 20x;
+	width: 100%;
+	font-size: 1em;
 }
 #table td {
 	padding: 4px;
@@ -175,7 +177,7 @@ tr:nth-child(odd) {
 	text-overflow: ellipsis;
 	-o-text-overflow: ellipsis;
 	white-space: nowrap;
-	max-width: 150px;
+	max-width: 120px;
 }
 
 #table a {

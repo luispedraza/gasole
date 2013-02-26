@@ -3,6 +3,7 @@ var map;
 var province = "";
 var town = "";
 var markerCenter;
+var pagerN = 20;
 
 var FUEL_OPTIONS = {"1": {"short": "G95", "name": "Gasolina 95"},
 				// "2": {"short": "G97", "name": "Gasolina 97"},
@@ -21,6 +22,7 @@ function newDistance() {
 	geocoder.geocode({'address': location}, function (res, stat){
 		if (stat == google.maps.GeocoderStatus.OK) {
 			markerCenter.setPosition(res[0].geometry.location);
+			map.panTo(res[0].geometry.location);
 			calcDistances();
 		} else {
 			alert("Geocode ha fallado: " + stat);
@@ -40,6 +42,7 @@ function calcDistances() {
 		}
 		catch(e) {};
 	}
+	sortTable("T_DIST");
 }
 
 function initMap(callback) {
@@ -86,6 +89,44 @@ function initMap(callback) {
 			}
 		}
 	}
+}
+function sortTable(cname) {
+	function quickSort(a) {
+		/* Ordenación QuickSort de una tabla */
+		if (a.length<=1) return a;
+		var npivot = Math.floor(Math.random()*a.length);
+		for (var p=npivot+1; p<a.length; p++)
+			if (a[p][0]!=a[npivot][0]) break;
+		var pivot = a.splice(p-1, 1);
+		var less = [];
+		var greater = [];
+		for (var i=0; i<a.length; i++) {
+			if (a[i][0]<=pivot[0]) less.push(a[i]);
+			else greater.push(a[i]);
+		}
+		return quickSort(less).concat(pivot, quickSort(greater));
+	}
+	var table_data = document.getElementById("table_data");
+	var values = table_data.getElementsByClassName(cname);
+	var array = [];
+	for (var v=0; v<values.length; v++)
+		if (values[v].textContent)
+			array.push([values[v].textContent, v]);
+	array = quickSort(array);
+	var rows = table_data.getElementsByTagName("tr");
+	var static_rows = [];
+	for (var r=0; r<rows.length; r++) static_rows.push(rows[r]);
+	for (var e=0; e<array.length; e++) {
+		table_data.insertBefore(static_rows[array[e][1]], table_data.children[e]);
+	}
+	var arrows = document.getElementsByClassName("arrow_down");
+	for (var a=0; a< arrows.length; a++)
+		arrows[a].setAttribute("class", "arrow");
+	arrows = document.getElementsByClassName("arrow_up");
+	for (var a=0; a< arrows.length; a++)
+		arrows[a].setAttribute("class", "arrow");
+	ev.target.getElementsByClassName("arrow")[0]
+		.setAttribute("class", "arrow_down");
 }
 
 function initControl() {
@@ -149,7 +190,6 @@ function initControl() {
 				}
 			}
 		}
-
 	}
 	// Interactividad con la tabla 
 	var rows = document.getElementById("table_data").getElementsByTagName("tr");
@@ -162,44 +202,10 @@ function initControl() {
 	var heads = document.getElementById("table").getElementsByTagName("th");
 	for (var h=0; h<heads.length; h++) {
 		heads[h].addEventListener("click", function(ev) {
-			function quickSort(a) {
-				if (a.length<=1) return a;
-				var npivot = Math.floor(Math.random()*a.length);
-				for (var p=npivot+1; p<a.length; p++)
-					if (a[p][0]!=a[npivot][0]) break;
-				var pivot = a.splice(p-1, 1);
-				var less = [];
-				var greater = [];
-				for (var i=0; i<a.length; i++) {
-					if (a[i][0]<=pivot[0]) less.push(a[i]);
-					else greater.push(a[i]);
-				}
-				return quickSort(less).concat(pivot, quickSort(greater));
-			}
-			var cname = ev.target.className.match(/T_.+/);
-			var table_data = document.getElementById("table_data");
-			var values = table_data.getElementsByClassName(cname);
-			var array = [];
-			for (var v=0; v<values.length; v++)
-				if (values[v].textContent)
-					array.push([values[v].textContent, v]);
-			array = quickSort(array);
-			var rows = table_data.getElementsByTagName("tr");
-			var static_rows = [];
-			for (var r=0; r<rows.length; r++) static_rows.push(rows[r]);
-			for (var e=0; e<array.length; e++) {
-				table_data.insertBefore(static_rows[array[e][1]], table_data.children[e]);
-			}
-			var arrows = document.getElementsByClassName("arrow_down");
-			for (var a=0; a< arrows.length; a++)
-				arrows[a].setAttribute("class", "arrow");
-			arrows = document.getElementsByClassName("arrow_up");
-			for (var a=0; a< arrows.length; a++)
-				arrows[a].setAttribute("class", "arrow");
-			ev.target.getElementsByClassName("arrow")[0]
-				.setAttribute("class", "arrow_down");
+			sortTable(ev.target.className.match(/T_.+/));
 		})
 	}
+
 	// Tamaño del mapa 
 	document.getElementById("zoom_google_map").addEventListener("click", function() {
 		var mapDiv = document.getElementById("google_map");
