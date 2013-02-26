@@ -255,6 +255,10 @@ function initControl() {
 			for (var cc=0; cc<c_contents.length; cc++)
 				c_contents[cc].className = c_contents[cc].className.replace(" on", "");
 			document.getElementById(ev.target.id.replace("c_", "")).className += " on";
+			var c_items = document.getElementsByClassName("c_item");
+			for (var cc=0; cc<c_items.length; cc++)
+				c_items[cc].className = c_items[cc].className.replace(" on", "");
+			this.className += " on";
 		})
 	}
 }
@@ -263,16 +267,20 @@ function populateTable(id) {
 	var table = document.getElementById(id);
 	var path = document.location.pathname.split("/");
 	var nTotal = nG95 = nG98 = nGOA = nGO = nGOB = nGOC = nBIOD = 0;
+	var cities = [];
+	var p_link, t_link, s_link;
 	for (var p in info) {
+		p_link = path[2] || encodeName(p);
 		for (var t in info[p]) {
+			t_link = path[3] || encodeName(t);
+			s_link = "/gasolineras/" + p_link + "/" + t_link;
+			cities.push([t, s_link]);
 			for (var s in info[p][t]) {
-				p_link = path[2] || encodeName(p);
-				t_link = path[3] || encodeName(t);
 				var tr = document.createElement("tr");
 				tr.className = "r_on";
 				var td_town = document.createElement("td");
 				var a_town = document.createElement("a");
-				a_town.href = "/gasolineras/" + p_link + "/" + t_link;
+				a_town.href = s_link;
 				a_town.title = "Todas las gasolineras de " + t;
 				a_town.textContent = t.toUpperCase();
 				td_town.className = "T_LOC";
@@ -315,6 +323,17 @@ function populateTable(id) {
 	paginateTable(0);
 	var divInfo = document.getElementById("info");
 	divInfo.innerHTML = "<p>Se han encontrado " + nTotal + " gasolineras en " + ((town)?(town):(province)).bold() + ".</p>";
+	if (cities.length > 1) { // Lista de ciudades
+		var citiesList = document.getElementById("cities_list");
+		for (var c=0; c<cities.length; c++) {
+			var newCity = document.createElement("li");
+			newCity.innerHTML = cities[c][0].link(cities[c][1]);
+			citiesList.appendChild(newCity);
+		}
+	}
+	else {
+		document.getElementById("c_cities").style.display = "none";
+	}
 }
 
 window.addEventListener("load", function(){

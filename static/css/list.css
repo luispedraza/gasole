@@ -4,46 +4,64 @@
 }
 #control {
 	position: relative;
-	height: 130px;
+	height: 150px;
 }
 #control_items li {
-	width: 30px;
-	height: 30px;
+	width: 90px;
+	height: 20px;
 	cursor: pointer;
+	padding-left: 35px;
+	padding-top: 5px;
 }
 #control .c_content {
 	position: absolute;
-	left: 40px;
+	left: 130px;
+	right: 0;
 	top: 0;
+	bottom: 10px;
 	display: none;
+	padding: 10px;
+	border: 5px solid #3399CC;
+	overflow: scroll;
 }
 #control .c_content.on {
 	display: block;
 }
+.c_item {
+	background-repeat: no-repeat;
+	background-size: 20px;
+}
+.c_item.on {
+	background-color: #3399CC;
+	color: white;
+	border: 5px solid #3399CC;
+}
+
 #c_info {
 	background-image: url("/img/info.svg");
-	background-repeat: no-repeat;
-	background-size: 30px;
 }
 #c_cities {
 	background-image: url("/img/city.svg");
-	background-repeat: no-repeat;
-	background-size: 30px;
+}
+#cities ul {
+	-moz-column-count:5; /* Firefox */
+	-webkit-column-count:5; /* Safari and Chrome */
+	column-count:5;
+	-moz-column-gap:10px; /* Firefox */
+	-webkit-column-gap:10px; /* Safari and Chrome */
+	column-gap:10px;
+	-moz-column-rule:1px outset white; /* Firefox */
+	-webkit-column-rule:1px outset white; /* Safari and Chrome */
+	column-rule:1px outset white;
 }
 #c_filter {
 	background-image: url("/img/filter.svg");
-	background-repeat: no-repeat;
-	background-size: 30px;
 }
 #c_types {
 	background-image: url("/img/pump.svg");
-	background-repeat: no-repeat;
-	background-size: 30px;
 }
 #c_distance {
 	background-image: url("/img/distance.svg");
-	background-repeat: no-repeat;
-	background-size: 30px;
 }
 
 #google_map {
@@ -130,7 +148,7 @@ li.off {
 	background-color: #bbb;
 }
 th {
-	padding: 3px 3px 3px 15px;
+	padding: 3px;
 	font-size: 1.2em;
 	border-bottom-width: 10px;
 	border-bottom-style: solid;
