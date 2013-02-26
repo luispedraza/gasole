@@ -130,24 +130,33 @@ th {
 	border-bottom-width: 10px;
 	border-bottom-style: solid;
 	color: white;
-	background-image: url('/img/sorting.svg');
-	background-repeat: no-repeat;
-	background-size: 10px;
-	border-spacing: 30px;
+	position: relative;
 }
-th svg {
-	padding: 0;
-	height: 15px;
-	width: 15px;
+th:before {
+	content:"";
 	position: absolute;
-	bottom: 3px;
-	right: 3px;
+	left: 0;
+	top: 0;
+	width: 10px;
+	height: 20px;
+	background-image: url('/img/sort.svg');
+	background-repeat: no-repeat;
+	background-size: 10px 20px;
 }
-th svg .arrow {
-	fill: none;
+th.sort_up:before {
+	background-image: url('/img/sort_up.svg');
+	background-repeat: no-repeat;
+	background-size: 10px 20px;
 }
-th svg .arrow_down, th svg .arrow_up {
-	fill: #FF5555;
+th.sort_down:before {
+	background-image: url('/img/sort_up.svg');
+	background-repeat: no-repeat;
+	background-size: 10px 20px;
+	-webkit-transform: rotate(180deg);
+	-moz-transform: rotate(180deg);
+	-ms-transform: rotate(180deg);
+	-o-transform: rotate(180deg);
+	transform: rotate(180deg);
 }
 
 th.off, td.off {

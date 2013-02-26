@@ -90,7 +90,9 @@ function initMap(callback) {
 		}
 	}
 }
-function sortTable(cname) {
+function sortTable(cname, reverse) {
+	if (typeof reverse == "undefined")
+		reverse = false;
 	function quickSort(a) {
 		/* Ordenación QuickSort de una tabla */
 		if (a.length<=1) return a;
@@ -113,20 +115,21 @@ function sortTable(cname) {
 		if (values[v].textContent)
 			array.push([values[v].textContent, v]);
 	array = quickSort(array);
+	if (reverse) array.reverse();
 	var rows = table_data.getElementsByTagName("tr");
 	var static_rows = [];
 	for (var r=0; r<rows.length; r++) static_rows.push(rows[r]);
 	for (var e=0; e<array.length; e++) {
 		table_data.insertBefore(static_rows[array[e][1]], table_data.children[e]);
 	}
-	var arrows = document.getElementsByClassName("arrow_down");
-	for (var a=0; a< arrows.length; a++)
-		arrows[a].setAttribute("class", "arrow");
-	arrows = document.getElementsByClassName("arrow_up");
-	for (var a=0; a< arrows.length; a++)
-		arrows[a].setAttribute("class", "arrow");
-	ev.target.getElementsByClassName("arrow")[0]
-		.setAttribute("class", "arrow_down");
+	var headers = document.getElementById("table").getElementsByTagName("th");
+	for (var h=0; h<headers.length; h++) {
+		headers[h].className = headers[h].className.replace(" sort_up", "")
+			.replace(" sort_down", "");
+		if (headers[h].className.match(cname)) {
+			headers[h].className = headers[h].className + ((reverse) ? (" sort_down") : (" sort_up"));
+		}
+	}
 }
 
 function initControl() {
@@ -202,7 +205,8 @@ function initControl() {
 	var heads = document.getElementById("table").getElementsByTagName("th");
 	for (var h=0; h<heads.length; h++) {
 		heads[h].addEventListener("click", function(ev) {
-			sortTable(ev.target.className.match(/T_.+/));
+			sortTable(ev.target.className.match(/T_\w+/)[0],
+				ev.target.className.match("sort_up"));
 		})
 	}
 
