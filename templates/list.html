@@ -52,16 +52,16 @@
 	<table>
 	<thead>
 	<tr>
-		<th class="T_LOC">Localidad</th>
-		<th class="T_ADDR">Dirección</th>
-		<th class="T_DIST">Distancia</th>
-		<th class="T_G95 on">G95</th>
-		<th class="T_G98 on">G98</th>
-		<th class="T_GOA on">GOA</th>
-		<th class="T_NGO on">NGO</th>
-		<th class="T_GOB on">GOB</th>
-		<th class="T_GOC on">GOC</th>
-		<th class="T_BIOD on">BIOD</th>
+		<th class="T_LOC"><div class="sort"></div>Localidad</th>
+		<th class="T_ADDR"><div class="sort"></div>Dirección</th>
+		<th class="T_DIST"><div class="sort"></div>Distancia</th>
+		<th class="T_G95 on"><div class="sort"></div>G95</th>
+		<th class="T_G98 on"><div class="sort"></div>G98</th>
+		<th class="T_GOA on"><div class="sort"></div>GOA</th>
+		<th class="T_NGO on"><div class="sort"></div>NGO</th>
+		<th class="T_GOB on"><div class="sort"></div>GOB</th>
+		<th class="T_GOC on"><div class="sort"></div>GOC</th>
+		<th class="T_BIOD on"><div class="sort"></div>BIOD</th>
 	</tr>
 	</thead>
 	<tbody id="table_data">
@@ -69,6 +69,14 @@
 	</tbody>
 	</table>
 </div> <!-- #table -->
+
+<div id="pager">
+	<div id="pager_less"><a href="javascript:paginateTable('less')"><img src="/img/less.svg"/></a></div>
+	<div id="pager_more"><a href="javascript:paginateTable('more')"><img src="/img/more.svg"></a></div>
+	<div id="pager_links"></div>
+	
+</div><!-- pager -->
+
 </div> <!-- #list -->
 
 <div id="zoom_google_map">+ Ampliar el mapa</div>

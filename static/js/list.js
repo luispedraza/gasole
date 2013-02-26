@@ -4,6 +4,7 @@ var province = "";
 var town = "";
 var markerCenter;
 var pagerN = 20;
+var pagerCurrent = 0;
 
 var FUEL_OPTIONS = {"1": {"short": "G95", "name": "Gasolina 95"},
 				// "2": {"short": "G97", "name": "Gasolina 97"},
@@ -29,6 +30,30 @@ function newDistance() {
 		}
 	});
 }
+
+function paginateTable(index) {
+	var rows = document.getElementById("table_data").getElementsByTagName("tr");
+	var pager_links = document.getElementById("pager_links");
+	pager_links.innerHTML = "";
+	if (typeof index == "string") {
+		if (index == "more") index = Math.min(pagerCurrent+pagerN, parseInt(rows.length/pagerN)*pagerN);
+		else if (index == "less") index = Math.max(pagerCurrent-pagerN, 0);
+	}
+	for (var r=0; r<rows.length; r++) {
+		if (r<index) rows[r].className = "r_off";
+		else if (r<index+pagerN) rows[r].className = "r_on";
+		else rows[r].className = "r_off";
+		if (r%pagerN == 0){
+			var link = document.createElement("div");
+			link.innerHTML = ((r+1) + "<br/>" + Math.min(r+pagerN, rows.length))
+				.link("javascript:paginateTable(" + r + ");");
+			if (r==index) link.className = "current";
+			pager_links.appendChild(link);
+		}
+	}
+	pagerCurrent = index;
+}
+
 
 function calcDistances() {
 	var rows = document.getElementById("table_data").getElementsByTagName("tr");
@@ -149,12 +174,13 @@ function initControl() {
 				var row = trs[tr];
 				row.getElementsByClassName(cname)[0].className = e.target.className;
 				var tds = row.getElementsByClassName("on");
-				var st_aux = ""
+				var st_aux = "";
 				for (var td=0; td<tds.length; td++) {
 					st_aux+=tds[td].textContent;
 				}
-				row.className = (st_aux.length) ? ("") : "off";
+				row.className = (st_aux.length) ? ("r_on") : "r_off";
 			}
+			paginateTable(0);
 		})
 	}
 	// Filtro de contenido de texto
@@ -169,9 +195,9 @@ function initControl() {
 		}
 		var filtervalue = e.target.value;
 		var terms = filtervalue.split(" ");
-		var files = document.getElementById("table").getElementsByTagName("tr");
-		for (var f=1; f<files.length; f++) {
-			file = files[f];
+		var rows = document.getElementById("table").getElementsByTagName("tr");
+		for (var f=1; f<rows.length; f++) {
+			row = rows[f];
 			var found = false;
 			for (var t=0; t<terms.length; t++) {
 				term = terms[t];
@@ -181,15 +207,12 @@ function initControl() {
 						term = term.substr(1);
 						if (term.length == 0) continue;
 					}
-					var cells = file.getElementsByTagName("td");
+					var cells = row.getElementsByTagName("td");
 					for (var c=0; c<2; c++) {
 						var cell = cells[c];
 						found = found || (RegExp(term, "i").exec(cleanFilter(cell.textContent)) != null);
 					}
-					if (found != expected) 
-						file.style.display = "none";
-					else 
-						file.style.display = "table-row"
+					row.className = ((found != expected) ? ("r_off") : ("r_on"));
 				}
 			}
 		}
@@ -205,8 +228,8 @@ function initControl() {
 	var heads = document.getElementById("table").getElementsByTagName("th");
 	for (var h=0; h<heads.length; h++) {
 		heads[h].addEventListener("click", function(ev) {
-			sortTable(ev.target.className.match(/T_\w+/)[0],
-				ev.target.className.match("sort_up"));
+			sortTable(this.className.match(/T_\w+/)[0],
+				this.className.match("sort_up"));
 		})
 	}
 
@@ -240,6 +263,7 @@ function populateTable(id) {
 				p_link = path[2] || encodeName(p);
 				t_link = path[3] || encodeName(t);
 				var tr = document.createElement("tr");
+				tr.className = "r_on";
 				var td_town = document.createElement("td");
 				var a_town = document.createElement("a");
 				a_town.href = "/gasolineras/" + p_link + "/" + t_link;
@@ -264,7 +288,6 @@ function populateTable(id) {
 					td_dist.textContent = Math.sqrt(dlat*dlat+dlon*dlon).toFixed(1);
 				}
 				catch(e) {
-					console.log(e);
 					td_dist.textContent = "";
 				}
 				td_dist.className = "T_DIST";
@@ -283,6 +306,7 @@ function populateTable(id) {
 			}
 		}
 	}
+	paginateTable(0);
 	var divInfo = document.getElementById("info");
 	divInfo.innerHTML = "<p>Se han encontrado " + nTotal + " gasolineras en " + ((town)?(town):(province)).bold() + ".</p>";
 }
