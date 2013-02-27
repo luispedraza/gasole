@@ -244,7 +244,7 @@ tr:nth-child(odd) {
 }
 
 #pager {
-	font-size: .8em;
+	font-size: .7em;
 	width: 100%;
 }
 #pager_links {
@@ -260,9 +260,9 @@ tr:nth-child(odd) {
 #pager_links div {
 	background-color: black;
 	width: 28px;
-	height: 28px;
+	height: 22px;
 	text-align: center;
-	padding: 2px;
+	padding: 6px 0px 0px 0px;
 	margin: 1px;
 	-webkit-border-radius: 15px;
 	-moz-border-radius: 15px;

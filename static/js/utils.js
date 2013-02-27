@@ -1,16 +1,18 @@
 function toTitle(s) {
 	return s.replace(" [N]", "")
-		.replace(/^CARRETERA ?|^CR\.? ?/, "CTRA. ")
-		.replace(/(CTRA. )+/, "CTRA. ")
-		.replace(/^AVENIDA ?|^AV. ?/, "AVDA. ")
-		.replace(/^POLIGONO INDUSTRIAL ?|POLIGONO ?|P\.I\. ?/, "POL. IND. ")
-		.replace(/^CALLE |^CL\.? ?|C\/ ?/, "C/ ")
-		.replace(/^RONDA |^RD /, "RDA. ")
-		.replace(/^AUTOPISTA ?(AUTOPISTA ?)?/, "AU. ")
-		.replace(/^PLAZA ?/, "PZA. ")
-		.replace(/^PASEO (PASEO ?)?/, "Pº ")
-		.replace(/^TRAVESS?[IÍ]A /, "TRAV. ")
+		.replace(/^CARRETERA ?|^CR\.? ?/i, "CTRA. ")
+		.replace(/(CTRA. )+/i, "CTRA. ")
+		.replace(/^AVENIDA ?|^AV. ?/i, "AVDA. ")
+		.replace(/^POLIGONO INDUSTRIAL ?|POLIGONO ?|P\.I\. ?/i, "POL. IND. ")
+		.replace(/^CALLE |^CL\.? ?|C\/ ?/i, "C/ ")
+		.replace(/^RONDA |^RD /i, "RDA. ")
+		.replace(/^AUTOPISTA (AUTOPISTA ?)?/i, "AU. ")
+		.replace(/^PLAZA ?/i, "PL. ")
+		.replace(/^PASEO (PASEO ?)?/i, "Pº ")
+		.replace(/^TRAVESS?[IÍ]A /i, "TRAV. ")
+		.replace(/^V[ií]A (V[IÍ]A )?/i, "VÍA ")
 		.replace(/\B[^\d- ]+[ $]/g, function(t) {return t.toLowerCase()})
+		.replace(/\b[NAE]-.+\b/, function(t) {return t.toUpperCase()});
 }
 function decodeName(s) {
 	return decodeURI(s).replace(/_/g, " ").replace(/\|/g, "/");

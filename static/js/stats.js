@@ -1,3 +1,6 @@
+// https://developers.google.com/maps/documentation/javascript/layers?hl=es#JSHeatMaps
+
+
 var data;
 var map;
 
@@ -21,7 +24,7 @@ function drawData(data) {
         var pos = new google.maps.LatLng(latlon[p][t][s][0], latlon[p][t][s][1]);
         var magnitude = data.info[p][t][s]["options"][1] || null;
         if (magnitude) {
-          magnitude = (magnitude-1.4)*1000;
+          magnitude = (magnitude-1.4)*100;
           console.log(magnitude);
           heatmapData.push({
             location: pos,
@@ -35,6 +38,7 @@ function drawData(data) {
     data: heatmapData,
     dissipating: true,
     radius: 20,
+    gradient: ['transparent', "#00f", "#0f0", "#f00"],
     map: map
   });
 }

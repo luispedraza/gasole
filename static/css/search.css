@@ -24,13 +24,9 @@
 }
 
 #search_form input { 
-	border:none; 
-	color:#333; 
-	font:bold 24px Helvetica, Arial, sans-serif; 
 	width:510px; 
-	outline: none;
-	padding: 0;
 }
+
 
 #search_form button {
 	background:-moz-linear-gradient(top, #453e26, #000);

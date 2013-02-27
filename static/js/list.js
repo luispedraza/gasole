@@ -7,9 +7,9 @@ var town = "";
 var markerCenter;
 var pagerN = 20;
 var pagerCurrent = 0;
+var markerIcon = "/icon/pump_r.png";
 
 var FUEL_OPTIONS = {"1": {"short": "G95", "name": "Gasolina 95"},
-				// "2": {"short": "G97", "name": "Gasolina 97"},
 				"3": {"short": "G98", "name": "Gasolina 98"},
 				"4": {"short": "GOA", "name": "Gasóleo Automoción"},
 				"5": {"short": "NGO", "name": "Nuevo Gasóleo A"},
@@ -61,7 +61,7 @@ function calcDistances() {
 	var rows = document.getElementById("table_data").getElementsByTagName("tr");
 	for (var r=0; r<rows.length; r++) {
 		try {
-			var latlon = rows[r].id.split(",");
+			var latlon = rows[r].getAttribute("latlon").split(",");
 			var dlat = (latlon[0] - markerCenter.position.lat()) * 111.03461;
 			var dlon = (latlon[1] - markerCenter.position.lng()) * 85.39383;
 			var dist = Math.sqrt(dlat*dlat+dlon*dlon).toFixed(1);
@@ -69,10 +69,10 @@ function calcDistances() {
 		}
 		catch(e) {};
 	}
-	sortTable("T_DIST");
+	sortTable("T_DIST", false, true);
 }
 
-function initMap(callback) {
+function initMap() {
 	var place = ((town) ? (town + ", " + province) : (province));
 	var mapOptions = {
 		center: new google.maps.LatLng(40.400, 3.6833),
@@ -90,38 +90,15 @@ function initMap(callback) {
             	position: res[0].geometry.location,
             	draggable: true
 			});
+			calcDistances();
 		} else {
 			alert("Geocode ha fallado: " + stat);
 		}
-		callback();
 	});
-	var latlon = data.latlon;
-	var image = "/icon/pump_r.png";
-	for (p in latlon) {
-		for (t in latlon[p]) {
-			for (s in latlon[p][t]) {
-				var pos = new google.maps.LatLng(latlon[p][t][s][0], latlon[p][t][s][1]);
-				var marker = new google.maps.Marker({
-					// map: map,
-					position: pos,
-					icon: image,
-					// animation: google.maps.Animation.DROP
-				})
-				google.maps.event.addListener(marker, 'click', function(e) {
-					if (infoWindow) infoWindow.close();
-					infoWindow = new google.maps.InfoWindow({
-						content: "contenido"
-					})
-					infoWindow.open(map, this);
-				});
-				markers.push(marker);
-			}
-		}
-	}
 	// para cambiar la imagen http://stackoverflow.com/questions/4416089/google-maps-api-v3-custom-cluster-icon
 	var markerCluster = new MarkerClusterer(map, markers);
 }
-function sortTable(cname, reverse) {
+function sortTable(cname, reverse, isfloat) {
 	if (typeof reverse == "undefined")
 		reverse = false;
 	function quickSort(a) {
@@ -134,7 +111,8 @@ function sortTable(cname, reverse) {
 		var less = [];
 		var greater = [];
 		for (var i=0; i<a.length; i++) {
-			if (a[i][0]<=pivot[0]) less.push(a[i]);
+			if (a[i][0]<=pivot[0][0])
+				less.push(a[i]);
 			else greater.push(a[i]);
 		}
 		return quickSort(less).concat(pivot, quickSort(greater));
@@ -143,9 +121,12 @@ function sortTable(cname, reverse) {
 	var values = table_data.getElementsByClassName(cname);
 	var array = [];
 	for (var v=0; v<values.length; v++)
-		if (values[v].textContent)
-			array.push([values[v].textContent, v]);
+		if (values[v].textContent) {
+			var newval = (isfloat ? parseFloat(values[v].textContent) : values[v].textContent);
+			array.push([newval, v]);
+		}
 	array = quickSort(array);
+	console.log(array);
 	if (reverse) array.reverse();
 	var rows = table_data.getElementsByTagName("tr");
 	var static_rows = [];
@@ -161,6 +142,7 @@ function sortTable(cname, reverse) {
 			headers[h].className = headers[h].className + ((reverse) ? (" sort_down") : (" sort_up"));
 		}
 	}
+	paginateTable(0);
 }
 
 function initControl() {
@@ -235,7 +217,8 @@ function initControl() {
 	for (var h=0; h<heads.length; h++) {
 		heads[h].addEventListener("click", function(ev) {
 			sortTable(this.className.match(/T_\w+/)[0],
-				this.className.match("sort_up"));
+				this.className.match("sort_up"),
+				this.hasAttribute("isfloat"));
 		})
 	}
 
@@ -268,12 +251,11 @@ function populateTable(id) {
 	var path = document.location.pathname.split("/");
 	var nTotal = nG95 = nG98 = nGOA = nGO = nGOB = nGOC = nBIOD = 0;
 	var cities = [];
-	var p_link, t_link, s_link;
 	for (var p in info) {
-		p_link = path[2] || encodeName(p);
+		var p_link = path[2] || encodeName(p);
 		for (var t in info[p]) {
-			t_link = path[3] || encodeName(t);
-			s_link = "/gasolineras/" + p_link + "/" + t_link;
+			var t_link = path[3] || encodeName(t);
+			var s_link = "/gasolineras/" + p_link + "/" + t_link;
 			cities.push([t, s_link]);
 			for (var s in info[p][t]) {
 				var tr = document.createElement("tr");
@@ -294,16 +276,7 @@ function populateTable(id) {
 				td_s.appendChild(a_s);
 				td_s.className = "T_ADDR";
 				tr.appendChild(td_s);
-				// Distancia al marcador
 				var td_dist = document.createElement("td");
-				try {
-					var dlat = (data.latlon[p][t][s][0] - markerCenter.position.lat()) * 111.03461;
-					var dlon = (data.latlon[p][t][s][1] - markerCenter.position.lng()) * 85.39383;
-					td_dist.textContent = Math.sqrt(dlat*dlat+dlon*dlon).toFixed(1);
-				}
-				catch(e) {
-					td_dist.textContent = "";
-				}
 				td_dist.className = "T_DIST";
 				tr.appendChild(td_dist);
 				for (var o in FUEL_OPTIONS) {
@@ -312,8 +285,23 @@ function populateTable(id) {
 					otd.textContent = info[p][t][s]["options"][o] || "";
 					tr.appendChild(otd);
 				}
-				// ID de fila, que coincide con lat,lon
-				try {tr.id = data.latlon[p][t][s].join(",");}
+				try { // Marcadores
+					var pos = new google.maps.LatLng(data.latlon[p][t][s][0], data.latlon[p][t][s][1]);
+					var marker = new google.maps.Marker({
+						position: pos,
+						icon: markerIcon
+					});
+					google.maps.event.addListener(marker, 'click', function(e) {
+						if (infoWindow) infoWindow.close();
+						infoWindow = new google.maps.InfoWindow({
+							content: "contenido"
+						})
+						infoWindow.open(map, this);
+					});
+					markers.push(marker);
+					tr.setAttribute("markerid", markers.length-1);
+					tr.setAttribute("latlon", data.latlon[p][t][s].join(","));
+				}
 				catch (e){}
 				table.appendChild(tr);
 				nTotal++;
@@ -331,9 +319,7 @@ function populateTable(id) {
 			citiesList.appendChild(newCity);
 		}
 	}
-	else {
-		document.getElementById("c_cities").style.display = "none";
-	}
+	else document.getElementById("c_cities").style.display = "none";
 }
 
 window.addEventListener("load", function(){
@@ -343,12 +329,11 @@ window.addEventListener("load", function(){
 		console.log(data);
 		var pts = decodeArray(document.location.pathname.split("/").splice(2));
 		province = prettyName(pts[0]);
-		if (pts[1]) {
-			town = prettyName(pts[1]);
-		}
+		if (pts[1]) town = prettyName(pts[1]);
 		var h1 = document.getElementById("title");
 		h1.textContent = "Gasolineras en " + ((town) ? (town + ", ") : ("la ")) + "provincia de " + province;
-		initMap(function() {populateTable("table_data");});
+		populateTable("table_data");
+		initMap();
 		initControl();
 	}
 	var url = document.URL;
