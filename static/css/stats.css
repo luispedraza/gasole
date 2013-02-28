@@ -1,4 +1,4 @@
-#map {
+#map, #polymap, #kartomap {
 	width: 500px;
 	height: 400px;
 }

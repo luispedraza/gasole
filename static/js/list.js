@@ -126,7 +126,6 @@ function sortTable(cname, reverse, isfloat) {
 			array.push([newval, v]);
 		}
 	array = quickSort(array);
-	console.log(array);
 	if (reverse) array.reverse();
 	var rows = table_data.getElementsByTagName("tr");
 	var static_rows = [];

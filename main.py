@@ -115,7 +115,13 @@ class Stats(BaseHandler):
     def get(self, province, city):
         self.render("base.html", 
             title=u"Estadísticas",
-            scripts=[GOOGLE_MAPS_VIS_API, '/js/stats.js'],
+            scripts=[GOOGLE_MAPS_VIS_API, 
+                '/js/stats.js', 
+                '/js/libs/polymaps.min.js', 
+                '/js/libs/jquery.min.js', 
+                '/js/libs/raphael.min.js', 
+                '/js/libs/kartograph.min.js',
+                '/js/libs/d3.v3.min.js'],
             styles=["stats.css"],
             content=jinja_env.get_template("stats.html").render())
 
@@ -129,7 +135,7 @@ class List(BaseHandler):
         self.render("base.html", 
             title = title,
             styles=["list.css"],
-            scripts=['/js/utils.js', '/js/list.js', GOOGLE_MAPS_API, '/js/google/markerclusterer_compiled.js'],
+            scripts=['/js/utils.js', '/js/list.js', GOOGLE_MAPS_API, '/js/libs/markerclusterer_compiled.js'],
             content=jinja_env.get_template("list.html").render())
 class Detail(BaseHandler):
     def get(self, province, city, station):
