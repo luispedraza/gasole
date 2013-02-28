@@ -37,17 +37,22 @@
 		</ul>
 	</div>
 	<div id="cities" class="c_content">
-		<p>Todas las ciudades de esta provincia</p>
+		<p>Todas las ciudades de esta provincia: 
+			<span id="c_A" onclick="javascript:filterCities('c_A')" class="filter">A-C</span>
+			<span id="c_D" onclick="javascript:filterCities('c_D')" class="filter">D-L</span>
+			<span id="c_N" onclick="javascript:filterCities('c_N')" class="filter">N-Q</span>
+			<span id="c_S" onclick="javascript:filterCities('c_S')" class="filter">S-Z</span></p>
 		<ul id="cities_list"></ul>
 	</div>
 	<div id="filter" class="c_content">
 		<p>Refina la búsqueda introduciendo un texto para filtrar los resultados obtenidos:</p>
-		<input id="contains" type="text">
+		<input id="contains" type="text" />
 	</div>
 	<div id="distance" class="c_content">
 		<p>Encuentra las gasolineras más cercanas a una dirección:</p>
 		<form action="javascript:newDistance()">
-		<input id="from" type="text">
+		<input id="from" type="text" placeholder="Ej.: Gran Vía 27, o Parque de Atracciones…" />
+		<p id="distante_info"></p>
 		</form>
 	</div>
 </div> <!-- control -->

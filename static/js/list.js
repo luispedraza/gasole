@@ -24,13 +24,31 @@ function newDistance() {
 	var geocoder = new google.maps.Geocoder();
 	geocoder.geocode({'address': location}, function (res, stat){
 		if (stat == google.maps.GeocoderStatus.OK) {
+			console.log(res);
 			markerCenter.setPosition(res[0].geometry.location);
+			markerCenter.set("place", res[0].formatted_address);
+			if (infoWindow) infoWindow.close();
 			map.panTo(res[0].geometry.location);
 			calcDistances();
+			paginateTable(0);
+			var nearest = document.getElementById("table_data").getElementsByTagName("tr")[0];
+			var infoDiv = document.getElementById("distante_info");
+			infoDiv.innerHTML = "La gasolinera más próxima a " + 
+				res[0].formatted_address + " se encuentra en " + 
+				nearest.getElementsByClassName("T_ADDR")[0].innerHTML.replace(/ \[.\]/g, "");
+			console.log(nearest.getElementsByClassName("T_ADDR")[0].innerHTML);
 		} else {
 			alert("Geocode ha fallado: " + stat);
 		}
 	});
+}
+
+/* Filtrado alfabético de ciudades encontradas */
+function filterCities(cname) {
+	var cities = document.getElementById("cities_list").getElementsByTagName("li");
+	for (var c=0; c<cities.length; c++) {
+		cities[c].style.display = ((cities[c].className==cname) ? "block" : "none");
+	}
 }
 
 function paginateTable(index) {
@@ -84,11 +102,20 @@ function initMap() {
 	var geocoder = new google.maps.Geocoder();
 	geocoder.geocode({'address': place}, function (res, stat){
 		if (stat == google.maps.GeocoderStatus.OK) {
-			map.setCenter(res[0].geometry.location)
+			map.setCenter(res[0].geometry.location);
 			markerCenter = new google.maps.Marker({
             	map: map,
             	position: res[0].geometry.location,
             	draggable: true
+			});
+			markerCenter.set("place", res[0].formatted_address);
+			google.maps.event.addListener(markerCenter, 'click', function(e) {
+				console.log(this);
+				if (infoWindow) infoWindow.close();
+				infoWindow = new google.maps.InfoWindow({
+					content: "Punto de referencia:<br /> " + this.place.bold()
+				})
+				infoWindow.open(map, this);
 			});
 			calcDistances();
 		} else {
@@ -312,9 +339,18 @@ function populateTable(id) {
 	divInfo.innerHTML = "<p>Se han encontrado " + nTotal + " gasolineras en " + ((town)?(town):(province)).bold() + ".</p>";
 	if (cities.length > 1) { // Lista de ciudades
 		var citiesList = document.getElementById("cities_list");
+		cities.sort(function(a, b) {
+			if (a[0].toLowerCase()<b[0].toLowerCase()) return -1;
+			if (a[0].toLowerCase()>b[0].toLowerCase()) return 1;
+			return 0;
+		})
 		for (var c=0; c<cities.length; c++) {
 			var newCity = document.createElement("li");
 			newCity.innerHTML = cities[c][0].link(cities[c][1]);
+			if (cities[c][0].charAt(0).toLowerCase() < "d") newCity.className = "c_A";
+			else if (cities[c][0].charAt(0).toLowerCase() < "n") newCity.className = "c_D";
+			else if (cities[c][0].charAt(0).toLowerCase() < "s") newCity.className = "c_N";
+			else newCity.className = "c_S";
 			citiesList.appendChild(newCity);
 		}
 	}

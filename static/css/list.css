@@ -22,7 +22,19 @@
 	display: none;
 	padding: 10px;
 	border: 5px solid #3399CC;
+	background-color: #3399CC;
+	color: white;
 	overflow: scroll;
+}
+
+#control .c_content > p:first-child {
+	border-bottom: 2px solid white;
+	overflow: hidden;
+	padding-top: 5px;
+}
+
+#control .c_content a {
+	color: white;
 }
 #control .c_content.on {
 	display: block;
@@ -43,6 +55,13 @@
 #c_cities {
 	background-image: url("/img/city.svg");
 }
+#cities .filter {
+	padding: 3px;
+	cursor: pointer;
+	border: 1px solid white;
+	margin-right: 3px;
+}
+
 #cities ul {
 	-moz-column-count:5; /* Firefox */
 	-webkit-column-count:5; /* Safari and Chrome */
@@ -53,7 +72,20 @@
 	-moz-column-rule:1px outset white; /* Firefox */
 	-webkit-column-rule:1px outset white; /* Safari and Chrome */
 	column-rule:1px outset white;
+	font-size: .8em;
 }
+#cities ul li {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	-o-text-overflow: ellipsis;
+	white-space: nowrap;
+	margin-bottom: .5em;
+	display: none;
+}
+#cities ul li.c_A {
+	display: block;
+}
+
 #c_filter {
 	background-image: url("/img/filter.svg");
 }
