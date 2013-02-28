@@ -112,18 +112,26 @@ class Map(BaseHandler):
         self.render("map.html")
 
 class Stats(BaseHandler):
-    def get(self, province, city):
-        self.render("base.html", 
-            title=u"Estadísticas",
-            scripts=[GOOGLE_MAPS_VIS_API, 
+    def get(self, g_type, province, city):
+        the_scripts = []
+        if (g_type=="precio"):
+            the_scripts = [GOOGLE_MAPS_VIS_API, 
                 '/js/stats.js', 
                 '/js/libs/polymaps.min.js', 
                 '/js/libs/jquery.min.js', 
                 '/js/libs/raphael.min.js', 
                 '/js/libs/kartograph.min.js',
-                '/js/libs/d3.v3.min.js'],
+                '/js/libs/d3.v3.min.js']
+            styles=["stats.css"]
+        elif (g_type=="cantidad"):
+            the_scripts = [GOOGLE_MAPS_VIS_API, '/js/g_cantidad.js']
+        elif (g_type=="variedad"):
+            pass
+        self.render("base.html", 
+            title=u"Gráficos",
+            scripts=the_scripts,
             styles=["stats.css"],
-            content=jinja_env.get_template("stats.html").render())
+            content=jinja_env.get_template("g_"+g_type+".html").render())
 
 class Data(BaseHandler):
     def get(self, option, province):
@@ -230,7 +238,7 @@ app = webapp2.WSGIApplication([
     ('/admin/update/?(\w+)?', AdminUpdate),
     ('/admin/search/?', AdminSearch),
     ('/map/?', Map),
-    ('/stats/?([^ \/]+)?/?([^ \/]+)?/?', Stats),
+    ('/graficos/?([^ \/]+)?/?([^ \/]+)?/?([^ \/]+)?/?', Stats),
     ('/data/(\w+)/(\w+)', Data),
     ('/gasolineras/?([^ \/]+)/?([^ \/]+)?/?', List),
     ('/ficha/?([^ \/]+)/?([^ \/]+)?/?([^ \/]+)?', Detail),

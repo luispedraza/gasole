@@ -8,6 +8,8 @@ var markerCenter;
 var pagerN = 20;
 var pagerCurrent = 0;
 var markerIcon = "/icon/pump_r.png";
+var windowTimeout;
+var focusMarker;
 
 var FUEL_OPTIONS = {"1": {"short": "G95", "name": "Gasolina 95"},
 				"3": {"short": "G98", "name": "Gasolina 98"},
@@ -235,7 +237,11 @@ function initControl() {
 	var rows = document.getElementById("table_data").getElementsByTagName("tr");
 	for (var r=0; r<rows.length; r++) {
 		rows[r].addEventListener("mouseover", function() {
-
+			clearTimeout(windowTimeout);
+			focusMarker = markers[this.getAttribute("markerid")];
+			windowTimeout = setTimeout(function() {
+				google.maps.event.trigger(focusMarker, "click");
+			}, 800);
 		})
 	}
 	// Ordenación de la tabla
@@ -322,6 +328,8 @@ function populateTable(id) {
 						infoWindow = new google.maps.InfoWindow({
 							content: "contenido"
 						})
+						map.panTo(this.position);
+						map.setZoom(12);
 						infoWindow.open(map, this);
 					});
 					markers.push(marker);

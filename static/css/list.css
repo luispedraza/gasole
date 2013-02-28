@@ -24,7 +24,6 @@
 	border: 5px solid #3399CC;
 	background-color: #3399CC;
 	color: white;
-	overflow: scroll;
 }
 
 #control .c_content > p:first-child {
@@ -62,7 +61,7 @@
 	margin-right: 3px;
 }
 
-#cities ul {
+#cities_list {
 	-moz-column-count:5; /* Firefox */
 	-webkit-column-count:5; /* Safari and Chrome */
 	column-count:5;
@@ -73,8 +72,9 @@
 	-webkit-column-rule:1px outset white; /* Safari and Chrome */
 	column-rule:1px outset white;
 	font-size: .8em;
+	overflow: scroll;
 }
-#cities ul li {
+#cities_list li {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	-o-text-overflow: ellipsis;
