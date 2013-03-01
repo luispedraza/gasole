@@ -17,15 +17,17 @@ class Province(db.Model):
 class Town(db.Model):
 	pass
 
-class GasStation(db.Model):
-	label = db.StringProperty(required=True)
+class GasStation(db.Expando):
+	label = db.StringProperty()
 	phone = db.PhoneNumberProperty()
 	email = db.EmailProperty()
 	link = db.LinkProperty()
 	hours = db.StringProperty()
-
-class GeoData(db.Model):
 	geopt = db.GeoPtProperty()
+	date = db.DateTimeProperty(auto_now_add=True)
+
+# class GeoData(db.Model):
+# 	geopt = db.GeoPtProperty()
 
 class PriceData(db.Expando):
 	date = db.DateProperty()
@@ -38,8 +40,7 @@ class Comment(db.Model):
 	content = db.StringProperty(required=True, multiline=True)
 	date = db.DateTimeProperty(auto_now_add=True)
 
-# No actualiza datos de combustible, puesto que sólos on para un tipo, y es
-# más económico hacerlo con todos juntos (desde caché)
+
 def data2store(data):
 	_provinces = []
 	_towns = []
@@ -106,6 +107,9 @@ def store2data(option=None, prov_kname=None):
 	for price in q:
 		prices = {FUEL_REVERSE[o]: getattr(price, o) for o in price.dynamic_properties()}
 		station = price.parent()
+		latlon = None
+		if (station.geopt):
+			latlon = [station.geopt.lat, station.geopt.lon]
 		result.add_item(
 			province = price.key().parent().parent().parent().name(),
 			town     = price.key().parent().parent().name(),
@@ -113,24 +117,25 @@ def store2data(option=None, prov_kname=None):
 			label    = station.label,
 			date     = price.date,
 			option   = prices,
-			hours    = station.hours)
+			hours    = station.hours,
+			latlon   = latlon)
 	memcache.set(prov_kname, result.data.get(prov_kname))
 	return result.data
 
-def get_latlon(prov, town=None, station=None):
-	latlon_cache = memcache.get("latlon_" + prov) or {}
-	if not latlon_cache:
-		q = GeoData.all().ancestor(db.Key.from_path('Province', prov))
-		for g in q:
-			latlon_cache.setdefault(g.key().parent().name(), {})[g.key().name()] = [g.geopt.lat, g.geopt.lon]
-		memcache.set("latlon_" + prov, latlon_cache)
-	if station:
-		return {prov: {town: {station: latlon_cache.get(town, {}).get(station)}}}
-	elif town:
-		return {prov: {town: latlon_cache.get(town)}}
-	if latlon_cache:
-		return {prov: latlon_cache}
-	return {"error": "Datos no encontrados"}
+# def get_latlon(prov, town=None, station=None):
+# 	latlon_cache = memcache.get("latlon_" + prov) or {}
+# 	if not latlon_cache:
+# 		q = GeoData.all().ancestor(db.Key.from_path('Province', prov))
+# 		for g in q:
+# 			latlon_cache.setdefault(g.key().parent().name(), {})[g.key().name()] = [g.geopt.lat, g.geopt.lon]
+# 		memcache.set("latlon_" + prov, latlon_cache)
+# 	if station:
+# 		return {prov: {town: {station: latlon_cache.get(town, {}).get(station)}}}
+# 	elif town:
+# 		return {prov: {town: latlon_cache.get(town)}}
+# 	if latlon_cache:
+# 		return {prov: latlon_cache}
+# 	return {"error": "Datos no encontrados"}
 
 def get_near(lat, lon, dist):
 	near = {}

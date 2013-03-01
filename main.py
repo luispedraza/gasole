@@ -91,19 +91,22 @@ class AdminSearch(BaseHandler):
             data = data,
             static_map = static_map)
         if update:
-            logging.info("guardando datos")
             _geodata = []
             data = data.data
             for p in data.keys():
                 for t in data[p].keys():
                     for s in data[p][t].keys():
-                        if data[p][t][s].has_key("latlon"):
-                            _geodata.append(GeoData(
-                                key_name = s,
-                                parent = db.Key.from_path('Province', p, 'Town', t),
-                                geopt = db.GeoPt(lat = data[p][t][s]["latlon"][1],
-                                    lon = data[p][t][s]["latlon"][0])
-                                ))
+                        if data[p][t][s].has_key("latlon") and data[p][t][s]["latlon"]:
+                            station = GasStation.get(db.Key.from_path('Province', p, 'Town', t, 'GasStation', s))
+                            if station:
+                                station.geopt = db.GeoPt(lat = data[p][t][s]["latlon"][1], lon = data[p][t][s]["latlon"][0])
+                                _geodata.append(station)
+                                # _geodata.append(GeoData(
+                                #     key_name = s,
+                                #     parent = db.Key.from_path('Province', p, 'Town', t),
+                                #     geopt = db.GeoPt(lat = data[p][t][s]["latlon"][1],
+                                #         lon = data[p][t][s]["latlon"][0])
+                                #     ))
             db.put(_geodata)
             logging.info("guardadas %s posiciones" %len(_geodata))
 
@@ -201,7 +204,7 @@ class Api(BaseHandler):
                     "history": get_history(prov, town, station),
                     "comments" : get_comments(prov, town, station)
                     }
-        self.render_json({"info": info, "latlon": get_latlon(prov=prov, town=town, station=station)})
+        self.render_json(info)
         
 class GeoApi(BaseHandler):
     def get(self, place, lat, lon, dist):
@@ -221,7 +224,7 @@ class SearchResults(BaseHandler):
         self.render("base.html", 
             scripts=['/js/utils.js', '/js/list.js', GOOGLE_MAPS_API],
             content=jinja_env.get_template("list.html").render())
-        
+
 class Info(BaseHandler):
     def get(self, section):
         content_html = ""

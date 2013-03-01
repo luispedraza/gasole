@@ -95,8 +95,8 @@ class ResultIter(Result):
 		s = t.get(station)
 		if not s:
 			s = t[station] = {"date":date,"label":label,"hours":hours,"options":option}
-			if latlon: 
-				s["latlon"] = latlon
+			if latlon:
+				t[station]["latlon"] = latlon
 		else:
 			s["options"].update(option)
 			s["date"] = date

@@ -279,18 +279,17 @@ function initControl() {
 	}
 }
 function populateTable(id) {
-	var info = data.info;
 	var table = document.getElementById(id);
 	var path = document.location.pathname.split("/");
 	var nTotal = nG95 = nG98 = nGOA = nGO = nGOB = nGOC = nBIOD = 0;
 	var cities = [];
-	for (var p in info) {
+	for (var p in data) {
 		var p_link = path[2] || encodeName(p);
-		for (var t in info[p]) {
+		for (var t in data[p]) {
 			var t_link = path[3] || encodeName(t);
 			var s_link = "/gasolineras/" + p_link + "/" + t_link;
 			cities.push([t, s_link]);
-			for (var s in info[p][t]) {
+			for (var s in data[p][t]) {
 				var tr = document.createElement("tr");
 				tr.className = "r_on";
 				var td_town = document.createElement("td");
@@ -315,11 +314,11 @@ function populateTable(id) {
 				for (var o in FUEL_OPTIONS) {
 					var otd = document.createElement("td");
 					otd.className = "T_" + FUEL_OPTIONS[o]["short"] + " on";
-					otd.textContent = info[p][t][s]["options"][o] || "";
+					otd.textContent = data[p][t][s]["options"][o] || "";
 					tr.appendChild(otd);
 				}
 				try { // Marcadores
-					var pos = new google.maps.LatLng(data.latlon[p][t][s][0], data.latlon[p][t][s][1]);
+					var pos = new google.maps.LatLng(data[p][t][s].latlon[0], data[p][t][s].latlon[1]);
 					var marker = new google.maps.Marker({
 						position: pos,
 						icon: markerIcon
@@ -335,7 +334,7 @@ function populateTable(id) {
 					});
 					markers.push(marker);
 					tr.setAttribute("markerid", markers.length-1);
-					tr.setAttribute("latlon", data.latlon[p][t][s].join(","));
+					tr.setAttribute("latlon", data[p][t][s]["latlon"].join(","));
 				}
 				catch (e){}
 				table.appendChild(tr);
