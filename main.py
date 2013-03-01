@@ -146,6 +146,7 @@ class Data(BaseHandler):
     def get(self, option, province):
         data = get_means(option)
         self.render_json(data)
+
 class List(BaseHandler):
     def get(self, province, city):
         title = "Gasolineras en " + (decode_param(city)+ ", " if city else "la ") + "provincia de " + decode_param(province)
@@ -204,12 +205,11 @@ class Api(BaseHandler):
                     "history": get_history(prov, town, station),
                     "comments" : get_comments(prov, town, station)
                     }
-        self.render_json(info)
+        self.render_json({"_data": info})
         
 class GeoApi(BaseHandler):
     def get(self, place, lat, lon, dist):
-        latlon = get_near(lat=float(lat), lon=float(lon), dist=float(dist))
-        self.render_json({"info": {}, "latlon": {place: latlon}})
+        self.render_json({"_near": place, "_data": get_near(lat=float(lat), lon=float(lon), dist=float(dist))})
 
 class Search(BaseHandler):
     def get(self):
@@ -221,8 +221,11 @@ class Search(BaseHandler):
 
 class SearchResults(BaseHandler):
     def get(self, place, lat, lon, dist):
+        title = "Gasolineras cerca de " + decode_param(place)
         self.render("base.html", 
-            scripts=['/js/utils.js', '/js/list.js', GOOGLE_MAPS_API],
+            title = title,
+            styles=["list.css"],
+            scripts=['/js/utils.js', '/js/list.js', GOOGLE_MAPS_API, '/js/libs/markerclusterer_compiled.js'],
             content=jinja_env.get_template("list.html").render())
 
 class Info(BaseHandler):

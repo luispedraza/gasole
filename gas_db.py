@@ -138,17 +138,35 @@ def store2data(option=None, prov_kname=None):
 # 	return {"error": "Datos no encontrados"}
 
 def get_near(lat, lon, dist):
-	near = {}
+	near = ResultIter()
 	# http://www.csgnetwork.com/degreelenllavcalc.html
 	dlat = dist/111.03461
 	dlon = dist/85.39383
 	ne = db.GeoPt(lat=lat+dlat, lon=lon+dlon)
 	sw = db.GeoPt(lat=lat-dlat, lon=lon-dlon)
-	q = GeoData.all().filter('geopt >', sw).filter('geopt <', ne)
+	q = GasStation.all().filter('geopt >', sw).filter('geopt <', ne)
+	keys = []
 	for g in q:
 		if abs(g.geopt.lon-lon) < dlon:
-			near.setdefault(g.key().parent().name(), {})[g.key().name()] = [g.geopt.lat, g.geopt.lon]
-	return near
+			keys.append(db.Key.from_path('PriceData', g.key().name(), parent=g.key()))
+			# logging.info(db.Key.from_path('GasStation', g.key().name(), parent=g.key()))
+	q = PriceData.get(keys)
+	for price in q:
+		prices = {FUEL_REVERSE[o]: getattr(price, o) for o in price.dynamic_properties()}
+		station = price.parent()
+		latlon = None
+		if (station.geopt):
+			latlon = [station.geopt.lat, station.geopt.lon]
+		near.add_item(
+			province = price.key().parent().parent().parent().name(),
+			town     = price.key().parent().parent().name(),
+			station  = price.key().name(),
+			label    = station.label,
+			date     = price.date,
+			option   = prices,
+			hours    = station.hours,
+			latlon   = latlon)
+	return near.data
 
 
 def get_history(prov, town, station):

@@ -1,5 +1,6 @@
 var data;
 var map;
+var place = "";
 var markers = [];
 var province = "";
 var infoWindow = null;
@@ -93,7 +94,6 @@ function calcDistances() {
 }
 
 function initMap() {
-	var place = ((town) ? (town + ", " + province) : (province));
 	var mapOptions = {
 		center: new google.maps.LatLng(40.400, 3.6833),
 		zoom: 8,
@@ -368,13 +368,21 @@ function populateTable(id) {
 window.addEventListener("load", function(){
 	var req = new XMLHttpRequest();
 	req.onload = function(r) {
-		data = JSON.parse(r.target.responseText);
-		console.log(data);
-		var pts = decodeArray(document.location.pathname.split("/").splice(2));
-		province = prettyName(pts[0]);
-		if (pts[1]) town = prettyName(pts[1]);
+		result = JSON.parse(r.target.responseText);
+		data = result._data;
+		console.log(result);
 		var h1 = document.getElementById("title");
-		h1.textContent = "Gasolineras en " + ((town) ? (town + ", ") : ("la ")) + "provincia de " + province;
+		if (result["_near"]) {
+			h1.textContent = "Gasolineras cerca de " + result["_near"];
+			place = result["_near"];
+		}
+		else {
+			var pts = decodeArray(document.location.pathname.split("/").splice(2));
+			province = prettyName(pts[0]);
+			if (pts[1]) town = prettyName(pts[1]);
+			h1.textContent = "Gasolineras en " + ((town) ? (town + ", ") : ("la ")) + "provincia de " + province;
+			place = ((town) ? (town + ", " + province) : (province));
+		}
 		populateTable("table_data");
 		initMap();
 		initControl();
