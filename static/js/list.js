@@ -232,6 +232,7 @@ function initControl() {
 				}
 			}
 		}
+		paginateTable(0);
 	}
 	// Interactividad con la tabla 
 	var rows = document.getElementById("table_data").getElementsByTagName("tr");

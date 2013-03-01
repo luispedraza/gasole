@@ -113,8 +113,18 @@ class Map(BaseHandler):
 
 class Stats(BaseHandler):
     def get(self, g_type, province, city):
+        logging.info(conpute_stats())
         the_scripts = []
+        the_styles = []
         if (g_type=="precio"):
+            the_scripts = [GOOGLE_MAPS_API, 
+                '/js/g_precio.js', 
+                '/js/libs/d3.v3.min.js']
+            the_styles=["g_precio.css"]
+        elif (g_type=="cantidad"):
+            the_scripts = [GOOGLE_MAPS_VIS_API, '/js/g_cantidad.js']
+            the_styles=["g_cantidad.css"]
+        elif (g_type=="variedad"):
             the_scripts = [GOOGLE_MAPS_VIS_API, 
                 '/js/stats.js', 
                 '/js/libs/polymaps.min.js', 
@@ -122,15 +132,11 @@ class Stats(BaseHandler):
                 '/js/libs/raphael.min.js', 
                 '/js/libs/kartograph.min.js',
                 '/js/libs/d3.v3.min.js']
-            styles=["stats.css"]
-        elif (g_type=="cantidad"):
-            the_scripts = [GOOGLE_MAPS_VIS_API, '/js/g_cantidad.js']
-        elif (g_type=="variedad"):
-            pass
+            the_styles=["g_variedad.css"]
         self.render("base.html", 
             title=u"Gráficos",
             scripts=the_scripts,
-            styles=["stats.css"],
+            styles=the_styles,
             content=jinja_env.get_template("g_"+g_type+".html").render())
 
 class Data(BaseHandler):
@@ -147,9 +153,11 @@ class List(BaseHandler):
             content=jinja_env.get_template("list.html").render())
 class Detail(BaseHandler):
     def get(self, province, city, station):
-        # Vista de detalle de una gasolinera
-        logging.info(station)
-        station = station.replace("_[D]", "(margen derecho)").replace("_[I]", " (margen izquierdo)").replace("_[N]", "")
+        # Vista de detalle de una gasoliner
+        edit_station=""
+        if users.is_current_user_admin():
+            edit_station = jinja_env.get_template("edit_station.html").render()
+        station = station.replace("_[D]", " (margen derecho)").replace("_[I]", " (margen izquierdo)").replace("_[N]", "")
         title = "Gasolinera en " + decode_param(city) + ", " + decode_param(station)
         self.render("base.html", 
             title = title,
@@ -158,8 +166,12 @@ class Detail(BaseHandler):
                 '/js/utils.js', 
                 '/js/detail.js'
                 ],
-            content=jinja_env.get_template("detail.html").render())
+            content=jinja_env.get_template("detail.html").render(edit_station=edit_station))
     def post(self, province, city, station):
+        # Actualización de datos de la gasolinera:
+        if users.is_current_user_admin() and self.request.get("edit_station"):
+            self.get(province=province, city=city, station=station)
+            return
         # Creación de un nuevo comentario sobre una estación
         title=self.request.get("title")
         content=self.request.get("content")
@@ -169,7 +181,6 @@ class Detail(BaseHandler):
                     'Town', decode_param(city), 
                     'GasStation', decode_param(station)))
             comment.put()
-            logging.info(self.request)
             self.get(province=province, city=city, station=station)
 
 class Api(BaseHandler):
@@ -191,10 +202,12 @@ class Api(BaseHandler):
                     "comments" : get_comments(prov, town, station)
                     }
         self.render_json({"info": info, "latlon": get_latlon(prov=prov, town=town, station=station)})
+        
 class GeoApi(BaseHandler):
     def get(self, place, lat, lon, dist):
         latlon = get_near(lat=float(lat), lon=float(lon), dist=float(dist))
         self.render_json({"info": {}, "latlon": {place: latlon}})
+
 class Search(BaseHandler):
     def get(self):
         self.render("base.html", 
@@ -208,6 +221,7 @@ class SearchResults(BaseHandler):
         self.render("base.html", 
             scripts=['/js/utils.js', '/js/list.js', GOOGLE_MAPS_API],
             content=jinja_env.get_template("list.html").render())
+        
 class Info(BaseHandler):
     def get(self, section):
         content_html = ""

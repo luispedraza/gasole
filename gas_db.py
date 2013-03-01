@@ -161,6 +161,24 @@ def get_comments(prov, town, station):
 			"date": c.date.isoformat()}
 	return result
 
+# def compute_stats():
+# 	data_stats = memcache.get("stats")
+# 	if not data_stats:
+# 		data_stats = {}
+# 		q = Province.all()
+# 		for province in q:
+# 			p = province.key().name()
+# 			datap = memcache.get(o) or store2data(prov_kname=p).gete(p)
+# 			opationsp = {}
+# 			for t in datap.keys():
+# 				for s in datap[t].keys():
+# 					station = datap[t][s]
+# 					price = station["options"].get(option)
+# 					if price:
+# 						opationsp[o].append(getattr(station.options, o)) for o in station.options
+
+def mean_val(array):
+	return sum(values)/len(values)
 
 # precios medios de combustible por provincia
 def get_means(option):
@@ -179,7 +197,7 @@ def get_means(option):
 					if price:
 						values.append(price)
 			if len(values):
-				data[p] = value = sum(values)/len(values)
+				data[p] = value = mean_val(values)
 			else:
 				data[p] = None
 		memcache.set("means_"+option, data)
