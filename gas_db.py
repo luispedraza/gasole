@@ -7,8 +7,8 @@ from gas_update import *
 import logging
 from math import fabs
 
-from os import environ
-DEBUG = environ['SERVER_SOFTWARE'].startswith('Dev')
+import os
+DEBUG = os.environ['SERVER_SOFTWARE'].startswith('Dev')
 
 ## Modelo de provincia
 class Province(db.Model):
@@ -47,16 +47,16 @@ def data2store(data):
 	_stations = []
 	_prices = []
 	_history = []
-	for p in data: # recorremos las provincias
+	for p in data.keys(): # recorremos las provincias
 		cachep = memcache.get(p) or store2data(prov_kname=p).get(p)
 		if not cachep: 		# nueva provincia
 			cachep = {}
 			_provinces.append(Province(key_name=p))
-		for t in data[p]: # recorremos las ciudades
+		for t in data[p].keys(): # recorremos las ciudades
 			if not cachep.has_key(t):	# nueva ciudad
 				cachep[t] = {}
 				_towns.append(Town(key_name=t, parent=db.Key.from_path('Province', p)))
-			for s in data[p][t]: # recorremos las estaciones
+			for s in data[p][t].keys(): # recorremos las estaciones
 				update_price = False
 				if not cachep[t].has_key(s): # nueva estación
 					cachep[t][s] = data[p][t][s]

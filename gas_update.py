@@ -10,13 +10,14 @@
 # biodiesel: 			http://geoportal.mityc.es/hidrocarburos/files/eess_BIOD_ddmmaaaa.zip
 # ARCHIVOS EXCEL:
 # http://geoportal.mityc.es/hidrocarburos/eess/searchTotal.do?tipoCons=1&tipoBusqueda=0&tipoCarburante=1&textoCarburante=Gasolina%2095
-from  urllib import urlencode
-from  zipfile import ZipFile
+import urllib
+import zipfile
 import time
-from StringIO import StringIO
+import StringIO
 from datetime import date
 from bs4 import BeautifulSoup
 import re
+# import time
 from google.appengine.api import urlfetch
 import logging
 
@@ -89,10 +90,11 @@ class ResultIter(Result):
 		data = self.data
 		province = make_clean_name(province)
 		town = make_clean_name(town)
-		t = data.setdefault(province, {}).setdefault(town, {})
+		p = data[province] = data.get(province) or {}
+		t = p[town] = p.get(town) or {}
 		s = t.get(station)
 		if not s:
-			t[station] = {"date":date,"label":label,"hours":hours,"options":option}
+			s = t[station] = {"date":date,"label":label,"hours":hours,"options":option}
 			if latlon:
 				t[station]["latlon"] = latlon
 		else:
@@ -108,12 +110,11 @@ def gas_update_csv(option="1"):
 	response = urlfetch.fetch(zipFileURL)
 	if response.status_code != 200:
 		return
-	zippedFile = StringIO(response.content)
+	zippedFile = StringIO.StringIO(response.content)
 	# extract data
-	zfobj = ZipFile(zippedFile)
+	zfobj = zipfile.ZipFile(zippedFile)
 	name = zfobj.namelist()[0]
-	csv_data = StringIO(zfobj.read(name))
-	del zfobj # para liberar memoria ?
+	csv_data = StringIO.StringIO(zfobj.read(name))
 	data = []
 	while True:
 		line = csv_data.readline()
@@ -127,7 +128,6 @@ def gas_update_csv(option="1"):
 					data.append(info[0:2]+[re.sub(" %s e" %price, "", info[2]), fprice])
 		else:
 			break
-	del csv_data
 	headers = ["Lat.", "Lon.", "Info", "Precio"]
 	return Result(headers=headers, data=data)
 
@@ -142,7 +142,7 @@ def gas_update_xls(option="1"):
 			option = [option]
 	def handle_xls_result(rpc, o, result=result):
 		rpc_result = rpc.get_result()
-		xlsFile = StringIO(rpc_result.content)
+		xlsFile = StringIO.StringIO(rpc_result.content)
 		rows = BeautifulSoup(xlsFile).find('table').findAll('tr')
 		for tr in rows[2:]:
 			if not tr.findAll('b'):
@@ -232,6 +232,7 @@ def gas_update_search(option="1", prov="01"):
 				rpc.callback = create_search_callback(rpc)
 				urlfetch.make_fetch_call(rpc, URL_SEARCH+"?"+urllib.urlencode(values))
 				rpcs.append(rpc)
+				time.sleep(.1)
 				pos += 10
 			for rpc in rpcs:
 				rpc.wait()
