@@ -1,19 +1,20 @@
 window.addEventListener("load", function(){
 	var req = new XMLHttpRequest();
 	req.onload = function(r) {
-		data = JSON.parse(r.target.responseText);
-		console.log(data);
+		info = JSON.parse(r.target.responseText);
+		console.log(info);
+		data = info["_data"];
 		pts = decodeArray(document.location.pathname.split("/").splice(2));
 		var province = pts[0];
 		var town = pts[1];
 		var station = pts[2];
-		document.getElementById("sign").innerText = data.info[pts[0]][pts[1]][pts[2]].label;
+		document.getElementById("sign").innerText = data[pts[0]][pts[1]][pts[2]].label;
 		var img = document.createElement("img");
-		img.src = "/img/logos/" + data.info[pts[0]][pts[1]][pts[2]].label.toLowerCase() + ".png";
+		img.src = "/img/logos/" + data[pts[0]][pts[1]][pts[2]].label.toLowerCase() + ".png";
 		document.getElementById("logo").appendChild(img);
 
 		var commentsDiv = document.getElementById("comments");
-		var comments = data.info.comments;
+		var comments = data.comments;
 		for (var c in comments) {
 			var newComment = document.createElement("div");
 			newComment.className = "comment";
@@ -23,7 +24,7 @@ window.addEventListener("load", function(){
 
 		var chart_data = new google.visualization.DataTable();
 		chart_data.addColumn('date', 'Fecha');
-		var history = data.info.history;
+		var history = data.history;
 		var init = false;
 		for (var h in history){
 			if (!init) {
