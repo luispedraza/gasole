@@ -156,25 +156,33 @@ class List(BaseHandler):
             scripts=['/js/utils.js', '/js/list.js', GOOGLE_MAPS_API, '/js/libs/markerclusterer_compiled.js'],
             content=jinja_env.get_template("list.html").render())
 class Detail(BaseHandler):
-    def get(self, province, city, station):
-        # Vista de detalle de una gasoliner
-        edit_station=""
+    def get(self, province, town, station):
+        # Vista de detalle de una gasolinera
+        province = decode_param(province)
+        town = decode_param(town)
+        station = decode_param(station)
+        address = station.replace("_[D]", " (margen derecho)").replace("_[I]", " (margen izquierdo)").replace("_[N]", "")
+        title = "Gasolinera en " + address + ", " + town
+        edit_station = None
         if users.is_current_user_admin():
-            edit_station = jinja_env.get_template("edit_station.html").render()
-        station = station.replace("_[D]", " (margen derecho)").replace("_[I]", " (margen izquierdo)").replace("_[N]", "")
-        title = "Gasolinera en " + decode_param(city) + ", " + decode_param(station)
-        self.render("base.html", 
+            sdata = GasStation.get(db.Key.from_path('Province', province, 'Town', town, 'GasStation', station))
+            if sdata:
+                edit_station = {k: sdata.get(k) for k in sdata.dynamic_properties()}
+        self.render("base.html",
             title = title,
             styles=['detail.css', 'chart.css'],
-            scripts=[GOOGLE_VIS_API,
+            scripts=[GOOGLE_VIS_API, GOOGLE_MAPS_API,
                 '/js/utils.js', 
                 '/js/detail.js'
                 ],
-            content=jinja_env.get_template("detail.html").render(edit_station=edit_station))
-    def post(self, province, city, station):
+            content=jinja_env.get_template("detail.html").render(
+                title = title,
+                edit_station=edit_station
+                ))
+    def post(self, province, town, station):
         # Actualización de datos de la gasolinera:
         if users.is_current_user_admin() and self.request.get("edit_station"):
-            self.get(province=province, city=city, station=station)
+            self.get(province=province, town=city, station=station)
             return
         # Creación de un nuevo comentario sobre una estación
         title=self.request.get("title")
@@ -182,30 +190,31 @@ class Detail(BaseHandler):
         if title and content:
             comment = Comment(title=title, content=content,
                 parent=db.Key.from_path('Province', decode_param(province), 
-                    'Town', decode_param(city), 
+                    'Town', decode_param(town), 
                     'GasStation', decode_param(station)))
             comment.put()
-            self.get(province=province, city=city, station=station)
+            self.get(province=province, town=town, station=station)
 
 class Api(BaseHandler):
     def get(self, prov, town, station):
         if prov:
             prov = decode_param(prov)
             data = memcache.get(prov) or store2data(prov_kname=prov).get(prov)
-            if not town or town == "Todas":
-                info = {prov: data or {"error": "Provincia no encontrada"}}
+            if not town:
+                info = {"_data": {prov: data or {"error": "Provincia no encontrada"}}}
             elif data and town:
                 town = decode_param(town)
                 data = data.get(town)
-                info = {prov: {town: data or {"error": "Ciudad no encontrada"}}}
-                if data and station:
+                if not station:
+                    info = {"_data": {prov: {town: data or {"error": "Ciudad no encontrada"}}}}
+                elif data and station:
                     station = decode_param(station)
                     data = data.get(station)
-                    info = {prov: {town: {station: data or {"error": "Estación no encontrada"}}},
-                    "history": get_history(prov, town, station),
-                    "comments" : get_comments(prov, town, station)
+                    info = {"_data": {prov: {town: {station: data or {"error": "Estación no encontrada"}}}},
+                    "_history": get_history(prov, town, station),
+                    "_comments" : get_comments(prov, town, station)
                     }
-        self.render_json({"_data": info})
+        self.render_json(info)
         
 class GeoApi(BaseHandler):
     def get(self, place, lat, lon, dist):

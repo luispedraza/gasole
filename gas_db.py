@@ -168,13 +168,13 @@ def get_near(lat, lon, dist):
 			latlon   = latlon)
 	return near.data
 
-
 def get_history(prov, town, station):
 	result = {}
 	q = HistoryData.all().ancestor(db.Key.from_path('Province', prov, 'Town', town, 'GasStation', station))
 	for h in q:
 		result[h.date.isoformat()] = {k: getattr(h, k) for k in h.dynamic_properties()}
 	return result
+
 def get_comments(prov, town, station):
 	result = {}
 	q = Comment.all().ancestor(db.Key.from_path('Province', prov, 'Town', town, 'GasStation', station)).order('date')

@@ -12,14 +12,6 @@ var markerIcon = "/icon/pump_r.png";
 var windowTimeout;
 var focusMarker;
 
-var FUEL_OPTIONS = {"1": {"short": "G95", "name": "Gasolina 95"},
-				"3": {"short": "G98", "name": "Gasolina 98"},
-				"4": {"short": "GOA", "name": "Gasóleo Automoción"},
-				"5": {"short": "NGO", "name": "Nuevo Gasóleo A"},
-				"6": {"short": "GOB", "name": "Gasóleo B"},
-				"7": {"short": "GOC", "name": "Gasóleo C"},
-				"8": {"short": "BIOD", "name": "Biodiésel"}}
-
 function newDistance() {
 	var location = document.getElementById("from").value + 
 		((town) ? (", " + town ) : ("")) + 
@@ -284,9 +276,9 @@ function populateTable(id) {
 	var nTotal = nG95 = nG98 = nGOA = nGO = nGOB = nGOC = nBIOD = 0;
 	var cities = [];
 	for (var p in data) {
-		var p_link = path[2] || encodeName(p);
+		var p_link = encodeName(p);
 		for (var t in data[p]) {
-			var t_link = path[3] || encodeName(t);
+			var t_link = encodeName(t);
 			var s_link = "/gasolineras/" + p_link + "/" + t_link;
 			cities.push([t, s_link]);
 			for (var s in data[p][t]) {
@@ -373,7 +365,7 @@ window.addEventListener("load", function(){
 		console.log(result);
 		var h1 = document.getElementById("title");
 		if (result["_near"]) {
-			h1.textContent = "Gasolineras cerca de " + result["_near"];
+			h1.textContent = "Gasolineras cerca de: " + result["_near"];
 			place = result["_near"];
 		}
 		else {

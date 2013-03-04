@@ -11,9 +11,9 @@
 # ARCHIVOS EXCEL:
 # http://geoportal.mityc.es/hidrocarburos/eess/searchTotal.do?tipoCons=1&tipoBusqueda=0&tipoCarburante=1&textoCarburante=Gasolina%2095
 import urllib
-import zipfile
+from zipfile import ZipFile
 import time
-import StringIO
+from StringIO import StringIO
 from datetime import date
 from bs4 import BeautifulSoup
 import re
@@ -110,11 +110,11 @@ def gas_update_csv(option="1"):
 	response = urlfetch.fetch(zipFileURL)
 	if response.status_code != 200:
 		return
-	zippedFile = StringIO.StringIO(response.content)
+	zippedFile = StringIO(response.content)
 	# extract data
-	zfobj = zipfile.ZipFile(zippedFile)
+	zfobj = ZipFile(zippedFile)
 	name = zfobj.namelist()[0]
-	csv_data = StringIO.StringIO(zfobj.read(name))
+	csv_data = StringIO(zfobj.read(name))
 	data = []
 	while True:
 		line = csv_data.readline()
@@ -142,8 +142,9 @@ def gas_update_xls(option="1"):
 			option = [option]
 	def handle_xls_result(rpc, o, result=result):
 		rpc_result = rpc.get_result()
-		xlsFile = StringIO.StringIO(rpc_result.content)
+		xlsFile = StringIO(rpc_result.content)
 		rows = BeautifulSoup(xlsFile).find('table').findAll('tr')
+		del xlsFile
 		for tr in rows[2:]:
 			if not tr.findAll('b'):
 				table_data = [td.text for td in tr.findAll('td')]

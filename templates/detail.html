@@ -1,37 +1,79 @@
-<div id="detail">
-<h1>Detalle de la gasolinera</h1>
-
-<table id="detail_table">
-<tr>
-	<td>Rótulo</td><td id="sign"></td>
-</tr>
-<tr>
-	<td>Provincia</td><td id="province"></td>
-</tr>
-<tr>
-	<td>Localidad</td><td id="town"></td>
-</tr>
-<tr>
-	<td>Dirección</td><td id="address"></td>
-</tr>
-<tr>
-	<td></td><td id="logo"></td>
-</tr>
-</table>
-
-<div id="map"></div>
-
-<div id="history"></div>
-
-<div id="chart"></div>
-
-
-<div id="map"></div>
+<div id="price_board">
+<div id="logo"></div>
+<div class="section T_G95">
+	<div class="section_name">Gasolina 95</div>
+	<div class="price">1,47</div>
+</div>
+<div class="section  T_G98">
+	<div class="section_name">Gasolina 98</div>
+	<div class="price">1,47</div>
+</div>
+<div class="section T_GOA">
+	<div class="section_name">Gasóleo A</div>
+	<div class="price">1,47</div>
+</div>
+<div class="section T_NGO">
+	<div class="section_name">Nuevo Gasóleo A</div>
+	<div class="price">1,47</div>
+</div>
+<div class="section T_GOB">
+	<div class="section_name">Gasóleo B</div>
+	<div class="price">1,47</div>
+</div>
+<div class="section T_GOC">
+	<div class="section_name">Gasóleo C</div>
+	<div class="price">1,47</div>
+</div>
+<div class="section T_BIOD">
+	<div class="section_name">Biodiésel</div>
+	<div class="price">1,47</div>
+</div>
 </div>
 
-<div id="edit">{{edit_station}}</edit>
+
+<div id="detail">
+		<div id="ads_top">
+		
+		</div>
+
+		<h1>Detalle de la {{title}}</h1>
+		<div class="field">Rótulo</div> 	<div class="field_value" id="label"></div><br>
+		<div class="field">Dirección</div> 	<div class="field_value" id="address"></div><br>
+		<div class="field">Horario</div> 	<div class="field_value" id="hours"></div><br>
+
+
+
+		<div id="map"></div>
+
+		<div id="history"></div>
+
+		<div id="chart"></div>
+		<div id="google_map"></div>
+</div>
+
+
+
+
+
+
 
 <div id="comments">
+
+	{% if edit_station %}
+	<h1>Edición de la estación</h1>
+	<form method="post">
+		<label for="email">E-mail </label><input name="email" /><br/>
+		<label for="web">Página web </label><input name="web" /><br/>
+		<label for="phone">Teléfono </label><input name="phone" /><br/>
+		<p>Localización:</p>
+		<label for="lat">Latitud </label><input name="lat" /><br/>
+		<label for="lat">Longitud </label><input name="lon" /><br/>
+		<input type="hidden" name="edit_station" value="true"/>
+		<input type="submit" value="Enviar datos" />
+	</form>
+	{% endif %}
+
+
 	<h1>Opiniones de los usuarios</h1>
 	<p>Identifícate para dejar un comentario</p>
 	<form method="post">

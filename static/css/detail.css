@@ -1,19 +1,88 @@
+@font-face {
+  font-family: 'digital-7';
+  src: url('/font/digital-7.ttf');
+}
+
+#price_board {
+	width: 300px;
+	height: 600px;
+	float: left;
+	background-color: black;
+	border: 2px solid black;
+}
+#logo {
+	font-size: 25px;
+	padding: 10px;
+}
+#price_board .section {
+	border-bottom: 3px solid white;
+	padding: 10px;
+	height: 50px;
+}
+#price_board .section_name {
+	width: 120px;
+	float: left;
+}
+#price_board .price {
+	font-family: 'digital-7', sans-serif;
+	font-size: 50px;
+	width: 150px;
+	float: right;
+}
+
+.T_G95 {
+	color: #006633;
+}
+.T_G98 {
+	color: #339933;
+}
+.T_GOA {
+	color: #fff;
+}
+.T_NGO {
+	color: #aaa;
+}
+.T_GOB {
+	color: #CC3333;
+}
+.T_GOC {
+	color: #FF3300;
+}
+.T_BIOD {
+	color: #FFCC33;
+}
+
+
+#ads_top {
+	width: 730px;
+	height: 90px;
+	background-color: red;
+}
+
+#logo {
+	background-color: white;
+}
+#google_map {
+	width: 400px;
+	height: 300px;
+	position: absolute;
+	top: 0;
+	right: 0;
+}
 #detail {
-	border: 1px dotted black;
+	width: 730px;
+	float: right;
+}
+#comments {
+	width: 730px;
+}
+#comments textarea {
+	width: 600px;
 }
 
-#history {
+#old_comments {
+	width: 730px;
+	height: 300px;
 }
 
-.comment {
-	border-radius: 2px;
-	-webkit-border-radius: 2px;
-	-moz-border-radius: 2px;
-	box-shadow: 0 1px 1px #E9E9E9;
-	-webkit-box-shadow: 2px;
-	-moz-box-shadow: 2px;
-	border: 1px solid #D3D3D3;
-	padding: 10px 15px 10px 15px;
-	margin: 0 0 10px 0;
 
-}
