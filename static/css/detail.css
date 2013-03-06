@@ -73,11 +73,99 @@
 	width: 730px;
 	float: right;
 }
+#detail label {
+	width: 100px;
+	text-align: right;
+	display: inline-block;
+}
 #comments {
 	width: 730px;
 }
 #comments textarea {
 	width: 600px;
+}
+#social_login {
+	margin-left: 100px;
+}
+.login {
+	width: 50px;
+	height: 50px;
+	cursor: pointer;
+	background-size: 50px;
+	background-repeat: no-repeat;
+	display: inline-block;
+	margin: 5px;
+}
+.fb_login {
+	background-color: #3B5B99;
+	background-image: url('/img/fb_logo.png');
+}
+.tt_login {
+	background-color: #00ACED;
+	background-image: url('/img/tt_logo.png');
+}
+.gp_login {
+	background-color: #DD4B39;
+	background-image: url('/img/gp_logo.png');
+}
+#c_points {
+	display: inline-block;
+}
+#c_points:hover {
+	border: 1px solid #ccc;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	-ms-border-radius: 5px;
+	-o-border-radius: 5px;
+	border-radius: 5px;
+
+}
+#comments textarea {
+	width: 400px;
+	height: 120px;
+	border: 5px solid #ccc;
+	padding: 5px;
+}
+
+#c_points input {
+	width: 40px;
+	font-size: 30px;
+	border: 0;
+	text-align: right;
+}
+.star, .shit {
+	cursor: pointer;
+	background-size: 30px;
+	background-repeat: no-repeat;
+	width: 30px;
+	height: 30px;
+	padding: 0;
+	display: inline-block;
+	-webkit-filter: grayscale(80%);
+	-moz-filter: grayscale(80%);
+	-ms-filter: grayscale(80%);
+	-o-filter: grayscale(80%);
+	filter: grayscale(80%);
+
+}
+.star.on {
+	-webkit-filter: grayscale(0%);
+	-moz-filter: grayscale(0%);
+	-ms-filter: grayscale(0%);
+	-o-filter: grayscale(0%);
+	filter: grayscale(0%);
+}
+.star {
+	background-image: url('/img/star.svg');
+}
+.star.shit {
+	background-image: url('/img/shit.svg');
+}
+.comment {
+	border-top: 2px solid black;
+}
+.comment .title {
+	font-size: 1.2em;
 }
 
 #old_comments {
@@ -85,4 +173,19 @@
 	height: 300px;
 }
 
-
+.c_error {
+	background-color: #FF9966;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	-ms-border-radius: 5px;
+	-o-border-radius: 5px;
+	border-radius: 5px;
+	border: 1px solid #FF6633;
+	color: #fff;
+}
+.c_error li {
+	margin: 10px;
+	border-left: 5px solid #FF6633;
+	margin-bottom: 5px;
+	padding-left: 5px;
+}

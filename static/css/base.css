@@ -165,6 +165,7 @@ nav a {
 footer {
 	font-size: 11px;
 	height: auto;
+	clear: both;
 }
 footer ul {
 	list-style: none;
@@ -200,9 +201,10 @@ footer a:hover{
 }
 
 input {
-	border:none; 
+	border: 10x solid #ccc; 
+	padding: 3px;
 	color:#333; 
-	font:bold 24px Helvetica, Arial, sans-serif; 
+	font: bold 18px Helvetica, Arial, sans-serif; 
 	width:510px; 
 	outline: none;
 	padding: 0;

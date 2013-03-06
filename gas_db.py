@@ -17,7 +17,7 @@ class Province(db.Model):
 class Town(db.Model):
 	pass
 
-class GasStation(db.Expando):
+class GasStation(db.Model):
 	label = db.StringProperty()
 	phone = db.PhoneNumberProperty()
 	email = db.EmailProperty()
@@ -36,6 +36,10 @@ class HistoryData(db.Expando):
 	date = db.DateProperty()
 
 class Comment(db.Model):
+	user = db.StringProperty(required=True)
+	email = db.EmailProperty(required=True)
+	link = db.LinkProperty()
+	points = db.RatingProperty(required=True)
 	title = db.StringProperty(required=True)
 	content = db.StringProperty(required=True, multiline=True)
 	date = db.DateTimeProperty(auto_now_add=True)

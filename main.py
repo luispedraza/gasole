@@ -20,6 +20,10 @@ from gas_update import *
 from gas_maps import *
 from gas_db import *
 from google.appengine.api import users
+from recaptcha import *
+from webapp2 import Route
+
+# from webapp2_extras.appengine.auth.models import User
 
 GOOGLE_MAPS_API = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyD5XZNFlQsyWtYDeKual-OcqmP_5pgwbds&sensor=false&region=ES'
 GOOGLE_VIS_API = 'https://www.google.com/jsapi?autoload={modules:[{name:visualization,version:1,packages:[corechart]}]}'
@@ -156,18 +160,21 @@ class List(BaseHandler):
             scripts=['/js/utils.js', '/js/list.js', GOOGLE_MAPS_API, '/js/libs/markerclusterer_compiled.js'],
             content=jinja_env.get_template("list.html").render())
 class Detail(BaseHandler):
-    def get(self, province, town, station):
+    def get(self, province, town, station, error={}):
         # Vista de detalle de una gasolinera
-        province = decode_param(province)
-        town = decode_param(town)
-        station = decode_param(station)
-        address = station.replace("_[D]", " (margen derecho)").replace("_[I]", " (margen izquierdo)").replace("_[N]", "")
-        title = "Gasolinera en " + address + ", " + town
-        edit_station = None
+        data = {}
+        if error:
+            data = {k: self.request.get(k) for k in self.request.arguments()}
+        p = decode_param(province)
+        t = decode_param(town)
+        s = decode_param(station)
+        address = s.replace("_[D]", " (margen derecho)").replace("_[I]", " (margen izquierdo)").replace("_[N]", "")
+        title = "Gasolinera en " + address + ", " + t
+        edit_station = {}
         if users.is_current_user_admin():
-            sdata = GasStation.get(db.Key.from_path('Province', province, 'Town', town, 'GasStation', station))
+            sdata = GasStation.get(db.Key.from_path('Province', p, 'Town', t, 'GasStation', s))
             if sdata:
-                edit_station = {k: sdata.get(k) for k in sdata.dynamic_properties()}
+                edit_station = {k: getattr(sdata,k) for k in sdata.properties()}
         self.render("base.html",
             title = title,
             styles=['detail.css', 'chart.css'],
@@ -176,24 +183,61 @@ class Detail(BaseHandler):
                 '/js/detail.js'
                 ],
             content=jinja_env.get_template("detail.html").render(
-                title = title,
-                edit_station=edit_station
+                title=title,
+                edit_station=edit_station,
+                data=data,
+                error=error
                 ))
     def post(self, province, town, station):
+        logging.info(self.request.arguments())
+        p = decode_param(province)
+        t = decode_param(town)
+        s = decode_param(station)
         # Actualización de datos de la gasolinera:
         if users.is_current_user_admin() and self.request.get("edit_station"):
-            self.get(province=province, town=city, station=station)
+            sdata = GasStation.get(db.Key.from_path('Province', p, 'Town', t, 'GasStation', s))
+            sdata.geopt = db.GeoPt(float(self.request.get("lat")), float(self.request.get("lon")))
+            sdata.put()
+            self.get(province=province, town=town, station=station)
             return
         # Creación de un nuevo comentario sobre una estación
-        title=self.request.get("title")
-        content=self.request.get("content")
-        if title and content:
-            comment = Comment(title=title, content=content,
-                parent=db.Key.from_path('Province', decode_param(province), 
-                    'Town', decode_param(town), 
-                    'GasStation', decode_param(station)))
+        error = {}
+        name=self.request.get("c_name")
+        if not name:
+            error["c_name"] = u"Debes indicar tu nombre en el comentario."
+        email=self.request.get("c_email")
+        if not email:
+            error["c_email"] = u"Debes indicar tu dirección de correo electrónico. Recuerda que no será mostrada a otros usuarios."
+        points=self.request.get("c_points")
+        if not points:
+            error["c_points"] = u"Olvidaste asignar una valoración a esta gasolinera."
+        title=self.request.get("c_title")
+        if not title:
+            error["c_title"] = u"Por favor, pon un título a tu comentario."
+        content=self.request.get("c_content")
+        if not content:
+            error["c_content"] = u"El texto del comentario está vacío."
+        challenge_field = self.request.get("recaptcha_challenge_field")
+        response_field = self.request.get("recaptcha_response_field")
+        captcha_result = verifyCaptcha(
+            challenge_field=challenge_field,
+            response_field=response_field,
+            remote_ip=self.request.remote_addr)
+        if not captcha_result.is_valid:
+             error["c_captcha"] = u"La solución del captcha no es correcta."
+        logging.info(error)
+        if not len(error):
+            logging.info("guardando")
+            comment = Comment(
+                user=user,
+                email=db.Email(email),
+                points=db.Rating(points),
+                title=title, 
+                content=content,
+                parent=db.Key.from_path('Province',p,'Town',t,'GasStation',s))
             comment.put()
-            self.get(province=province, town=town, station=station)
+        self.get(province=province, town=town, station=station, error=error)
+
 
 class Api(BaseHandler):
     def get(self, prov, town, station):
@@ -275,7 +319,10 @@ app = webapp2.WSGIApplication([
     ('/buscador/?', Search),
     ('/geo/(.+)/(.+)/(.+)/(.+)/?', GeoApi),
     ('/resultados/(.+)/(.+)/(.+)/(.+)/?', SearchResults),
-    ('/info/(noticias|tarjetas|combustibles)/?', Info)
+    ('/info/(noticias|tarjetas|combustibles)/?', Info),
+    Route('/auth/<provider>', handler=BaseAuthHandler, name='auth_login', handler_method='_simple_auth'),
+    Route('/auth/<provider>/callback', handler=BaseAuthHandler,  name='auth_callback', handler_method='_auth_callback'),
+    Route('/logout', handler=BaseAuthHandler, name='logout', handler_method= 'logout')
 ], debug=True)
 
 app.error_handlers[404] = handle_404

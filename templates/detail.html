@@ -1,87 +1,129 @@
 <div id="price_board">
-<div id="logo"></div>
-<div class="section T_G95">
-	<div class="section_name">Gasolina 95</div>
-	<div class="price">1,47</div>
+	<div id="logo"></div>
+	<div class="section T_G95">
+		<div class="section_name">Gasolina 95</div>
+		<div class="price">1,47</div>
+	</div>
+	<div class="section  T_G98">
+		<div class="section_name">Gasolina 98</div>
+		<div class="price">1,47</div>
+	</div>
+	<div class="section T_GOA">
+		<div class="section_name">Gasóleo A</div>
+		<div class="price">1,47</div>
+	</div>
+	<div class="section T_NGO">
+		<div class="section_name">Nuevo Gasóleo A</div>
+		<div class="price">1,47</div>
+	</div>
+	<div class="section T_GOB">
+		<div class="section_name">Gasóleo B</div>
+		<div class="price">1,47</div>
+	</div>
+	<div class="section T_GOC">
+		<div class="section_name">Gasóleo C</div>
+		<div class="price">1,47</div>
+	</div>
+	<div class="section T_BIOD">
+		<div class="section_name">Biodiésel</div>
+		<div class="price">1,47</div>
+	</div>
 </div>
-<div class="section  T_G98">
-	<div class="section_name">Gasolina 98</div>
-	<div class="price">1,47</div>
-</div>
-<div class="section T_GOA">
-	<div class="section_name">Gasóleo A</div>
-	<div class="price">1,47</div>
-</div>
-<div class="section T_NGO">
-	<div class="section_name">Nuevo Gasóleo A</div>
-	<div class="price">1,47</div>
-</div>
-<div class="section T_GOB">
-	<div class="section_name">Gasóleo B</div>
-	<div class="price">1,47</div>
-</div>
-<div class="section T_GOC">
-	<div class="section_name">Gasóleo C</div>
-	<div class="price">1,47</div>
-</div>
-<div class="section T_BIOD">
-	<div class="section_name">Biodiésel</div>
-	<div class="price">1,47</div>
-</div>
-</div>
-
 
 <div id="detail">
-		<div id="ads_top">
-		
-		</div>
+	<div id="ads_top">
+	
+	</div>
 
-		<h1>Detalle de la {{title}}</h1>
-		<div class="field">Rótulo</div> 	<div class="field_value" id="label"></div><br>
-		<div class="field">Dirección</div> 	<div class="field_value" id="address"></div><br>
-		<div class="field">Horario</div> 	<div class="field_value" id="hours"></div><br>
+	<h1>Detalle de la {{title}}</h1>
+	<div class="field">Rótulo</div> 	<div class="field_value" id="label"></div><br>
+	<div class="field">Dirección</div> 	<div class="field_value" id="address"></div><br>
+	<div class="field">Horario</div> 	<div class="field_value" id="hours"></div><br>
 
+	<div id="chart"></div>
+	<div id="google_map"></div>
 
-
-		<div id="map"></div>
-
-		<div id="history"></div>
-
-		<div id="chart"></div>
-		<div id="google_map"></div>
-</div>
-
-
-
-
-
-
-
-<div id="comments">
-
-	{% if edit_station %}
-	<h1>Edición de la estación</h1>
-	<form method="post">
-		<label for="email">E-mail </label><input name="email" /><br/>
-		<label for="web">Página web </label><input name="web" /><br/>
-		<label for="phone">Teléfono </label><input name="phone" /><br/>
-		<p>Localización:</p>
-		<label for="lat">Latitud </label><input name="lat" /><br/>
-		<label for="lat">Longitud </label><input name="lon" /><br/>
-		<input type="hidden" name="edit_station" value="true"/>
-		<input type="submit" value="Enviar datos" />
-	</form>
+	{% if edit_station|count %}
+	<div id="edit">
+		<h1>Edición de la estación</h1>
+		<form method="post">
+			<label for="email">E-mail: </label><input name="email" value="{{edit_station['email']}}"/><br>
+			<label for="web">Página web: </label><input name="web"  value="{{edit_station['link']}}"/><br>
+			<label for="phone">Teléfono: </label><input name="phone"  value="{{edit_station['phone']}}"/><br>
+			<p>Localización:</p>
+			<label for="lat">Latitud: </label><input name="lat"  value="{{edit_station['geopt'].lat}}"/><br>
+			<label for="lat">Longitud: </label><input name="lon"  value="{{edit_station['geopt'].lon}}"/><br>
+			<input type="hidden" name="edit_station" value="true"/>
+			<input type="submit" value="Enviar datos" />
+		</form>
+	</div>
 	{% endif %}
+	<div id="comments">
+		<h1>Opina sobre esta gasolinera</h1>
+			{% if error|count %}
+			<div class="c_error">
+			<p><b>Se han detectado errores en el formulario:</b></p>
+			<ul>
+				{% for e in error %}
+				<li>{{error[e]}}</li>
+				{% endfor %}
+			</ul>
+			</div>
+			{% endif %}
 
+		<script type="text/javascript">
+		var RecaptchaOptions = {theme:'clean',lang:'es'};
+		</script>
 
-	<h1>Opiniones de los usuarios</h1>
-	<p>Identifícate para dejar un comentario</p>
-	<form method="post">
-		<label><div>Título</div><input type="text" name="title" value="{{title}}"></label>
-		<label><div>Contenido</div><textarea name="content" value="{{content}}"></textarea></label>
-		<div class="error">{{error}}</div>
-		<input type="submit" value="Enviar">
-	</form>
-	<div id="old_comments"></div>
+		<form method="post">
+
+			<p>Identifícate para dejar un comentario: </p>
+			<label for="c_name">Nombre: </label><input type="text" name="c_name" id="c_name" value="{{data['c_name']}}"><br>
+			<label for="c_email">E-Mail: </label><input type="text" name="c_email" id="c_email" value="{{data['c_email']}}"><br>
+			<p>O inicia sesión: </p>
+			<div id="social_login">
+				<a href="/auth/facebook"><div class="login fb_login" title="Identifícate con tu perfil de Facebook"></div></a>
+				<a href="/auth/twitter"><div class="login tt_login" title="Identifícate con tu perfil de Twitter"></div></a>
+				<a href="/auth/google"><div class="login gp_login" title="Identifícate con tu perfil de Google+"></div></a>
+			</div>
+
+			<label for="c_title">Título: </label><input id="c_title" type="text" name="c_title" value="{{data['c_title']}}">
+			<br>
+			<label for="c_points">Valoración: </label>
+				<div id="c_points">
+					<div class="star shit" id="star_0"></div>
+					<div class="star" id="star_01"></div>
+					<div class="star" id="star_02"></div>
+					<div class="star" id="star_03"></div>
+					<div class="star" id="star_04"></div>
+					<div class="star" id="star_05"></div>
+					<div class="star" id="star_06"></div>
+					<div class="star" id="star_07"></div>
+					<div class="star" id="star_08"></div>
+					<div class="star" id="star_09"></div>
+					<div class="star" id="star_10"></div>
+					<input id="c_points" type="text" name="c_points" value="0" readonly value="{{data['c_points']}}/10">
+				</div>
+			<br>
+			<label for="c_content">Comentario: </label><textarea id="c_content" name="c_content" value="{{data['c_content']}}"></textarea><br>
+
+			<!-- captcha -->
+			<div id="captcha">
+			<script type="text/javascript" src="http://www.google.com/recaptcha/api/challenge?k=6Lfg290SAAAAAF7lz7UcKF7Sn0KOCQne8TWwqjAF">
+			</script>
+			<noscript>
+			<iframe src="http://www.google.com/recaptcha/api/noscript?k=your_public_key" height="300" width="500" frameborder="0">
+			</iframe><br>
+			<textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea>
+			<input type="hidden" name="recaptcha_response_field" value="manual_challenge">
+			</noscript>
+			</div>
+			<!-- fin captcha -->
+
+			<input type="submit" value="Enviar">
+		</form>
+		<h1>Todas las opiniones sobre esta gasolinera</h1>
+		<div id="old_comments"></div>
+	</div>
 </div>
 

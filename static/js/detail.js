@@ -1,4 +1,5 @@
 function initMap(latlon) {
+	if (!latlon) return;
 	var position = new google.maps.LatLng(latlon[0], latlon[1]);
 	var mapOptions = {
 		center: position,
@@ -11,6 +12,25 @@ function initMap(latlon) {
     	map: map,
     	position: position
 	});
+}
+
+function initPoints() {
+	var stars = document.getElementsByClassName("star");
+	for (var s=0; s<stars.length; s++) {
+		stars[s].addEventListener("mouseover", function() {
+			var id = this.id.split("_")[1];
+			var stars = document.getElementsByClassName("star");
+			for (var s=0; s<stars.length; s++) {
+				var _id=stars[s].id.split("_")[1];
+				if (_id<=id) stars[s].className = "star on";
+				else stars[s].className = "star";
+			}
+			var shit = document.getElementById("star_0");
+			if (id==0) shit.className = "star shit on";
+			else shit.className = "star shit";
+			document.getElementById("c_points").value = id;
+		})
+	}
 }
 
 function insertLogo(label) {
@@ -48,12 +68,19 @@ window.addEventListener("load", function(){
 		insertLogo(label);
 		initMap(latlon);
 
-		var commentsDiv = document.getElementById("comments");
+		var commentsDiv = document.getElementById("old_comments");
 		var comments = info._comments;
 		for (var c in comments) {
 			var newComment = document.createElement("div");
 			newComment.className = "comment";
-			newComment.innerText = comments[c].content;
+			var newCTitle = document.createElement("div");
+			newCTitle.className = "title";
+			newCTitle.textContent = comments[c].title;
+			var newCContent = document.createElement("div");
+			newCContent.className = "content";
+			newCContent.textContent = comments[c].content;
+			newComment.appendChild(newCTitle);
+			newComment.appendChild(newCContent);
 			commentsDiv.appendChild(newComment);
 		}
 
@@ -85,6 +112,9 @@ window.addEventListener("load", function(){
         };
 		var chart = new google.visualization.LineChart(document.getElementById('chart'));
         chart.draw(chart_data, options);
+
+        /* Puntuaciones (estrellas) */
+        initPoints();
 	}
 	req.open("GET", document.URL.replace("ficha", "api"), true);
 	req.send();
