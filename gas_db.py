@@ -13,10 +13,10 @@ DEBUG = os.environ['SERVER_SOFTWARE'].startswith('Dev')
 ## Modelo de provincia
 class Province(db.Model):
 	pass
-
+## Modelo de ciudad
 class Town(db.Model):
 	pass
-
+## Modelo de gasolinera
 class GasStation(db.Model):
 	label = db.StringProperty()
 	phone = db.PhoneNumberProperty()
@@ -25,25 +25,23 @@ class GasStation(db.Model):
 	hours = db.StringProperty()
 	geopt = db.GeoPtProperty()
 	date = db.DateTimeProperty(auto_now_add=True)
-
-# class GeoData(db.Model):
-# 	geopt = db.GeoPtProperty()
-
+## Modelo de precios
 class PriceData(db.Expando):
 	date = db.DateProperty()
-
+## Modelo de histórico de precios
 class HistoryData(db.Expando):
 	date = db.DateProperty()
-
+## Modelo de comentario
 class Comment(db.Model):
-	user = db.StringProperty(required=True)
+	user = db.StringProperty(required=True)		#provider:email e.g. gasole:luispedraza@gmail.com
+	name = db.StringProperty(required=True)
 	email = db.EmailProperty(required=True)
 	link = db.LinkProperty()
+	avatar = db.LinkProperty()
 	points = db.RatingProperty(required=True)
 	title = db.StringProperty(required=True)
-	content = db.StringProperty(required=True, multiline=True)
+	content = db.TextProperty(required=True)
 	date = db.DateTimeProperty(auto_now_add=True)
-
 
 def data2store(data):
 	_provinces = []
@@ -183,7 +181,12 @@ def get_comments(prov, town, station):
 	result = {}
 	q = Comment.all().ancestor(db.Key.from_path('Province', prov, 'Town', town, 'GasStation', station)).order('date')
 	for c in q:
-		result[c.key().id()] = {"title": c.title, 
+		result[c.key().id()] = {
+			"name": c.name,
+			"avatar": c.avatar,
+			"link": c.link or "",
+			"points": c.points,
+			"title": c.title, 
 			"content": c.content,
 			"date": c.date.isoformat()}
 	return result

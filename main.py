@@ -21,9 +21,8 @@ from gas_maps import *
 from gas_db import *
 from google.appengine.api import users
 from recaptcha import *
-from webapp2 import Route
-
-# from webapp2_extras.appengine.auth.models import User
+from google.appengine.api.mail import is_email_valid
+from hashlib import md5
 
 GOOGLE_MAPS_API = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyD5XZNFlQsyWtYDeKual-OcqmP_5pgwbds&sensor=false&region=ES'
 GOOGLE_VIS_API = 'https://www.google.com/jsapi?autoload={modules:[{name:visualization,version:1,packages:[corechart]}]}'
@@ -189,7 +188,6 @@ class Detail(BaseHandler):
                 error=error
                 ))
     def post(self, province, town, station):
-        logging.info(self.request.arguments())
         p = decode_param(province)
         t = decode_param(town)
         s = decode_param(station)
@@ -202,19 +200,22 @@ class Detail(BaseHandler):
             return
         # Creación de un nuevo comentario sobre una estación
         error = {}
-        name=self.request.get("c_name")
+        name=self.request.get("c_name").strip()
         if not name:
             error["c_name"] = u"Debes indicar tu nombre en el comentario."
-        email=self.request.get("c_email")
+        email=self.request.get("c_email").strip().lower()
         if not email:
             error["c_email"] = u"Debes indicar tu dirección de correo electrónico. Recuerda que no será mostrada a otros usuarios."
+        elif not is_email_valid(email):
+            error["c_email"] = u"La dirección de correo electrónico no es válida."
+        link=self.request.get("c_link").strip()
         points=self.request.get("c_points")
         if not points:
             error["c_points"] = u"Olvidaste asignar una valoración a esta gasolinera."
-        title=self.request.get("c_title")
+        title=self.request.get("c_title").strip()
         if not title:
             error["c_title"] = u"Por favor, pon un título a tu comentario."
-        content=self.request.get("c_content")
+        content=self.request.get("c_content").strip()
         if not content:
             error["c_content"] = u"El texto del comentario está vacío."
         challenge_field = self.request.get("recaptcha_challenge_field")
@@ -225,16 +226,19 @@ class Detail(BaseHandler):
             remote_ip=self.request.remote_addr)
         if not captcha_result.is_valid:
              error["c_captcha"] = u"La solución del captcha no es correcta."
-        logging.info(error)
         if not len(error):
-            logging.info("guardando")
+            logging.info(content)
             comment = Comment(
-                user=user,
+                user="%s:%s" %("gasole", email),
+                name=name,
                 email=db.Email(email),
-                points=db.Rating(points),
+                avatar=db.Link("http://www.gravatar.com/avatar/"+md5(email).hexdigest()+"?s=100&d=%2Fimg%2Favatar.png"),
+                points=db.Rating(points*10),
                 title=title, 
-                content=content,
+                content=db.Text(content),
                 parent=db.Key.from_path('Province',p,'Town',t,'GasStation',s))
+            if link:
+                comment.link = db.Link(link)
             comment.put()
         self.get(province=province, town=town, station=station, error=error)
 
@@ -319,10 +323,7 @@ app = webapp2.WSGIApplication([
     ('/buscador/?', Search),
     ('/geo/(.+)/(.+)/(.+)/(.+)/?', GeoApi),
     ('/resultados/(.+)/(.+)/(.+)/(.+)/?', SearchResults),
-    ('/info/(noticias|tarjetas|combustibles)/?', Info),
-    Route('/auth/<provider>', handler=BaseAuthHandler, name='auth_login', handler_method='_simple_auth'),
-    Route('/auth/<provider>/callback', handler=BaseAuthHandler,  name='auth_callback', handler_method='_auth_callback'),
-    Route('/logout', handler=BaseAuthHandler, name='logout', handler_method= 'logout')
+    ('/info/(noticias|tarjetas|combustibles)/?', Info)
 ], debug=True)
 
 app.error_handlers[404] = handle_404

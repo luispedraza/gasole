@@ -110,6 +110,12 @@
 }
 #c_points {
 	display: inline-block;
+	border: 1px solid #fff;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	-ms-border-radius: 5px;
+	-o-border-radius: 5px;
+	border-radius: 5px;
 }
 #c_points:hover {
 	border: 1px solid #ccc;
@@ -118,7 +124,6 @@
 	-ms-border-radius: 5px;
 	-o-border-radius: 5px;
 	border-radius: 5px;
-
 }
 #comments textarea {
 	width: 400px;
@@ -172,7 +177,29 @@
 	width: 730px;
 	height: 300px;
 }
-
+#old_comments .c_comment {
+	position: relative;
+}
+#old_comments .c_name {
+	width: 120px;
+}
+#old_comments .c_date {
+	width: 120px;
+}
+#old_comments .c_title {
+	position: absolute;
+	left: 120px;
+	top: 0;
+	font-size: 1.5em;
+	border-bottom: 1px dotted black;
+	width: auto;
+}
+#old_comments .c_content {
+	position: absolute;
+	left: 120px;
+	top: 20px;
+	margin-top: 1.5em;
+}
 .c_error {
 	background-color: #FF9966;
 	-webkit-border-radius: 5px;

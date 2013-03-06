@@ -72,15 +72,29 @@ window.addEventListener("load", function(){
 		var comments = info._comments;
 		for (var c in comments) {
 			var newComment = document.createElement("div");
-			newComment.className = "comment";
+			newComment.className = "c_comment";
+			var newCName = document.createElement("div");
+			newCName.className = "c_name";
+			if (comments[c].link) newCName.innerHTML = "<a href='" + comments[c].link + "' rel='nofollow'>"+comments[c].name+"</a>";
+			else newCName.textContent = comments[c].name;
+			newComment.appendChild(newCName);
+			var newCDate = document.createElement("div");
+			newCDate.className = "c_date";
+			newCDate.innerText = new Date(comments[c].date).toLocaleString();
+			newComment.appendChild(newCDate);
+			var newCAvatar = document.createElement("img");
+			newCAvatar.src = comments[c].avatar;
+			newComment.appendChild(newCAvatar);
+
 			var newCTitle = document.createElement("div");
-			newCTitle.className = "title";
+			newCTitle.className = "c_title";
 			newCTitle.textContent = comments[c].title;
-			var newCContent = document.createElement("div");
-			newCContent.className = "content";
-			newCContent.textContent = comments[c].content;
 			newComment.appendChild(newCTitle);
+			var newCContent = document.createElement("div");
+			newCContent.className = "c_content";
+			newCContent.innerHTML = comments[c].content.replace(/\n/, "<br>");
 			newComment.appendChild(newCContent);
+			// Inserto el comentario
 			commentsDiv.appendChild(newComment);
 		}
 

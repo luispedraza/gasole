@@ -78,18 +78,21 @@
 		<form method="post">
 
 			<p>Identifícate para dejar un comentario: </p>
-			<label for="c_name">Nombre: </label><input type="text" name="c_name" id="c_name" value="{{data['c_name']}}"><br>
-			<label for="c_email">E-Mail: </label><input type="text" name="c_email" id="c_email" value="{{data['c_email']}}"><br>
+			<label for="c_name">Nombre<sup> *</sup>: </label><input type="text" name="c_name" id="c_name" value="{{data['c_name']}}"><br>
+			<label for="c_email">E-Mail<sup> **</sup>: </label><input type="text" name="c_email" id="c_email" value="{{data['c_email']}}"><br>
+			<label for="c_link">Página Web: </label><input type="text" name="c_link" id="c_link" value="{{data['c_link']}}"><br>
+			<!--
 			<p>O inicia sesión: </p>
 			<div id="social_login">
 				<a href="/auth/facebook"><div class="login fb_login" title="Identifícate con tu perfil de Facebook"></div></a>
 				<a href="/auth/twitter"><div class="login tt_login" title="Identifícate con tu perfil de Twitter"></div></a>
 				<a href="/auth/google"><div class="login gp_login" title="Identifícate con tu perfil de Google+"></div></a>
 			</div>
+			-->
 
-			<label for="c_title">Título: </label><input id="c_title" type="text" name="c_title" value="{{data['c_title']}}">
+			<label for="c_title">Título<sup> *</sup>: </label><input id="c_title" type="text" name="c_title" value="{{data['c_title']}}">
 			<br>
-			<label for="c_points">Valoración: </label>
+			<label for="c_points">Valoración<sup> *</sup>: </label>
 				<div id="c_points">
 					<div class="star shit" id="star_0"></div>
 					<div class="star" id="star_01"></div>
@@ -102,10 +105,10 @@
 					<div class="star" id="star_08"></div>
 					<div class="star" id="star_09"></div>
 					<div class="star" id="star_10"></div>
-					<input id="c_points" type="text" name="c_points" value="0" readonly value="{{data['c_points']}}/10">
+					<input type="text" name="c_points" value="0" readonly value="{{data['c_points']}}/10">
 				</div>
 			<br>
-			<label for="c_content">Comentario: </label><textarea id="c_content" name="c_content" value="{{data['c_content']}}"></textarea><br>
+			<label for="c_content">Comentario<sup> *</sup>: </label><textarea id="c_content" name="c_content" value="{{data['c_content']}}"></textarea><br>
 
 			<!-- captcha -->
 			<div id="captcha">
@@ -123,7 +126,8 @@
 			<input type="submit" value="Enviar">
 		</form>
 		<h1>Todas las opiniones sobre esta gasolinera</h1>
-		<div id="old_comments"></div>
+		<div id="old_comments">
+		</div>
 	</div>
 </div>
 
