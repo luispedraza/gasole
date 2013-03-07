@@ -10,6 +10,10 @@
 # biodiesel: 			http://geoportal.mityc.es/hidrocarburos/files/eess_BIOD_ddmmaaaa.zip
 # ARCHIVOS EXCEL:
 # http://geoportal.mityc.es/hidrocarburos/eess/searchTotal.do?tipoCons=1&tipoBusqueda=0&tipoCarburante=1&textoCarburante=Gasolina%2095
+
+import sys
+sys.path.insert(0, 'libs')
+
 import urllib
 from zipfile import ZipFile
 import time
@@ -139,11 +143,7 @@ def gas_update_xls(option="1"):
 		else:
 			option = [option]
 	def handle_xls_result(rpc, o, result=result):
-		rpc_result = rpc.get_result()
-		xlsFile = StringIO(rpc_result.content)
-		del rpc_result
-		rows = BeautifulSoup(xlsFile).find('table').findAll('tr')
-		del xlsFile
+		rows = BeautifulSoup(StringIO(rpc.get_result().content)).find('table').findAll('tr')
 		for tr in rows[2:]:
 			if not tr.findAll('b'):
 				table_data = [td.text for td in tr.findAll('td')]
