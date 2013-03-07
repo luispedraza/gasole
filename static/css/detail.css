@@ -84,9 +84,11 @@
 #comments textarea {
 	width: 600px;
 }
-#social_login {
-	margin-left: 100px;
+
+#user_data, #user_login {
+	width: 45%;
 }
+
 .login {
 	width: 50px;
 	height: 50px;
@@ -171,6 +173,10 @@
 }
 .comment .title {
 	font-size: 1.2em;
+}
+.avatar {
+	width: 100px;
+	height: auto;
 }
 
 #old_comments {

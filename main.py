@@ -23,6 +23,7 @@ from google.appengine.api import users
 from recaptcha import *
 from google.appengine.api.mail import is_email_valid
 from hashlib import md5
+from secrets import SESSION_KEY
 
 GOOGLE_MAPS_API = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyD5XZNFlQsyWtYDeKual-OcqmP_5pgwbds&sensor=false&region=ES'
 GOOGLE_VIS_API = 'https://www.google.com/jsapi?autoload={modules:[{name:visualization,version:1,packages:[corechart]}]}'
@@ -31,7 +32,7 @@ GOOGLE_MAPS_VIS_API = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyD5XZNFl
 def decode_param(s):
     return s.decode('utf-8').replace("_", " ").replace("|", "/")
 
-class MainHandler(BaseHandler):
+class MainHandler(BaseAuthHandler):
     def get(self):
         self.render("base.html")
 
@@ -113,11 +114,11 @@ class AdminSearch(BaseHandler):
             db.put(_geodata)
             logging.info("guardadas %s posiciones" %len(_geodata))
 
-class Map(BaseHandler):
+class Map(BaseAuthHandler):
     def get(self):
         self.render("map.html")
 
-class Stats(BaseHandler):
+class Stats(BaseAuthHandler):
     def get(self, g_type, province, city):
         logging.info(conpute_stats())
         the_scripts = []
@@ -145,12 +146,12 @@ class Stats(BaseHandler):
             styles=the_styles,
             content=jinja_env.get_template("g_"+g_type+".html").render())
 
-class Data(BaseHandler):
+class Data(BaseAuthHandler):
     def get(self, option, province):
         data = get_means(option)
         self.render_json(data)
 
-class List(BaseHandler):
+class List(BaseAuthHandler):
     def get(self, province, city):
         title = "Gasolineras en " + (decode_param(city)+ ", " if city else "la ") + "provincia de " + decode_param(province)
         self.render("base.html", 
@@ -158,8 +159,11 @@ class List(BaseHandler):
             styles=["list.css"],
             scripts=['/js/utils.js', '/js/list.js', GOOGLE_MAPS_API, '/js/libs/markerclusterer_compiled.js'],
             content=jinja_env.get_template("list.html").render())
-class Detail(BaseHandler):
+class Detail(BaseAuthHandler):
     def get(self, province, town, station, error={}):
+        user = {}
+        if self.logged_in:
+            user = self.current_user
         # Vista de detalle de una gasolinera
         data = {}
         if error:
@@ -185,7 +189,8 @@ class Detail(BaseHandler):
                 title=title,
                 edit_station=edit_station,
                 data=data,
-                error=error
+                error=error,
+                user=user
                 ))
     def post(self, province, town, station):
         p = decode_param(province)
@@ -268,7 +273,7 @@ class GeoApi(BaseHandler):
     def get(self, place, lat, lon, dist):
         self.render_json({"_near": place, "_data": get_near(lat=float(lat), lon=float(lon), dist=float(dist))})
 
-class Search(BaseHandler):
+class Search(BaseAuthHandler):
     def get(self):
         self.render("base.html", 
             styles =['search.css', 'map.css'],
@@ -276,7 +281,7 @@ class Search(BaseHandler):
             content=jinja_env.get_template("search.html").render(
                 map=jinja_env.get_template("spain.svg").render()))
 
-class SearchResults(BaseHandler):
+class SearchResults(BaseAuthHandler):
     def get(self, place, lat, lon, dist):
         title = "Gasolineras cerca de " + decode_param(place)
         self.render("base.html", 
@@ -285,7 +290,7 @@ class SearchResults(BaseHandler):
             scripts=['/js/utils.js', '/js/list.js', GOOGLE_MAPS_API, '/js/libs/markerclusterer_compiled.js'],
             content=jinja_env.get_template("list.html").render())
 
-class Info(BaseHandler):
+class Info(BaseAuthHandler):
     def get(self, section):
         content_html = ""
         if section=="combustibles":
@@ -297,7 +302,6 @@ class Info(BaseHandler):
         self.render("base.html",
             content=jinja_env.get_template(content_html).render())
 
-
 def handle_404(request, response, exception):
     #http://webapp-improved.appspot.com/guide/exceptions.html
     logging.exception(exception)
@@ -308,6 +312,19 @@ def handle_500(request, response, exception):
     logging.exception(exception)
     response.write('Error en el servidor.')
     response.set_status(500)
+
+
+# webapp2 config
+app_config = {
+    'webapp2_extras.sessions': {
+        'cookie_name': '_simpleauth_sess',
+        'secret_key': SESSION_KEY
+        },
+    'webapp2_extras.auth': {
+        'user_attributes': []
+        }
+    }
+
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
@@ -327,7 +344,7 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/login/<provider>', handler=BaseAuthHandler, name='auth_login', handler_method='_simple_auth'),
     webapp2.Route('/login/<provider>/callback', handler=BaseAuthHandler, name='auth_callback', handler_method='_auth_callback'),
     webapp2.Route('/logout', handler=BaseAuthHandler, name='auth_logout', handler_method='_logout'),
-], debug=True)
+], debug=True, config=app_config)
 
 app.error_handlers[404] = handle_404
 app.error_handlers[500] = handle_500

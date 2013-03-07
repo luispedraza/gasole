@@ -31,7 +31,25 @@ class BaseHandler(webapp2.RequestHandler):
 		finally:
 			# Save all sessions.
 			self.session_store.save_sessions(self.response)
-			
+	@webapp2.cached_property
+	def session(self):
+		"""Returns a session using the default cookie key"""
+		return self.session_store.get_session()
+	@webapp2.cached_property
+  	def auth(self):
+  		return auth.get_auth()
+  	@webapp2.cached_property
+  	def current_user(self):
+  		"""Returns currently logged in user"""
+  		user_dict = self.auth.get_user_by_session()
+  		return self.auth.store.user_model.get_by_id(user_dict['user_id'])
+
+  	@webapp2.cached_property
+  	def logged_in(self):
+  		"""Returns true if a user is currently logged in, false otherwise"""
+  		return self.auth.get_user_by_session() is not None
+
+
 	def write(self, *a, **kw):
 		self.response.out.write(*a, **kw)
 
@@ -57,19 +75,70 @@ class BaseHandler(webapp2.RequestHandler):
 		self.write(json_txt)
 
 class BaseAuthHandler(BaseHandler, SimpleAuthHandler):
+	# Enable optional OAuth 2.0 CSRF guard
+	OAUTH2_CSRF_STATE = True
+	USER_ATTRS = {
+		'facebook' : {
+			'id'     : lambda id: ('avatar_url', 
+				'http://graph.facebook.com/{0}/picture?type=large'.format(id)),
+			'name'   : 'name',
+			'link'   : 'link'
+			},
+		'google'   : {
+			'picture': 'avatar_url',
+			'name'   : 'name',
+			'link'   : 'link'
+			},
+		'twitter'  : {
+			'profile_image_url': 'avatar_url',
+			'screen_name'      : 'name',
+			'link'             : 'link'
+			}
+		}
 	def _on_signin(self, data, auth_info, provider):
 		logging.info(data)
 		logging.info(auth_info)
 		logging.info(provider)
 		auth_id = '%s:%s' % (provider, data['id'])
 		logging.info(auth_id)
-		# user = User.get_by_auth_id(auth_id)
-		# if not user:
-		#     User(**data).put()
-		self.session['_user_id'] = auth_id
+		user = self.auth.store.user_model.get_by_auth_id(auth_id)
+		_attrs = self._to_user_model_attrs(data, self.USER_ATTRS[provider])
+		if user:
+			logging.info('Found existing user to log in')
+			# Existing users might've changed their profile data so we update our
+			# local model anyway. This might result in quite inefficient usage
+			# of the Datastore, but we do this anyway for demo purposes.
+			#
+			# In a real app you could compare _attrs with user's properties fetched
+			# from the datastore and update local user in case something's changed.
+			user.populate(**_attrs)
+			user.put()
+			self.auth.set_session(self.auth.store.user_to_dict(user))
+		else:
+			# check whether there's a user currently logged in
+			# then, create a new user if nobody's signed in, 
+			# otherwise add this auth_id to currently logged in user.
+			if self.logged_in:
+				logging.info('Updating currently logged in user')
+				u = self.current_user
+				u.populate(**_attrs)
+				# The following will also do u.put(). Though, in a real app
+				# you might want to check the result, which is
+				# (boolean, info) tuple where boolean == True indicates success
+				# See webapp2_extras.appengine.auth.models.User for details.
+				u.add_auth_id(auth_id)
+			else:
+				logging.info('Creating a brand new user')
+				ok, user = self.auth.store.user_model.create_user(auth_id, **_attrs)
+				if ok:
+					self.auth.set_session(self.auth.store.user_to_dict(user))
+		self.redirect('/')
+
 	def _logout(self):
+		logging.info("Cerrando la sesión…")
 		self.auth.unset_session()
 		self.redirect('/')
+
 	def _callback_uri_for(self, provider):
 		return self.uri_for('auth_callback', provider=provider, _full=True)
 
@@ -83,5 +152,12 @@ class BaseAuthHandler(BaseHandler, SimpleAuthHandler):
 		"""
 		return secrets.AUTH_CONFIG[provider]
 
-	def logged_in(self):
-		return self.auth.get_user_by_session() is not None
+	def _to_user_model_attrs(self, data, attrs_map):
+		"""Get the needed information from the provider dataset."""
+		user_attrs = {}
+		for k, v in attrs_map.iteritems():
+			attr = (v, data.get(k)) if isinstance(v, str) else v(data.get(k))
+			user_attrs.setdefault(*attr)
+		return user_attrs
+
+
