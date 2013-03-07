@@ -92,7 +92,7 @@ window.addEventListener("load", function(){
 			newComment.appendChild(newCTitle);
 			var newCContent = document.createElement("div");
 			newCContent.className = "c_content";
-			newCContent.innerHTML = comments[c].content.replace(/\n/, "<br>");
+			newCContent.innerHTML = comments[c].content.replace(/\n/g, "<br>");
 			newComment.appendChild(newCContent);
 			// Inserto el comentario
 			commentsDiv.appendChild(newComment);

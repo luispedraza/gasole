@@ -90,13 +90,11 @@ class ResultIter(Result):
 		data = self.data
 		province = make_clean_name(province)
 		town = make_clean_name(town)
-		p = data[province] = data.get(province) or {}
-		t = p[town] = p.get(town) or {}
-		s = t.get(station)
+		s = data.setdefault(province,{}).setdefault(town, {}).get(station)
 		if not s:
-			s = t[station] = {"date":date,"label":label,"hours":hours,"options":option}
+			data[province][town][station] = {"date":date,"label":label,"hours":hours,"options":option}
 			if latlon:
-				t[station]["latlon"] = latlon
+				data[province][town][station]["latlon"] = latlon
 		else:
 			s["options"].update(option)
 			s["date"] = date
@@ -143,6 +141,7 @@ def gas_update_xls(option="1"):
 	def handle_xls_result(rpc, o, result=result):
 		rpc_result = rpc.get_result()
 		xlsFile = StringIO(rpc_result.content)
+		del rpc_result
 		rows = BeautifulSoup(xlsFile).find('table').findAll('tr')
 		del xlsFile
 		for tr in rows[2:]:
@@ -157,6 +156,7 @@ def gas_update_xls(option="1"):
 						label    = table_data[6],
 						hours    = table_data[9],
 						option   = {o: float(re.sub(",", ".", table_data[5]))})
+		del rows
 
 	def create_xls_callback(rpc, o):
 		return lambda: handle_xls_result(rpc, o)
