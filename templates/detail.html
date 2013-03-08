@@ -109,7 +109,7 @@
 				<label for="c_title">Título<sup> *</sup>: </label><input id="c_title" type="text" name="c_title" value="{{data['c_title']}}">
 				<br>
 				<label for="c_points">Valoración<sup> *</sup>: </label>
-					<div id="c_points">
+					<div id="c_points_div">
 						<div class="star shit" id="star_0"></div>
 						<div class="star" id="star_01"></div>
 						<div class="star" id="star_02"></div>
@@ -121,7 +121,7 @@
 						<div class="star" id="star_08"></div>
 						<div class="star" id="star_09"></div>
 						<div class="star" id="star_10"></div>
-						<input type="text" name="c_points" value="0" readonly value="{{data['c_points']}}/10">
+						<input type="text" id="c_points" name="c_points" value="0" readonly value="{{data['c_points']}}/10">
 					</div>
 				<br>
 				<label for="c_content">Comentario<sup> *</sup>: </label><textarea id="c_content" name="c_content" value="{{data['c_content']}}"></textarea><br>

@@ -28,7 +28,11 @@ function initPoints(val) {
 			var shit = document.getElementById("star_0");
 			if (id==0) shit.className = "star shit on";
 			else shit.className = "star shit";
-			document.getElementById("c_points").value = id;
+			// document.getElementById("c_points").value = id;
+		})
+		stars[s].addEventListener("click", function() {
+			var id = this.id.split("_")[1];
+			document.getElementById("c_points").value = id
 		})
 	}
 }

@@ -347,7 +347,7 @@ app = webapp2.WSGIApplication([
     ('/geo/(.+)/(.+)/(.+)/(.+)/?', GeoApi),
     ('/resultados/(.+)/(.+)/(.+)/(.+)/?', SearchResults),
     ('/info/(noticias|tarjetas|combustibles)/?', Info),
-    webapp2.Route('/login/<provider>', handler=BaseAuthHandler, name='auth_login', handler_method='_simple_auth'),
+    webapp2.Route('/login/<provider>', handler=BaseAuthHandler, name='auth_login', handler_method='_login'),
     webapp2.Route('/login/<provider>/callback', handler=BaseAuthHandler, name='auth_callback', handler_method='_auth_callback'),
     webapp2.Route('/logout', handler=BaseAuthHandler, name='auth_logout', handler_method='_logout'),
 ], debug=True, config=app_config)

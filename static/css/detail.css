@@ -133,11 +133,11 @@ float: left;
 	clear: both;
 	padding-top: 10px;
 }
-#c_points {
+#c_points_div {
 	display: inline-block;
 }
 
-#c_points input {
+#c_points {
 	width: 40px;
 	font-size: 30px;
 	border: 0;
@@ -145,10 +145,10 @@ float: left;
 }
 .star, .shit {
 	cursor: pointer;
-	background-size: 30px;
+	background-size: 20px;
 	background-repeat: no-repeat;
-	width: 30px;
-	height: 30px;
+	width: 20px;
+	height: 20px;
 	padding: 0;
 	display: inline-block;
 	-webkit-filter: grayscale(80%);

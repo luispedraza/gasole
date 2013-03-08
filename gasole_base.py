@@ -132,12 +132,20 @@ class BaseAuthHandler(BaseHandler, SimpleAuthHandler):
 				ok, user = self.auth.store.user_model.create_user(auth_id, **_attrs)
 				if ok:
 					self.auth.set_session(self.auth.store.user_to_dict(user))
-		self.redirect('/')
+
+		self.redirect(str(self.session.get('ref')) or '/')
+		self.session['ref'] = ""
+		# self.redirect('/')
+
+	def _login(self, provider=None):
+		logging.info(self.request.headers)
+		self.session['ref'] = self.request.headers['Referer']
+		self._simple_auth(provider=provider)
 
 	def _logout(self):
 		logging.info("Cerrando la sesión…")
 		self.auth.unset_session()
-		self.redirect('/')
+		self.redirect(self.request.headers['Referer'])
 
 	def _callback_uri_for(self, provider):
 		return self.uri_for('auth_callback', provider=provider, _full=True)
