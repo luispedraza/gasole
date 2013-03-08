@@ -35,9 +35,11 @@ function toTitle(s) {
 }
 function getLogo(label) {
 	if (label) {
-		label = label.replace(/\./g, "");
-		logo = label.match(/\b(alcampo|avia|bp|buquerin|campsa|carmoned|carrefour|cepsa|empresoil|eroski|galp|gasolben|iberdoex|leclerc|makro|meroil|norpetrol|petrocat|petromiralles|petronor|repostar|repsol|saras|shell|staroil|tamoil|valcarce)\b/i);
-		if (logo) return logo[0].toLowerCase();	
+		/* Algunos errores del archivo del Ministerio */
+		label = label.replace(/camspa/i, "campsa");
+		console.log(label)
+		logo = label.match(/\b(abycer|agla|alcampo|andamur|a\.?n\.? energeticos|avia|bonarea|b\.?p\.?|buquerin|campsa|carmoned|carrefour|cepsa|empresoil|eroski|esclatoil|galp|gasolben|iberdoex|leclerc|makro|meroil|norpetrol|petrem|petrocat|petromiralles|petronor|repostar|repsol|saras|shell|simply|staroil|tamoil|valcarce)\b/i);
+		if (logo) return logo[0].replace(/\./g, "").replace(/ /g, "_").toLowerCase();	
 	}
 	return null;
 }

@@ -226,17 +226,6 @@ function initControl() {
 		}
 		paginateTable(0);
 	}
-	// Interactividad con la tabla 
-	var rows = document.getElementById("table_data").getElementsByTagName("tr");
-	for (var r=0; r<rows.length; r++) {
-		rows[r].addEventListener("mouseover", function() {
-			clearTimeout(windowTimeout);
-			focusMarker = markers[this.getAttribute("markerid")];
-			windowTimeout = setTimeout(function() {
-				google.maps.event.trigger(focusMarker, "click");
-			}, 800);
-		})
-	}
 	// Ordenación de la tabla
 	var heads = document.getElementById("table").getElementsByTagName("th");
 	for (var h=0; h<heads.length; h++) {
