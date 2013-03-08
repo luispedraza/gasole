@@ -11,8 +11,6 @@
 # ARCHIVOS EXCEL:
 # http://geoportal.mityc.es/hidrocarburos/eess/searchTotal.do?tipoCons=1&tipoBusqueda=0&tipoCarburante=1&textoCarburante=Gasolina%2095
 
-import sys
-sys.path.insert(0, 'libs')
 
 import urllib
 from zipfile import ZipFile
@@ -24,6 +22,7 @@ import re
 # import time
 from google.appengine.api import urlfetch
 import logging
+
 
 FUEL_OPTIONS = {"0": {"short": u"Todos", "name": u"Todos los tipos"},
 				"1": {"short": u"G95", "name": u"Gasolina 95"},

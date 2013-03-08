@@ -1,47 +1,52 @@
 <div id="price_board">
 	<div id="logo"></div>
-	<div class="section T_G95">
-		<div class="section_name">Gasolina 95</div>
-		<div class="price">1,47</div>
+	<div id="sec_G95" class="section T_G95">
+		<div class="sec_name">Gasolina 95</div>
+		<div id="p_G95" class="price">1,47</div>
 	</div>
-	<div class="section  T_G98">
-		<div class="section_name">Gasolina 98</div>
-		<div class="price">1,47</div>
+	<div id="sec_G98" class="section  T_G98">
+		<div class="sec_name">Gasolina 98</div>
+		<div id="p_G98" class="price">1,47</div>
 	</div>
-	<div class="section T_GOA">
-		<div class="section_name">Gasóleo A</div>
-		<div class="price">1,47</div>
+	<div id="sec_GOA" class="section T_GOA">
+		<div class="sec_name">Gasóleo A</div>
+		<div id="p_GOA" class="price">1,47</div>
 	</div>
-	<div class="section T_NGO">
-		<div class="section_name">Nuevo Gasóleo A</div>
-		<div class="price">1,47</div>
+	<div id="sec_NGO" class="section T_NGO">
+		<div class="sec_name">Nuevo Gasóleo A</div>
+		<div id="p_NGO" class="price">1,47</div>
 	</div>
-	<div class="section T_GOB">
-		<div class="section_name">Gasóleo B</div>
-		<div class="price">1,47</div>
+	<div id="sec_GOB" class="section T_GOB">
+		<div class="sec_name">Gasóleo B</div>
+		<div id="p_GOB" class="price">1,47</div>
 	</div>
-	<div class="section T_GOC">
-		<div class="section_name">Gasóleo C</div>
-		<div class="price">1,47</div>
+	<div id="sec_GOC" class="section T_GOC">
+		<div class="sec_name">Gasóleo C</div>
+		<div id="p_GOC" class="price">1,47</div>
 	</div>
-	<div class="section T_BIOD">
-		<div class="section_name">Biodiésel</div>
-		<div class="price">1,47</div>
+	<div id="sec_BIOD" class="section T_BIOD">
+		<div class="sec_name">Biodiésel</div>
+		<div id="p_BIOD" class="price">1,47</div>
+	</div>
+
+	<div id="ads_detail">
+		
 	</div>
 </div>
 
 <div id="detail">
-	<div id="ads_top">
-	
+	<h1>Detalle de la {{title}}</h1>
+	<div id="ads_top"></div>
+	<div id="detail_info">
+		<div id="detail_info_fields">
+			<div class="field">Dirección</div> 	<div class="field_value" id="address"></div><br>
+			<div class="field">Horario</div> 	<div class="field_value" id="hours"></div><br>
+		</div>
+		<div id="google_map"></div>
+		<div id="chart"></div>
 	</div>
 
-	<h1>Detalle de la {{title}}</h1>
-	<div class="field">Rótulo</div> 	<div class="field_value" id="label"></div><br>
-	<div class="field">Dirección</div> 	<div class="field_value" id="address"></div><br>
-	<div class="field">Horario</div> 	<div class="field_value" id="hours"></div><br>
-
-	<div id="chart"></div>
-	<div id="google_map"></div>
+	
 
 	{% if edit_station|count %}
 	<div id="edit">
@@ -79,7 +84,7 @@
 			
 			{% if user %}
 			<img class="avatar" src="{{user.avatar_url}}">
-			<p>Estás autenticado como <a href="{{user.link}}">{{user.name}}</a> (<a href="/logout">cerrar sesión</a>)
+			<p id="username">Estás autenticado como <a href="{{user.link}}">{{user.name}}</a></p><p><a href="/logout">cerrar sesión</a></p>
 			<input type="hidden" name="c_authid" value="{{user.auth_ids[0]}}"><br>
 			<input type="hidden" name="c_name" id="c_name" value="{{user.name}}"><br>
 			<input type="hidden" name="c_link" id="c_link" value="{{user.link}}">
@@ -100,41 +105,42 @@
 			</div>
 			</div>
 			{% endif %}
+			<div id="new_comment">
+				<label for="c_title">Título<sup> *</sup>: </label><input id="c_title" type="text" name="c_title" value="{{data['c_title']}}">
+				<br>
+				<label for="c_points">Valoración<sup> *</sup>: </label>
+					<div id="c_points">
+						<div class="star shit" id="star_0"></div>
+						<div class="star" id="star_01"></div>
+						<div class="star" id="star_02"></div>
+						<div class="star" id="star_03"></div>
+						<div class="star" id="star_04"></div>
+						<div class="star" id="star_05"></div>
+						<div class="star" id="star_06"></div>
+						<div class="star" id="star_07"></div>
+						<div class="star" id="star_08"></div>
+						<div class="star" id="star_09"></div>
+						<div class="star" id="star_10"></div>
+						<input type="text" name="c_points" value="0" readonly value="{{data['c_points']}}/10">
+					</div>
+				<br>
+				<label for="c_content">Comentario<sup> *</sup>: </label><textarea id="c_content" name="c_content" value="{{data['c_content']}}"></textarea><br>
 
-			<label for="c_title">Título<sup> *</sup>: </label><input id="c_title" type="text" name="c_title" value="{{data['c_title']}}">
-			<br>
-			<label for="c_points">Valoración<sup> *</sup>: </label>
-				<div id="c_points">
-					<div class="star shit" id="star_0"></div>
-					<div class="star" id="star_01"></div>
-					<div class="star" id="star_02"></div>
-					<div class="star" id="star_03"></div>
-					<div class="star" id="star_04"></div>
-					<div class="star" id="star_05"></div>
-					<div class="star" id="star_06"></div>
-					<div class="star" id="star_07"></div>
-					<div class="star" id="star_08"></div>
-					<div class="star" id="star_09"></div>
-					<div class="star" id="star_10"></div>
-					<input type="text" name="c_points" value="0" readonly value="{{data['c_points']}}/10">
+				<!-- captcha -->
+				<div id="captcha">
+				<script type="text/javascript" src="http://www.google.com/recaptcha/api/challenge?k=6Lfg290SAAAAAF7lz7UcKF7Sn0KOCQne8TWwqjAF">
+				</script>
+				<noscript>
+				<iframe src="http://www.google.com/recaptcha/api/noscript?k=your_public_key" height="300" width="500" frameborder="0">
+				</iframe><br>
+				<textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea>
+				<input type="hidden" name="recaptcha_response_field" value="manual_challenge">
+				</noscript>
 				</div>
-			<br>
-			<label for="c_content">Comentario<sup> *</sup>: </label><textarea id="c_content" name="c_content" value="{{data['c_content']}}"></textarea><br>
+				<!-- fin captcha -->
 
-			<!-- captcha -->
-			<div id="captcha">
-			<script type="text/javascript" src="http://www.google.com/recaptcha/api/challenge?k=6Lfg290SAAAAAF7lz7UcKF7Sn0KOCQne8TWwqjAF">
-			</script>
-			<noscript>
-			<iframe src="http://www.google.com/recaptcha/api/noscript?k=your_public_key" height="300" width="500" frameborder="0">
-			</iframe><br>
-			<textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea>
-			<input type="hidden" name="recaptcha_response_field" value="manual_challenge">
-			</noscript>
-			</div>
-			<!-- fin captcha -->
-
-			<input type="submit" value="Enviar">
+				<input type="submit" value="Enviar (no olvides rellenar todos los campos obligatorios y resolver el captcha)">
+			</div><!-- new_comment -->
 		</form>
 		<h1>Todas las opiniones sobre esta gasolinera</h1>
 		<div id="old_comments">

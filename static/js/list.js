@@ -282,6 +282,7 @@ function populateTable(id) {
 			var s_link = "/gasolineras/" + p_link + "/" + t_link;
 			cities.push([t, s_link]);
 			for (var s in data[p][t]) {
+				var label = data[p][t][s]["label"];
 				var tr = document.createElement("tr");
 				tr.className = "r_on";
 				var td_town = document.createElement("td");
@@ -299,6 +300,11 @@ function populateTable(id) {
 				a_s.title = "Detalles de la gasolinera en " + t + ", " + a_s.textContent;
 				td_s.appendChild(a_s);
 				td_s.className = "T_ADDR";
+				var logo = getLogo(label);
+				if (logo) {
+					console.log("si");
+					td_s.style.backgroundImage = "url('/img/logos/"+logo+"_mini.png')";
+				}
 				tr.appendChild(td_s);
 				var td_dist = document.createElement("td");
 				td_dist.className = "T_DIST";

@@ -15,6 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+import sys
+if 'lib' not in sys.path:
+    sys.path.insert(0, 'libs')
+    
 from gasole_base import *
 from gas_update import *
 from gas_maps import *
@@ -24,6 +28,8 @@ from recaptcha import *
 from google.appengine.api.mail import is_email_valid
 from hashlib import md5
 from secrets import SESSION_KEY
+
+
 
 GOOGLE_MAPS_API = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyD5XZNFlQsyWtYDeKual-OcqmP_5pgwbds&sensor=false&region=ES'
 GOOGLE_VIS_API = 'https://www.google.com/jsapi?autoload={modules:[{name:visualization,version:1,packages:[corechart]}]}'
@@ -180,7 +186,7 @@ class Detail(BaseAuthHandler):
                 edit_station = {k: getattr(sdata,k) for k in sdata.properties()}
         self.render("base.html",
             title = title,
-            styles=['detail.css', 'chart.css'],
+            styles=['detail.css'],
             scripts=[GOOGLE_VIS_API, GOOGLE_MAPS_API,
                 '/js/utils.js', 
                 '/js/detail.js'

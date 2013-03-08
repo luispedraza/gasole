@@ -14,7 +14,7 @@ function initMap(latlon) {
 	});
 }
 
-function initPoints() {
+function initPoints(val) {
 	var stars = document.getElementsByClassName("star");
 	for (var s=0; s<stars.length; s++) {
 		stars[s].addEventListener("mouseover", function() {
@@ -34,16 +34,24 @@ function initPoints() {
 }
 
 function insertLogo(label) {
-	var logoid = label.match(/\b(avia|bp|campsa|carmoned|carrefour|cepsa|galp|petronor|repsol|saras|shell|tamoil)\b/i);
+	var logoid = getLogo(label);
 	if (logoid) {
 		var img = document.createElement("img");
-		img.src = "/img/logos/" + logoid[0].toLowerCase() + ".png";
+		img.src = "/img/logos/" + logoid + "_w.png";
 		document.getElementById("logo").appendChild(img);
 	}
 	else {
 		document.getElementById("logo").textContent = label;
 	}
 }
+function initPrice(price) {
+	for (var p in price) {
+		var type = FUEL_OPTIONS[p]["short"];
+		document.getElementById("sec_"+type).style.display = "block";
+		document.getElementById("p_"+type).textContent = price[p];
+	}
+}
+
 
 window.addEventListener("load", function(){
 	var req = new XMLHttpRequest();
@@ -51,7 +59,7 @@ window.addEventListener("load", function(){
 		info = JSON.parse(r.target.responseText);
 		console.log(info);
 		data = info["_data"];
-		var province, town, station, date, label, hours, latlon;
+		var province, town, station, date, label, hours, latlon, price;
 		for (var p in data) province= p
 			for (var t in data[p]) town=t;
 				for (var s in data[p][t]) {
@@ -60,13 +68,14 @@ window.addEventListener("load", function(){
 					label = data[p][t][s]["label"];
 					hours = data[p][t][s]["hours"];
 					latlon = data[p][t][s]["latlon"];
+					price = data[p][t][s]["options"];
 				}
 
-		document.getElementById("label").innerText = label;
-		document.getElementById("address").innerText = toTitle(station) + " (" + town + ", " + province + ")";
-		document.getElementById("hours").innerText = hours;
+		document.getElementById("address").textContent = toTitle(station) + " (" + town + ", " + province + ")";
+		document.getElementById("hours").textContent = hours;
 		insertLogo(label);
 		initMap(latlon);
+		initPrice(price);
 
 		var commentsDiv = document.getElementById("old_comments");
 		var comments = info._comments;
@@ -80,7 +89,7 @@ window.addEventListener("load", function(){
 			newComment.appendChild(newCName);
 			var newCDate = document.createElement("div");
 			newCDate.className = "c_date";
-			newCDate.innerText = new Date(comments[c].date).toLocaleString();
+			newCDate.textContent = new Date(comments[c].date).toLocaleString();
 			newComment.appendChild(newCDate);
 			var newCAvatar = document.createElement("img");
 			newCAvatar.src = comments[c].avatar;
@@ -100,12 +109,14 @@ window.addEventListener("load", function(){
 
 		var chart_data = new google.visualization.DataTable();
 		chart_data.addColumn('date', 'Fecha');
+		var chart_colors = []
 		var history = info._history;
 		var init = false;
 		for (var h in history){
 			if (!init) {
 				for (var o in history[h]) {
 					chart_data.addColumn('number', o);
+					chart_colors.push(FUEL_COLORS[o]);
 				}
 				init = true;
 			}
@@ -122,13 +133,17 @@ window.addEventListener("load", function(){
 		chart_data.sort(0);
 		
 		var options = {
-          title: 'Precios'
+          title: 'Precios',
+          theme: 'maximized',
+          pointSize: 5,
+          colors: chart_colors
+
         };
 		var chart = new google.visualization.LineChart(document.getElementById('chart'));
         chart.draw(chart_data, options);
 
         /* Puntuaciones (estrellas) */
-        initPoints();
+        initPoints(5);
 	}
 	req.open("GET", document.URL.replace("ficha", "api"), true);
 	req.send();

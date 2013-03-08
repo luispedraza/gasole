@@ -8,18 +8,17 @@
 	height: 600px;
 	float: left;
 	background-color: black;
-	border: 2px solid black;
 }
 #logo {
 	font-size: 25px;
-	padding: 10px;
 }
 #price_board .section {
+	display: none;
 	border-bottom: 3px solid white;
 	padding: 10px;
 	height: 50px;
 }
-#price_board .section_name {
+#price_board .sec_name {
 	width: 120px;
 	float: left;
 }
@@ -57,26 +56,38 @@
 	width: 730px;
 	height: 90px;
 	background-color: red;
+	margin-bottom: 10px;
 }
 
 #logo {
 	background-color: white;
 }
-#google_map {
-	width: 400px;
-	height: 300px;
-	position: absolute;
-	top: 0;
-	right: 0;
-}
+
+
 #detail {
 	width: 730px;
 	float: right;
 }
-#detail label {
-	width: 100px;
-	text-align: right;
-	display: inline-block;
+
+#detail_info_fields {
+	width: 50%;
+	float: left;
+}
+#detail_info_fields .field_value {
+	padding-left: 20px;
+}
+#google_map {
+	width: 50%;
+	height: 300px;
+	float: right;
+	top: 0;
+	right: 0;
+	margin-bottom: 20px;
+}
+#chart {
+	width: 100%;
+	height: 300px;
+	clear: both;
 }
 #comments {
 	width: 730px;
@@ -88,7 +99,15 @@
 #user_data, #user_login {
 	width: 45%;
 }
-
+#user_data input[type=text] {
+	width: 90%;
+}
+#user_data {
+float: left;
+}
+#user_login {
+	float: right;
+}
 .login {
 	width: 50px;
 	height: 50px;
@@ -110,28 +129,12 @@
 	background-color: #DD4B39;
 	background-image: url('/img/gp_logo.png');
 }
+#new_comment {
+	clear: both;
+	padding-top: 10px;
+}
 #c_points {
 	display: inline-block;
-	border: 1px solid #fff;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
-	-ms-border-radius: 5px;
-	-o-border-radius: 5px;
-	border-radius: 5px;
-}
-#c_points:hover {
-	border: 1px solid #ccc;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
-	-ms-border-radius: 5px;
-	-o-border-radius: 5px;
-	border-radius: 5px;
-}
-#comments textarea {
-	width: 400px;
-	height: 120px;
-	border: 5px solid #ccc;
-	padding: 5px;
 }
 
 #c_points input {
@@ -174,11 +177,47 @@
 .comment .title {
 	font-size: 1.2em;
 }
-.avatar {
-	width: 100px;
-	height: auto;
+#username {
+	font-size: 1.5em;
 }
-
+.avatar {
+	width: 50px;
+	height: auto;
+	float: left;
+	margin-right: 10px;
+}
+#new_comment label {
+	width: 35%;
+	vertical-align: top;
+	display: inline-block;
+}
+#new_comment input#c_title {
+	font-size: 2em;
+	padding: 5px;
+	width: 60%;
+	display: inline-block;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	-ms-border-radius: 5px;
+	-o-border-radius: 5px;
+	border-radius: 5px;
+}
+#new_comment textarea {
+	width: 60%;
+	height: 120px;
+	border: 1px solid #ccc;
+	padding: 5px;
+	display: inline-block;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	-ms-border-radius: 5px;
+	-o-border-radius: 5px;
+	border-radius: 5px;
+}
+#captcha {
+	width: 60%;
+	float: right;
+}
 #old_comments {
 	width: 730px;
 	height: 300px;

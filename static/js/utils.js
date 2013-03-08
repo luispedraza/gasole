@@ -5,7 +5,15 @@ var FUEL_OPTIONS = {"1": {"short": "G95", "name": "Gasolina 95"},
 				"6": {"short": "GOB", "name": "Gasóleo B"},
 				"7": {"short": "GOC", "name": "Gasóleo C"},
 				"8": {"short": "BIOD", "name": "Biodiésel"}}
-
+var FUEL_COLORS = {
+	"G95": "#006633",
+	"G98": "#339933",
+	"GOA": "#000",
+	"NGO": "#aaa",
+	"GOB": "#CC3333",
+	"GOC": "#FF3300",
+	"BIOD": "#FFCC33"
+}
 function toTitle(s) {
 	return s.replace(" [N]", "")
 		.replace(/^CARRETERA ?|^CR\.? ?/i, "CTRA. ")
@@ -24,6 +32,14 @@ function toTitle(s) {
 		.replace(/\[D\]$/, "(m.d.)")
 		.replace(/\[I\]$/, "(m.i.)")
 		.replace(/ \[N\]$/, "")
+}
+function getLogo(label) {
+	if (label) {
+		label = label.replace(/\./g, "");
+		logo = label.match(/\b(alcampo|avia|bp|buquerin|campsa|carmoned|carrefour|cepsa|empresoil|eroski|galp|gasolben|iberdoex|leclerc|makro|meroil|norpetrol|petrocat|petromiralles|petronor|repostar|repsol|saras|shell|staroil|tamoil|valcarce)\b/i);
+		if (logo) return logo[0].toLowerCase();	
+	}
+	return null;
 }
 function decodeName(s) {
 	return decodeURI(s).replace(/_/g, " ").replace(/\|/g, "/");

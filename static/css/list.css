@@ -129,6 +129,10 @@ th.T_LOC, th.T_ADDR, th.T_DIST {
 	background-color: #3399CC;
 	border-color: #006699;
 }
+#table td.T_ADDR {
+	padding-left: 32px;
+	background-repeat: no-repeat;
+}
 li.T_G95, th.T_G95 {
 	background-color: #006633;
 }
@@ -224,10 +228,9 @@ thead tr.r_off {
 }
 tr {
 	margin-top: 5px;
+	border-bottom: 3px solid #EEF;
 }
-tr:nth-child(odd) {
-	background-color: #EEF;
-}
+
 #table {
 	margin-right: 10px;
 	width: 100%;
