@@ -1,0 +1,6 @@
+backends:
+- name: update
+  class: B4
+  instances: 1
+  options: dynamic
+  start: backends.app

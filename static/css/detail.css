@@ -129,6 +129,9 @@ float: left;
 	background-color: #DD4B39;
 	background-image: url('/img/gp_logo.png');
 }
+.fs_login {
+	background-image: url('/img/sf_logo.png');
+}
 #new_comment {
 	clear: both;
 	padding-top: 10px;

@@ -1,5 +1,6 @@
 import logging
 import webapp2
+from google.appengine.api import taskqueue
 
 import sys
 if 'lib' not in sys.path:
@@ -10,8 +11,7 @@ from gas_db import *
 
 class Update(webapp2.RequestHandler):
 	def get(self):
-		data = gas_update_xls(option="0")
-		data2store(data.data)
+		taskqueue.add(url='/_ah/start', target='update', method='GET')
 
 app = webapp2.WSGIApplication([
     ('/tasks/update', Update)
