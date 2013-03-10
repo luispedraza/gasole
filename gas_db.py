@@ -81,11 +81,15 @@ def data2store(data):
 					_history.append(HistoryData(parent = parent_key,
 						date=cachep[t][s]["date"], **props))
 		memcache.set(p, cachep)
-	if DEBUG:
-		db.put(_provinces + _towns + _stations + _prices + _history)
-	else:
-		db.put_async(_provinces + _towns + _stations + _prices + _history)
-
+	# if DEBUG:
+	# 	logging.info("Guardando en modo debug: put")
+	# 	db.put(_provinces + _towns + _stations + _prices + _history)
+	# else:
+	# 	logging.info("Guardando en modo release: put_async")
+	# 	put_future = db.put_async(_provinces + _towns + _stations + _prices + _history)
+	# 	put_result = put_future.get_result()
+	# 	logging.info(put_result.content)
+	db.put(_provinces + _towns + _stations + _prices + _history)
 	logging.info("Insertadas %s provincias" % len(_provinces))
 	# for e in _provinces:
 	# 	logging.info(e.key().name())

@@ -11,7 +11,7 @@ from gas_db import *
 
 class Update(webapp2.RequestHandler):
 	def get(self):
-		taskqueue.add(url='/_ah/start', target='update', method='GET')
+		taskqueue.add(url='/backends/update', target='update', method='GET')
 
 app = webapp2.WSGIApplication([
     ('/tasks/update', Update)

@@ -7,13 +7,14 @@ import webapp2
 
 from gas_update import *
 from gas_db import *
+from google.appengine.api import taskqueue
 
 class UpdateHandler(webapp2.RequestHandler):
     def get(self):
     	logging.info("===== Update backend corriendo")
-    	newdata = gas_update_xls(option="0")
-    	data2store(newdata.data)
+    	# newdata = gas_update_xls(option="0")
+    	data2store(gas_update_xls(option="0").data)
 
 app = webapp2.WSGIApplication([
-    ('/_ah/start', UpdateHandler)
+    ('/backends/update', UpdateHandler)
 ], debug=True)

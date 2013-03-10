@@ -1,16 +1,18 @@
 application: gasole-app
-version: development
+version: release
 runtime: python27
 api_version: 1
 threadsafe: yes
 
 builtins:
 - remote_api: on
-- deferred: on
+# - deferred: on
 
 handlers:
 # - url: /clean
 #   script: clean_history.app
+- url: /backends/update
+  script: backends.app
 - url: /robots.txt
   static_files: static/txt/robots.txt
   upload: static/txt/robots.txt
