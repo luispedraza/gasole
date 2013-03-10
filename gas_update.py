@@ -11,7 +11,6 @@
 # ARCHIVOS EXCEL:
 # http://geoportal.mityc.es/hidrocarburos/eess/searchTotal.do?tipoCons=1&tipoBusqueda=0&tipoCarburante=1&textoCarburante=Gasolina%2095
 
-
 import urllib
 from zipfile import ZipFile
 import time
@@ -22,7 +21,7 @@ import re
 # import time
 from google.appengine.api import urlfetch
 import logging
-
+from google.appengine.api.runtime import *
 
 FUEL_OPTIONS = {"0": {"short": u"Todos", "name": u"Todos los tipos"},
 				"1": {"short": u"G95", "name": u"Gasolina 95"},
@@ -134,6 +133,7 @@ def gas_update_csv(option="1"):
 
 # Actualización por descarga de archivo xls
 def gas_update_xls(option="1"):
+	logging.info("comienzo gas_update_xls %s" %memory_usage().current())
 	result = ResultIter()
 	if type(option) == str or type(option) == unicode:
 		if option == "0":
@@ -142,6 +142,7 @@ def gas_update_xls(option="1"):
 		else:
 			option = [option]
 	def handle_xls_result(rpc, o, result=result):
+		logging.info("procesando %s: %s" %(o, memory_usage().current()))
 		rows = BeautifulSoup(StringIO(rpc.get_result().content)).find('table').findAll('tr')
 		for tr in rows[2:]:
 			if not tr.findAll('b'):
@@ -156,6 +157,7 @@ def gas_update_xls(option="1"):
 						hours    = table_data[9],
 						option   = {o: float(re.sub(",", ".", table_data[5]))})
 		del rows
+		logging.info("fin procesando %s: %s" %(o, memory_usage().current()))
 
 	def create_xls_callback(rpc, o):
 		return lambda: handle_xls_result(rpc, o)
