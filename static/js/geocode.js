@@ -1,6 +1,6 @@
 function findLocation (loc) {
-	var lat = loc.geometry.location.hb;
-	var lon = loc.geometry.location.ib;
+	var lat = loc.geometry.location.lat();
+	var lon = loc.geometry.location.lng();
 	window.location = "/resultados/"+encodeURI(loc.formatted_address)+"/"+lat+"/"+lon+"/"+2;
 }
 
@@ -9,9 +9,7 @@ function geoCode() {
 	var geocoder = new google.maps.Geocoder();
 	geocoder.geocode({'address': a, 'region': 'es'}, function(results, status) {
 		if (status == google.maps.GeocoderStatus.OK) {
-			console.log(results)
 			if (results.length == 1) {
-				console.log(results[0].geometry.location);
 				findLocation(results[0]);
 				return;
 			}

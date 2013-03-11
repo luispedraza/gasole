@@ -83,6 +83,8 @@ window.addEventListener("load", function(){
 
 		var commentsDiv = document.getElementById("old_comments");
 		var comments = info._comments;
+		var points = 0;
+		var n_comments = 0;
 		for (var c in comments) {
 			var newComment = document.createElement("div");
 			newComment.className = "c_comment";
@@ -105,7 +107,8 @@ window.addEventListener("load", function(){
 			newCTitle.textContent = comments[c].title;
 			newComment.appendChild(newCTitle);
 			var newCPoints = document.createElement("div");
-			newCPoints.textContent = parseInt(comments[c].points)/10;
+			var c_points = parseInt(comments[c].points)/10;
+			newCPoints.textContent = c_points;
 			if (newCPoints.textContent=="0") {
 				newCPoints.className = "c_points_0";	
 			} else {
@@ -119,6 +122,11 @@ window.addEventListener("load", function(){
 			newComment.appendChild(newCContent);
 			// Inserto el comentario
 			commentsDiv.appendChild(newComment);
+			points = (points*n_comments + c_points)/(n_comments+1);
+			n_comments++;
+		}
+		if (points) {
+			document.getElementById("points").innerHTML = points.toFixed(1) + " (" + n_comments + " valoraciones)";
 		}
 
 		var chart_data = new google.visualization.DataTable();
