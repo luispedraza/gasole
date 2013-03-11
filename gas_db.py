@@ -6,7 +6,7 @@ from google.appengine.api import memcache
 from gas_update import *
 import logging
 from math import fabs
-
+from webapp2_extras.appengine.auth.models import User
 import os
 DEBUG = os.environ['SERVER_SOFTWARE'].startswith('Dev')
 
@@ -33,15 +33,16 @@ class HistoryData(db.Expando):
 	date = db.DateProperty()
 ## Modelo de comentario
 class Comment(db.Model):
-	user = db.StringProperty(required=True)		#provider:email e.g. gasole:luispedraza@gmail.com
+	userid = db.IntegerProperty(required=True)
 	name = db.StringProperty(required=True)
-	email = db.EmailProperty(required=True)
-	link = db.LinkProperty()
+	link = db.StringProperty()
 	avatar = db.LinkProperty()
 	points = db.RatingProperty(required=True)
 	title = db.StringProperty(required=True)
 	content = db.TextProperty(required=True)
 	date = db.DateTimeProperty(auto_now_add=True)
+	# def get_author(self):
+	# 	return User.get_by_auth_id(self.userid)
 
 def data2store(data):
 	_provinces = []

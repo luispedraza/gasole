@@ -228,6 +228,10 @@ float: left;
 #old_comments .c_comment {
 	position: relative;
 }
+#old_comments .c_avatar {
+	width: 100px;
+	height: auto;
+}
 #old_comments .c_name {
 	width: 120px;
 }
@@ -241,6 +245,19 @@ float: left;
 	font-size: 1.5em;
 	border-bottom: 1px dotted black;
 	width: auto;
+}
+#old_comments .c_points_0 {
+	background-image: url('/img/shit.svg');
+	background-size: 30px;
+	background-repeat: no-repeat;
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 30px;
+	height: 30px;
+}
+#old_comments .c_points {
+
 }
 #old_comments .c_content {
 	position: absolute;

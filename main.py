@@ -170,6 +170,7 @@ class Detail(BaseAuthHandler):
         user = {}
         if self.logged_in:
             user = self.current_user
+            logging.info(user)
         # Vista de detalle de una gasolinera
         data = {}
         if error:
@@ -177,20 +178,17 @@ class Detail(BaseAuthHandler):
         p = decode_param(province)
         t = decode_param(town)
         s = decode_param(station)
-        address = s.replace("_[D]", " (margen derecho)").replace("_[I]", " (margen izquierdo)").replace("_[N]", "")
+        address = s.replace(" [D]", " (margen der.)").replace(" [I]", " (margen izq.)").replace(" [N]", "")
         title = "Gasolinera en " + address + ", " + t
         edit_station = {}
         if users.is_current_user_admin():
             sdata = GasStation.get(db.Key.from_path('Province', p, 'Town', t, 'GasStation', s))
             if sdata:
-                edit_station = {k: getattr(sdata,k) for k in sdata.properties()}
+                edit_station = {k: getattr(sdata,k) or "" for k in sdata.properties()}
         self.render("base.html",
             title = title,
             styles=['detail.css'],
-            scripts=[GOOGLE_VIS_API, GOOGLE_MAPS_API,
-                '/js/utils.js', 
-                '/js/detail.js'
-                ],
+            scripts=[GOOGLE_VIS_API, GOOGLE_MAPS_API,'/js/utils.js','/js/detail.js'],
             content=jinja_env.get_template("detail.html").render(
                 title=title,
                 edit_station=edit_station,
@@ -206,23 +204,39 @@ class Detail(BaseAuthHandler):
         if users.is_current_user_admin() and self.request.get("edit_station"):
             sdata = GasStation.get(db.Key.from_path('Province', p, 'Town', t, 'GasStation', s))
             sdata.geopt = db.GeoPt(float(self.request.get("lat")), float(self.request.get("lon")))
+            sdata.phone = self.request.get("phone")
+            sdata.email = self.request.get("email")
+            sdata.link = self.request.get("link")
             sdata.put()
             self.get(province=province, town=town, station=station)
             return
         # Creación de un nuevo comentario sobre una estación
         error = {}
-        name=self.request.get("c_name").strip()
-        if not name:
-            error["c_name"] = u"Debes indicar tu nombre en el comentario."
-        email=self.request.get("c_email").strip().lower()
-        if not email:
-            error["c_email"] = u"Debes indicar tu dirección de correo electrónico. Recuerda que no será mostrada a otros usuarios."
-        elif not is_email_valid(email):
-            error["c_email"] = u"La dirección de correo electrónico no es válida."
-        link=self.request.get("c_link").strip()
+        user = {}
+        if self.logged_in:
+            user = self.current_user
+        else:
+            name=self.request.get("c_name").strip()
+            if not name:
+                error["c_name"] = u"Debes indicar tu nombre en el comentario."
+            email=self.request.get("c_email").strip().lower()
+            if not email:
+                error["c_email"] = u"Debes indicar tu dirección de correo electrónico (no será guardada ni mostrada)."
+            elif not is_email_valid(email):
+                error["c_email"] = u"La dirección de correo electrónico no es válida."
+            if not len(error):
+                hashemail = md5(email).hexdigest()
+                avatar = "http://www.gravatar.com/avatar/"+hashemail+"?s=100&d=%2Fimg%2Favatar.png"
+                link=self.request.get("c_link").strip()
+                self._on_signin({'name':name,'link':link,'avatar':avatar,'id':hashemail}, None, provider='gasole',redirect=False)
+                user = self.current_user
+                self.auth.unset_session()
+
         points=self.request.get("c_points")
         if not points:
             error["c_points"] = u"Olvidaste asignar una valoración a esta gasolinera."
+        else:
+            points=int(points)*10
         title=self.request.get("c_title").strip()
         if not title:
             error["c_title"] = u"Por favor, pon un título a tu comentario."
@@ -237,22 +251,18 @@ class Detail(BaseAuthHandler):
             remote_ip=self.request.remote_addr)
         if not captcha_result.is_valid:
              error["c_captcha"] = u"La solución del captcha no es correcta."
-        if not len(error):
-            logging.info(content)
+        if not len(error) and user:
             comment = Comment(
-                user="%s:%s" %("gasole", email),
-                name=name,
-                email=db.Email(email),
-                avatar=db.Link("http://www.gravatar.com/avatar/"+md5(email).hexdigest()+"?s=100&d=%2Fimg%2Favatar.png"),
-                points=db.Rating(points*10),
-                title=title, 
+                userid=user.key.id(),
+                name=user.name,
+                avatar=db.Link(user.avatar_url),
+                link=user.link,
+                points=db.Rating(points),
+                title=title,
                 content=db.Text(content),
                 parent=db.Key.from_path('Province',p,'Town',t,'GasStation',s))
-            if link:
-                comment.link = db.Link(link)
             comment.put()
         self.get(province=province, town=town, station=station, error=error)
-
 
 class Api(BaseHandler):
     def get(self, prov, town, station):

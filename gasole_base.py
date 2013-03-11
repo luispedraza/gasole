@@ -105,13 +105,15 @@ class BaseAuthHandler(BaseHandler, SimpleAuthHandler):
 			# 'contact'  : lambda data: ('email',data.get('contact').get('email')),
 			'id'       : lambda data: ('link', 'http://foursquare.com/user/{0}'.format(data.get('id'))),
 			'name'	   : lambda data: ('name', '%s %s' %(data.get('firstName'),data.get('lastName')))
+			},
+		'gasole'	   : {
+			'avatar'   : 'avatar_url',
+			'name'	   : 'name',
+			'link'     : 'link'
 			}
 		}
 
-	def _on_signin(self, data, auth_info, provider):
-		logging.info(data)
-		logging.info(auth_info)
-		logging.info(provider)
+	def _on_signin(self, data, auth_info, provider, redirect=True):
 		auth_id = '%s:%s' % (provider, data['id'])
 		logging.info(auth_id)
 		user = self.auth.store.user_model.get_by_auth_id(auth_id)
@@ -146,17 +148,16 @@ class BaseAuthHandler(BaseHandler, SimpleAuthHandler):
 				if ok:
 					self.auth.set_session(self.auth.store.user_to_dict(user))
 
-		self.redirect(str(self.session.get('ref')) or '/')
-		self.session['ref'] = ""
-		# self.redirect('/')
+		if redirect:
+			self.redirect(str(self.session.get('ref')) or '/')
+			self.session['ref'] = ""
+
 
 	def _login(self, provider=None):
-		logging.info(self.request.headers)
 		self.session['ref'] = self.request.headers['Referer']
 		self._simple_auth(provider=provider)
 
 	def _logout(self):
-		logging.info("Cerrando la sesión…")
 		self.auth.unset_session()
 		self.redirect(self.request.headers['Referer'])
 

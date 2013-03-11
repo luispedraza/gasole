@@ -93,9 +93,10 @@ window.addEventListener("load", function(){
 			newComment.appendChild(newCName);
 			var newCDate = document.createElement("div");
 			newCDate.className = "c_date";
-			newCDate.textContent = new Date(comments[c].date).toLocaleString();
+			newCDate.textContent = new Date(comments[c].date).toLocaleString().split(" ")[0];
 			newComment.appendChild(newCDate);
 			var newCAvatar = document.createElement("img");
+			newCAvatar.className = "c_avatar";
 			newCAvatar.src = comments[c].avatar;
 			newComment.appendChild(newCAvatar);
 
@@ -103,6 +104,15 @@ window.addEventListener("load", function(){
 			newCTitle.className = "c_title";
 			newCTitle.textContent = comments[c].title;
 			newComment.appendChild(newCTitle);
+			var newCPoints = document.createElement("div");
+			newCPoints.textContent = parseInt(comments[c].points)/10;
+			if (newCPoints.textContent=="0") {
+				newCPoints.className = "c_points_0";	
+			} else {
+				newCPoints.className = "c_points";	
+			}
+			
+			newComment.appendChild(newCPoints);
 			var newCContent = document.createElement("div");
 			newCContent.className = "c_content";
 			newCContent.innerHTML = comments[c].content.replace(/\n/g, "<br>");
