@@ -28,6 +28,7 @@ from recaptcha import *
 from google.appengine.api.mail import is_email_valid
 from hashlib import md5
 from secrets import SESSION_KEY
+import urllib
 
 
 
@@ -226,7 +227,7 @@ class Detail(BaseAuthHandler):
                 error["c_email"] = u"La dirección de correo electrónico no es válida."
             if not len(error):
                 hashemail = md5(email).hexdigest()
-                avatar = "http://www.gravatar.com/avatar/"+hashemail+"?s=100&d=%2Fimg%2Favatar.png"
+                avatar = "http://www.gravatar.com/avatar/"+hashemail+"?s=100&d="+urllib.quote_plus(u'http://www.gasole.net/img/avatar.png')
                 link=self.request.get("c_link").strip()
                 self._on_signin({'name':name,'link':link,'avatar':avatar,'id':hashemail}, None, provider='gasole',redirect=False)
                 user = self.current_user
