@@ -79,15 +79,19 @@ class BaseAuthHandler(BaseHandler, SimpleAuthHandler):
 	OAUTH2_CSRF_STATE = True
 	USER_ATTRS = {
 		'facebook' : {
-			'id'     : lambda id: ('avatar_url', 
-				'http://graph.facebook.com/{0}/picture?type=large'.format(id)),
+			'id'     : lambda data: ('avatar_url', 
+				'http://graph.facebook.com/{0}/picture?type=large'.format(data.get('id'))),
 			'name'   : 'name',
-			'link'   : 'link'
+			'link'   : 'link',
+			'first_name': 'firstName',
+			'last_name': 'lastName',
 			},
 		'google'   : {
 			'picture': 'avatar_url',
 			'name'   : 'name',
-			'link'   : 'link'
+			'link'   : 'link',
+			'family_name': 'lastName',
+			'given_name' : 'firstName'
 			},
 		'twitter'  : {
 			'profile_image_url': 'avatar_url',
@@ -95,13 +99,14 @@ class BaseAuthHandler(BaseHandler, SimpleAuthHandler):
 			'link'             : 'link'
 			},
 		'foursquare'   : {
-			'photo'    : lambda photo: ('avatar_url', photo.get('prefix') + '100x100' + photo.get('suffix')),
+			'photo'    : lambda data: ('avatar_url', data.get('photo').get('prefix') + '100x100' + data.get('photo').get('suffix')),
 			'firstName': 'firstName',
 			'lastName' : 'lastName',
-			'contact'  : lambda contact: ('email',contact.get('email')),
-			'id'       : lambda id: ('link', 'http://foursquare.com/user/{0}'.format(id))
-			},
-		},
+			# 'contact'  : lambda data: ('email',data.get('contact').get('email')),
+			'id'       : lambda data: ('link', 'http://foursquare.com/user/{0}'.format(data.get('id'))),
+			'name'	   : lambda data: ('name', '%s %s' %(data.get('firstName'),data.get('lastName')))
+			}
+		}
 
 	def _on_signin(self, data, auth_info, provider):
 		logging.info(data)
@@ -172,7 +177,7 @@ class BaseAuthHandler(BaseHandler, SimpleAuthHandler):
 		"""Get the needed information from the provider dataset."""
 		user_attrs = {}
 		for k, v in attrs_map.iteritems():
-			attr = (v, data.get(k)) if isinstance(v, str) else v(data.get(k))
+			attr = (v, data.get(k)) if isinstance(v, str) else v(data)
 			user_attrs.setdefault(*attr)
 		return user_attrs
 

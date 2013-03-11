@@ -15,6 +15,4 @@ class UpdateHandler(webapp2.RequestHandler):
     	# newdata = gas_update_xls(option="0")
     	data2store(gas_update_xls(option="0").data)
 
-app = webapp2.WSGIApplication([
-    ('/backends/update', UpdateHandler)
-], debug=True)
+app = webapp2.WSGIApplication([('/backends/update', UpdateHandler)])

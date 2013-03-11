@@ -1,5 +1,5 @@
 application: gasole-app
-version: release
+version: development
 runtime: python27
 api_version: 1
 threadsafe: yes
