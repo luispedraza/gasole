@@ -1,7 +1,10 @@
+@import url(http://fonts.googleapis.com/css?family=Fresca);
 @font-face {
   font-family: 'digital-7';
   src: url('/font/digital-7.ttf');
 }
+
+
 
 #price_board {
 	width: 300px;
@@ -92,15 +95,76 @@
 #comments {
 	width: 730px;
 }
+#comments {
+	font-family: 'Fresca', sans-serif;
+}
 #comments textarea {
-	width: 600px;
+	width: 695px;
+	height: 200px;
+	padding-left: 35px;
+	font-size: 1.1em;
 }
 
 #user_data, #user_login {
 	width: 45%;
 }
-#user_data input[type=text] {
-	width: 90%;
+#comments input[type=text], #comments label {
+	width: 300px;
+	padding: 3px;
+	margin: 0;
+	font-size: 1.1em;
+	padding-left: 35px;
+}
+#comments input[type=text] {
+	margin-bottom: 15px;
+}
+#comments label {
+	background-color: #d24e33;
+	color: white;
+	display: block;
+	background-repeat: no-repeat;
+	background-size: 20px;
+	background-position: 5px 3px;
+	border-bottom: 5px solid #7e2516;
+	padding-right: 6px;
+}
+#comments label.c_name {
+	background-image: url('/icon/name_icon.svg');
+}
+#comments label.c_email {
+	background-image: url('/icon/email_icon.svg');
+}
+#comments label.c_link {
+	background-image: url('/icon/link_icon.svg');
+}
+#comments label.c_title {
+	background-image: url('/icon/title_icon.svg');
+}
+#comments label.c_points {
+	background-image: url('/icon/star_icon.svg');
+	position: absolute;
+	right: 0;
+	top: 0;
+}
+#comments label.c_content {
+	background-image: url('/icon/content_icon.svg');
+}
+#new_comment {
+	clear: both;
+	position: relative;
+}
+#send_comment, #send_comment + p {
+	width: 250px;
+	float: right;
+}
+#send_comment {
+	background-color: #7e2516;
+	color: white;
+	height: 100px;
+	cursor: pointer;
+}
+#send_comment:hover {
+	background-color: #d24e33;
 }
 #user_data {
 float: left;
@@ -109,10 +173,10 @@ float: left;
 	float: right;
 }
 .login {
-	width: 50px;
-	height: 50px;
+	width: 100px;
+	height: 100px;
 	cursor: pointer;
-	background-size: 50px;
+	background-size: 100px;
 	background-repeat: no-repeat;
 	display: inline-block;
 	margin: 5px;
@@ -130,14 +194,20 @@ float: left;
 	background-image: url('/img/gp_logo.png');
 }
 .fs_login {
+	background-color: #0072b1;
 	background-image: url('/img/fs_logo.png');
 }
-#new_comment {
-	clear: both;
-	padding-top: 10px;
-}
+
 #c_points_div {
+	width: 300px;
+	position: absolute;
+	right: 0;
+	top: 30px;
+}
+#comments #c_points_div input[type=text] {
 	display: inline-block;
+	width: 30px;
+	padding: 3px;
 }
 
 #c_points {
@@ -189,41 +259,16 @@ float: left;
 	float: left;
 	margin-right: 10px;
 }
-#new_comment label {
-	width: 35%;
-	vertical-align: top;
-	display: inline-block;
-}
-#new_comment input#c_title {
-	font-size: 2em;
-	padding: 5px;
-	width: 60%;
-	display: inline-block;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
-	-ms-border-radius: 5px;
-	-o-border-radius: 5px;
-	border-radius: 5px;
-}
-#new_comment textarea {
-	width: 60%;
-	height: 120px;
-	border: 1px solid #ccc;
-	padding: 5px;
-	display: inline-block;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
-	-ms-border-radius: 5px;
-	-o-border-radius: 5px;
-	border-radius: 5px;
-}
+
 #captcha {
-	width: 60%;
-	float: right;
+	width: 300px;
+	float: left;
+}
+#comments_history {
+	clear: both;
 }
 #old_comments {
 	width: 730px;
-	height: 300px;
 }
 #old_comments .c_comment {
 	position: relative;
@@ -266,6 +311,7 @@ float: left;
 	margin-top: 1.5em;
 }
 .c_error {
+	padding: 10px;
 	background-color: #FF9966;
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;

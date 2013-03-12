@@ -10,7 +10,10 @@
 # biodiesel: 			http://geoportal.mityc.es/hidrocarburos/files/eess_BIOD_ddmmaaaa.zip
 # ARCHIVOS EXCEL:
 # http://geoportal.mityc.es/hidrocarburos/eess/searchTotal.do?tipoCons=1&tipoBusqueda=0&tipoCarburante=1&textoCarburante=Gasolina%2095
-
+import sys
+if 'lib' not in sys.path:
+    sys.path.insert(0, 'libs')
+    
 import urllib
 from zipfile import ZipFile
 import time

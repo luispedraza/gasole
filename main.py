@@ -174,6 +174,7 @@ class Detail(BaseAuthHandler):
             logging.info(user)
         # Vista de detalle de una gasolinera
         data = {}
+        logging.info(self.request)
         if error:
             data = {k: self.request.get(k) for k in self.request.arguments()}
         p = decode_param(province)
