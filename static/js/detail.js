@@ -108,7 +108,7 @@ window.addEventListener("load", function(){
 			newComment.className = "c_comment";
 			newComment.id = "comment-"+comments[c].id;
 
-			if (comments[c].points) {
+			if (comments[c].points!=null) {
 				var newCPoints = document.createElement("div");
 				var c_points = parseInt(comments[c].points)/10;
 				newCPoints.textContent = c_points;

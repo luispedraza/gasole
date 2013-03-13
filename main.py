@@ -261,13 +261,14 @@ class Detail(BaseAuthHandler):
             remote_ip=self.request.remote_addr)
         if not captcha_result.is_valid:
              error["c_captcha"] = u"La solución del captcha no es correcta."
+        logging.info(points)
         if not len(error) and user:
             comment = Comment(
                 userid=user.key.id(),
                 name=user.name,
                 avatar=db.Link(user.avatar_url),
                 link=user.link,
-                points=db.Rating(points) if points else None,
+                points=db.Rating(points) if points!=None else None,
                 title=title if title else None,
                 content=db.Text(content),
                 replyto=int(replyto) if replyto else None,
