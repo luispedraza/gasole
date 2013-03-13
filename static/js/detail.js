@@ -55,7 +55,25 @@ function initPrice(price) {
 		document.getElementById("p_"+type).textContent = price[p];
 	}
 }
-
+function fillReplyTo(id) {
+	console.log(id);
+	var comment = document.getElementById("comment-"+id);
+	document.getElementById("replyto_name").innerHTML = comment.getElementsByClassName("c_name")[0].textContent.bold();
+	document.getElementById("replyto_msg").innerHTML = comment.getElementsByClassName("c_content")[0].innerHTML;
+	document.getElementById("replyto").style.display = "block";
+	document.getElementById("comments").scrollIntoView();
+	document.getElementById("c_replyto").value = id;
+	document.getElementById("section_title").style.display = "none";
+	document.getElementById("section_points").style.display = "none";
+	document.getElementById("replyto_cancel").addEventListener("click", function() {
+		document.getElementById("replyto").style.display = "none";
+		document.getElementById("replyto_name").innerHTML = "";
+		document.getElementById("replyto_msg").innerHTML = "";
+		document.getElementById("c_replyto").value = "";
+		document.getElementById("section_title").style.display = "block";
+		document.getElementById("section_points").style.display = "block";
+	})
+}
 
 window.addEventListener("load", function(){
 	var req = new XMLHttpRequest();
@@ -85,9 +103,26 @@ window.addEventListener("load", function(){
 		var comments = info._comments;
 		var points = 0;
 		var n_comments = 0;
-		for (var c in comments) {
+		for (var c=0; c<comments.length; c++) {
 			var newComment = document.createElement("div");
 			newComment.className = "c_comment";
+			newComment.id = "comment-"+comments[c].id;
+
+			if (comments[c].points) {
+				var newCPoints = document.createElement("div");
+				var c_points = parseInt(comments[c].points)/10;
+				newCPoints.textContent = c_points;
+				if (newCPoints.textContent=="0") {
+					newCPoints.className = "c_points_0";	
+				} else {
+					newCPoints.className = "c_points";	
+				}
+				newComment.appendChild(newCPoints);
+				// La puntuación de la gasolinera:
+				points = (points*n_comments + c_points)/(n_comments+1);
+				n_comments++;
+			}
+
 			var newCName = document.createElement("div");
 			newCName.className = "c_name";
 			if (comments[c].link) newCName.innerHTML = "<a href='" + comments[c].link + "' rel='nofollow'>"+comments[c].name+"</a>";
@@ -102,29 +137,49 @@ window.addEventListener("load", function(){
 			newCAvatar.src = comments[c].avatar;
 			newComment.appendChild(newCAvatar);
 
-			var newCTitle = document.createElement("div");
-			newCTitle.className = "c_title";
-			newCTitle.textContent = comments[c].title;
-			newComment.appendChild(newCTitle);
-			var newCPoints = document.createElement("div");
-			var c_points = parseInt(comments[c].points)/10;
-			newCPoints.textContent = c_points;
-			if (newCPoints.textContent=="0") {
-				newCPoints.className = "c_points_0";	
-			} else {
-				newCPoints.className = "c_points";	
+			if (comments[c].title) {
+				var newCTitle = document.createElement("div");
+				newCTitle.className = "c_title";
+				newCTitle.textContent = comments[c].title;
+				newComment.appendChild(newCTitle);	
 			}
 			
-			newComment.appendChild(newCPoints);
 			var newCContent = document.createElement("div");
 			newCContent.className = "c_content";
 			newCContent.innerHTML = comments[c].content.replace(/\n/g, "<br>");
 			newComment.appendChild(newCContent);
+
+			var newCReply = document.createElement("div");
+			newCReply.textContent = "responder…";
+			newCReply.className = "reply_btn";
+			newCReply.id = "replyto-"+comments[c].id;
+			newCReply.addEventListener("click", function(e) {
+				var id = this.id.split("-")[1];
+				fillReplyTo(id);
+			})
+			newComment.appendChild(newCReply);
+			// Div auxiliar para respuestas:
+			var newCReplies = document.createElement("div");
+			newCReplies.id = "replies-"+comments[c].id;
+			newCReplies.className = "replies";
+			newComment.appendChild(newCReplies);
 			// Inserto el comentario
-			commentsDiv.appendChild(newComment);
-			points = (points*n_comments + c_points)/(n_comments+1);
-			n_comments++;
+			if (comments[c].replyto) {
+				document.getElementById("replies-"+comments[c].replyto).appendChild(newComment);
+			} else {
+				commentsDiv.appendChild(newComment);	
+			}
+
 		}
+
+		if (document.getElementById("c_replyto").value) {
+			fillReplyTo(document.getElementById("c_replyto").value);
+		}
+		function fillLinkProtocol(e) {
+			if (this.value == "")
+				this.value = "http://";
+		}
+		document.getElementById("c_link").addEventListener("click", fillLinkProtocol);
 		if (points) {
 			document.getElementById("points").innerHTML = points.toFixed(1) + " (" + n_comments + " valoraciones)";
 		}
@@ -166,6 +221,10 @@ window.addEventListener("load", function(){
 
         /* Puntuaciones (estrellas) */
         initPoints(5);
+
+        if (document.getElementById("c_error")) {
+        	document.getElementById("comments").scrollIntoView();
+        }
 	}
 	req.open("GET", document.URL.replace("ficha", "api"), true);
 	req.send();

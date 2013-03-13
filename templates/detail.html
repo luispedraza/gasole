@@ -69,7 +69,7 @@
 			{% if error|count %}
 			<div class="c_error">
 			<p><b>Se han detectado errores en el formulario:</b></p>
-			<ul>
+			<ul id="error_list">
 				{% for e in error %}
 				<li>{{error[e]}}</li>
 				{% endfor %}
@@ -80,36 +80,46 @@
 		<script type="text/javascript">
 		var RecaptchaOptions = {theme:'clean',lang:'es'};
 		</script>
-
-		<form method="post">
-			
-			{% if user %}
-			<img class="avatar" src="{{user.avatar_url}}">
-			<p id="username">Estás autenticado como <a href="{{user.link}}">{{user.name}}</a></p><p><a href="/logout">cerrar sesión</a></p>
-			<input type="hidden" name="c_authid" value="{{user.auth_ids[0]}}"><br>
-			<input type="hidden" name="c_name" id="c_name" value="{{user.name}}"><br>
-			<input type="hidden" name="c_link" id="c_link" value="{{user.link}}">
-			
-			{% else %}
-			<div id="user_data">
-			<p>Identifícate para dejar un comentario: </p>
-			<label for="c_name" class="c_name">Nombre<sup> *</sup></label><input type="text" name="c_name" id="c_name" value="{{data['c_name']}}" placeholder="ej.: Antonio Ruiz"><br>
-			<label for="c_email" class="c_email">E-mail<sup> *</sup> (no se mostrará)</label><input type="text" name="c_email" id="c_email" value="{{data['c_email']}}" placeholder="ej.: aruiz777@gmail.com"><br>
-			<label for="c_link" class="c_link">Enlace</label><input type="text" name="c_link" id="c_link" value="{{data['c_link']}}"><br>
-			</div>
-			<div id="user_login">
-			<p>O inicia sesión: </p>
+		{% if not user %}
+		<div id="user_login">
 			<div id="social_login">
 				<a href="/login/facebook"><div class="login fb_login" title="Identifícate con tu perfil de Facebook"></div></a>
 				<a href="/login/twitter"><div class="login tt_login" title="Identifícate con tu perfil de Twitter"></div></a>
 				<a href="/login/google"><div class="login gp_login" title="Identifícate con tu perfil de Google+"></div></a>
 				<a href="/login/foursquare"><div class="login fs_login" title="Identifícate con tu perfil de Foursquare"></div></a>
 			</div>
+		</div>
+		{% endif %}
+
+
+		<form method="post">
+			
+			{% if user %}
+			<img class="avatar" src="{{user.avatar_url}}">
+			<p id="username">Estás identificado como <a href="{{user.link}}">{{user.name}}</a></p><p><a href="/logout">cerrar sesión</a></p>
+			<input type="hidden" name="c_authid" value="{{user.auth_ids[0]}}"><br>
+			<input type="hidden" name="c_name" id="c_name" value="{{user.name}}"><br>
+			<input type="hidden" name="c_link" id="c_link" value="{{user.link}}">
+			
+			{% else %}
+			<div id="user_data">
+				<div class="section left">
+				<label for="c_name" class="c_name">Nombre<sup> *</sup></label><input type="text" name="c_name" id="c_name" value="{{data['c_name']}}" placeholder="ej.: Antonio Ruiz">
+				</div>
+				<div class="section right">
+					<label for="c_email" class="c_email">E-mail<sup> *</sup> (no se mostrará)</label><input type="text" name="c_email" id="c_email" value="{{data['c_email']}}" placeholder="ej.: aruiz777@gmail.com">
+				</div>
+				<div class="section full">
+				<label for="c_link" class="c_link">Enlace</label><input type="text" name="c_link" id="c_link" value="{{data['c_link']}}" placeholder="http://…">
+				</div>
 			</div>
+
 			{% endif %}
 			<div id="new_comment">
-				<label for="c_title" class="c_title">Título<sup> *</sup></label><input id="c_title" type="text" name="c_title" value="{{data['c_title']}}">
-				<br>
+				<div class="section left" id="section_title">
+				<label for="c_title" class="c_title">Título<sup> *</sup></label><input id="c_title" type="text" name="c_title" value="{{data['c_title']}}" placeholder="TItular, resumen del comentario">
+				</div>
+				<div class="section right" id="section_points">
 				<label for="c_points" class="c_points">Valoración<sup> *</sup></label>
 					<div id="c_points_div">
 						<div class="star shit" id="star_0"></div>
@@ -125,8 +135,20 @@
 						<div class="star" id="star_10"></div>
 						<input type="text" id="c_points" name="c_points" value="0" readonly value="{{data['c_points']}}/10">
 					</div>
-				<br>
-				<label for="c_content" class="c_content">Comentario<sup> *</sup></label><textarea id="c_content" name="c_content">{{data['c_content']}}</textarea><br>
+				</div>
+				<div class="section full">
+				<label for="c_content" class="c_content">Comentario<sup> *</sup>
+					<div id="replyto">
+					<div id="replyto_cancel">Cancelar</div>
+					<p>En respuesta a:</p>
+					<div id="replyto_name"></div>
+					<div id="replyto_msg"></div>
+					<input type="hidden" id="c_replyto" name="c_replyto" value="{{data['c_replyto']}}">
+					</div>
+				</label><textarea id="c_content" name="c_content">{{data['c_content']}}</textarea>
+				</div>
+
+				
 
 				<!-- captcha -->
 				<div id="captcha">

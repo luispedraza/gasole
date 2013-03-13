@@ -29,6 +29,7 @@ from google.appengine.api.mail import is_email_valid
 from hashlib import md5
 from secrets import SESSION_KEY
 import urllib
+import re
 
 
 
@@ -38,6 +39,11 @@ GOOGLE_MAPS_VIS_API = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyD5XZNFl
 
 def decode_param(s):
     return s.decode('utf-8').replace("_", " ").replace("|", "/")
+
+def remove_html_tags(data):
+    s = re.compile('< *script *>.+</ *script *>')
+    p = re.compile(r'<.*?>')
+    return p.sub('', s.sub('', data))
 
 class MainHandler(BaseAuthHandler):
     def get(self):
@@ -218,7 +224,7 @@ class Detail(BaseAuthHandler):
         if self.logged_in:
             user = self.current_user
         else:
-            name=self.request.get("c_name").strip()
+            name=remove_html_tags(self.request.get("c_name").strip())
             if not name:
                 error["c_name"] = u"Debes indicar tu nombre en el comentario."
             email=self.request.get("c_email").strip().lower()
@@ -233,16 +239,18 @@ class Detail(BaseAuthHandler):
                 self._on_signin({'name':name,'link':link,'avatar':avatar,'id':hashemail}, None, provider='gasole',redirect=False)
                 user = self.current_user
                 self.auth.unset_session()
-
-        points=self.request.get("c_points")
-        if not points:
-            error["c_points"] = u"Olvidaste asignar una valoración a esta gasolinera."
-        else:
-            points=int(points)*10
-        title=self.request.get("c_title").strip()
-        if not title:
-            error["c_title"] = u"Por favor, pon un título a tu comentario."
-        content=self.request.get("c_content").strip()
+        replyto = self.request.get("c_replyto")
+        points = title = None
+        if not replyto:
+            points=self.request.get("c_points")
+            if not points:
+                error["c_points"] = u"Olvidaste asignar una valoración a esta gasolinera."
+            else:
+                points=int(points)*10
+            title=remove_html_tags(self.request.get("c_title").strip())
+            if not title:
+                error["c_title"] = u"Por favor, pon un título a tu comentario."
+        content=remove_html_tags(self.request.get("c_content").strip())
         if not content:
             error["c_content"] = u"El texto del comentario está vacío."
         challenge_field = self.request.get("recaptcha_challenge_field")
@@ -259,9 +267,10 @@ class Detail(BaseAuthHandler):
                 name=user.name,
                 avatar=db.Link(user.avatar_url),
                 link=user.link,
-                points=db.Rating(points),
-                title=title,
+                points=db.Rating(points) if points else None,
+                title=title if title else None,
                 content=db.Text(content),
+                replyto=int(replyto) if replyto else None,
                 parent=db.Key.from_path('Province',p,'Town',t,'GasStation',s))
             comment.put()
         self.get(province=province, town=town, station=station, error=error)

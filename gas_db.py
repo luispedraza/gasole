@@ -37,10 +37,11 @@ class Comment(db.Model):
 	name = db.StringProperty(required=True)
 	link = db.StringProperty()
 	avatar = db.LinkProperty()
-	points = db.RatingProperty(required=True)
-	title = db.StringProperty(required=True)
+	points = db.RatingProperty()
+	title = db.StringProperty()
 	content = db.TextProperty(required=True)
 	date = db.DateTimeProperty(auto_now_add=True)
+	replyto = db.IntegerProperty()
 	# def get_author(self):
 	# 	return User.get_by_auth_id(self.userid)
 
@@ -177,23 +178,25 @@ def get_near(lat, lon, dist):
 
 def get_history(prov, town, station):
 	result = {}
-	q = HistoryData.all().ancestor(db.Key.from_path('Province', prov, 'Town', town, 'GasStation', station))
+	q = HistoryData.all().ancestor(db.Key.from_path('Province', prov, 'Town', town, 'GasStation', station)).order('date')
 	for h in q:
 		result[h.date.isoformat()] = {k: getattr(h, k) for k in h.dynamic_properties()}
 	return result
 
 def get_comments(prov, town, station):
-	result = {}
+	result = []
 	q = Comment.all().ancestor(db.Key.from_path('Province', prov, 'Town', town, 'GasStation', station)).order('date')
 	for c in q:
-		result[c.key().id()] = {
+		result.append({
+			"date": c.date.isoformat(),
 			"name": c.name,
 			"avatar": c.avatar,
 			"link": c.link or "",
 			"points": c.points,
 			"title": c.title, 
 			"content": c.content,
-			"date": c.date.isoformat()}
+			"replyto": c.replyto,
+			"id": c.key().id()})
 	return result
 
 # def compute_stats():
