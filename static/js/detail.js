@@ -106,171 +106,165 @@ function fillReplyTo(id) {
 	})
 }
 
-function processData() {
-	console.log(data);
+function processData(info) {
+	console.log(info);
+	data = info["_data"];
+	var province, town, station, date, label, hours, latlon, price;
+	for (var p in data) province= p
+		for (var t in data[p]) town=t;
+			for (var s in data[p][t]) {
+				station=s;
+				date = data[p][t][s]["date"];
+				label = data[p][t][s]["label"];
+				hours = data[p][t][s]["hours"];
+				latlon = data[p][t][s]["latlon"];
+				price = data[p][t][s]["options"];
+			}
+
+	document.getElementById("address").textContent = toTitle(station) + " (" + town + ", " + province + ")";
+	document.getElementById("hours").textContent = hours;
+	insertLogo(label);
+	initMap(latlon);
+	initPrice(price);
+
+	var commentsDiv = document.getElementById("old_comments");
+	var comments = info._comments;
+	var total_points = 0;
+	var n_comments = 0;
+	for (var c=0; c<comments.length; c++) {
+		var newCommentBlock = document.createElement("div");
+		newCommentBlock.className = "c_block";
+		newCommentBlock.id = "block-"+comments[c].id;
+
+		var newComment = document.createElement("div");
+		newComment.className = "c_comment";
+		newComment.id = "comment-"+comments[c].id;
+
+		if (comments[c].points!=null) {
+			var newCPoints = document.createElement("div");
+			var points = parseInt(comments[c].points)/10;
+			var c_points = "\""+POINTS[points]+"\" ("+points+"/10)";
+			newCPoints.textContent = c_points;
+			if (points==0) {
+				newCPoints.className = "c_points_0";
+			} else {
+				newCPoints.className = "c_points";
+				newCPoints.style.backgroundImage = "url('/img/star_"+points+".svg')";	
+			}
+			newComment.appendChild(newCPoints);
+			// La puntuación de la gasolinera:
+			total_points += points;
+			n_comments++;
+		}
+
+		var newCName = document.createElement("div");
+		newCName.className = "c_name";
+		if (comments[c].link) newCName.innerHTML = "<a href='" + comments[c].link + "' rel='external nofollow'>"+comments[c].name+"</a>";
+		else newCName.textContent = comments[c].name;
+		newComment.appendChild(newCName);
+		var newCDate = document.createElement("div");
+		newCDate.className = "c_date";
+		newCDate.textContent = new Date(comments[c].date).toLocaleString().split(" ")[0];
+		newComment.appendChild(newCDate);
+		var newCAvatar = document.createElement("img");
+		newCAvatar.className = "c_avatar";
+		newCAvatar.src = comments[c].avatar;
+		newComment.appendChild(newCAvatar);
+
+		if (comments[c].title) {
+			var newCTitle = document.createElement("div");
+			newCTitle.className = "c_title";
+			newCTitle.textContent = comments[c].title;
+			newComment.appendChild(newCTitle);	
+		}
+		
+		var newCContent = document.createElement("div");
+		newCContent.className = "c_content";
+		newCContent.innerHTML = comments[c].content.replace(/\n/g, "<br>");
+		newComment.appendChild(newCContent);
+
+		var newCReply = document.createElement("div");
+		newCReply.textContent = "responder…";
+		newCReply.className = "reply_btn";
+		newCReply.id = "replyto-"+comments[c].id;
+		newCReply.addEventListener("click", function(e) {
+			var id = this.id.split("-")[1];
+			fillReplyTo(id);
+		})
+		newComment.appendChild(newCReply);
+		// Inserto el comentario en el block:
+		newCommentBlock.appendChild(newComment);
+		// Div auxiliar para respuestas:
+		var newCReplies = document.createElement("div");
+		newCReplies.id = "replies-"+comments[c].id;
+		newCReplies.className = "replies";
+		newCommentBlock.appendChild(newCReplies);
+
+		// Inserto el comentario
+		if (comments[c].replyto) {
+			document.getElementById("replies-"+comments[c].replyto).appendChild(newCommentBlock);
+		} else {
+			commentsDiv.appendChild(newCommentBlock);	
+		}
+
+	}
+
+	if (document.getElementById("c_replyto").value) {
+		fillReplyTo(document.getElementById("c_replyto").value);
+	}
+	function fillLinkProtocol(e) {
+		if (this.value == "")
+			this.value = "http://";
+	}
+	document.getElementById("c_link").addEventListener("click", fillLinkProtocol);
+	if (total_points!=0) {
+		var points = total_points/n_comments;
+		document.getElementById("points").innerHTML = points.toFixed(1) + " (" + n_comments + " valoraciones)";
+	}
+
+	var chart_data = new google.visualization.DataTable();
+	chart_data.addColumn('date', 'Fecha');
+	var chart_colors = []
+	var history = info._history;
+	var init = false;
+	for (var h in history){
+		if (!init) {
+			for (var o in history[h]) {
+				chart_data.addColumn('number', o);
+				chart_colors.push(FUEL_COLORS[o]);
+			}
+			init = true;
+		}
+		var date = h.split("-");
+		var values = [];
+		for (var o in history[h]) {
+				values.push(history[h][o]);
+			}
+
+		chart_data.addRows([
+			[new Date(date[0], date[1]-1, date[2])].concat(values),
+		]);
+	}
+	chart_data.sort(0);
+	
+	var options = {
+      title: 'Precios',
+      theme: 'maximized',
+      pointSize: 5,
+      colors: chart_colors
+
+    };
+	var chart = new google.visualization.LineChart(document.getElementById('chart'));
+    chart.draw(chart_data, options);
+
+    /* Puntuaciones (estrellas) */
+    initPoints(5);
+
+    if (document.getElementById("c_error")) {
+    	document.getElementById("comments").scrollIntoView();
+    }
 }
 
 window.addEventListener("load", function() {
-	var req = new XMLHttpRequest();
-	req.onload = function(r) {
-		info = JSON.parse(r.target.responseText);
-		console.log(info);
-		data = info["_data"];
-		var province, town, station, date, label, hours, latlon, price;
-		for (var p in data) province= p
-			for (var t in data[p]) town=t;
-				for (var s in data[p][t]) {
-					station=s;
-					date = data[p][t][s]["date"];
-					label = data[p][t][s]["label"];
-					hours = data[p][t][s]["hours"];
-					latlon = data[p][t][s]["latlon"];
-					price = data[p][t][s]["options"];
-				}
-
-		document.getElementById("address").textContent = toTitle(station) + " (" + town + ", " + province + ")";
-		document.getElementById("hours").textContent = hours;
-		insertLogo(label);
-		initMap(latlon);
-		initPrice(price);
-
-		var commentsDiv = document.getElementById("old_comments");
-		var comments = info._comments;
-		var total_points = 0;
-		var n_comments = 0;
-		for (var c=0; c<comments.length; c++) {
-			var newCommentBlock = document.createElement("div");
-			newCommentBlock.className = "c_block";
-			newCommentBlock.id = "block-"+comments[c].id;
-
-			var newComment = document.createElement("div");
-			newComment.className = "c_comment";
-			newComment.id = "comment-"+comments[c].id;
-
-			if (comments[c].points!=null) {
-				var newCPoints = document.createElement("div");
-				var points = parseInt(comments[c].points)/10;
-				var c_points = "\""+POINTS[points]+"\" ("+points+"/10)";
-				newCPoints.textContent = c_points;
-				if (points==0) {
-					newCPoints.className = "c_points_0";
-				} else {
-					newCPoints.className = "c_points";
-					newCPoints.style.backgroundImage = "url('/img/star_"+points+".svg')";	
-				}
-				newComment.appendChild(newCPoints);
-				// La puntuación de la gasolinera:
-				total_points += points;
-				n_comments++;
-			}
-
-			var newCName = document.createElement("div");
-			newCName.className = "c_name";
-			if (comments[c].link) newCName.innerHTML = "<a href='" + comments[c].link + "' rel='external nofollow'>"+comments[c].name+"</a>";
-			else newCName.textContent = comments[c].name;
-			newComment.appendChild(newCName);
-			var newCDate = document.createElement("div");
-			newCDate.className = "c_date";
-			newCDate.textContent = new Date(comments[c].date).toLocaleString().split(" ")[0];
-			newComment.appendChild(newCDate);
-			var newCAvatar = document.createElement("img");
-			newCAvatar.className = "c_avatar";
-			newCAvatar.src = comments[c].avatar;
-			newComment.appendChild(newCAvatar);
-
-			if (comments[c].title) {
-				var newCTitle = document.createElement("div");
-				newCTitle.className = "c_title";
-				newCTitle.textContent = comments[c].title;
-				newComment.appendChild(newCTitle);	
-			}
-			
-			var newCContent = document.createElement("div");
-			newCContent.className = "c_content";
-			newCContent.innerHTML = comments[c].content.replace(/\n/g, "<br>");
-			newComment.appendChild(newCContent);
-
-			var newCReply = document.createElement("div");
-			newCReply.textContent = "responder…";
-			newCReply.className = "reply_btn";
-			newCReply.id = "replyto-"+comments[c].id;
-			newCReply.addEventListener("click", function(e) {
-				var id = this.id.split("-")[1];
-				fillReplyTo(id);
-			})
-			newComment.appendChild(newCReply);
-			// Inserto el comentario en el block:
-			newCommentBlock.appendChild(newComment);
-			// Div auxiliar para respuestas:
-			var newCReplies = document.createElement("div");
-			newCReplies.id = "replies-"+comments[c].id;
-			newCReplies.className = "replies";
-			newCommentBlock.appendChild(newCReplies);
-
-			// Inserto el comentario
-			if (comments[c].replyto) {
-				document.getElementById("replies-"+comments[c].replyto).appendChild(newCommentBlock);
-			} else {
-				commentsDiv.appendChild(newCommentBlock);	
-			}
-
-		}
-
-		if (document.getElementById("c_replyto").value) {
-			fillReplyTo(document.getElementById("c_replyto").value);
-		}
-		function fillLinkProtocol(e) {
-			if (this.value == "")
-				this.value = "http://";
-		}
-		document.getElementById("c_link").addEventListener("click", fillLinkProtocol);
-		if (total_points!=0) {
-			var points = total_points/n_comments;
-			document.getElementById("points").innerHTML = points.toFixed(1) + " (" + n_comments + " valoraciones)";
-		}
-
-		var chart_data = new google.visualization.DataTable();
-		chart_data.addColumn('date', 'Fecha');
-		var chart_colors = []
-		var history = info._history;
-		var init = false;
-		for (var h in history){
-			if (!init) {
-				for (var o in history[h]) {
-					chart_data.addColumn('number', o);
-					chart_colors.push(FUEL_COLORS[o]);
-				}
-				init = true;
-			}
-			var date = h.split("-");
-			var values = [];
-			for (var o in history[h]) {
-					values.push(history[h][o]);
-				}
-
-			chart_data.addRows([
-				[new Date(date[0], date[1]-1, date[2])].concat(values),
-			]);
-		}
-		chart_data.sort(0);
-		
-		var options = {
-          title: 'Precios',
-          theme: 'maximized',
-          pointSize: 5,
-          colors: chart_colors
-
-        };
-		var chart = new google.visualization.LineChart(document.getElementById('chart'));
-        chart.draw(chart_data, options);
-
-        /* Puntuaciones (estrellas) */
-        initPoints(5);
-
-        if (document.getElementById("c_error")) {
-        	document.getElementById("comments").scrollIntoView();
-        }
-	}
-	req.open("GET", document.URL.replace("ficha", "api"), true);
-	req.send();
+	getData(processData);
 })

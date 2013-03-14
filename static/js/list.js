@@ -1,3 +1,4 @@
+var data;
 var map;
 var place = "";
 var markers = [];
@@ -348,12 +349,12 @@ function populateTable(id) {
 	else document.getElementById("c_cities").style.display = "none";
 }
 
-function processData() {
-	console.log(data);
+function processData(info) {
+	console.log(info);
 	var h1 = document.getElementById("title");
-	if (data["_near"]) {
-		h1.textContent = "Gasolineras cerca de: " + data["_near"];
-		place = data["_near"];
+	if (info["_near"]) {
+		h1.textContent = "Gasolineras cerca de: " + info["_near"];
+		place = info["_near"];
 	}
 	else {
 		var pts = decodeArray(document.location.pathname.split("/").splice(2));
@@ -362,7 +363,7 @@ function processData() {
 		h1.textContent = "Gasolineras en " + ((town) ? (town + ", ") : ("la ")) + "provincia de " + province;
 		place = ((town) ? (town + ", " + province) : (province));
 	}
-	data=data._data;
+	data=info._data;
 	populateTable("table_data");
 	initMap();
 	initControl();

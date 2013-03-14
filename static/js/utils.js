@@ -73,19 +73,20 @@ function checkLocalStorage() {
 	}
 }
 
-var data = null;
+var info = null;
 var LOCAL_EXPIRATION = 3600;
 var APIS = 	{ 	"gasolineras": "api",
-				"resultados": "geo"
+				"resultados": "geo",
+				"ficha": "api"
 			}
 
 function getApiData(url, key, callback) {
 	var req = new XMLHttpRequest();
 	req.onload = function(r) {
-		data = JSON.parse(r.target.responseText);
-		console.log("datos obtenidos: ", data);
-		if (key) localStorage.setItem(key, JSON.stringify(data));
-		callback();
+		info = JSON.parse(r.target.responseText);
+		console.log("datos obtenidos: ", info);
+		if (key) localStorage.setItem(key, JSON.stringify(info));
+		callback(info);
 	}
 	req.open("GET", url);
 	req.send();
@@ -112,21 +113,25 @@ function getData(callback) {
 				key = where1;
 				storedData = localStorage[key];
 			}
+		} else if (option == "ficha") {
+			var where3 = pathArray[4];
+			key = [where1,where2,where3].join("*");
+			storedData = localStorage[key];
 		}
-		if (storedData) data = JSON.parse(storedData);
+		if (storedData) info = JSON.parse(storedData);
 	}
-	if (data) {
+	if (info) {
 		if ((option=="gasolineras") && (where2)) {
 			var prov  = decodeName(where1);
 			var town = decodeName(where2);
 			tempData = {};
 			tempData["_data"] = {};
 			tempData["_data"][prov] = {};
-			tempData["_data"][prov][town] = data._data[prov][town];
-			data = tempData;
+			tempData["_data"][prov][town] = info._data[prov][town];
+			info = tempData;
 		}
-		console.log("datos recuperados: ", data);
-		callback(data);
+		console.log("datos recuperados: ", info);
+		callback(info);
 	} else {
 		// Buscamos datos nuevos
 		console.log(key);
