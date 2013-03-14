@@ -1,4 +1,3 @@
-var data;
 var map;
 var place = "";
 var markers = [];
@@ -290,10 +289,7 @@ function populateTable(id) {
 				td_s.appendChild(a_s);
 				td_s.className = "T_ADDR";
 				var logo = getLogo(label);
-				if (logo) {
-					console.log("si");
-					td_s.style.backgroundImage = "url('/img/logos/"+logo+"_mini.png')";
-				}
+				if (logo) td_s.style.backgroundImage = "url('/img/logos/"+logo+"_mini.png')";
 				tr.appendChild(td_s);
 				var td_dist = document.createElement("td");
 				td_dist.className = "T_DIST";
@@ -352,35 +348,26 @@ function populateTable(id) {
 	else document.getElementById("c_cities").style.display = "none";
 }
 
-window.addEventListener("load", function(){
-	var req = new XMLHttpRequest();
-	req.onload = function(r) {
-		result = JSON.parse(r.target.responseText);
-		data = result._data;
-		console.log(result);
-		var h1 = document.getElementById("title");
-		if (result["_near"]) {
-			h1.textContent = "Gasolineras cerca de: " + result["_near"];
-			place = result["_near"];
-		}
-		else {
-			var pts = decodeArray(document.location.pathname.split("/").splice(2));
-			province = prettyName(pts[0]);
-			if (pts[1]) town = prettyName(pts[1]);
-			h1.textContent = "Gasolineras en " + ((town) ? (town + ", ") : ("la ")) + "provincia de " + province;
-			place = ((town) ? (town + ", " + province) : (province));
-		}
-		populateTable("table_data");
-		initMap();
-		initControl();
+function processData() {
+	console.log(data);
+	var h1 = document.getElementById("title");
+	if (data["_near"]) {
+		h1.textContent = "Gasolineras cerca de: " + data["_near"];
+		place = data["_near"];
 	}
-	var url = document.URL;
-	if (url.match("gasolineras")) {
-		req.open("GET", document.URL.replace("gasolineras", "api"), true)
+	else {
+		var pts = decodeArray(document.location.pathname.split("/").splice(2));
+		province = prettyName(pts[0]);
+		if (pts[1]) town = prettyName(pts[1]);
+		h1.textContent = "Gasolineras en " + ((town) ? (town + ", ") : ("la ")) + "provincia de " + province;
+		place = ((town) ? (town + ", " + province) : (province));
 	}
-	else if (url.match("resultados")) {
-		req.open("GET", document.URL.replace("resultados", "geo"), true);
-	}
-	req.send();
-})
+	data=data._data;
+	populateTable("table_data");
+	initMap();
+	initControl();
+}
 
+window.addEventListener("load", function() {
+	getData(processData);
+})

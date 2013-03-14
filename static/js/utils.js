@@ -64,3 +64,71 @@ function decodeArray(a) {
 function encodeName(s) {
 	return s.replace(/\//g, "|").replace(/ /g, "_");
 }
+
+function checkLocalStorage() {
+	try {
+		return 'localStorage' in window && window['localStorage'] !== null;
+	} catch (e) {
+		return false;
+	}
+}
+
+var data = null;
+var LOCAL_EXPIRATION = 3600;
+var APIS = 	{ 	"gasolineras": "api",
+				"resultados": "geo"
+			}
+
+function getApiData(url, key, callback) {
+	var req = new XMLHttpRequest();
+	req.onload = function(r) {
+		data = JSON.parse(r.target.responseText);
+		console.log("datos obtenidos: ", data);
+		if (key) localStorage.setItem(key, JSON.stringify(data));
+		callback();
+	}
+	req.open("GET", url);
+	req.send();
+}
+
+function getData(callback) {
+	var pathArray = window.location.pathname.split("/");
+	var option = pathArray[1];		// resultados, gasolineras
+	var where1 = pathArray[2];		
+	var where2 = pathArray[3];
+	var key = null;	
+	if (checkLocalStorage()) {
+		var storedData = null;
+		if (option == "resultados") {
+			key = where1;
+			storedData = localStorage[key];
+		} else if (option == "gasolineras") {
+			if (where2) {
+				key = [where1,where2].join("*");
+				storedData = localStorage[key];
+			} 
+			if (!where2 || !storedData) {
+				key = where1;
+				storedData = localStorage[key];
+			}
+		}
+		if (storedData) data = JSON.parse(storedData);
+	}
+	if (data) {
+		if ((option=="gasolineras") && (where2)) {
+			var prov  = decodeName(where1);
+			var town = decodeName(where2);
+			tempData = {}
+			tempData["_data"] = {}
+			tempData["_data"][prov] = {}
+			tempData["_data"][prov][town] = data._data[prov][town];
+			data = tempData;
+		}
+		console.log("datos recuperados: ", data);
+		callback(data);
+	} else {
+		// Buscamos datos nuevos
+		getApiData(document.URL.replace(option, APIS[option]), key, callback);
+	}
+	return null;
+}
