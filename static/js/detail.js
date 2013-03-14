@@ -28,7 +28,7 @@ function initMap(latlon) {
 	});
 }
 
-function initPoints(val) {
+function initPoints() {
 	var stars = document.getElementsByClassName("star");
 	document.getElementById("c_points_div").addEventListener("mouseleave", function() {
 		var val = parseInt(document.getElementById("c_points").value);
@@ -258,11 +258,15 @@ function processData(info) {
     chart.draw(chart_data, options);
 
     /* Puntuaciones (estrellas) */
-    initPoints(5);
+    initPoints();
 
-    if (document.getElementById("c_error")) {
+    if (document.getElementById("error_list")) {
     	document.getElementById("comments").scrollIntoView();
     }
+    document.getElementById("send_comment").addEventListener("click", function() {
+    	// Es necesario para recargar la página cuando se comenta
+    	clearCurrentStorage();
+    })
 }
 
 window.addEventListener("load", function() {

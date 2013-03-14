@@ -74,7 +74,7 @@ function checkLocalStorage() {
 }
 
 var info = null;
-var LOCAL_EXPIRATION = 3600;
+var LOCAL_EXPIRATION = 3600000;	// 1 hora
 var APIS = 	{ 	"gasolineras": "api",
 				"resultados": "geo",
 				"ficha": "api"
@@ -85,20 +85,39 @@ function getApiData(url, key, callback) {
 	req.onload = function(r) {
 		info = JSON.parse(r.target.responseText);
 		console.log("datos obtenidos: ", info);
-		if (key) localStorage.setItem(key, JSON.stringify(info));
+		if (key) {
+			localStorage.setItem(key, JSON.stringify(info));
+			localStorage.setItem("timestamp", new Date().getTime());
+		}
 		callback(info);
 	}
 	req.open("GET", url);
 	req.send();
 }
 
+function clearCurrentStorage() {
+	if (!checkLocalStorage()) return;
+	// Limpia los datos locales de la página actual
+	var pathArray = window.location.pathname.split("/");
+	var option = pathArray[1];		// ficha
+	if (option=="ficha") {
+		localStorage.removeItem(pathArray.slice(2).join("*"));
+	}
+}
+
 function getData(callback) {
 	var pathArray = window.location.pathname.split("/");
-	var option = pathArray[1];		// resultados, gasolineras
+	var option = pathArray[1];		// resultados, gasolineras, ficha
 	var where1 = pathArray[2];		
 	var where2 = pathArray[3];
 	var key = null;	
 	if (checkLocalStorage()) {
+		// Limpieza de datos antiguos
+		var timestamp = localStorage["timestamp"];
+		if (timestamp && (new Date().getTime() - parseInt(timestamp))>LOCAL_EXPIRATION) {		
+			console.log("datos antiguos");	
+		}
+		
 		var storedData = null;
 		if (option == "resultados") {
 			key = where1;
