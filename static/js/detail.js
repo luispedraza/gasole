@@ -1,3 +1,17 @@
+var POINTS = [
+				"un asco de lugar",				// 0
+				"deja mucho que desear",		// 1
+				"mejor evitarla",				// 2
+				"las hay mejores",				// 3
+				"tiene deficiencias",			// 4
+				"una del montón",				// 5
+				"está bien en general",			// 6
+				"por encima de la media", 		// 7
+				"muy recomendable",				// 8
+				"de las mejores",				// 9
+				"¡excelente!"						// 10
+			]
+
 function initMap(latlon) {
 	if (!latlon) return;
 	var position = new google.maps.LatLng(latlon[0], latlon[1]);
@@ -16,23 +30,40 @@ function initMap(latlon) {
 
 function initPoints(val) {
 	var stars = document.getElementsByClassName("star");
+	document.getElementById("c_points_div").addEventListener("mouseleave", function() {
+		var val = parseInt(document.getElementById("c_points").value);
+		console.log(val);
+		if (!val){
+			document.getElementById("c_points_text").textContent = "no olvides asignar una puntuación";
+		}
+		else {
+			document.getElementById("c_points_text").textContent = POINTS[val];
+		}
+		
+	})
 	for (var s=0; s<stars.length; s++) {
 		stars[s].addEventListener("mouseover", function() {
-			var id = this.id.split("_")[1];
+			var id = parseInt(this.id.split("_")[1]);
 			var stars = document.getElementsByClassName("star");
-			for (var s=0; s<stars.length; s++) {
-				var _id=stars[s].id.split("_")[1];
-				if (_id<=id) stars[s].className = "star on";
-				else stars[s].className = "star";
+			for (var s=1; s<stars.length; s++) {
+				var _id=parseInt(stars[s].id.split("_")[1]);
+				stars[s].className = stars[s].className.replace(" on", "");
+				if (_id<=id) stars[s].className += " on";
 			}
 			var shit = document.getElementById("star_0");
-			if (id==0) shit.className = "star shit on";
-			else shit.className = "star shit";
-			// document.getElementById("c_points").value = id;
+			if (id==0) shit.className += " on";
+			else shit.className = shit.className.replace(" on", "");
+			document.getElementById("c_points_text").textContent = POINTS[id];
 		})
 		stars[s].addEventListener("click", function() {
 			var id = this.id.split("_")[1];
-			document.getElementById("c_points").value = id
+			document.getElementById("c_points").value = parseInt(id);
+			var stars = document.getElementsByClassName("star");
+			for (var s=0; s<stars.length; s++) {
+				stars[s].className = stars[s].className.replace(" sel", "");
+			}
+			this.className += " sel";
+
 		})
 	}
 }
@@ -101,31 +132,37 @@ window.addEventListener("load", function(){
 
 		var commentsDiv = document.getElementById("old_comments");
 		var comments = info._comments;
-		var points = 0;
+		var total_points = 0;
 		var n_comments = 0;
 		for (var c=0; c<comments.length; c++) {
+			var newCommentBlock = document.createElement("div");
+			newCommentBlock.className = "c_block";
+			newCommentBlock.id = "block-"+comments[c].id;
+
 			var newComment = document.createElement("div");
 			newComment.className = "c_comment";
 			newComment.id = "comment-"+comments[c].id;
 
 			if (comments[c].points!=null) {
 				var newCPoints = document.createElement("div");
-				var c_points = parseInt(comments[c].points)/10;
+				var points = parseInt(comments[c].points)/10;
+				var c_points = "\""+POINTS[points]+"\" ("+points+"/10)";
 				newCPoints.textContent = c_points;
-				if (newCPoints.textContent=="0") {
-					newCPoints.className = "c_points_0";	
+				if (points==0) {
+					newCPoints.className = "c_points_0";
 				} else {
-					newCPoints.className = "c_points";	
+					newCPoints.className = "c_points";
+					newCPoints.style.backgroundImage = "url('/img/star_"+points+".svg')";	
 				}
 				newComment.appendChild(newCPoints);
 				// La puntuación de la gasolinera:
-				points = (points*n_comments + c_points)/(n_comments+1);
+				total_points += points;
 				n_comments++;
 			}
 
 			var newCName = document.createElement("div");
 			newCName.className = "c_name";
-			if (comments[c].link) newCName.innerHTML = "<a href='" + comments[c].link + "' rel='nofollow'>"+comments[c].name+"</a>";
+			if (comments[c].link) newCName.innerHTML = "<a href='" + comments[c].link + "' rel='external nofollow'>"+comments[c].name+"</a>";
 			else newCName.textContent = comments[c].name;
 			newComment.appendChild(newCName);
 			var newCDate = document.createElement("div");
@@ -158,16 +195,19 @@ window.addEventListener("load", function(){
 				fillReplyTo(id);
 			})
 			newComment.appendChild(newCReply);
+			// Inserto el comentario en el block:
+			newCommentBlock.appendChild(newComment);
 			// Div auxiliar para respuestas:
 			var newCReplies = document.createElement("div");
 			newCReplies.id = "replies-"+comments[c].id;
 			newCReplies.className = "replies";
-			newComment.appendChild(newCReplies);
+			newCommentBlock.appendChild(newCReplies);
+
 			// Inserto el comentario
 			if (comments[c].replyto) {
-				document.getElementById("replies-"+comments[c].replyto).appendChild(newComment);
+				document.getElementById("replies-"+comments[c].replyto).appendChild(newCommentBlock);
 			} else {
-				commentsDiv.appendChild(newComment);	
+				commentsDiv.appendChild(newCommentBlock);	
 			}
 
 		}
@@ -180,7 +220,8 @@ window.addEventListener("load", function(){
 				this.value = "http://";
 		}
 		document.getElementById("c_link").addEventListener("click", fillLinkProtocol);
-		if (points) {
+		if (total_points!=0) {
+			var points = total_points/n_comments;
 			document.getElementById("points").innerHTML = points.toFixed(1) + " (" + n_comments + " valoraciones)";
 		}
 

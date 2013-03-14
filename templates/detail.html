@@ -117,23 +117,28 @@
 			{% endif %}
 			<div id="new_comment">
 				<div class="section left" id="section_title">
-				<label for="c_title" class="c_title">Título<sup> *</sup></label><input id="c_title" type="text" name="c_title" value="{{data['c_title']}}" placeholder="TItular, resumen del comentario">
+				<label for="c_title" class="c_title">Título<sup> *</sup></label><input id="c_title" type="text" name="c_title" value="{{data['c_title']}}" placeholder="Titular del comentario">
 				</div>
 				<div class="section right" id="section_points">
 				<label for="c_points" class="c_points">Valoración<sup> *</sup></label>
 					<div id="c_points_div">
+						{% if data %}
+						<input type="text" id="c_points" name="c_points" readonly value="{{data['c_points']}}">
+						{% else %}
+						<input type="text" id="c_points" name="c_points" readonly value="¿?">
+						{% endif %}
+						<div id="c_points_text">selecciona una puntuación</div>
 						<div class="star shit" id="star_0"></div>
-						<div class="star" id="star_01"></div>
-						<div class="star" id="star_02"></div>
-						<div class="star" id="star_03"></div>
-						<div class="star" id="star_04"></div>
-						<div class="star" id="star_05"></div>
-						<div class="star" id="star_06"></div>
-						<div class="star" id="star_07"></div>
-						<div class="star" id="star_08"></div>
-						<div class="star" id="star_09"></div>
+						<div class="star" id="star_1"></div>
+						<div class="star" id="star_2"></div>
+						<div class="star" id="star_3"></div>
+						<div class="star" id="star_4"></div>
+						<div class="star" id="star_5"></div>
+						<div class="star" id="star_6"></div>
+						<div class="star" id="star_7"></div>
+						<div class="star" id="star_8"></div>
+						<div class="star" id="star_9"></div>
 						<div class="star" id="star_10"></div>
-						<input type="text" id="c_points" name="c_points" value="0" readonly value="{{data['c_points']}}/10">
 					</div>
 				</div>
 				<div class="section full">

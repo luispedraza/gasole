@@ -67,6 +67,7 @@
 #detail {
 	width: 730px;
 	float: right;
+	margin-bottom: 50px;
 }
 
 #detail_info_fields {
@@ -86,7 +87,7 @@
 }
 #chart {
 	width: 100%;
-	height: 300px;
+	height: 250px;
 	clear: both;
 }
 #comments {
@@ -112,6 +113,9 @@
 	box-sizing:border-box;
 	-moz-box-sizing:border-box; /* Firefox */
 	-webkit-box-sizing:border-box; /* Safari */
+}
+#comments input[type=text]#c_title {
+	font-size: 1.5em;height: 40px;
 }
 
 #comments label {
@@ -165,13 +169,13 @@
 	float: right;
 }
 #send_comment {
-	background-color: #3399CC;
+	background-color: #d24e33;
 	color: white;
 	height: 100px;
 	cursor: pointer;
 }
 #send_comment:hover {
-	background-color: #006699;
+	background-color: #7e2516;
 }
 
 .login {
@@ -232,38 +236,67 @@
 	cursor: pointer;
 }
 
-#c_points {
+#comments input[type=text]#c_points {
 	width: 40px;
 	font-size: 30px;
 	border: 0;
 	text-align: right;
-}
-.star, .shit {
-	cursor: pointer;
-	background-size: 20px;
-	background-repeat: no-repeat;
-	width: 20px;
-	height: 20px;
 	padding: 0;
-	display: inline-block;
-	-webkit-filter: grayscale(80%);
-	-moz-filter: grayscale(80%);
-	-ms-filter: grayscale(80%);
-	-o-filter: grayscale(80%);
-	filter: grayscale(80%);
-
+	margin: 10px 10px 0px 0px;
+	float: left;
 }
-.star.on {
-	-webkit-filter: grayscale(0%);
-	-moz-filter: grayscale(0%);
-	-ms-filter: grayscale(0%);
-	-o-filter: grayscale(0%);
-	filter: grayscale(0%);
+#c_points_div {
+	height: 40px;
+	position: relative;
+}
+#c_points_text {
+	position: absolute;
+	top: 0;
+	right: 0;
 }
 .star {
+	margin: 0;
+	cursor: pointer;
+	background-repeat: no-repeat;
+	background-size: 100%;
+	width: 0px;
+	height: 40px;
+	padding: 0;
+	float: left;
+	background-position: bottom;
+	-webkit-transition: width 1s;
+	-moz-transition: width 1s;
+	-ms-transition: width 1s;
+	-o-transition: width 1s;
+	transition: width 1s;
+	overflow: hidden;
+}
+
+#c_points_div:hover .star {
+	width: 25px;
+}
+#c_points_div .star.sel {
+	width: 40px;
+	height: 40px;
 	background-image: url('/img/star.svg');
 }
+#c_points_div .star.sel.shit {
+	background-image: url('/img/shit.svg');
+}
+#c_points_div:hover .star.sel {
+	width: 25px;
+}
+
+.star.on {
+	background-image: url('/img/star.svg');
+}
+.star {
+	background-image: url('/img/star_off.svg');
+}
 .star.shit {
+	background-image: url('/img/shit_off.svg');
+}
+.star.shit.on {
 	background-image: url('/img/shit.svg');
 }
 
@@ -289,21 +322,41 @@
 }
 #old_comments {
 	width: 730px;
+	margin-bottom: 
+}
+
+#old_comments .c_block {
+	clear: both;
+}
+#old_comments > .c_block {
+	padding-top: 30px;
+}
+#old_comments .c_block .c_block {
+	padding: 15px 0px 0px 40px;
+	margin-left: 0;
+	border-bottom: 1px solid #d3d3d3;
+	height: 50px;
+	clear: both;
+}
+#old_comments .replies {
+	margin-left: 20px;
+	margin-top: 0;
+	border-left: 1px solid #d3d3d3;
 }
 #old_comments .c_comment {
+	clear: both;
 	border: 1px solid #d3d3d3;
+	border-left: 5px solid #d3d3d3;
 	background-color: #fff;
-	padding: 10px;
-	margin-bottom: 25px;
+	padding: 10px 10px 40px 10px;
 	min-height: 100px;
+	position: relative;
+
 }
-#old_comments .c_comment .c_comment {
-	border-width: 0;
-	border-top: 2px solid #d3d3d3;
-	padding: 10px 0px 5px 20px;
-	background-repeat: no-repeat;
-	background-image: url('/img/reply_arrow.svg');
-	background-size: 20px;
+#old_comments .replies .c_comment {
+	border-left: 1px solid #d3d3d3;
+	width: 100%;
+	float: right;
 }
 #old_comments .c_avatar {
 	width: 50px;
@@ -319,18 +372,22 @@
 #old_comments .c_title {
 	margin-left: 120px;
 	font-size: 1.5em;
+	border-bottom: 2px solid black;
+}
+#old_comments .c_points_0, #old_comments .c_points{
+	background-size: auto 20px;
+	background-repeat: no-repeat;
+	background-position: right;
+	height: 20px;
+	float: right;
+	padding-top: 7px;
 }
 #old_comments .c_points_0 {
 	background-image: url('/img/shit.svg');
-	background-size: 30px;
-	background-repeat: no-repeat;
-	width: 30px;
-	height: 30px;
-	border: 1px solid #d3d3d3;
-	float: right;
+	padding-right: 30px;
 }
 #old_comments .c_points {
-
+	padding-right: 210px;
 }
 #old_comments .c_content {
 	margin-left: 120px;
@@ -344,11 +401,11 @@
 	color: #fff;
 	padding: 3px;
 	border: 5px solid #fff;
+	position: absolute;
+	bottom: 5px;
+	right: 5px;
 }
-#old_comments .replies {
-	margin-top: 20px;
-	padding: 10px 0px 0px 30px;
-}
+
 .c_error {
 	padding: 10px;
 	background-color: #FF9966;

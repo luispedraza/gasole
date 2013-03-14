@@ -45,6 +45,12 @@ def remove_html_tags(data):
     p = re.compile(r'<.*?>')
     return p.sub('', s.sub('', data))
 
+def get_points(s):
+    try:
+        return int(s)
+    except ValueError:
+        return None
+
 class MainHandler(BaseAuthHandler):
     def get(self):
         self.render("base.html")
@@ -133,7 +139,6 @@ class Map(BaseAuthHandler):
 
 class Stats(BaseAuthHandler):
     def get(self, g_type, province, city):
-        logging.info(conpute_stats())
         the_scripts = []
         the_styles = []
         if (g_type=="precio"):
@@ -177,10 +182,8 @@ class Detail(BaseAuthHandler):
         user = {}
         if self.logged_in:
             user = self.current_user
-            logging.info(user)
         # Vista de detalle de una gasolinera
         data = {}
-        logging.info(self.request)
         if error:
             data = {k: self.request.get(k) for k in self.request.arguments()}
         p = decode_param(province)
@@ -242,7 +245,7 @@ class Detail(BaseAuthHandler):
         replyto = self.request.get("c_replyto")
         points = title = None
         if not replyto:
-            points=self.request.get("c_points")
+            points=get_points(self.request.get("c_points"))
             if not points:
                 error["c_points"] = u"Olvidaste asignar una valoración a esta gasolinera."
             else:
@@ -261,7 +264,6 @@ class Detail(BaseAuthHandler):
             remote_ip=self.request.remote_addr)
         if not captcha_result.is_valid:
              error["c_captcha"] = u"La solución del captcha no es correcta."
-        logging.info(points)
         if not len(error) and user:
             comment = Comment(
                 userid=user.key.id(),
