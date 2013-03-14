@@ -9,7 +9,7 @@ var POINTS = [
 				"por encima de la media", 		// 7
 				"muy recomendable",				// 8
 				"de las mejores",				// 9
-				"¡excelente!"						// 10
+				"¡excelente!"					// 10
 			]
 
 function initMap(latlon) {
@@ -106,7 +106,11 @@ function fillReplyTo(id) {
 	})
 }
 
-window.addEventListener("load", function(){
+function processData() {
+	console.log(data);
+}
+
+window.addEventListener("load", function() {
 	var req = new XMLHttpRequest();
 	req.onload = function(r) {
 		info = JSON.parse(r.target.responseText);

@@ -106,8 +106,9 @@ function getData(callback) {
 			if (where2) {
 				key = [where1,where2].join("*");
 				storedData = localStorage[key];
+				if (!storedData) storedData = localStorage[where1];
 			} 
-			if (!where2 || !storedData) {
+			else {
 				key = where1;
 				storedData = localStorage[key];
 			}
@@ -118,9 +119,9 @@ function getData(callback) {
 		if ((option=="gasolineras") && (where2)) {
 			var prov  = decodeName(where1);
 			var town = decodeName(where2);
-			tempData = {}
-			tempData["_data"] = {}
-			tempData["_data"][prov] = {}
+			tempData = {};
+			tempData["_data"] = {};
+			tempData["_data"][prov] = {};
 			tempData["_data"][prov][town] = data._data[prov][town];
 			data = tempData;
 		}
@@ -128,6 +129,7 @@ function getData(callback) {
 		callback(data);
 	} else {
 		// Buscamos datos nuevos
+		console.log(key);
 		getApiData(document.URL.replace(option, APIS[option]), key, callback);
 	}
 	return null;
