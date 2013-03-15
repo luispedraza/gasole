@@ -106,7 +106,7 @@
 	border: 1px solid #d3d3d3;
 }
 
-#comments input[type=text], #comments label {
+#comments input[type=text], #comments label, #comments input[type=email] {
 	font-size: 1.1em;
 	padding: 5px 5px 5px 35px;
 	width: 100%;
