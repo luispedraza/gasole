@@ -237,12 +237,15 @@
 }
 
 #comments input[type=text]#c_points {
-	width: 40px;
+	background-color: #3399CC;
+	color: white;
+	height: 40px;
+	width: 45px;
 	font-size: 30px;
 	border: 0;
 	text-align: right;
-	padding: 0;
-	margin: 10px 10px 0px 0px;
+	padding: 0px 5px 0px 5px;
+	margin: 0px 10px 0px 0px;
 	float: left;
 }
 #c_points_div {
