@@ -212,11 +212,15 @@ function processData(info) {
 	if (document.getElementById("c_replyto").value) {
 		fillReplyTo(document.getElementById("c_replyto").value);
 	}
-	function fillLinkProtocol(e) {
+	// relleno de http:// en c_link
+	document.getElementById("c_link").addEventListener("click", function() {
 		if (this.value == "")
 			this.value = "http://";
-	}
-	document.getElementById("c_link").addEventListener("click", fillLinkProtocol);
+	});
+	document.getElementById("c_link").addEventListener("blur", function() {
+		if (this.value == "http://")
+			this.value = "";
+	});
 	if (total_points!=0) {
 		var points = total_points/n_comments;
 		document.getElementById("points").innerHTML = points.toFixed(1) + " (" + n_comments + " valoraciones)";
