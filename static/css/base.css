@@ -76,7 +76,7 @@ header, footer {
 }
 header {
 	height: 120px;
-	text-align: right;
+	/*text-align: right;*/
 }
 header div {
 	width: 400px;
