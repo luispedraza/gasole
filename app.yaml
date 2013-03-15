@@ -32,6 +32,8 @@ handlers:
   static_dir: static/css
 - url: /js
   static_dir: static/js
+- url: /js/min
+  static_dir: static/js/min
 - url: /img
   static_dir: static/img
 - url: /icon

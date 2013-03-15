@@ -30,8 +30,7 @@ from hashlib import md5
 from secrets import SESSION_KEY
 import urllib
 import re
-
-
+from gas_slimmer import *
 
 GOOGLE_MAPS_API = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyD5XZNFlQsyWtYDeKual-OcqmP_5pgwbds&sensor=false&region=ES'
 GOOGLE_VIS_API = 'https://www.google.com/jsapi?autoload={modules:[{name:visualization,version:1,packages:[corechart]}]}'
@@ -175,7 +174,7 @@ class List(BaseAuthHandler):
         self.render("base.html", 
             title = title,
             styles=["list.css"],
-            scripts=['/js/utils.js', '/js/list.js', GOOGLE_MAPS_API, '/js/libs/markerclusterer_compiled.js'],
+            scripts=[GOOGLE_MAPS_API]+get_js('list.js'),
             content=jinja_env.get_template("list.html").render())
 class Detail(BaseAuthHandler):
     def get(self, province, town, station, error={}):
@@ -199,7 +198,7 @@ class Detail(BaseAuthHandler):
         self.render("base.html",
             title = title,
             styles=['detail.css'],
-            scripts=[GOOGLE_VIS_API, GOOGLE_MAPS_API,'/js/utils.js','/js/detail.js'],
+            scripts=[GOOGLE_VIS_API, GOOGLE_MAPS_API] + get_js('detail.js'),
             content=jinja_env.get_template("detail.html").render(
                 title=title,
                 edit_station=edit_station,
@@ -307,7 +306,7 @@ class Search(BaseAuthHandler):
     def get(self):
         self.render("base.html", 
             styles =['search.css', 'map.css'],
-            scripts=['/js/geocode.js', GOOGLE_MAPS_API],
+            scripts=[GOOGLE_MAPS_API]+get_js('geocode.js',DEBUG),
             content=jinja_env.get_template("search.html").render(
                 map=jinja_env.get_template("spain.svg").render()))
 
@@ -317,7 +316,7 @@ class SearchResults(BaseAuthHandler):
         self.render("base.html", 
             title = title,
             styles=["list.css"],
-            scripts=['/js/utils.js', '/js/list.js', GOOGLE_MAPS_API, '/js/libs/markerclusterer_compiled.js'],
+            scripts=[GOOGLE_MAPS_API]+get_js('list.js',DEBUG),
             content=jinja_env.get_template("list.html").render())
 
 class Info(BaseAuthHandler):
