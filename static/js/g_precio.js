@@ -158,7 +158,7 @@ window.addEventListener("load", function(){
 		data = JSON.parse(r.target.responseText);
 		initMap();
 		console.log(data);
-		initD3();
+		// initD3();
 	}
 	var url = document.URL;
 	req.open("GET", document.URL.replace("graficos/precio", "api"), true)

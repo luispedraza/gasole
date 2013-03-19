@@ -30,8 +30,8 @@ handlers:
   upload: favicon\.ico
 - url: /css
   static_dir: static/css
-- url: /js
-  static_dir: static/js
+- url: /js/my_js_files
+  static_dir: static/js/
 - url: /js/min
   static_dir: static/js/min
 - url: /img
@@ -49,5 +49,7 @@ libraries:
 - name: jinja2
   version: latest
 - name: lxml
+  version: latest
+- name: numpy
   version: latest
   

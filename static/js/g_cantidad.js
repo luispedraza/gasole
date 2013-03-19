@@ -8,22 +8,22 @@ function initialize() {
 		center: new google.maps.LatLng(40.4000, -3.6833),
 		mapTypeId: google.maps.MapTypeId.ROADMAP
 	};
-
-	map = new google.maps.Map(document.getElementById('map'),
-		mapOptions);
+	map = new google.maps.Map(document.getElementById('map'), mapOptions);
 }
 
 function drawData(data) {
+	console.log("procesando)")
 	var heatmapData = [];
-	var latlon = data.latlon;
 	var latSum = lonSum = 0;
-	for (p in latlon) {
-		for (t in latlon[p]) {
-			for (s in latlon[p][t]) {
-				var pos = new google.maps.LatLng(latlon[p][t][s][0], latlon[p][t][s][1]);
-				latSum += pos.lat();
-				lonSum += pos.lng();
-				heatmapData.push(pos);
+	for (p in data) {
+		for (t in data[p]) {
+			for (s in data[p][t]) {
+				if (data[p][t][s]["latlon"]) {
+					var pos = new google.maps.LatLng(data[p][t][s]["latlon"][0], data[p][t][s]["latlon"][1]);
+					latSum += pos.lat();
+					lonSum += pos.lng();
+					heatmapData.push(pos);
+				}
 			}
 		}
 	}
@@ -43,11 +43,14 @@ window.addEventListener("load", function(){
 	var req = new XMLHttpRequest();
 	req.onload = function(r) {
 		data = JSON.parse(r.target.responseText);
-		console.log(data);
-		drawData(data);
+		if (data) {
+			console.log(data);
+			// drawData(data._data);
+		}
+		
 	}
 	var url = document.URL;
-	req.open("GET", document.URL.replace("graficos/cantidad", "api"), true)
+	req.open("GET", document.URL.replace("graficos/cantidad", "stats"), true)
 	req.send();
 
 })

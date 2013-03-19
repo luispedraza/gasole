@@ -68,7 +68,7 @@ class Result(object):
 
 class ResultIter(Result):
 	def __init__(self):
-		headers = [u"Provincia", u"Localidad", u"Dirección", u"Fecha", u"Precio", u"Rótulo", u"Horario", u"Lat.,Lon."]
+		headers = [u"Provincia", u"Localidad", u"Dirección", u"Fecha", u"Rótulo", u"Horario", u"Precio", u"Lat.,Lon."]
 		self.date = date.today()
 		self.headers = headers
 		self.data = {}
@@ -81,17 +81,28 @@ class ResultIter(Result):
 				town = prov[t]
 				for s in town:
 					st = town[s]
-					yield [p, t, s, st["date"], st["options"], st["label"], st["hours"], st.get("latlon")]
+					yield [p, t, s, st["date"], st["label"], st["hours"], st["options"], st.get("latlon")]
 	def as_table(self):
-		for item in self:
-			row = [i or "" for i in item]
+		for row in self:
 			row[3] = "/".join(row[3].isoformat().split("-")[1:])
-			options = ""
-			for o in row[4]:
-				options += "<td class=op%s>%s</td>" %(o, row[4][o] or "")
-			row[4] = options
-			row[-1] = "("+",".join(row[-1])+")"
-			yield "<td>"+"</td><td>".join(row)+"</td>"
+			options = [str(row[6].get(o, "")) for o in FUEL_OPTIONS]
+			row[-1] = "("+",".join(row[-1])+")" if row[-1] else ""
+			yield "<td>"+"</td><td>".join(row[:6]+options+row[7:])+"</td>"
+	def html_table(self):
+		table = ""
+		for r in self.as_table():
+			table+="<td>"+r+"</td>\n"
+		return table
+	def as_array(self):
+		for row in self:
+			options = [row[6].get(o, None) for o in FUEL_OPTIONS]
+			yield row[:6]+options+row[7:-1]+(row[-1] if row[-1] else [None, None])
+	def array(self):
+		the_array = []
+		for r in self.as_array():
+			the_array.append(r)
+		return the_array
+
 
 	def add_item(self, province, town, station, label, date, option, hours, latlon=None):
 		data = self.data

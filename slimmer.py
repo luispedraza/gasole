@@ -3,6 +3,8 @@
 
 from slimit import minify
 from gas_slimmer import *
+import rcssmin
+
 
 
 MEDIA_JS_PATH = '/static/js/'

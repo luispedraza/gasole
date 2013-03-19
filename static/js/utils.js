@@ -115,7 +115,8 @@ function getData(callback) {
 		// Limpieza de datos antiguos
 		var timestamp = localStorage["timestamp"];
 		if (timestamp && (new Date().getTime() - parseInt(timestamp))>LOCAL_EXPIRATION) {		
-			console.log("datos antiguos");	
+			console.log("datos antiguos");
+			localStorage.clear();
 		}
 		
 		var storedData = null;

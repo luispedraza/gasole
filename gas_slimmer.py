@@ -1,4 +1,4 @@
-JS_PATH = '/js/'
+JS_PATH = '/js/my_js_files/'
 JS_PATH_MIN = '/js/min/'
 
 MEDIA_JS = {
@@ -8,9 +8,12 @@ MEDIA_JS = {
 		],
 	'geocode.js' : ['geocode.js'],
 	'list.js': [
-		'libs/markerclusterer_compiled.js',
+		'libs/markerclusterer.min.js',
 		'utils.js', 
 		'list.js'
+		],
+	'g_cantidad.js' : [
+		'g_cantidad.js'
 		]
 	}
 

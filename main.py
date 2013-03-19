@@ -31,10 +31,14 @@ from secrets import SESSION_KEY
 import urllib
 import re
 from gas_slimmer import *
+from gas_stats import *
 
 GOOGLE_MAPS_API = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyD5XZNFlQsyWtYDeKual-OcqmP_5pgwbds&sensor=false&region=ES'
 GOOGLE_VIS_API = 'https://www.google.com/jsapi?autoload={modules:[{name:visualization,version:1,packages:[corechart]}]}'
 GOOGLE_MAPS_VIS_API = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyD5XZNFlQsyWtYDeKual-OcqmP_5pgwbds&sensor=false&libraries=visualization'
+
+MAPBOX_API = 'http://api.tiles.mapbox.com/mapbox.js/v0.6.7/mapbox.js'
+MAPBOX_CSS = 'http://api.tiles.mapbox.com/mapbox.js/v0.6.7/mapbox.css'
 
 def decode_param(s):
     return s.decode('utf-8').replace("_", " ").replace("|", "/")
@@ -80,6 +84,7 @@ class AdminUpdate(BaseHandler):
 
     def post(self, method):
     	option = self.request.get("option")
+        data = None
         if method and method=="csv":
             data = gas_update_csv(option)
             self.render("admin_update_csv.html",
@@ -90,6 +95,7 @@ class AdminUpdate(BaseHandler):
             self.render("admin_update_xls.html",
                 options=FUEL_OPTIONS,
                 data=data)
+        logging.info(data.array())
         if self.request.get("updatedb"):
                 data2store(data.data)
 
@@ -123,12 +129,6 @@ class AdminSearch(BaseHandler):
                             if station:
                                 station.geopt = db.GeoPt(lat = data[p][t][s]["latlon"][1], lon = data[p][t][s]["latlon"][0])
                                 _geodata.append(station)
-                                # _geodata.append(GeoData(
-                                #     key_name = s,
-                                #     parent = db.Key.from_path('Province', p, 'Town', t),
-                                #     geopt = db.GeoPt(lat = data[p][t][s]["latlon"][1],
-                                #         lon = data[p][t][s]["latlon"][0])
-                                #     ))
             db.put(_geodata)
             logging.info("guardadas %s posiciones" %len(_geodata))
 
@@ -138,16 +138,18 @@ class Map(BaseAuthHandler):
 
 class Stats(BaseAuthHandler):
     def get(self, g_type, province, city):
+        if not province and not city:
+            pass
         the_scripts = []
         the_styles = []
         if (g_type=="precio"):
             the_scripts = [GOOGLE_MAPS_API, 
                 '/js/g_precio.js', 
                 '/js/libs/d3.v3.min.js']
-            the_styles=["g_precio.css"]
+            the_styles=["/css/g_precio.css"]
         elif (g_type=="cantidad"):
-            the_scripts = [GOOGLE_MAPS_VIS_API, '/js/g_cantidad.js']
-            the_styles=["g_cantidad.css"]
+            the_scripts = [GOOGLE_MAPS_VIS_API, MAPBOX_API]+get_js('g_cantidad.js',DEBUG)
+            the_styles=["/css/g_cantidad.css", MAPBOX_CSS]
         elif (g_type=="variedad"):
             the_scripts = [GOOGLE_MAPS_VIS_API, 
                 '/js/stats.js', 
@@ -156,7 +158,7 @@ class Stats(BaseAuthHandler):
                 '/js/libs/raphael.min.js', 
                 '/js/libs/kartograph.min.js',
                 '/js/libs/d3.v3.min.js']
-            the_styles=["g_variedad.css"]
+            the_styles=["/css/g_variedad.css"]
         self.render("base.html", 
             title=u"Gráficos",
             scripts=the_scripts,
@@ -173,7 +175,7 @@ class List(BaseAuthHandler):
         title = "Gasolineras en " + (decode_param(city)+ ", " if city else "la ") + "provincia de " + decode_param(province)
         self.render("base.html", 
             title = title,
-            styles=["list.css"],
+            styles=["/css/list.css"],
             scripts=[GOOGLE_MAPS_API]+get_js('list.js'),
             content=jinja_env.get_template("list.html").render())
 class Detail(BaseAuthHandler):
@@ -197,8 +199,8 @@ class Detail(BaseAuthHandler):
                 edit_station = {k: getattr(sdata,k) or "" for k in sdata.properties()}
         self.render("base.html",
             title = title,
-            styles=['detail.css'],
-            scripts=[GOOGLE_VIS_API, GOOGLE_MAPS_API] + get_js('detail.js'),
+            styles=['/css/detail.css'],
+            scripts=[GOOGLE_VIS_API, GOOGLE_MAPS_API] + get_js('detail.js',DEBUG),
             content=jinja_env.get_template("detail.html").render(
                 title=title,
                 edit_station=edit_station,
@@ -279,6 +281,7 @@ class Detail(BaseAuthHandler):
 
 class Api(BaseHandler):
     def get(self, prov, town, station):
+        info = {}
         if prov:
             prov = decode_param(prov)
             data = memcache.get(prov) or store2data(prov_kname=prov).get(prov)
@@ -297,7 +300,15 @@ class Api(BaseHandler):
                     "_comments" : get_comments(prov, town, station)
                     }
         self.render_json(info)
-        
+
+class StatsApi(BaseHandler):
+    def get(self, prov, town):
+        info = {}
+        if not prov and not town:
+            info = compute_stats()
+            self.render_json(info)
+
+
 class GeoApi(BaseHandler):
     def get(self, place, lat, lon, dist):
         self.render_json({"_near": place, "_data": get_near(lat=float(lat), lon=float(lon), dist=float(dist))})
@@ -305,7 +316,7 @@ class GeoApi(BaseHandler):
 class Search(BaseAuthHandler):
     def get(self):
         self.render("base.html", 
-            styles =['search.css', 'map.css'],
+            styles =['/css/search.css', '/css/map.css'],
             scripts=[GOOGLE_MAPS_API]+get_js('geocode.js',DEBUG),
             content=jinja_env.get_template("search.html").render(
                 map=jinja_env.get_template("spain.svg").render()))
@@ -315,7 +326,7 @@ class SearchResults(BaseAuthHandler):
         title = "Gasolineras cerca de " + decode_param(place)
         self.render("base.html", 
             title = title,
-            styles=["list.css"],
+            styles=["/css/list.css"],
             scripts=[GOOGLE_MAPS_API]+get_js('list.js',DEBUG),
             content=jinja_env.get_template("list.html").render())
 
@@ -361,7 +372,8 @@ app = webapp2.WSGIApplication([
     ('/admin/update/?(\w+)?', AdminUpdate),
     ('/admin/search/?', AdminSearch),
     ('/map/?', Map),
-    ('/graficos/?([^ \/]+)?/?([^ \/]+)?/?([^ \/]+)?/?', Stats),
+    ('/graficos/([^ \/]+)/?([^ \/]+)?/?([^ \/]+)?/?', Stats),
+    ('/stats/?([^ \/]+)?/?([^ \/]+)?/?', StatsApi),
     ('/data/(\w+)/(\w+)', Data),
     ('/gasolineras/?([^ \/]+)/?([^ \/]+)?/?', List),
     ('/ficha/?([^ \/]+)/?([^ \/]+)?/?([^ \/]+)?', Detail),

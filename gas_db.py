@@ -206,7 +206,7 @@ def get_comments(prov, town, station):
 # 		q = Province.all()
 # 		for province in q:
 # 			p = province.key().name()
-# 			datap = memcache.get(o) or store2data(prov_kname=p).gete(p)
+# 			datap = memcache.get(o) or store2data(prov_kname=p).get(p)
 # 			opationsp = {}
 # 			for t in datap.keys():
 # 				for s in datap[t].keys():
