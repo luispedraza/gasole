@@ -3,15 +3,9 @@
 	height: 600px;
 }
 #map svg {
-	width: 100%;
+	width: 800px;
+	height: 600px;
 }
-
-#label {
-	opacity: 1.0;
-	display: none;
-	z-index: 500;
-}
-
 .canarias {
 	fill-rule:evenodd;
 	clip-rule:evenodd;
@@ -21,11 +15,8 @@
 	stroke-linejoin:round;
 	stroke-miterlimit:3;
 }
-
 .prov {
-/*	fill-rule:evenodd;
-	clip-rule:evenodd;*/
-	fill:#F00;
+	fill:#ccc;
 	cursor: pointer;
 }
 .prov:hover {

@@ -51,7 +51,7 @@ def compute_stats():
 		if where['_g']:
 			for o in where['_g']:
 				arr_g = np.array(where['_g'][o])
-				H, xedges, yedges = np.histogram2d(arr_g[:,0], arr_g[:,1],normed=True)
+				H, xedges, yedges = np.histogram2d(arr_g[:,0], arr_g[:,1])
 				del where['_g'][o]
 				where['_g'][o] = {'h':H.tolist(), 'x':xedges.tolist(), 'y':yedges.tolist()}
 		if where['_p']:
@@ -59,7 +59,7 @@ def compute_stats():
 				arr_p = np.array(where['_p'][o])
 				H, edges = np.histogram(arr_p)
 				del where['_p'][o]
-				where['_p'][o] = {'h':H.tolist(), 'x':edges.tolist()}
+				where['_p'][o] = {'h':H.tolist(), 'x':edges.tolist(), 'm': np.mean(arr_p), 's': np.std(arr_p)}
 
 
 	q = Province.all()

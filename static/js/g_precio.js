@@ -4,6 +4,11 @@ window.addEventListener("load", function(){
 		data = JSON.parse(r.target.responseText);
 		if (data) {
 			console.log(data);
+			drawPriceMap(data, "1");
+
+			document.getElementById("hide").addEventListener("change", function() {
+				drawPriceMap(data, "5", this.checked);
+			})
 		}
 		
 	}

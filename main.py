@@ -132,19 +132,17 @@ class AdminSearch(BaseHandler):
             db.put(_geodata)
             logging.info("guardadas %s posiciones" %len(_geodata))
 
-class Map(BaseAuthHandler):
-    def get(self):
-        self.render("map.html")
-
 class Stats(BaseAuthHandler):
     def get(self, g_type, province, city):
         if not province and not city:
             pass
         the_scripts = []
         the_styles = []
+        title = ""
         if (g_type=="precio"):
             the_scripts = get_js('precio.js',DEBUG)
             the_styles=["/css/g_precio.css"]
+            title = u"El Precio del Combustible en España."
         elif (g_type=="cantidad"):
             the_scripts = [GOOGLE_MAPS_VIS_API, MAPBOX_API]+get_js('cantidad.js',DEBUG)
             the_styles=["/css/g_cantidad.css", MAPBOX_CSS]
@@ -157,11 +155,12 @@ class Stats(BaseAuthHandler):
                 '/js/libs/kartograph.min.js',
                 '/js/libs/d3.v3.min.js']
             the_styles=["/css/g_variedad.css"]
-        self.render("base.html", 
-            title=u"Gráficos",
+        self.render("base.html",
+            title=u"Gráficos: "+title,
             scripts=the_scripts,
-            styles=the_styles,
-            content=jinja_env.get_template("g_"+g_type+".html").render())
+            styles=the_styles+['/css/g_map.css'],
+            content=jinja_env.get_template("g_"+g_type+".html").render(
+                map=jinja_env.get_template("spain.svg").render()))
 
 class Data(BaseAuthHandler):
     def get(self, option, province):
