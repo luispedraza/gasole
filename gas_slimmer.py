@@ -12,8 +12,13 @@ MEDIA_JS = {
 		'utils.js', 
 		'list.js'
 		],
-	'g_cantidad.js' : [
+	'cantidad.js' : [
 		'g_cantidad.js'
+		],
+	'precio.js': [
+		'libs/d3.v3.min.js',
+		'g_map.js',
+		'g_precio.js'
 		]
 	}
 

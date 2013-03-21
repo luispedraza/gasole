@@ -143,12 +143,10 @@ class Stats(BaseAuthHandler):
         the_scripts = []
         the_styles = []
         if (g_type=="precio"):
-            the_scripts = [GOOGLE_MAPS_API, 
-                '/js/g_precio.js', 
-                '/js/libs/d3.v3.min.js']
+            the_scripts = get_js('precio.js',DEBUG)
             the_styles=["/css/g_precio.css"]
         elif (g_type=="cantidad"):
-            the_scripts = [GOOGLE_MAPS_VIS_API, MAPBOX_API]+get_js('g_cantidad.js',DEBUG)
+            the_scripts = [GOOGLE_MAPS_VIS_API, MAPBOX_API]+get_js('cantidad.js',DEBUG)
             the_styles=["/css/g_cantidad.css", MAPBOX_CSS]
         elif (g_type=="variedad"):
             the_scripts = [GOOGLE_MAPS_VIS_API, 
@@ -172,12 +170,15 @@ class Data(BaseAuthHandler):
 
 class List(BaseAuthHandler):
     def get(self, province, city):
+        logging.info("****************")
+        logging.info(province)
         title = "Gasolineras en " + (decode_param(city)+ ", " if city else "la ") + "provincia de " + decode_param(province)
         self.render("base.html", 
             title = title,
             styles=["/css/list.css"],
             scripts=[GOOGLE_MAPS_API]+get_js('list.js'),
             content=jinja_env.get_template("list.html").render())
+
 class Detail(BaseAuthHandler):
     def get(self, province, town, station, error={}):
         user = {}
