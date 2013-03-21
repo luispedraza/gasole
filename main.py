@@ -372,7 +372,6 @@ app = webapp2.WSGIApplication([
     ('/admin/?', AdminHandler),
     ('/admin/update/?(\w+)?', AdminUpdate),
     ('/admin/search/?', AdminSearch),
-    ('/map/?', Map),
     ('/graficos/([^ \/]+)/?([^ \/]+)?/?([^ \/]+)?/?', Stats),
     ('/stats/?([^ \/]+)?/?([^ \/]+)?/?', StatsApi),
     ('/data/(\w+)/(\w+)', Data),
