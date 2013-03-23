@@ -370,5 +370,6 @@ function processData(info) {
 }
 
 window.addEventListener("load", function() {
-	// getData(processData);
+	getData(processData);
+	console.log(data);
 })

@@ -33,13 +33,6 @@ import re
 from gas_slimmer import *
 from gas_stats import *
 
-GOOGLE_MAPS_API = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyD5XZNFlQsyWtYDeKual-OcqmP_5pgwbds&sensor=false&region=ES'
-GOOGLE_VIS_API = 'https://www.google.com/jsapi?autoload={modules:[{name:visualization,version:1,packages:[corechart]}]}'
-GOOGLE_MAPS_VIS_API = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyD5XZNFlQsyWtYDeKual-OcqmP_5pgwbds&sensor=false&libraries=visualization'
-
-MAPBOX_API = 'http://api.tiles.mapbox.com/mapbox.js/v0.6.7/mapbox.js'
-MAPBOX_CSS = 'http://api.tiles.mapbox.com/mapbox.js/v0.6.7/mapbox.css'
-
 def decode_param(s):
     return s.decode('utf-8').replace("_", " ").replace("|", "/")
 
@@ -141,7 +134,7 @@ class Stats(BaseAuthHandler):
         title = ""
         if (g_type=="precio"):
             the_scripts = get_js('precio.js',DEBUG)
-            the_styles=["/css/g_precio.css"]
+            the_styles=['/css/g_map.css','/css/g_precio.css']
             title = u"El Precio del Combustible en España."
         elif (g_type=="cantidad"):
             the_scripts = [GOOGLE_MAPS_VIS_API, MAPBOX_API]+get_js('cantidad.js',DEBUG)
@@ -153,14 +146,14 @@ class Stats(BaseAuthHandler):
                 '/js/libs/jquery.min.js', 
                 '/js/libs/raphael.min.js', 
                 '/js/libs/kartograph.min.js',
-                '/js/libs/d3.v3.min.js']
+                'http://d3js.org/d3.v3.min.js']
             the_styles=["/css/g_variedad.css"]
         self.render("base.html",
             title=u"Gráficos: "+title,
-            scripts=the_scripts,
-            styles=the_styles+['/css/g_map.css'],
-            content=jinja_env.get_template("g_"+g_type+".html").render(
-                map=jinja_env.get_template("spain.svg").render()))
+            scripts = the_scripts,
+            styles  = the_styles,
+            content = jinja_env.get_template("g_"+g_type+".html").render(
+                map = jinja_env.get_template("spain.svg").render()))
 
 class Data(BaseAuthHandler):
     def get(self, option, province):
@@ -169,13 +162,11 @@ class Data(BaseAuthHandler):
 
 class List(BaseAuthHandler):
     def get(self, province, city):
-        logging.info("****************")
-        logging.info(province)
         title = "Gasolineras en " + (decode_param(city)+ ", " if city else "la ") + "provincia de " + decode_param(province)
         self.render("base.html", 
             title = title,
             styles=["/css/list.css"],
-            scripts=[GOOGLE_MAPS_API]+get_js('list.js'),
+            scripts=[GOOGLE_MAPS_API]+get_js('list.js',DEBUG),
             content=jinja_env.get_template("list.html").render())
 
 class Detail(BaseAuthHandler):

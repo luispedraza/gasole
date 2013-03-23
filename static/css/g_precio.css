@@ -1,31 +1,162 @@
-#map {
+#stats {
+  position: relative;
+}
+#infocontrol {
   width: 500px;
-  height: 400px;
-}
-
-.stations {
   position: absolute;
+  right: 0;
+  top: 0;
 }
-
-.stations, .stations svg.aaa {
-  position: absolute;
+#prov_h2, #prov_sel {
+  display: inline-block;
 }
-
-.stations border {
-  position: absolute;
-  stroke: black;
-  stroke-width: 2px;
-}
-
-.stations svg.aaa {
-  width: 60px;
+#prov_h2 {
   height: 20px;
-  padding-right: 100px;
+  overflow: hidden;
+}
+#prov_h2:hover {
+  height: 100px;
+  overflow-y: scroll;
+  text-align: top;
+}
+input[type=radio] {
+  display: none;
+}
+label {
+  width: 120px;
+  border: 1px dotted #383838;
+  color: white;
+  background-color: #999;
+  padding: 3px;
+  margin: 1px;
+  display: block;
+  cursor: pointer;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px;
+}
+#options label:hover {
+  background-color: #767676;
+}
+#options input:checked + label.T_G95 {
+  background-color: #006633;
+
+}
+#options input:checked + label.T_G98 {
+  background-color: #339933;
+
+}
+#options input:checked + label.T_GOA {
+  background-color: #000;
+
+}
+#options input:checked + label.T_NGO {
+  background-color: #555;
+
+}
+#options input:checked + label.T_GOB {
+  background-color: #CC3333;
+
+}
+#options input:checked + label.T_GOC {
+  background-color: #FF3300;
+
+}
+#options input:checked + label.T_BIOD {
+  background-color: #FFCC33;
+
+}
+#prov_h2 input:checked + label {
+  background-color: #7e2516;
+}
+#bar_price {
+  display: inline-block;
+  position: relative;
+  height: 20px;
+  width: 300px;
+}
+#bar {
+  height: 20px;
+  width: 200px;
+  padding: 3px;
+  background: #fff032; /* Old browsers */
+  background: -moz-linear-gradient(left,  #fff032 0%, #ff0000 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, right top, color-stop(0%,#fff032), color-stop(100%,#ff0000)); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(left,  #fff032 0%,#ff0000 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(left,  #fff032 0%,#ff0000 100%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(left,  #fff032 0%,#ff0000 100%); /* IE10+ */
+  background: linear-gradient(to right,  #fff032 0%,#ff0000 100%); /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fff032', endColorstr='#ff0000',GradientType=1 ); /* IE6-9 */
+  position: absolute;
+  left: 36px;
+  top: 0;
+}
+
+#bar_min, #bar_max {
+  width: 30px;
+  height: 20px;
+  font-size: 20px;
+  background-color: #000;
+  color: #fff;
+  padding: 3px;
+  font-size: .8em;
+  position: absolute;
+  top: 0;
+}
+#bar_min {
+  text-align: left;
+  left: 0px;
+  -webkit-border-top-left-radius: 5px;
+  -webkit-border-bottom-left-radius: 5px;
+  -moz-border-radius-topleft: 5px;
+  -moz-border-radius-bottomleft: 5px;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+#bar_max {
+  text-align: right;
+  left: 242px;
+  -webkit-border-top-right-radius: 5px;
+  -webkit-border-bottom-right-radius: 5px;
+  -moz-border-radius-topright: 5px;
+  -moz-border-radius-bottomright: 5px;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+/* Histogramas */
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+.axis text {
   font: 10px sans-serif;
 }
-
-.stations circle {
-  fill: brown;
-  stroke: black;
-  stroke-width: 1.5px;
+.bar {
+  fill: steelblue;
+}
+.tooltip {
+  width: 30px;
+  height: 30px;
+  background: white;
+  border: 2px solid steelblue;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
+  border-radius: 4px;
+  padding: 2px 2px 2px 32px;
+  background-repeat: no-repeat;
+  background-image: url('/icon/pump_r.png');
+  background-position: 2px 2px;
+  background-size: 27px;
+  font-size: .8em;
+}
+#openmap {
+  width: 800px;
+  height: 600px;
 }

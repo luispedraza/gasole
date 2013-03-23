@@ -5,15 +5,15 @@ from gas_db import *
 from gas_update import ResultIter
 import numpy as np
 
+BINS = 20
 def compute_stats():
 	def init_stats():
 		return {
 			'min': 	{"p": {}, "s": {}}, # precios máximos y localizaciones
 			'max': 	{"p": {}, "s": {}},	# precios mínimos y localizaciones
-			'hist': {},					# histogramas de precios
 			'n':    {},					# número de puntos de venta de cada tipo
-			'_p':   {},					# temporal para histograma de precios
-			'_g':	{}, 				# temporal para histograma de lugares		
+			'_p':   {},					# histograma de precios
+			'_g':	{}, 				# histograma de lugares		
 			'g':    [-100,100,100,-100]}
 	def init_all():
 		val = init_stats()
@@ -47,19 +47,26 @@ def compute_stats():
 			elif data[o] == where["max"]["p"][o]:
 				where["max"]["s"][o].append(place)
 			where['_p'].setdefault(o,[]).append(data[o])
-	def compute(where):
-		if where['_g']:
+	def compute(where, the_range=None):
+		if where.get('_g'):
 			for o in where['_g']:
 				arr_g = np.array(where['_g'][o])
 				H, xedges, yedges = np.histogram2d(arr_g[:,0], arr_g[:,1])
 				del where['_g'][o]
 				where['_g'][o] = {'h':H.tolist(), 'x':xedges.tolist(), 'y':yedges.tolist()}
-		if where['_p']:
+		if where.get('_p'):
 			for o in where['_p']:
+				range = None
+				if the_range:
+					range = (the_range[0][o],the_range[1][o])
+					logging.info(range)
+				logging.info(the_range)
 				arr_p = np.array(where['_p'][o])
-				H, edges = np.histogram(arr_p)
+				H, edges = np.histogram(arr_p, bins=BINS, range=range)
 				del where['_p'][o]
-				where['_p'][o] = {'h':H.tolist(), 'x':edges.tolist(), 'm': np.mean(arr_p), 's': np.std(arr_p)}
+				where['_p'][o] = {'h':H.tolist(),'m': np.mean(arr_p), 's': np.std(arr_p)}
+				if not the_range: 
+					 where['_p'][o]['x'] = edges.tolist()
 
 
 	q = Province.all()
@@ -74,9 +81,11 @@ def compute_stats():
 				datas = datat[s]
 				add_data(datas.get("latlon"),datas["options"],[p,t,s],statsp)
 				add_data(datas.get("latlon"),datas["options"],[p,t,s],stats)
-		# estadísticos de provincia:
-		compute(statsp)
 	compute(stats)
+	for p in stats['provinces']:
+		# estadísticos de provincia:
+		compute(stats['provinces'][p], the_range=[stats["min"]["p"], stats["max"]["p"]])
+	
 	return stats
 
 
