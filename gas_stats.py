@@ -6,6 +6,7 @@ from gas_update import ResultIter
 import numpy as np
 
 BINS = 20
+GEOBINS = 120
 def compute_stats():
 	def init_stats():
 		return {
@@ -51,7 +52,7 @@ def compute_stats():
 		if where.get('_g'):
 			for o in where['_g']:
 				arr_g = np.array(where['_g'][o])
-				H, xedges, yedges = np.histogram2d(arr_g[:,0], arr_g[:,1])
+				H, xedges, yedges = np.histogram2d(arr_g[:,0], arr_g[:,1], GEOBINS)
 				del where['_g'][o]
 				where['_g'][o] = {'h':H.tolist(), 'x':xedges.tolist(), 'y':yedges.tolist()}
 		if where.get('_p'):
@@ -59,8 +60,6 @@ def compute_stats():
 				range = None
 				if the_range:
 					range = (the_range[0][o],the_range[1][o])
-					logging.info(range)
-				logging.info(the_range)
 				arr_p = np.array(where['_p'][o])
 				H, edges = np.histogram(arr_p, bins=BINS, range=range)
 				del where['_p'][o]

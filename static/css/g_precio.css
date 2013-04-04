@@ -1,12 +1,19 @@
-#stats {
+#stats-price, #stats-number {
   position: relative;
+  width: 100%;
+  clear: both;
 }
-#infocontrol {
-  width: 500px;
-  position: absolute;
-  right: 0;
-  top: 0;
+.r-pan, .l-pan {
+  width: 48%;
 }
+.l-pan {
+  float: left;
+}
+.r-pan {
+  float: right;
+  border-left: 1px solid #ccc;
+}
+
 #prov_h2, #prov_sel {
   display: inline-block;
 }
@@ -29,7 +36,6 @@ label {
   background-color: #999;
   padding: 3px;
   margin: 1px;
-  display: block;
   cursor: pointer;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
@@ -73,7 +79,6 @@ label {
 }
 #bar_price {
   display: inline-block;
-  position: relative;
   height: 20px;
   width: 300px;
 }
@@ -89,41 +94,38 @@ label {
   background: -ms-linear-gradient(left,  #fff032 0%,#ff0000 100%); /* IE10+ */
   background: linear-gradient(to right,  #fff032 0%,#ff0000 100%); /* W3C */
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fff032', endColorstr='#ff0000',GradientType=1 ); /* IE6-9 */
-  position: absolute;
-  left: 36px;
-  top: 0;
+  display: inline-block;
+  position: relative;
 }
 
-#bar_min, #bar_max {
-  width: 30px;
+.bar_end {
+  width: 40px;
   height: 20px;
   font-size: 20px;
   background-color: #000;
   color: #fff;
   padding: 3px;
   font-size: .8em;
-  position: absolute;
-  top: 0;
+  display: inline-block;
 }
 #bar_min {
   text-align: left;
-  left: 0px;
   -webkit-border-top-left-radius: 5px;
   -webkit-border-bottom-left-radius: 5px;
   -moz-border-radius-topleft: 5px;
   -moz-border-radius-bottomleft: 5px;
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;
+
 }
 #bar_max {
   text-align: right;
-  left: 242px;
   -webkit-border-top-right-radius: 5px;
   -webkit-border-bottom-right-radius: 5px;
   -moz-border-radius-topright: 5px;
   -moz-border-radius-bottomright: 5px;
   border-top-right-radius: 5px;
-  border-bottom-right-radius: 5px;
+
 }
 
 /* Histogramas */
@@ -156,7 +158,7 @@ label {
   background-size: 27px;
   font-size: .8em;
 }
-#openmap {
-  width: 800px;
-  height: 600px;
+#openmap-p, #openmap-n {
+  width: 100%;
+  height: 500px;
 }

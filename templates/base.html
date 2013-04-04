@@ -51,36 +51,34 @@ fjs.parentNode.insertBefore(js, fjs);
 <!-- End FB Like -->
 
 <header id="header">
-	<a href="/"><div>Gasolé</div></a>
+	<a href="/"><div id="logo">Gasolé</div></a>
 	<p>Toda la información sobre gasolinas y otros combustibles</p>
-	<nav>
+<div id="search_form">
+	<div class="wrapper">
+	<form action="javascript:geoCode()">
+		<input type="text" id="address" name="address" placeholder="Ej.: Gran Vía 25, Madrid" />
+		<input type="submit" id="search" value=""></input>
+	</form>
+	</div>
+	
+	<ol id="results"></ol>
+
+</div>
+
+	
+
+	<a id="logout" href="/logout">[x] Salir</a>
+</header>
+
+<nav>
 	<ul class="menu">
 		<li class="menu_search"><a href="/buscador">BUSCADOR</a></li>
-			<ul class="submenu submenu_search">
-				<li>
-					<form id="fast_search" action="javascript:fastSearch()">
-					<input type="text" id="search" name="search" placeholder="Búsqueda rápida…" />
-					</form>
-				</li>
-			</ul>
-		<li class="menu_stats">GRÁFICOS</li>
-			<ul class="submenu submenu_stats">
-			<li><a href="/graficos/precio" title="Los precios del combustible en España">Precio</a></li>
-			<li><a href="/graficos/cantidad" title="Distribución de las gasolineras en España" href="/">Cantidad</a></li>
-			<li><a href="/graficos/variedad" title="Los combustibles vendidos en España">Variedad</a></li>
-			</ul>
-		
-		<li class="menu_news">INFORMACIÓN</li>
-			<ul class="submenu submenu_news">
-				<li><a href="/info/combustibles" title="Información sobre combustibles comercializados en España">Combustibles</a></li>
-				<li><a href="/info/tarjetas" title="Información sobre tarjetas para ahorrar en combustible">Tarjetas Descuento</a></li>
-				<li><a href="/info/noticias" title="Noticias sobre combustibles e hidrocarburos en España">Noticias</a></li>
-			</ul> 
+		<li class="menu_stats"><a href="/graficos/precio">GRÁFICOS</a></li>
+		<li class="menu_news"><a href="/info/combustibles">INFORMACIÓN</a></li>
+		<li class="menu_news"><a href="/info/tarjetas">TARJETAS DESCUENTO</a></li>
+		<li class="menu_news"><a href="/info/noticias">NOTICIAS</a></li>
 	</ul>
-	</nav>
-
-	<a href="/logout">[x] Salir</a>
-</header>
+</nav>
 
 
 <div id="content">{{content}}</div>

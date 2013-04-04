@@ -1,16 +1,8 @@
+
+<div id="stats-price">
 <h1>El precio de la gasolina en España</h1>
 <p>A continuación se muestran los precios medios de los diferentes combustibles en cada una de las comunidades autónomas y a nivel nacional</p>
-<div id="stats">
-	<div>Rango de precios<sup>*</sup>: 
-		<div id="bar_price">
-		<div id="bar_min" class="slider"></div><div id="bar"></div><div id="bar_max" class="slider"></div>
-		</div>
-	</div>
-	<div id="map">{{map}}</div>
-	<label for="hide">Excluir Ceuta, Melilla y Canarias</label><input id="hide" name="hide" type="checkbox" checked="true">
-	<p><sup>*</sup>Medias provinciales</p>
-	<div id="infocontrol">
-		<div id="options">
+	<div id="options">
 		<input type="radio" name="option" value="1" id="op1" checked="true"><label for="op1" class="T_G95">Gasolina 95</label>
 		<input type="radio" name="option" value="3" id="op3"><label for="op3" class="T_G98">Gasolina 98</label>
 		<input type="radio" name="option" value="4" id="op4"><label for="op4" class="T_GOA">Gasóleo A</label>
@@ -18,15 +10,44 @@
 		<input type="radio" name="option" value="6" id="op6"><label for="op6" class="T_GOB">Gasóleo B</label>
 		<input type="radio" name="option" value="7" id="op7"><label for="op7" class="T_GOC">Gasóleo C</label>
 		<input type="radio" name="option" value="8" id="op8"><label for="op8" class="T_BIOD">Biodiésel</label>
-		</div><!-- options -->
+	</div>
 
+	<div class="l-pan">
 		<h2>Precios en toda España</h2>
+		<label for="hide">Excluir Ceuta, Melilla y Canarias</label><input id="hide" name="hide" type="checkbox" checked="true">
 		<div id="spain_hist"></div>
-		<h2>Precios en una provincia <div id="prov_h2"></div><div id="prov_sel">+</div>
-		</h2>
-		<div id="prov_hist"></div>
+		<div>Rango de precios<sup>*</sup>: 
+			<div id="bar_price">
+				<div id="bar_min" class="bar_end"></div><div id="bar">
+					<div class="slider left"></div><div class="slider right"></div>
+				</div><div id="bar_max" class="bar_end"></div>
+			</div>
+		</div>
+		<div id="map">{{map}}</div>
+		<p><sup>*</sup>Medias provinciales</p>
 	</div>
 
 
-	<div id="openmap"></div>
+	<div class="r-pan">
+		<h2>Precios en la provincia de Madrid<div id="prov_h2"></div><div id="prov_sel">cambiar…</div></h2>
+		<div id="prov_hist"></div>
+		<div id="openmap-p"></div>
+	</div>
+
+</div>
+
+
+
+<div id="stats-number">
+<h1>Las gasolineras en España</h1>
+<div class="l-pan">
+		<h2>Distribución en todo el Estado</h2>
+		<div id="map_n">{{map}}</div>
+	</div>
+
+
+	<div class="r-pan">
+		<h2>Distribución provincial</h2>
+		<div id="openmap-n"></div>
+	</div>
 </div>
