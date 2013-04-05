@@ -90,81 +90,60 @@ header #logo {
 	text-indent: 1000px;
 	overflow: hidden;
 }
-.menu {
+ul.menu {
 	font-size: 0;
+	background-color: #222;
+	padding-left: 10px;
 }
-nav li {
-	list-style: none;
-	width: 200px;
-	color: white;
+li.menu {
 	display: inline-block;
+}
+li.menu a {
+	display: block;
+	border-bottom-width: 8px;
+	border-bottom-style: solid;
+	list-style: none;
+	width: 150px;
+	color: white;
 	cursor: pointer;
-	padding: 5px;
+	padding: 5px 5px 5px 40px;
 	height: 30px;
 	text-align: left;
 	font-size: 18px;
-}
-
-nav .menu > li {
-	border-bottom-width: 10px;
-	border-bottom-style: solid;
-}
-nav ul {
-	padding: 0;
-	font-size: 20px;
-}
-nav a {
+	background-repeat: no-repeat;
 	text-decoration: none;
-	color: white;
+	color: #fff;
+	background-position: 5px 5px;
 }
-.menu_search, .submenu_search li {
-	background-color: #3399CC;
-	border-color: #006699;
+li.menu.home a {
+	background-color: #333;
+	border-color: #111;
+	width: 0;
+	background-image: url('/icon/_home.png');
+	text-indent: -1000px;
 }
-.submenu_search li {
-	width: 500px;
-}
-.submenu_search input { 
-	border:none; 
-	color:#333; 
-	font:bold 24px Helvetica, Arial, sans-serif; 
-	width:510px; 
-	outline: none;
-	padding: 0;
-}
-.menu_stats, .submenu_stats li {
+li.menu.stats a {
 	background-color: #d24e33;
 	border-color: #7e2516;
+	background-image: url('/icon/_graficos.png');
 }
-.menu_news, .submenu_news li {
+li.menu.info a {
 	background-color: #f1aa41;
 	border-color: #be770e;
+	background-image: url('/icon/_info.png');
+}
+li.menu.cards a {
+	background-color: #339933;
+	border-color: #006633;
+	background-image: url('/icon/_tarjetas.png');
+}
+li.menu.news a {
+	background-color: #3399CC;
+	border-color: #006699;
+	background-image: url('/icon/_news.png');
 }
 
-.submenu {
-	left: 0;
-	top: 50px;
-	position: absolute;
-	height: 0;
-	overflow: hidden;
-	-webkit-transition: all .5s;
-	-moz-transition: all .5s;
-	transition: all .5s;
-}
-.submenu li {
-	margin-top:  10px;
-}
-.submenu li:hover {
-	text-decoration: underline;
-}
-
-.menu li:hover + .submenu {
-	height: 50px;
-}
-.submenu:hover {
-	height: 50px;
-}
-
+/* FOOTER */
 footer {
 	font-size: 11px;
 	height: auto;
