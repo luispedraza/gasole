@@ -57,7 +57,7 @@ body h1 {
 	font-size: 1.8em;
 	margin-top: 1em;
 	margin-bottom: 1em;
-	border-bottom: 10px solid black;
+	border-bottom: 8px solid black;
 }
 body h2 {
 	font-size: 1.4em;
@@ -280,6 +280,8 @@ ul.droplist:hover {
 	height: 300px;
 	overflow-y: scroll;
 }
-
-
+#content {
+	background-color: #fff;
+	margin: 20px;
+}
 

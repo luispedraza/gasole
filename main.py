@@ -49,7 +49,11 @@ def get_points(s):
 
 class MainHandler(BaseAuthHandler):
     def get(self):
-        self.render("base.html")
+        self.render("base.html", 
+            styles =['/css/map.css'],
+            scripts=[GOOGLE_MAPS_API]+get_js('geocode.js',DEBUG),
+            content=jinja_env.get_template("main.html").render(
+                map=jinja_env.get_template("spain.svg").render()))
 
 class AdminHandler(BaseHandler):
     def get(self):
@@ -304,14 +308,6 @@ class GeoApi(BaseHandler):
     def get(self, place, lat, lon, dist):
         self.render_json({"_near": place, "_data": get_near(lat=float(lat), lon=float(lon), dist=float(dist))})
 
-class Search(BaseAuthHandler):
-    def get(self):
-        self.render("base.html", 
-            styles =['/css/map.css'],
-            scripts=[GOOGLE_MAPS_API]+get_js('geocode.js',DEBUG),
-            content=jinja_env.get_template("search.html").render(
-                map=jinja_env.get_template("spain.svg").render()))
-
 class SearchResults(BaseAuthHandler):
     def get(self, place, lat, lon, dist):
         title = "Gasolineras cerca de " + decode_param(place)
@@ -368,7 +364,6 @@ app = webapp2.WSGIApplication([
     ('/gasolineras/?([^ \/]+)/?([^ \/]+)?/?', List),
     ('/ficha/?([^ \/]+)/?([^ \/]+)?/?([^ \/]+)?', Detail),
     ('/api/?([^ \/]+)/?([^ \/]+)?/?([^ \/]+)?', Api),
-    ('/buscador/?', Search),
     ('/geo/(.+)/(.+)/(.+)/(.+)/?', GeoApi),
     ('/resultados/(.+)/(.+)/(.+)/(.+)/?', SearchResults),
     ('/info/(noticias|tarjetas|combustibles)/?', Info),
