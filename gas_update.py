@@ -84,6 +84,7 @@ class ResultIter(Result):
 					yield [p, t, s, st["date"], st["label"], st["hours"], st["options"], st.get("latlon")]
 	def as_table(self):
 		for row in self:
+			row = [x if x else "" for x in row]
 			row[3] = "/".join(row[3].isoformat().split("-")[1:])
 			options = [str(row[6].get(o, "")) for o in FUEL_OPTIONS]
 			row[-1] = "("+",".join(row[-1])+")" if row[-1] else ""

@@ -175,11 +175,11 @@ footer a:hover{
 }
 
 #content {
+	background-color: #fff;
+	margin: 20px;
 	position: relative;
-	width: 100%;
-	padding: 10px;
+	padding: 20px;
 	width: 1100px;
-	margin: auto;
 }
 
 input {
@@ -279,9 +279,5 @@ ul.droplist a {
 ul.droplist:hover {
 	height: 300px;
 	overflow-y: scroll;
-}
-#content {
-	background-color: #fff;
-	margin: 20px;
 }
 

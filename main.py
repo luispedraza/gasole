@@ -92,7 +92,6 @@ class AdminUpdate(BaseHandler):
             self.render("admin_update_xls.html",
                 options=FUEL_OPTIONS,
                 data=data)
-        logging.info(data.array())
         if self.request.get("updatedb"):
                 data2store(data.data)
 
