@@ -14,25 +14,25 @@ D3_API = 'http://d3js.org/d3.v3.min.js'
 OPENLAYERS_API = 'http://openlayers.org/api/2.12/OpenLayers.js'
 
 MEDIA_JS = {
-	'detail.js': {
-		'src': 		['utils.js','detail.js'],
-		'api': 		[]
+	'home.js': {
+		'src':		['search.js'],
+		'api':		[GOOGLE_MAPS_API]
 		},
-	'geocode.js': {
-		'src':		['geocode.js'],
-		'api': 		[]
+	'detail.js': {
+		'src': 		['utils.js','detail.js','search.js'],
+		'api': 		[GOOGLE_MAPS_API]
 		},
 	'list.js': {
-		'src':		['libs/markerclusterer.min.js','utils.js','list.js'],
-		'api':		[]
+		'src':		['libs/markerclusterer.min.js','utils.js','list.js','search.js'],
+		'api':		[GOOGLE_MAPS_API]
 		},
 	'cantidad.js' : {
-		'src':		['g_cantidad.js'],
-		'api':		[]
+		'src':		['g_cantidad.js','search.js'],
+		'api':		[GOOGLE_MAPS_API]
 		},
 	'precio.js': {
-		'src':		['g_precio.js'],
-		'api':		[D3_API, OPENLAYERS_API]
+		'src':		['g_precio.js','search.js'],
+		'api':		[D3_API, OPENLAYERS_API, GOOGLE_MAPS_API]
 		},
 	}
 

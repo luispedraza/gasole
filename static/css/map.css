@@ -6,12 +6,6 @@
 	width: 100%;
 }
 
-#label {
-	opacity: 1.0;
-	display: none;
-	z-index: 500;
-}
-
 .canarias {
 	fill-rule:evenodd;
 	clip-rule:evenodd;
@@ -23,9 +17,7 @@
 }
 
 .prov {
-/*	fill-rule:evenodd;
-	clip-rule:evenodd;*/
-	fill:#F00;
+	fill: #f00;
 	cursor: pointer;
 }
 .prov:hover {

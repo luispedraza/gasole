@@ -34,7 +34,6 @@
 	<meta property="og:image" content="http://www.gasole.net/img/logo_small.png" />
 	<meta property="og:site_name" content="GasOl&#xe9;" />
 	<meta property="fb:admins" content="613759574" />
-
 </head>
 
 
@@ -53,30 +52,41 @@ fjs.parentNode.insertBefore(js, fjs);
 <header id="header">
 	<a href="/"><div id="logo">Gasolé</div></a>
 	<p>Toda la información sobre gasolinas y otros combustibles</p>
-<div id="search_form">
-	<div class="wrapper">
-	<form action="javascript:geoCode()">
-		<input type="text" id="address" name="address" placeholder="Ej.: Gran Vía 25, Madrid" />
-		<input type="submit" id="search" value=""></input>
-	</form>
-	</div>
-	
-	<ol id="results"></ol>
-
-</div>
-
-	
-
 	<a id="logout" href="/logout">[x] Salir</a>
 </header>
 
 <nav>
 	<ul class="menu">
-		<li class="menu home"><a href="/">INICIO</a></li>
-		<li class="menu stats"><a href="/graficos/precio">GRÁFICOS</a></li>
-		<li class="menu info"><a href="/info/combustibles">INFORMACIÓN</a></li>
-		<li class="menu cards"><a href="/info/tarjetas">TARJETAS</a></li>
-		<li class="menu news"><a href="/info/noticias">NOTICIAS</a></li>
+		<li class="menu home"><a class="item" href="/">INICIO</a>
+			<div class="description home">Volver a la página principal de GasOlé.</div></li>
+		<li class="menu stats"><a class="item" href="/graficos/precio">GRÁFICOS</a>
+			<div class="description stats">Representaciones gráficas de los precios del combustible y la distribución de gasolineras en España.</div></li>
+		<li class="menu info"><a class="item" href="/info/combustibles">INFORMACIÓN</a>
+			<div class="description info">Algunas notas y apuntes sobre tipos de combustibles e impuestos.</div></li>
+		<li class="menu cards"><a class="item" href="/info/tarjetas">TARJETAS</a>
+			<div class="description cards">Pequeña recopilación de tarjetas que te ayudan a ahorrar en tus compras de combustible.</div></li>
+		<li class="menu news"><a class="item" href="/info/noticias">NOTICIAS</a>
+			<div class="description news">Noticias de actualidad sobre gasolinas, y el mundo de los combustibles en general.</div></li>
+		<li class="menu search">
+			<div class="item">Buscador
+			<form action="javascript:geoCode()">
+			<input type="submit" id="search" value=""></input>
+			<input type="text" id="address" name="address" placeholder="Ej.: Gran Vía 25, Madrid" />
+			</form>
+			</div>
+			<div id="search-box">
+				<div id="results">
+					<p id="results-title">Introduce un lugar de búsqueda: población, provincia, dirección, código postal, hotel, aeropuerto…</p>
+					<ol id="results-list"></ol>
+				</div>
+				<div id="search-options">
+					<div class="my-slider" min="1" max="10" step=".5" id="search-d" value="2"></div>
+					<p id="current-loc">Usar mi posición actual</p>
+				</div><!-- search-options -->
+
+				
+			</div>
+		</li>
 	</ul>
 </nav>
 
