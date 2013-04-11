@@ -5,23 +5,25 @@
 	<h2 class="info">Resumen</h2>
 	<div id="info"></div>
 
-	<h2 class="cities">Ciudades</h2>
+
+	<h2 id="cities_h2" class="cities">Ciudades</h2>
 	<div id="cities">
 		<p>Todas las ciudades de esta provincia</p>
 		<ul id="cities_list"></ul>
 	</div>
 
+
 	<h2 class="types">Combustibles</h2>
 	<div id="types">
 		<p>Elige los tipos de combustible que quieres mostrar:</p>
 		<ul id="fuel_type">
-			<li class="T_G95 on" title="Gasolina 95">Gasolina 95: G95</li>
-			<li class="T_G98 on" title="Gasolina 98">Gasolina 98: G98</li>
-			<li class="T_GOA on" title="Gasóleo A">Gasóleo A: GOA</li>
-			<li class="T_NGO on" title="Nuevo Gasóleo">Nuevo Gasóleo A: NGO</li>
-			<li class="T_GOB on" title="Gasóleo B">Gasóleo B: GOB</li>
-			<li class="T_GOC on" title="Gasóleo C">Gasóleo C: GOC</li>
-			<li class="T_BIOD on" title="Biodiésel">Biodiésel: BIOD</li>
+			<li class="T_G95 on">G95<div>Gasolina 95</div></li>
+			<li class="T_G98 on">G98<div>Gasolina 98</div></li>
+			<li class="T_GOA on">GOA<div>Gasóleo A</div></li>
+			<li class="T_NGO on">NGO<div>Nuevo Gasóleo A</div></li>
+			<li class="T_GOB on">GOB<div>Gasóleo B</div></li>
+			<li class="T_GOC on">GOC<div>Gasóleo C</div></li>
+			<li class="T_BIOD on">BIOD<div>Biodiésel</div></li>
 		</ul>
 	</div>
 
@@ -39,6 +41,9 @@
 		<p id="distante_info"></p>
 		</form>
 	</div>
+
+	<div id="publi_300x250"></div>
+
 </div> <!-- control -->
 
 <div id="publi_730x90"></div>
@@ -68,14 +73,15 @@
 </div> <!-- #table -->
 
 <div id="pager">
-	<div id="pager_less"><a href="javascript:paginateTable('less')"><img src="/img/less.svg"/></a></div>
-	<div id="pager_more"><a href="javascript:paginateTable('more')"><img src="/img/more.svg"></a></div>
 	<div id="pager_links"></div>
+	<div id="pager_less" class="p" onclick="javascript:paginateTable('less')"></div>
+	<div id="pager_more" class="p" onclick="javascript:paginateTable('more')"></div>
+	
 	
 </div><!-- pager -->
 
 </div> <!-- #list -->
 
 
-<div id="ads"></div>
+
 

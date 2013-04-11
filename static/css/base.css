@@ -187,7 +187,6 @@ li.menu:hover > .description {
 footer {
 	font-size: 11px;
 	height: auto;
-	clear: both;
 	margin-top: 10px;
 }
 footer ul {
@@ -369,6 +368,13 @@ footer a:hover{
 	background-color: pink;
 }
 
-
+.clearer:after {
+        visibility: hidden;
+        display: block;
+        font-size: 0;
+        content: " ";
+        clear: both;
+        height: 0;
+}
 
 

@@ -6,7 +6,7 @@ var province = "";
 var infoWindow = null;
 var town = "";
 var markerCenter;
-var pagerN = 20;
+var pagerN = 15;
 var pagerCurrent = 0;
 var markerIcon = "/icon/pump_r.png";
 var windowTimeout;
@@ -51,11 +51,11 @@ function paginateTable(index) {
 		else if (r<index+pagerN) rows[r].className = "r_on";
 		else rows[r].className = "r_off";
 		if (r%pagerN == 0){
-			var link = document.createElement("div");
-			link.innerHTML = ((r+1) + "<br/>" + Math.min(r+pagerN, rows.length))
-				.link("javascript:paginateTable(" + r + ");");
-			if (r==index) link.className = "current";
-			pager_links.appendChild(link);
+			var p = document.createElement("div");
+			p.innerHTML = ((r+1) + "<br/>" + Math.min(r+pagerN, rows.length));
+			p.setAttribute("onclick", "javascript:paginateTable(" + r + ");");
+			if (r==index) p.className = "current";
+			pager_links.appendChild(p);
 		}
 	}
 	pagerCurrent = index;
@@ -327,7 +327,10 @@ function populateTable(id) {
 			citiesList.appendChild(newCity);
 		}
 	}
-	else document.getElementById("c_cities").style.display = "none";
+	else {
+		document.getElementById("cities").style.display = "none";
+		document.getElementById("cities_h2").style.display = "none";
+	}
 }
 
 function processData(info) {

@@ -9,8 +9,9 @@
 	float: left;
 	background-color: black;
 }
-#logo {
+#station-logo {
 	font-size: 25px;
+	background-color: white;
 }
 #price_board .section {
 	display: none;
@@ -62,11 +63,6 @@
 	background-color: red;
 	margin-bottom: 10px;
 }
-
-#logo {
-	background-color: white;
-}
-
 
 #detail {
 	width: 730px;
