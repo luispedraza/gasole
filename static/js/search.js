@@ -162,7 +162,7 @@ window.onload = function() {
 		mySlider(sliders[i]);
 	}
 
-	var provinces = document.getElementsByClassName("provincia");
+	var provinces = document.getElementById("map").getElementsByClassName("prov");
 	for (var p=0; p<provinces.length; p++) {
 		provinces[p].addEventListener("click", function() {
 			alert("hola")
