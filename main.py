@@ -122,7 +122,7 @@ class Stats(BaseAuthHandler):
         title = ""
         if (g_type=="precio"):
             the_scripts = get_js('precio.js',DEBUG)
-            the_styles=['/css/g_map.css','/css/g_precio.css']
+            the_styles=['/css/graficos.css']
             title = u"El Precio del Combustible en España."
         elif (g_type=="cantidad"):
             the_scripts = [GOOGLE_MAPS_VIS_API, MAPBOX_API]+get_js('cantidad.js',DEBUG)

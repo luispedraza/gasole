@@ -38,14 +38,6 @@ function newDistance() {
 	});
 }
 
-/* Filtrado alfabético de ciudades encontradas */
-function filterCities(cname) {
-	var cities = document.getElementById("cities_list").getElementsByTagName("li");
-	for (var c=0; c<cities.length; c++) {
-		cities[c].style.display = ((cities[c].className==cname) ? "block" : "none");
-	}
-}
-
 function paginateTable(index) {
 	var rows = document.getElementById("table_data").getElementsByTagName("tr");
 	var pager_links = document.getElementById("pager_links");
@@ -120,8 +112,7 @@ function initMap() {
 	var markerCluster = new MarkerClusterer(map, markers);
 }
 function sortTable(cname, reverse, isfloat) {
-	if (typeof reverse == "undefined")
-		reverse = false;
+	if (typeof reverse == "undefined") reverse = false;
 	function quickSort(a) {
 		/* Ordenación QuickSort de una tabla */
 		if (a.length<=1) return a;
@@ -236,14 +227,6 @@ function initControl() {
 		})
 	}
 
-	// Tamaño del mapa 
-	document.getElementById("zoom_google_map").addEventListener("click", function() {
-		var mapDiv = document.getElementById("google_map");
-		mapDiv.className = ((mapDiv.className) ? "" : "big");
-		setTimeout(function() {
-			google.maps.event.trigger(map, 'resize');
-		}, 1000);
-	})
 	// Control de resultados
 	var controls = document.getElementsByClassName("c_item");
 	for (var c=0; c<controls.length; c++) {
@@ -298,7 +281,9 @@ function populateTable(id) {
 				for (var o in FUEL_OPTIONS) {
 					var otd = document.createElement("td");
 					otd.className = "T_" + FUEL_OPTIONS[o]["short"] + " on";
-					otd.textContent = data[p][t][s]["options"][o] || "";
+					var price = data[p][t][s]["options"][o];
+					price = (price) ? (parseFloat(price).toFixed(3)) : ("");
+					otd.textContent = price;
 					tr.appendChild(otd);
 				}
 				try { // Marcadores
@@ -335,14 +320,10 @@ function populateTable(id) {
 			if (a[0].toLowerCase()<b[0].toLowerCase()) return -1;
 			if (a[0].toLowerCase()>b[0].toLowerCase()) return 1;
 			return 0;
-		})
+		});
 		for (var c=0; c<cities.length; c++) {
 			var newCity = document.createElement("li");
 			newCity.innerHTML = cities[c][0].link(cities[c][1]);
-			if (cities[c][0].charAt(0).toLowerCase() < "d") newCity.className = "c_A";
-			else if (cities[c][0].charAt(0).toLowerCase() < "n") newCity.className = "c_D";
-			else if (cities[c][0].charAt(0).toLowerCase() < "s") newCity.className = "c_N";
-			else newCity.className = "c_S";
 			citiesList.appendChild(newCity);
 		}
 	}

@@ -73,10 +73,10 @@ function insertLogo(label) {
 	if (logoid) {
 		var img = document.createElement("img");
 		img.src = "/img/logos/" + logoid + "_w.png";
-		document.getElementById("logo").appendChild(img);
+		document.getElementById("station-logo").appendChild(img);
 	}
 	else {
-		document.getElementById("logo").textContent = label;
+		document.getElementById("station-logo").textContent = label;
 	}
 }
 function initPrice(price) {

@@ -1,130 +1,88 @@
 #list {
 	width: 730px;
+	float: right;
 	font-size: .9em;
 }
 #control {
+	background-color: #333;
 	position: relative;
-	height: 150px;
-}
-#control_items li {
-	width: 90px;
-	height: 20px;
-	cursor: pointer;
-	padding-left: 35px;
-	padding-top: 5px;
-}
-#control .c_content {
-	position: absolute;
-	left: 130px;
-	right: 0;
-	top: 0;
-	bottom: 10px;
-	display: none;
-	padding: 10px;
-	border: 5px solid #3399CC;
-	background-color: #3399CC;
-	color: white;
-}
-
-#control .c_content > p:first-child {
-	border-bottom: 2px solid white;
-	overflow: hidden;
-	padding-top: 5px;
-}
-
-#control .c_content a {
-	color: white;
-}
-#control .c_content.on {
-	display: block;
-}
-.c_item {
-	background-repeat: no-repeat;
-	background-size: 20px;
-}
-.c_item.on {
-	background-color: #3399CC;
-	color: white;
-	border: 5px solid #3399CC;
-}
-
-#c_info {
-	background-image: url("/img/info.svg");
-}
-#c_cities {
-	background-image: url("/img/city.svg");
-}
-#cities .filter {
-	padding: 3px;
-	cursor: pointer;
-	border: 1px solid white;
-	margin-right: 3px;
-}
-
-#cities_list {
-	-moz-column-count:5; /* Firefox */
-	-webkit-column-count:5; /* Safari and Chrome */
-	column-count:5;
-	-moz-column-gap:10px; /* Firefox */
-	-webkit-column-gap:10px; /* Safari and Chrome */
-	column-gap:10px;
-	-moz-column-rule:1px outset white; /* Firefox */
-	-webkit-column-rule:1px outset white; /* Safari and Chrome */
-	column-rule:1px outset white;
-	font-size: .8em;
-	overflow: scroll;
-}
-#cities_list li {
-	overflow: hidden;
-	text-overflow: ellipsis;
-	-o-text-overflow: ellipsis;
-	white-space: nowrap;
-	margin-bottom: .5em;
-	display: none;
-}
-#cities ul li.c_A {
-	display: block;
-}
-
-#c_filter {
-	background-image: url("/img/filter.svg");
-}
-#c_types {
-	background-image: url("/img/pump.svg");
-}
-#c_distance {
-	background-image: url("/img/distance.svg");
+	width: 320px;
+	float: left;
+	color: #fff;
 }
 
 #google_map {
-	width: 370px;
+	width: 730px;
 	height: 300px;
-	border: 1px dotted black;
-	position: absolute;
-	right: 0;
-	top: 80px;
-	-webkit-transition: all .5s;
-	-moz-transition: all .5s;
-	transition: all .5s;
-
+	float: right;
+	margin-bottom: 2px;
 }
-#zoom_google_map {
-	width: 370px;
-	position: absolute;
-	right: 0;
-	top: 0;
+
+#publi_730x90 {
+	width: 730px;
+	height: 90px;
 	border: 1px dotted black;
+	float: right;
+	margin-bottom: 2px;
+}
+h2 {
+	padding-left: 30px;
+	background-repeat: no-repeat;
+	background-size: 20px;
+	height: 20px;
+	background-position: 5px 0px;
+}
+#control > div {
+	margin-left: 30px;
+}
+#cities p {
+	width: 250px;
+	border: 1px solid #fff;
+	padding: 3px;
+	background-position: 240px 10px;
+	background-repeat: no-repeat;
+	background-image: url('/img/arrow_white.png');
 	cursor: pointer;
 }
-
-#google_map.big {
-	width: 1000px;
-	height: 600px;
+#cities ul {
+	height: 0;
+	overflow: hidden;
+}
+#cities:hover ul {
+	height: 200px;
+	overflow: scroll;
+}
+#cities_list {
+	background-color: #fff;
+	width: 250px;
+}
+#cities_list a {
+	text-decoration: none;
+	color: #333;
+	display: block;
+	padding: 2px;
+}
+#cities_list a:hover {
+	color: #fff;
+	background-color: #333;
+}
+.info {
+	background-image: url("/icon/_info.png");
+}
+.cities {
+	background-image: url("/img/city.png");
+}
+.filter {
+	background-image: url("/img/filter.png");
+}
+.types {
+	background-image: url("/img/pump.png");
+}
+.distance {
+	background-image: url("/img/distance.png");
 }
 
-#ads {
-	border: 1px solid black;
-}
+
 th.T_LOC, th.T_ADDR, th.T_DIST {
 	background-color: #3399CC;
 	border-color: #006699;
@@ -208,9 +166,8 @@ th div.sort {
 	margin-bottom: 3px;
 	width: 10px;
 	height: 20px;
-	background-image: url('/img/sort.svg');
+	background-image: url('/img/sort_off.png');
 	background-repeat: no-repeat;
-	background-size: 10px 20px;
 	-webkit-transition: all .5s;
 	-moz-transition: all .5s;
 	-ie-transition: all .5s;
@@ -218,14 +175,10 @@ th div.sort {
 	transition: all .5s;
 }
 th.sort_up div.sort {
-	background-image: url('/img/sort_up.svg');
-	background-repeat: no-repeat;
-	background-size: 10px 20px;
+	background-image: url('/img/sort_on.png');
 }
 th.sort_down div.sort {
-	background-image: url('/img/sort_up.svg');
-	background-repeat: no-repeat;
-	background-size: 10px 20px;
+	background-image: url('/img/sort_on.png');
 	-webkit-transform: rotate(180deg);
 	-moz-transform: rotate(180deg);
 	-ms-transform: rotate(180deg);
@@ -241,7 +194,7 @@ thead tr.r_off {
 }
 tr {
 	margin-top: 5px;
-	border-bottom: 3px solid #EEF;
+	border-bottom: 1px solid #EEF;
 }
 
 #table {
@@ -331,7 +284,4 @@ tr {
 #pager div {
 	display: inline-block;
 	margin-right: 15px;
-}
-#pager_less {
-
 }
