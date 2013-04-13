@@ -2,21 +2,24 @@
 
 <div id="control">
 
-	<h2 class="info">Resumen</h2>
+	<div class="panel clearer" id="p-info">
+	<h2>Resumen</h2>
 	<div id="info"></div>
-
-
-	<h2 id="cities_h2" class="cities">Ciudades</h2>
-	<div id="cities">
-		<p>Todas las ciudades de esta provincia</p>
-		<ul id="cities_list"></ul>
 	</div>
 
+	<div class="panel clearer" id="p-cities">
+	<h2>Ciudades</h2>
+	<div id="cities">
+		<p>Todas las ciudades de esta provincia</p>
+		<ul id="cities-list"></ul>
+	</div>
+	</div>
 
-	<h2 class="types">Combustibles</h2>
+	<div class="panel clearer" id="p-types">
+	<h2>Combustibles</h2>
 	<div id="types">
 		<p>Elige los tipos de combustible que quieres mostrar:</p>
-		<ul id="fuel_type">
+		<ul id="fuel-type">
 			<li class="T_G95 on">G95<div>Gasolina 95</div></li>
 			<li class="T_G98 on">G98<div>Gasolina 98</div></li>
 			<li class="T_GOA on">GOA<div>Gasóleo A</div></li>
@@ -26,14 +29,18 @@
 			<li class="T_BIOD on">BIOD<div>Biodiésel</div></li>
 		</ul>
 	</div>
+	</div>
 
-	<h2 class="filter">Filtro</h2>
+	<div class="panel clearer" id="p-filter">
+	<h2>Filtro</h2>
 	<div id="filter">
 		<p>Refina la búsqueda introduciendo un texto para filtrar los resultados obtenidos:</p>
 		<input id="contains" type="text" />
 	</div>
+	</div>
 
-	<h2 class="distance">Distancia</h2>
+	<div class="panel clearer" id="p-distance">
+	<h2>Distancia</h2>
 	<div id="distance">
 		<p>Encuentra las gasolineras más cercanas a una dirección:</p>
 		<form action="javascript:newDistance()">
@@ -41,13 +48,33 @@
 		<p id="distante_info"></p>
 		</form>
 	</div>
+	</div>
 
-	<div id="publi_300x250"></div>
+	<div class="panel"><div id="publi_300x250"></div></div>
 
 </div> <!-- control -->
 
 <div id="publi_730x90"></div>
-<div id="google_map"></div>
+
+<div id="map_area">
+	<div id="toolbar">
+		<div id="m-density" title="Muestra la gasolineras agrupadas según su densidad" onclick="javascript:mapCluster();">Mapa de concentración</div>
+		<div>Mapas de precios</div>
+		<div onclick="javascript:mapPrice('G95');">Gasolina 95</div>
+		<div onclick="javascript:mapPrice('G98');">Gasolina 98</div>
+		<div onclick="javascript:mapPrice('GOA');">Gasóleo A</div>
+		<div onclick="javascript:mapPrice('NGO');">Nuevo Gasóleo A</div>
+		<div onclick="javascript:mapPrice('GOB');">Gasóleo B</div>
+		<div onclick="javascript:mapPrice('GOC');">Gasóleo C</div>
+		<div onclick="javascript:mapPrice('BIOD');">Biodiésel</div>
+	</div>
+	<div id="google_map"></div>
+	<div id="detail">
+		<div id="d-title"></div>
+		<ul id="d-prices"></ul>
+		<a id="d-link">Ver detalles y opiniones</a>
+	</div>
+</div>
 
 <div id="list">
 <div id="table">
@@ -76,8 +103,6 @@
 	<div id="pager_links"></div>
 	<div id="pager_less" class="p" onclick="javascript:paginateTable('less')"></div>
 	<div id="pager_more" class="p" onclick="javascript:paginateTable('more')"></div>
-	
-	
 </div><!-- pager -->
 
 </div> <!-- #list -->

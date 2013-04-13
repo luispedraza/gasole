@@ -161,12 +161,14 @@ window.onload = function() {
 	for (var i=0; i<sliders.length; i++) {
 		mySlider(sliders[i]);
 	}
+	var map = document.getElementById("map");
+	if (map) {
+		var provinces = map.getElementsByClassName("prov");
+		for (var p=0; p<provinces.length; p++) {
+			provinces[p].addEventListener("click", function() {
 
-	var provinces = document.getElementById("map").getElementsByClassName("prov");
-	for (var p=0; p<provinces.length; p++) {
-		provinces[p].addEventListener("click", function() {
-			alert("hola")
-		})
+			})
+		}
 	}
 	initGeoloc();
 }

@@ -23,7 +23,7 @@ MEDIA_JS = {
 		'api': 		[GOOGLE_MAPS_API]
 		},
 	'list.js': {
-		'src':		['libs/markerclusterer.min.js','utils.js','list.js','search.js'],
+		'src':		['libs/markerclustererplus.min.js','utils.js','list.js','search.js'],
 		'api':		[GOOGLE_MAPS_API]
 		},
 	'cantidad.js' : {

@@ -261,10 +261,6 @@ footer a:hover{
 	background-position: 5px 5px;
 	background-repeat: no-repeat;
 	border: 1px solid #58110e;
-	-webkit-border-radius: 3px;
-	-moz-border-radius: 3px;
-	-ms-border-radius: 3px;
-	-o-border-radius: 3px;
 	border-radius: 3px;
 }
 .menu.search:hover #search-box {
@@ -352,7 +348,7 @@ footer a:hover{
 	text-align: center;
 	border: 1px solid #fff;
 	cursor: pointer;
-	-webkit-border-radius: 3px;
+	border-radius: 3px;
 	background-image: url('/img/my_location.png');
 	background-repeat: no-repeat;
 	background-position: 2px 2px;
