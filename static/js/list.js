@@ -90,9 +90,9 @@ function newReference(loc) {
 /* Paginación de la tabla */
 function paginateTable(index) {
 	var rows = document.getElementById("table-data").getElementsByClassName("r_on");
-	var pager = document.getElementById("pager_links");
+	var pager = document.getElementById("pager-links");
 	if (!rows.length) {
-		pager.innerHTML = "No hay ningún resultado"; return;	
+		pager.innerHTML = "<p>No hay resultados coincidentes con los criterios de búsqueda.<br>Comprueba el filtro y tipos de combustible seleccionados.</p>"; return;	
 	}
 	if (index === "more") index = Math.min(pagerCurrent+pagerN, parseInt(rows.length/pagerN)*pagerN);
 	else if (index === "less") index = Math.max(pagerCurrent-pagerN, 0);
@@ -113,15 +113,16 @@ function paginateTable(index) {
 }
 /* Cálculo de distancias al marcador de referencia */
 function calcDistances() {
-	var rows = document.getElementById("table-data").getElementsByTagName("tr");
-	for (var r=0; r<rows.length; r++) {
-		try {
-			var latlon = rows[r].getAttribute("latlon").split(",");
+	var tds = document.getElementById("table-data").getElementsByClassName("T_DIST");
+	for (var i=0; i<tds.length; i++) {
+		var latlon = tds[i].getAttribute("data-geo");
+		if (latlon) {
+			latlon = latlon.split(",");
 			var dlat = (latlon[0] - markerCenter.position.lat()) * 111.03461;
 			var dlon = (latlon[1] - markerCenter.position.lng()) * 85.39383;
 			var dist = Math.sqrt(dlat*dlat+dlon*dlon).toFixed(1);
-			rows[r].getElementsByClassName("T_DIST")[0].textContent = dist;
-		} catch(e) {};
+			tds[i].textContent = dist;
+		}
 	}
 	sortTable("T_DIST", false, true);
 }
@@ -236,6 +237,7 @@ function sortTable(cname, reverse, isfloat) {
 			headers[h].className = headers[h].className + ((reverse) ? (" sort_down") : (" sort_up"));
 		}
 	}
+	paginateTable(0);
 }
 
 /* Filtro de resultados por tipo de combustible */
@@ -327,7 +329,7 @@ function showDetail(marker) {
 	map.setZoom(16);
 	var det=document.getElementById("detail");
 	det.className = "on";
-	var row = document.getElementById(marker.get("row-id"));
+	var row = document.getElementById(marker.get("id"));
 	var label = row.getElementsByClassName("T_ADDR")[0].getAttribute("label");
 	var address = row.getElementsByClassName("T_ADDR")[0]
 		.getElementsByTagName("a")[0].textContent;
@@ -420,11 +422,38 @@ function populateTable(types) {
 				tr.appendChild(td_s);
 				var td_dist = document.createElement("td");
 				td_dist.className = "T_DIST";
-				td_dist.addEventListener("click", function() {
-					var marker = markers[this.parentElement.id.split("-")[1]];
-					showDetail(marker);
-				})
+				// Marcadores
+				if (dataPTS.hasOwnProperty("latlon")) {
+					var pos = new google.maps.LatLng(dataPTS.latlon[0], dataPTS.latlon[1]);
+					var color = COLORS.p_max;
+					var colorS = COLORS.p_maxStroke;
+					var options = { 
+						icon: {
+							path: google.maps.SymbolPath.CIRCLE,
+							strokeColor: colorS,
+							strokeOpacity: 1.0,
+							strokeWeight: 2,
+							fillColor: color,
+							fillOpacity: .7,
+							scale: 8
+						}, 
+						map: map, position: pos };
+					var marker = new google.maps.Marker(options);
+					google.maps.event.addListener(marker, 'click', function(e) {
+						showDetail(this);
+					});
+					tr.id="tr-"+markers.length;
+					td_dist.id="td-"+markers.length;
+					markers.push(marker);
+					td_dist.setAttribute("data-geo", dataPTS["latlon"].join(","));
+					td_dist.addEventListener("click", function() {
+						var marker = markers[this.id.split("-")[1]];
+						showDetail(marker);
+					});
+					marker.set("id", tr.id);
+				}
 				tr.appendChild(td_dist);
+				// Precios
 				for (var o in FUEL_OPTIONS) {
 					otd = document.createElement("td");
 					var price = dataPTS["options"][o];
@@ -434,36 +463,6 @@ function populateTable(types) {
 					} else otd.className = "T_" + o;
 					tr.appendChild(otd);
 				}
-				// Marcadores
-				markers = []; 
-				try {
-					var pos = new google.maps.LatLng(dataPTS.latlon[0], dataPTS.latlon[1]);
-					var color = COLORS.p_max;
-					var colorS = COLORS.p_maxStroke;
-					if (value<.25) {color=COLORS.p_min; colorS=COLORS.p_minStroke;}
-					else if (value<.75) {color=COLORS.p_mean; colorS=COLORS.p_meanStroke;}
-					var options = {
-						icon: {
-							path: google.maps.SymbolPath.CIRCLE,
-							strokeColor: colorS,
-							strokeOpacity: 1.0,
-							strokeWeight: 2,
-							fillColor: color,
-							fillOpacity: .7,
-							scale: 8
-						},
-						map: map,
-						position: pos
-					};
-					var marker = new google.maps.Marker(options);
-					google.maps.event.addListener(marker, 'click', function(e) {
-						showDetail(this);
-					});
-					markers.push(marker);
-					tr.id="mark-"+(markers.length-1);
-					tr.setAttribute("latlon", dataPTS["latlon"].join(","));
-					marker.set("row-id", tr.id);
-				} catch (e){}
 				table.appendChild(tr);
 				Stats.add(dataPTS["options"]);
 			}
@@ -506,9 +505,9 @@ function processData(info) {
 	populateInfo();
 	// para cambiar la imagen http://stackoverflow.com/questions/4416089/google-maps-api-v3-custom-cluster-icon
 	// for (var m=0; m<markers.length; m++) markers[m].setMap(map);
-	mapCluster();
 	initControl();
 	newReference(place);
+	paginateTable(0);
 }
 
 window.addEventListener("load", function() {
