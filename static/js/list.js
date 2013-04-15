@@ -41,8 +41,8 @@ var COLORS = {
 	minStroke: "#288627",
 	max: "#f00",
 	maxStroke: "#D30000",
-	mu: "#FF9933",
-	muStroke: "#D07B26"
+	mu: "#3399CC",
+	muStroke: "#006699"
 }
 
 function newReference(loc) {
@@ -185,6 +185,22 @@ function initMap() {
 	map = new google.maps.Map(document.getElementById("google_map"),
 		mapOptions);
 	cluster = new MarkerClusterer(map);
+	// adsense
+	if (window.location.hostname.match("localhost")) return;
+	var adUnitDiv = document.createElement('div');
+	var adUnitOptions = {
+		format: google.maps.adsense.AdFormat.VERTICAL_BANNER,
+		position: google.maps.ControlPosition.RIGHT_TOP,
+		backgroundColor: '#c4d4f3',
+		borderColor: '#e5ecf9',
+		titleColor: '#0000cc',
+		textColor: '#000000',
+		urlColor: '#009900',
+		map: map,
+		visible: true,
+		publisherId: 'pub-9285487390483271'
+	}
+	adUnit = new google.maps.adsense.AdUnit(adUnitDiv, adUnitOptions);
 }
 /* Ordenación de la tabla */
 function sortTable(cname, reverse, isfloat) {
@@ -324,7 +340,7 @@ function initControl() {
 }
 function showDetail(marker) {
 	map.panTo(marker.position);
-	map.setZoom(14);
+	map.setZoom(16);
 	var det=document.getElementById("detail");
 	det.className = "on";
 	var row = document.getElementById(marker.get("id"));
@@ -367,11 +383,11 @@ function populateInfo() {
 		td = document.createElement("td");
 		td.textContent = data.n; tr.appendChild(td);
 		td = document.createElement("td");
-		td.textContent = data.min.toFixed(3); td.className="price min"; tr.appendChild(td);
+		td.innerHTML = "<span>"+data.min.toFixed(3)+"</span>"; td.className="price min"; tr.appendChild(td);
 		td = document.createElement("td");
-		td.textContent = data.mean.toFixed(3); td.className="price mean"; tr.appendChild(td);
+		td.innerHTML = "<span>"+data.mean.toFixed(3)+"</span>"; td.className="price mean"; tr.appendChild(td);
 		td = document.createElement("td");
-		td.textContent = data.max.toFixed(3); td.className="price max"; tr.appendChild(td);
+		td.innerHTML = "<span>"+data.max.toFixed(3)+"</span>"; td.className="price max"; tr.appendChild(td);
 		divSum.appendChild(tr);
 	}
 }
