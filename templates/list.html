@@ -5,12 +5,16 @@
 	<div class="panel clearer" id="p-info">
 	<h2>Resumen</h2>
 	<div id="info"></div>
+	<table id="summary">
+		<tr><th rowspan="2">Tipo</th><th rowspan="2">Puntos de venta</th><th colspan="3">Precios</th></tr>
+		<tr><td class="min">MÍNIMO</td><td class="mean">MEDIO</td><td class="max">MÁXIMO</td></tr>
+	</table>
 	</div>
 
 	<div class="panel clearer" id="p-cities">
 	<h2>Ciudades</h2>
 	<div id="cities">
-		<p>Todas las ciudades de esta provincia</p>
+		<p>Ciudades en este resultado</p>
 		<ul id="cities-list"></ul>
 	</div>
 	</div>
@@ -18,15 +22,15 @@
 	<div class="panel clearer" id="p-types">
 	<h2>Combustibles</h2>
 	<div id="types">
-		<p>Elige los tipos de combustible que quieres mostrar:</p>
+		<p>Elige los combustibles que quieres mostrar:</p>
 		<ul id="fuel-type">
-			<li class="T_G95 on">G95<div>Gasolina 95</div></li>
-			<li class="T_G98 on">G98<div>Gasolina 98</div></li>
-			<li class="T_GOA on">GOA<div>Gasóleo A</div></li>
-			<li class="T_NGO on">NGO<div>Nuevo Gasóleo A</div></li>
-			<li class="T_GOB on">GOB<div>Gasóleo B</div></li>
-			<li class="T_GOC on">GOC<div>Gasóleo C</div></li>
-			<li class="T_BIOD on">BIOD<div>Biodiésel</div></li>
+			<li class="T_1 on">G95<div>Gasolina 95</div></li>
+			<li class="T_3 off">G98<div>Gasolina 98</div></li>
+			<li class="T_4 off">GOA<div>Gasóleo A</div></li>
+			<li class="T_5 off">NGO<div>Nuevo Gasóleo A</div></li>
+			<li class="T_6 off">GOB<div>Gasóleo B</div></li>
+			<li class="T_7 off">GOC<div>Gasóleo C</div></li>
+			<li class="T_8 off">BIOD<div>Biodiésel</div></li>
 		</ul>
 	</div>
 	</div>
@@ -34,7 +38,7 @@
 	<div class="panel clearer" id="p-filter">
 	<h2>Filtro</h2>
 	<div id="filter">
-		<p>Refina la búsqueda introduciendo un texto para filtrar los resultados obtenidos:</p>
+		<p>Introduce un texto para refinar los resultados:</p>
 		<input id="contains" type="text" />
 	</div>
 	</div>
@@ -42,10 +46,10 @@
 	<div class="panel clearer" id="p-distance">
 	<h2>Distancia</h2>
 	<div id="distance">
-		<p>Encuentra las gasolineras más cercanas a una dirección:</p>
-		<form action="javascript:newDistance()">
+		<p>Busca un punto de referencia:</p>
+		<form action="javascript:newReference()">
 		<input id="from" type="text" placeholder="Ej.: Gran Vía 27, o Parque de Atracciones…" />
-		<p id="distante_info"></p>
+		<p id="distance-info"></p>
 		</form>
 	</div>
 	</div>
@@ -60,13 +64,13 @@
 	<div id="toolbar">
 		<div id="m-density" title="Muestra la gasolineras agrupadas según su densidad" onclick="javascript:mapCluster();">Mapa de concentración</div>
 		<div>Mapas de precios</div>
-		<div onclick="javascript:mapPrice('G95');">Gasolina 95</div>
-		<div onclick="javascript:mapPrice('G98');">Gasolina 98</div>
-		<div onclick="javascript:mapPrice('GOA');">Gasóleo A</div>
-		<div onclick="javascript:mapPrice('NGO');">Nuevo Gasóleo A</div>
-		<div onclick="javascript:mapPrice('GOB');">Gasóleo B</div>
-		<div onclick="javascript:mapPrice('GOC');">Gasóleo C</div>
-		<div onclick="javascript:mapPrice('BIOD');">Biodiésel</div>
+		<div onclick="javascript:mapPrice('1');">Gasolina 95</div>
+		<div onclick="javascript:mapPrice('3');">Gasolina 98</div>
+		<div onclick="javascript:mapPrice('4');">Gasóleo A</div>
+		<div onclick="javascript:mapPrice('5');">Nuevo Gasóleo A</div>
+		<div onclick="javascript:mapPrice('6');">Gasóleo B</div>
+		<div onclick="javascript:mapPrice('7');">Gasóleo C</div>
+		<div onclick="javascript:mapPrice('8');">Biodiésel</div>
 	</div>
 	<div id="google_map"></div>
 	<div id="detail">
@@ -79,21 +83,21 @@
 <div id="list">
 <div id="table">
 	<table>
-	<thead>
+	<thead id="table-head">
 	<tr>
 		<th class="T_LOC"><div class="sort"></div>Localidad</th>
 		<th class="T_ADDR"><div class="sort"></div>Dirección</th>
-		<th class="T_DIST" isfloat="true"><div class="sort"></div>Distancia</th>
-		<th class="T_G95 on" isfloat="true"><div class="sort"></div>G95</th>
-		<th class="T_G98 on" isfloat="true"><div class="sort"></div>G98</th>
-		<th class="T_GOA on" isfloat="true"><div class="sort"></div>GOA</th>
-		<th class="T_NGO on" isfloat="true"><div class="sort"></div>NGO</th>
-		<th class="T_GOB on" isfloat="true"><div class="sort"></div>GOB</th>
-		<th class="T_GOC on" isfloat="true"><div class="sort"></div>GOC</th>
-		<th class="T_BIOD on" isfloat="true"><div class="sort"></div>BIOD</th>
+		<th class="T_DIST" data-float><div class="sort"></div>Distancia</th>
+		<th class="T_1" data-float><div class="sort"></div>G95</th>
+		<th class="T_3" data-float><div class="sort"></div>G98</th>
+		<th class="T_4" data-float><div class="sort"></div>GOA</th>
+		<th class="T_5" data-float><div class="sort"></div>NGO</th>
+		<th class="T_6" data-float><div class="sort"></div>GOB</th>
+		<th class="T_7" data-float><div class="sort"></div>GOC</th>
+		<th class="T_8" data-float><div class="sort"></div>BIOD</th>
 	</tr>
 	</thead>
-	<tbody id="table_data">
+	<tbody id="table-data">
 
 	</tbody>
 	</table>
