@@ -7,51 +7,48 @@ var town = "";
 var markerCenter;
 var pagerN = 15;
 var pagerCurrent = null;
-var markerIcon = "/img/pump_mark.png";
-var windowTimeout;
-var focusMarker;
 var infoWindow = null;
 var cluster = null;
-var Stats = {types: {}, n: 0, init: false};
-Stats.add = function(station) {
-	if (this.init) return;
-	for (var t in station) {
-		var val = station[t];
-		if (this.types.hasOwnProperty(t)) {
-			var data = this.types[t];
-			if (val>data.max) data.max=val;
-			else if (val<data.min) data.min=val;
-			data.mean = (data.mean*data.n+val)/(data.n+1);
-			data.n++;
-		} else this.types[t] = {max: val, min: val, mean: val, n: 1};
+var Stats = {
+	types: {}, n: 0, init: false,
+	add: function(station) {
+		if (this.init) return;
+		for (var t in station) {
+			var val = station[t];
+			if (this.types.hasOwnProperty(t)) {
+				var data = this.types[t];
+				if (val>data.max) data.max=val;
+				else if (val<data.min) data.min=val;
+				data.mean = (data.mean*data.n+val)/(data.n+1);
+				data.n++;
+			} else this.types[t] = {max: val, min: val, mean: val, n: 1};
+		}
+		this.n++;
+	},
+	run: function() {
+		// Peso relativo de cada tipo de combustible
+		var N=0;
+		for (var t in this.types) {
+			N+=this.types[t].n;
+			this.types[t].range = this.types[t].max - this.types[t].min;
+		}
+		for (var t in this.types) this.types[t].w = this.types[t].n/N;
+		this.init = true;
 	}
-	this.n++;
 }
-Stats.run = function() {
-	// Peso relativo de cada tipo de combustible
-	var N=0;
-	for (var t in this.types) {
-		N+=this.types[t].n;
-		this.types[t].range = this.types[t].max - this.types[t].min;
-	}
-	for (var t in this.types) this.types[t].w = this.types[t].n/N;
-	this.init = true;
-}
-var priceMarkers = {};
 var COLORS = {
-	p_min: "#36AE34",
-	p_minStroke: "#288627",
-	p_max: "#f00",
-	p_maxStroke: "#D30000",
-	p_mean: "#FF9933",
-	p_meanStroke: "#D07B26"
+	min: "#36AE34",
+	minStroke: "#288627",
+	max: "#f00",
+	maxStroke: "#D30000",
+	mu: "#FF9933",
+	muStroke: "#D07B26"
 }
 
 function newReference(loc) {
 	if (infoWindow) infoWindow.close();
 	var location = loc;
-	if(!location) location = document.getElementById("from").value + 
-		((town) ? (", " + town ) : ("")) + ", " + province + ", " + "Spain";
+	if(!location) location = document.getElementById("from").value;
 	var geocoder = new google.maps.Geocoder();
 	geocoder.geocode({'address': location}, function (res, stat) {
 		var infoDiv = document.getElementById("distance-info");
@@ -127,65 +124,58 @@ function calcDistances() {
 	sortTable("T_DIST", false, true);
 }
 function mapCluster() {
-	if (!cluster) cluster = new MarkerClusterer(map, markers);
-	for (var t in priceMarkers) {
-		if (priceMarkers[t].on) {
-			var mm = priceMarkers[t].markers;
-			for (var m=0; m<mm.length; m++) mm[m].setMap(null);
-			priceMarkers[t].on = false;
+	if (document.getElementById("cluster").checked) {
+		for (var m=0; m<markers.length; m++) {
+			if (markers[m].getMap()) cluster.addMarker(markers[m]);
 		}
+	} else {
+		cluster.clearMarkers();
+		updateMarkers();
 	}
 }
-function markerColor(price) {
-
+function markerColor(sel, price) {
+	var vals = [];
+	for (var s=0; s<sel.length; s++) {
+		var current = sel[s];
+		var p = price[current];
+		if (Stats.types[current] && price) {
+			var range = Stats.types[current].range;
+			if (range) {
+				var min = Stats.types[current].min;
+				vals.push((p-min)/range); // precio normalizado
+			} else vals.push(.5);
+		}
+	}
+	if (vals.length==0) return null;
+	var mean = 0;
+	for (var v=0; v<vals.length; v++) {
+		mean = ((mean*v)+vals[v])/(v+1);
+	}
+	var color = [COLORS.maxStroke, COLORS.max];
+	if (mean<.25) color = [COLORS.minStroke, COLORS.min];
+	else if (mean<.75) color = [COLORS.muStroke, COLORS.mu];
+	return color;
 }
 function updateMarkers() {
-	// Busco las filas visibles:
 	var rows = document.getElementById("table-data").getElementsByTagName("tr");
+	selection = getSelTypes();
 	for (var r=0; r<rows.length; r++) {
-		// Precios activos
-		var prices = rows[r].getElementsByClassName("on");
-		var priceM = 0;
-		for (var p=0; p<prices.length; p++) {
-			var type = this.className.match(/T_\w+/)[0].replace("T_","");
-			var price = parseFloat(prices[p].textContent);
-			price = (price-Stats.types[type].min)/Stats.types[type].range;
-			priceM += price*Stats[type].w;
+		var marker = markers[rows[r].id.split("-")[1]];
+		if (marker) {
+			if (rows[r].className.match("r_on")) {
+				var color = markerColor(selection, marker.get("price"));
+				if (color) {
+					marker.setMap(map);
+					marker.icon.strokeColor = color[0];
+					marker.icon.fillColor = color[1];
+					continue;
+				}
+			}
+			marker.setMap(null);
 		}
 	}
 }
-function mapPrice(type) {
-	if (cluster) {
-		cluster.clearMarkers();
-		cluster = null;
-	}
-	for (var t in priceMarkers) {
-		if (priceMarkers[t].on) {
-			if (t==type) return;
-			var mm = priceMarkers[t].markers;
-			for (var m=0; m<mm.length; m++) mm[m].setMap(null);
-			priceMarkers[t].on = false;
-		}
-	}
-	if (priceMarkers.hasOwnProperty(type)) {
-		var mm = priceMarkers[type].markers;
-		for (var m=0; m<markers.length; m++) mm[m].setMap(map);
-		priceMarkers[type].on = true;
-		return;
-	}
-	priceMarkers[type] = {markers:[], on:true};
-	var min = Stats.types[type].min;
-	var range = Stats.types[type].max - min;
-	for (var m=0; m<markers.length; m++) {
-		var rowId = markers[m].get("row-id");
-		var value = document.getElementById(rowId)
-			.getElementsByClassName("T_"+type)[0].innerHTML;
-		if (value) value=parseFloat(value); else continue;
-		value = (value-min)/range;
-		
-		
-	}
-}
+
 function initMap() {
 	var mapOptions = {
 		center: new google.maps.LatLng(40.400, 3.6833),
@@ -194,6 +184,7 @@ function initMap() {
 	};
 	map = new google.maps.Map(document.getElementById("google_map"),
 		mapOptions);
+	cluster = new MarkerClusterer(map);
 }
 /* Ordenación de la tabla */
 function sortTable(cname, reverse, isfloat) {
@@ -298,21 +289,28 @@ function initControl() {
 	var filterT = document.getElementById("fuel-type").getElementsByTagName("li");
 	var filter = [];
 	for (var f=0; f<filterT.length; f++) {
-		filter.push(filterT[f].className);
-		filterT[f].addEventListener("click", function() {
-			var cname = this.className.split(" ");
-			var newCname = cname[0]+" "+((cname[1]=="on") ? "off" : "on");
-			this.className = newCname;
-			filterTypes([newCname]);
-			filterText();
-			paginateTable(0);
-		})
+		if (Stats.types[filterT[f].className.split(" ")[0].split("_")[1]]) {
+			filter.push(filterT[f].className);
+			filterT[f].addEventListener("click", function() {
+				var cname = this.className.split(" ");
+				var newCname = cname[0]+" "+((cname[1]=="on") ? "off" : "on");
+				this.className = newCname;
+				filterTypes([newCname]);
+				filterText();
+				paginateTable(0);
+				updateMarkers();
+			})
+		} else {
+			filter.push(filterT[f].className.replace("on", "off"));
+			filterT[f].className = "disabled";
+		}
 	}
 	filterTypes(filter);
 	// Filtro de contenido de texto
 	document.getElementById("contains").onkeyup = function() {
 		filterText();
 		paginateTable(0);
+		updateMarkers();
 	}
 	// Ordenación de la tabla
 	var heads = document.getElementById("table").getElementsByTagName("th");
@@ -326,7 +324,7 @@ function initControl() {
 }
 function showDetail(marker) {
 	map.panTo(marker.position);
-	map.setZoom(16);
+	map.setZoom(14);
 	var det=document.getElementById("detail");
 	det.className = "on";
 	var row = document.getElementById(marker.get("id"));
@@ -382,7 +380,7 @@ function populateInfo() {
 function getSelTypes() {
 	var res = [];
 	var types = document.getElementById("types").getElementsByClassName("on");
-	for (var t=0; t<types.length; t++) res.push(types[t].className.split(" ")[0]);
+	for (var t=0; t<types.length; t++) res.push(parseInt(types[t].className.split(" ")[0].split("_")[1]));
 	return res;
 }
 function populateTable(types) {
@@ -425,23 +423,20 @@ function populateTable(types) {
 				// Marcadores
 				if (dataPTS.hasOwnProperty("latlon")) {
 					var pos = new google.maps.LatLng(dataPTS.latlon[0], dataPTS.latlon[1]);
-					var color = COLORS.p_max;
-					var colorS = COLORS.p_maxStroke;
 					var options = { 
 						icon: {
 							path: google.maps.SymbolPath.CIRCLE,
-							strokeColor: colorS,
 							strokeOpacity: 1.0,
 							strokeWeight: 2,
-							fillColor: color,
 							fillOpacity: .7,
-							scale: 8
+							scale: 5
 						}, 
 						map: map, position: pos };
 					var marker = new google.maps.Marker(options);
 					google.maps.event.addListener(marker, 'click', function(e) {
 						showDetail(this);
 					});
+					marker.set("price", dataPTS["options"]);
 					tr.id="tr-"+markers.length;
 					td_dist.id="td-"+markers.length;
 					markers.push(marker);
@@ -507,6 +502,7 @@ function processData(info) {
 	// for (var m=0; m<markers.length; m++) markers[m].setMap(map);
 	initControl();
 	newReference(place);
+	updateMarkers();
 	paginateTable(0);
 }
 

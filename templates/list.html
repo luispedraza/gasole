@@ -62,15 +62,8 @@
 
 <div id="map_area">
 	<div id="toolbar">
-		<div id="m-density" title="Muestra la gasolineras agrupadas según su densidad" onclick="javascript:mapCluster();">Mapa de concentración</div>
-		<div>Mapas de precios</div>
-		<div onclick="javascript:mapPrice('1');">Gasolina 95</div>
-		<div onclick="javascript:mapPrice('3');">Gasolina 98</div>
-		<div onclick="javascript:mapPrice('4');">Gasóleo A</div>
-		<div onclick="javascript:mapPrice('5');">Nuevo Gasóleo A</div>
-		<div onclick="javascript:mapPrice('6');">Gasóleo B</div>
-		<div onclick="javascript:mapPrice('7');">Gasóleo C</div>
-		<div onclick="javascript:mapPrice('8');">Biodiésel</div>
+		<div id="m-density" title="Muestra la gasolineras agrupadas según su densidad"><label for="cluster">Mapa de concentración</label><input type="checkbox" id="cluster" name="cluster" onclick="javascript:mapCluster();"></div>
+		<div>Leyenda</div>
 	</div>
 	<div id="google_map"></div>
 	<div id="detail">

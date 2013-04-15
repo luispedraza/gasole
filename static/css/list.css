@@ -26,6 +26,12 @@
 #summary tr.data {
 	border-top: 1px solid #fff;
 }
+#summary .min {
+	color: #288627;
+}
+#summary .max {
+	color: #D30000;
+}
 #summary td.price {
 	font-family: 'digital-7', sans-serif;
 	font-size: 18px;
@@ -56,7 +62,7 @@
 }
 #google_map {
 	width: 730px;
-	height: 300px;
+	height: 350px;
 	float: right;
 	margin-bottom: 2px;
 }
@@ -70,9 +76,7 @@
 }
 #toolbar div {
 	float: left;
-	cursor: pointer;
 	padding: 1px;
-	border: 1px solid black;
 }
 #detail {
 	color: white;
@@ -80,7 +84,7 @@
 	top: 0;
 	left: 0;
 	width: 0;
-	height: 300px;
+	height: 350px;
 	background: rgb(8,8,8);
 	background: rgba(8,8,8,0.8);
 	border-right: 1px solid #fff;
@@ -211,6 +215,9 @@
 #fuel-type li.on {
 	border-color: #fff;
 }
+#fuel-type li.disabled {
+	opacity: .5;
+}
 #fuel-type li div {
 	width: auto;
 	margin-top: 32px;
@@ -223,7 +230,7 @@
 	background-position: 8px 0;
 	white-space: nowrap;
 }
-#fuel-type li:hover {
+#fuel-type li.off:hover {
 	border: 1px dotted #fff;
 }
 #fuel-type li.on:hover {

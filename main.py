@@ -154,7 +154,7 @@ class List(BaseAuthHandler):
         self.render("base.html", 
             title = title,
             styles=["/css/list.css"],
-            scripts=[GOOGLE_MAPS_API]+get_js('list.js',DEBUG),
+            scripts=get_js('list.js',DEBUG),
             content=jinja_env.get_template("list.html").render())
 
 class Detail(BaseAuthHandler):
