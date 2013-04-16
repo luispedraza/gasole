@@ -14,15 +14,6 @@ var FUEL_COLORS = {
 	"GOC": "#FF3300",
 	"BIOD": "#FFCC33"
 }
-var FUEL_NAMES = {
-	"G95": "Gasolina 95",
-	"G98": "Gasolina 98",
-	"GOA": "Gasóleo A",
-	"NGO": "Nuevo Gasóleo A",
-	"GOB": "Gasóleo B",
-	"GOC": "Gasóleo C",
-	"BIOD": "Biodiésel"
-}
 function toTitle(s) {
 	return s.replace(" [N]", "")
 		.replace(/^CARRETERA ?|^CR\.? ?/i, "CTRA. ")

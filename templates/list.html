@@ -37,24 +37,25 @@
 
 	<div class="panel clearer" id="p-filter">
 	<h2>Filtro</h2>
-	<div id="filter">
-		<p>Introduce un texto para refinar los resultados:</p>
+	<div id="filter" class="floater-r" >
 		<input id="contains" type="text" />
+		<p class="tooltip">Introduce un texto para refinar los resultados</p>
 	</div>
 	</div>
 
 	<div class="panel clearer" id="p-distance">
 	<h2>Distancia</h2>
-	<div id="distance">
-		<p>Busca un punto de referencia:</p>
+	<div class="floater-r" id="distance">
 		<form action="javascript:newReference()">
 		<input id="from" type="text" placeholder="Ej.: Gran Vía 27, o Parque de Atracciones…" />
+		<p class="tooltip">Lugar de referencia para el cálculo de distancias</p>
 		<p id="distance-info"></p>
 		</form>
+		
 	</div>
 	</div>
 
-	<div class="panel"><div id="publi_300x250"></div></div>
+	<div class="panel clearer"><div id="publi_300x250"></div></div>
 
 </div> <!-- control -->
 

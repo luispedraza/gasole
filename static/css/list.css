@@ -94,7 +94,7 @@ body {
 }
 #google_map {
 	width: 100%;
-	height: 350px;
+	height: 300px;
 	margin-bottom: 2px;
 }
 #map_area {
@@ -150,8 +150,11 @@ body {
 	font-size: 12px;
 	float: left;
 	width: 100px;
+	position: relative;
 }
 #d-prices li div {
+	position: absolute;
+	top: 25px;
 	font-size: 30px;
 	font-family: 'digital-7', sans-serif;
 }
@@ -180,9 +183,13 @@ body {
 	clear: both;
 }
 .panel input {
-	width: 280px;
+	width: 200px;
 	font-size: 16px;
 	border-radius: 5px;
+	float: right;
+}
+.panel input:hover + .tooltip {
+	opacity: 1;
 }
 #cities {
 	position: relative;
@@ -277,12 +284,31 @@ body {
 }
 #p-filter {
 	background-image: url("/img/filter.png");
+	position: relative;
+	height: 40px;
+}
+.floater-r {
+	padding: 0 5px 0 35px;
+	width: 300px;
+	position: absolute;
+	right: 0;
+	top: 0;
+}
+.panel .tooltip {
+	float: right;
+	padding-top: 5px;
+	opacity: 0;
 }
 #p-types {
 	background-image: url("/img/pump.png");
 }
 #p-distance {
+	height: 70px;
+	position: relative;
 	background-image: url("/img/distance.png");
+}
+#distance-info {
+	clear: both;
 }
 #distance-info a {
 	color: #fff;
@@ -467,4 +493,12 @@ th.off, td.off,tr.r_off, tr.f_off, tr.p_off {
 }
 #pager-more {
 	background-image: url('/img/more.png');
+}
+.cluster {
+	background: rgb(255,255,255);
+	background: rgba(255,255,255, 0.8);
+	border: 2px solid #888;
+	border-radius: 5px;
+	padding: 0 1px 3px 0;
+	background-repeat: no-repeat;
 }

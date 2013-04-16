@@ -4,7 +4,8 @@ var place = "";
 var markers = [];
 var province = "";
 var town = "";
-var markerCenter;
+var markerCenter=null;
+var markerDetail=null;
 var pagerN = 15;
 var pagerCurrent = null;
 var infoWindow = null;
@@ -38,11 +39,11 @@ var Stats = {
 }
 var COLORS = {
 	min: "#36AE34",
-	minStroke: "#288627",
+	minStroke: "#fff",
 	max: "#f00",
-	maxStroke: "#D30000",
+	maxStroke: "#fff",
 	mu: "#3399CC",
-	muStroke: "#006699"
+	muStroke: "#fff"
 }
 
 function newReference(loc) {
@@ -152,8 +153,8 @@ function markerColor(sel, price) {
 		mean = ((mean*v)+vals[v])/(v+1);
 	}
 	var color = [COLORS.maxStroke, COLORS.max];
-	if (mean<.25) color = [COLORS.minStroke, COLORS.min];
-	else if (mean<.75) color = [COLORS.muStroke, COLORS.mu];
+	if (mean<.33) color = [COLORS.minStroke, COLORS.min];
+	else if (mean<.66) color = [COLORS.muStroke, COLORS.mu];
 	return color;
 }
 function updateMarkers() {
@@ -184,7 +185,15 @@ function initMap() {
 	};
 	map = new google.maps.Map(document.getElementById("google_map"),
 		mapOptions);
-	cluster = new MarkerClusterer(map);
+	var clusterOptions = {
+		imagePath: "/",
+		styles: [{height: 40, width: 40, url: "/img/cluster.png", backgroundPosition: "-2px -2px"},
+			{height: 50, width: 50, url: "/img/cluster.png", backgroundPosition: "-44px -2px"},
+			{height: 60, width: 60, url: "/img/cluster.png", backgroundPosition: "-2px -54px"},
+			{height: 70, width: 70, url: "/img/cluster.png", backgroundPosition: "-2px -116px"}]
+	}
+	// cluster = new MarkerClusterer(map);
+	cluster = new MarkerClusterer(map, null, clusterOptions);
 	// adsense
 	if (window.location.hostname.match("localhost")) return;
 	var adUnitDiv = document.createElement('div');
@@ -257,8 +266,9 @@ function filterTypes(filter) {
 		var c_na=type;
 		var cells=document.getElementById("table").getElementsByClassName(type);
 		for (var c=0; c<cells.length; c++) {
-			if (f[1]=="off") cells[c].className = c_off;
-			else if (cells[c].textContent.length>0) cells[c].className = c_on;
+			var cell = cells[c];
+			if (f[1]=="off") cell.className = c_off;
+			else if (cell.textContent) cells[c].className = c_on;
 			else cells[c].className = c_na;
 		}
 	}
@@ -341,6 +351,16 @@ function initControl() {
 function showDetail(marker) {
 	map.panTo(marker.position);
 	map.setZoom(16);
+	if (!markerDetail) markerDetail = new google.maps.Marker({
+		position: marker.position,
+		map: map,
+		animation: google.maps.Animation.BOUNCE,
+		icon: '/img/pump_mark.png',
+	}); 
+	else {
+		markerDetail.setMap(map); 
+		markerDetail.position = marker.position;
+		markerDetail.setAnimation(google.maps.Animation.BOUNCE);};
 	var det=document.getElementById("detail");
 	det.className = "on";
 	var row = document.getElementById(marker.get("id"));
@@ -355,19 +375,22 @@ function showDetail(marker) {
 		document.getElementById("d-link").href = link;
 	var priceList = document.getElementById("d-prices");
 	priceList.innerHTML = "";
-	var prices = row.getElementsByClassName("price");
-	for (var p=0; p<prices.length; p++) {
+	var prices = row.getElementsByTagName("td");
+	for (var p=3; p<prices.length; p++) {
+		var val = prices[p].textContent;
+		if (!val) continue;
 		var t = prices[p].className.match(/T_\w+/)[0].replace("T_", "");
 		var newL = document.createElement("li");
-		newL.textContent = FUEL_NAMES[t];
+		newL.textContent = FUEL_OPTIONS[t].name;
 		var newP = document.createElement("div");
-		newP.textContent = prices[p].textContent;
+		newP.textContent = val;
 		newL.appendChild(newP);
 		priceList.appendChild(newL);
 	}
 
 	google.maps.event.addListenerOnce(map, "mousedown", function() {
 		document.getElementById("detail").className = "";
+		markerDetail.setMap(null);
 	})
 }
 function populateInfo() {
@@ -444,8 +467,8 @@ function populateTable(types) {
 							path: google.maps.SymbolPath.CIRCLE,
 							strokeOpacity: 1.0,
 							strokeWeight: 2,
-							fillOpacity: .7,
-							scale: 5
+							fillOpacity: .8,
+							scale: 8
 						}, 
 						map: map, position: pos };
 					var marker = new google.maps.Marker(options);
