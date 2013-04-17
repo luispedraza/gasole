@@ -49,7 +49,7 @@ body {
 #summary td {
 	width: 70px;
 	vertical-align: middle;
-	padding: 2px;
+	padding: 3px;
 }
 #summary tr.data {
 	border-top: 1px solid #fff;
@@ -87,10 +87,11 @@ body {
 }
 #summary span {
 	background-color: #000;
-	padding: 2px;
+	padding: 1px;
 	display: inline-block;
 	width: 40px;
 	text-align: center;
+	border: 1px inset #fff;
 }
 #google_map {
 	width: 100%;
@@ -149,12 +150,17 @@ body {
 #d-prices li {
 	font-size: 12px;
 	float: left;
-	width: 100px;
+	width: 68px;
 	position: relative;
+	border: 1px solid #fff;
+	height: 25px;
+	padding: 1px;
+	margin-right: 1px;
+	border-radius: 3px;
 }
 #d-prices li div {
 	position: absolute;
-	top: 25px;
+	top: 30px;
 	font-size: 30px;
 	font-family: 'digital-7', sans-serif;
 }
@@ -303,7 +309,7 @@ body {
 	background-image: url("/img/pump.png");
 }
 #p-distance {
-	height: 70px;
+	height: 90px;
 	position: relative;
 	background-image: url("/img/distance.png");
 }
@@ -314,78 +320,100 @@ body {
 	color: #fff;
 }
 
-th.T_LOC, th.T_ADDR, th.T_DIST {
+th.T_LOC, th.T_ADDR, th.T_DIST, th.T_DATE {
 	background-color: #3399CC;
 	border-color: #006699;
 }
-td.T_DIST {
-	background-image: url('/img/locate.svg');
-	background-size: 15px;
-	background-repeat: no-repeat;
-	background-position: -500px;
-	overflow: hidden;
-	-webkit-transition: all .5s;
-	-moz-transition: all .5s;
-	-ms-transition: all .5s;
-	-o-transition: all .5s;
-	transition: all .5s;
+.T_LOC {
+	width: 95px;
+}
 
+#table tr:hover td.T_DIST .icon{
+	top: 2px;
+	left: 2px;
 }
-#table td.T_ADDR {
-	padding-left: 32px;
-	background-repeat: no-repeat;
+#table tr:hover td.T_DIST span {
+	display: none;
 }
-li.T_1.on, th.T_1 {
+#table td.T_DIST .icon {
+	position: absolute;
+	left: -50px;
+	top: 2px;
+	cursor: pointer;
+	-webkit-transition: left .2s ease-in;
+	   -moz-transition: left .2s ease-in;
+	    -ms-transition: left .2s ease-in;
+	     -o-transition: left .2s ease-in;
+	        transition: left .2s ease-in;
+}
+#table a {
+	text-decoration: none;
+	color: black;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	display: block;
+}
+td.T_ADDR a {
+	display: block;
+}
+
+li.T_1.on, th.T_1, #d-prices li.T_1 {
 	background-color: #006633;
 }
 th.T_1 {
 	border-color: #004924;
 }
-li.T_3.on, th.T_3 {
+li.T_3.on, th.T_3, #d-prices li.T_3 {
 	background-color: #339933;
 }
 th.T_3 {
 	border-color: #257125;
 }
-li.T_4.on, th.T_4 {
+li.T_4.on, th.T_4, #d-prices li.T_4 {
 	background-color: #000;
 }
 th.T_4 {
 	border-color: #333;
 }
-li.T_5.on, th.T_5 {
+li.T_5.on, th.T_5, #d-prices li.T_5 {
 	background-color: #555;
 }
 th.T_5 {
 	border-color: #222;
 }
-li.T_6.on, th.T_6 {
+li.T_6.on, th.T_6, #d-prices li.T_6 {
 	background-color: #CC3333;
 }
 th.T_6 {
 	border-color: #A52828;
 }
-li.T_7.on, th.T_7 {
+li.T_7.on, th.T_7, #d-prices li.T_7 {
 	background-color: #FF3300;
 }
 
 th.T_7 {
 	border-color: #CB2800;
 }
-li.T_8.on, th.T_8 {
+li.T_8.on, th.T_8, #d-prices li.T_8 {
 	background-color: #f1aa41;
 }
 th.T_8 {
 	border-color: #be770e;
 }
-
+#table .on, .T_DIST, .T_DATE {
+	width: 40px;
+}
+.T_DATE span {
+	display: none;
+}
 #table th {
-	padding: 3px;
-	font-size: 1.2em;
+	padding: 2px;
 	border-bottom-width: 5px;
 	border-bottom-style: solid;
 	color: white;
 	text-align: left;
+	border-left: 1px solid #fff;
 }
 th div.sort {
 	margin-bottom: 3px;
@@ -415,34 +443,30 @@ th.off, td.off,tr.r_off, tr.f_off, tr.p_off {
 	display: none;
 }
 
-#table tr {
-	border-bottom: 1px solid #EEF;
+#table-data tr {
+	border-bottom: 1px solid #eee;
+	height: 25px;
 }
 
 #table {
 	margin-right: 10px;
-	width: 100%;
 	overflow-y: scroll;
 	width: 100%;
-	height: 420px;
+	height: 450px;
 }
 #table table {
+	table-layout: fixed;
 	margin-right: 20x;
 	width: 100%;
-	font-size: 1em;
 }
 #table td {
-	padding: 5px;
+	padding: 2px;
+	position: relative;
 	overflow: hidden;
-	text-overflow: ellipsis;
-	-o-text-overflow: ellipsis;
-	white-space: nowrap;
-	max-width: 120px;
+	border-left: 1px solid #eee;
 }
-
-#table a {
-	text-decoration: none;
-	color: black;
+.T_ADDR a {
+	margin-left: 30px;
 }
 #table a:hover {
 	text-decoration: underline;
@@ -450,13 +474,8 @@ th.off, td.off,tr.r_off, tr.f_off, tr.p_off {
 #table th {
 	cursor: pointer;
 }
-#table tr:hover, #table tr:hover a {
-	background-color: #006699;
-	color: white;
-}
-#table tr:hover td.T_DIST {
-	background-position: 35px;
-	cursor: pointer;
+#table-data tr:hover, #table-data tr:hover a {
+	background-color: #BFE6FF;
 }
 
 #pager {
@@ -464,14 +483,14 @@ th.off, td.off,tr.r_off, tr.f_off, tr.p_off {
 	width: 100%;
 }
 #pager .p.current {
-	color: #000;
+	color: #333;
 	background-color: #fff;
 }
 #pager .p {
 	cursor: pointer;
 	color: #fff;
-	background-color: black;
-	border: 2px solid black;
+	background-color: #333;
+	border: 2px solid #333;
 	width: 22px;
 	height: 22px;
 	text-align: center;
@@ -502,3 +521,70 @@ th.off, td.off,tr.r_off, tr.f_off, tr.p_off {
 	padding: 0 1px 3px 0;
 	background-repeat: no-repeat;
 }
+
+/* Sprites iconos */
+.icon {
+	background-repeat: no-repeat;
+	overflow: hidden;
+}
+.clock {
+	background-image: url(/img/clock.png);
+	width: 20px;
+	height: 20px;
+}
+.clock.old {
+	background-image: url(/img/clock_red.png);
+	width: 20px;
+	height: 20px;
+}
+.clock.new {
+	background-image: url(/img/clock_green.png);
+	width: 20px;
+	height: 20px;
+}
+.locate {
+	background-image: url(/img/locate.png);
+	width: 20px;
+	height: 20px;
+}
+
+
+
+/* Sprites logos */
+.logo {position: absolute; left: 0; overflow:hidden; background-repeat: no-repeat;background-image:url(/img/logos/logos.png);}
+
+.abycer {width:30px; height:20px; background-position: -2px -2px}
+.agla {width:30px; height:20px; background-position: -34px -2px}
+.alcampo {width:30px; height:20px; background-position: -66px -2px}
+.an_energeticos {width:30px; height:20px; background-position: -98px -2px}
+.andamur {width:30px; height:20px; background-position: -130px -2px}
+.avia {width:30px; height:20px; background-position: -162px -2px}
+.bonarea {width:30px; height:20px; background-position: -194px -2px}
+.bp {width:30px; height:20px; background-position: -2px -24px}
+.buquerin {width:30px; height:20px; background-position: -34px -24px}
+.campsa {width:30px; height:20px; background-position: -66px -24px}
+.carmoned {width:30px; height:20px; background-position: -98px -24px}
+.carrefour {width:30px; height:20px; background-position: -130px -24px}
+.cepsa {width:30px; height:20px; background-position: -162px -24px}
+.empresoil {width:30px; height:20px; background-position: -194px -24px}
+.eroski {width:30px; height:20px; background-position: -2px -46px}
+.esclatoil {width:30px; height:20px; background-position: -34px -46px}
+.galp {width:30px; height:20px; background-position: -66px -46px}
+.gasolben {width:30px; height:20px; background-position: -98px -46px}
+.iberdoex {width:30px; height:20px; background-position: -130px -46px}
+.leclerc {width:30px; height:20px; background-position: -162px -46px}
+.makro {width:30px; height:20px; background-position: -194px -46px}
+.meroil {width:30px; height:20px; background-position: -2px -68px}
+.norpetrol {width:30px; height:20px; background-position: -34px -68px}
+.petrem {width:30px; height:20px; background-position: -66px -68px}
+.petrocat {width:30px; height:20px; background-position: -98px -68px}
+.petromiralles {width:30px; height:20px; background-position: -130px -68px}
+.petronor {width:30px; height:20px; background-position: -162px -68px}
+.repostar {width:30px; height:20px; background-position: -194px -68px}
+.repsol {width:30px; height:20px; background-position: -2px -90px}
+.saras {width:30px; height:20px; background-position: -34px -90px}
+.shell {width:30px; height:20px; background-position: -66px -90px}
+.simply {width:30px; height:20px; background-position: -98px -90px}
+.staroil {width:30px; height:20px; background-position: -130px -90px}
+.tamoil {width:30px; height:20px; background-position: -162px -90px}
+.valcarce {width:30px; height:20px; background-position: -194px -90px}

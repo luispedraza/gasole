@@ -10,6 +10,8 @@ var pagerN = 15;
 var pagerCurrent = null;
 var infoWindow = null;
 var cluster = null;
+var bounds = new google.maps.LatLngBounds();
+var TO_DAYS = 86400000;
 var Stats = {
 	types: {}, n: 0, init: false,
 	add: function(station) {
@@ -76,9 +78,11 @@ function newReference(loc) {
 			if(!loc) map.setZoom(14);
 			calcDistances();
 			var nearest = document.getElementById("table-data").getElementsByTagName("tr")[0];
-			infoDiv.innerHTML = "La gasolinera más próxima a " + 
-				res[0].formatted_address + " se encuentra en " + 
-				nearest.getElementsByClassName("T_ADDR")[0].innerHTML.replace(/ \[.\]/g, "");
+			if (nearest) {
+				infoDiv.innerHTML = "La gasolinera más próxima a " + 
+					res[0].formatted_address + " se encuentra en " + 
+					nearest.getElementsByClassName("T_ADDR")[0].textContent;
+			} else infoDiv.innerHTML = "No se ha encontrado ninguna gasolinera. Intenta ampliar el radio de busqueda";
 			return;
 		}
 		infoDiv.innerHTML = "No se ha podido localizar la referencia.";
@@ -119,7 +123,7 @@ function calcDistances() {
 			var dlat = (latlon[0] - markerCenter.position.lat()) * 111.03461;
 			var dlon = (latlon[1] - markerCenter.position.lng()) * 85.39383;
 			var dist = Math.sqrt(dlat*dlat+dlon*dlon).toFixed(1);
-			tds[i].textContent = dist;
+			tds[i].getElementsByTagName("span")[0].textContent = dist;
 		}
 	}
 	sortTable("T_DIST", false, true);
@@ -135,27 +139,21 @@ function mapCluster() {
 	}
 }
 function markerColor(sel, price) {
-	var vals = [];
-	for (var s=0; s<sel.length; s++) {
-		var current = sel[s];
+	var mean = 0;
+	var n = 0;
+	for (var i=0; i<sel.length; i++) {
+		var current = sel[i];
 		var p = price[current];
-		if (Stats.types[current] && price) {
-			var range = Stats.types[current].range;
-			if (range) {
-				var min = Stats.types[current].min;
-				vals.push((p-min)/range); // precio normalizado
-			} else vals.push(.5);
+		var s = Stats.types[current];
+		if (s && p) {
+			if (s.range) mean = (mean*n+((p-s.min)/s.range))/++n;
+			else mean = mean*n+.5/++n;
 		}
 	}
-	if (vals.length==0) return null;
-	var mean = 0;
-	for (var v=0; v<vals.length; v++) {
-		mean = ((mean*v)+vals[v])/(v+1);
-	}
-	var color = [COLORS.maxStroke, COLORS.max];
-	if (mean<.33) color = [COLORS.minStroke, COLORS.min];
-	else if (mean<.66) color = [COLORS.muStroke, COLORS.mu];
-	return color;
+	if (n==0) return null;
+	if (mean<.33) return [COLORS.minStroke, COLORS.min];
+	if (mean<.66) return [COLORS.muStroke, COLORS.mu];
+	return [COLORS.maxStroke, COLORS.max];
 }
 function updateMarkers() {
 	var rows = document.getElementById("table-data").getElementsByTagName("tr");
@@ -179,8 +177,6 @@ function updateMarkers() {
 
 function initMap() {
 	var mapOptions = {
-		center: new google.maps.LatLng(40.400, 3.6833),
-		zoom: 8,
 		mapTypeId: google.maps.MapTypeId.ROADMAP
 	};
 	map = new google.maps.Map(document.getElementById("google_map"),
@@ -350,7 +346,7 @@ function initControl() {
 }
 function showDetail(marker) {
 	map.panTo(marker.position);
-	map.setZoom(16);
+	// map.setZoom(16);
 	if (!markerDetail) markerDetail = new google.maps.Marker({
 		position: marker.position,
 		map: map,
@@ -376,17 +372,24 @@ function showDetail(marker) {
 	var priceList = document.getElementById("d-prices");
 	priceList.innerHTML = "";
 	var prices = row.getElementsByTagName("td");
-	for (var p=3; p<prices.length; p++) {
+	for (var p=4; p<prices.length; p++) {
 		var val = prices[p].textContent;
 		if (!val) continue;
 		var t = prices[p].className.match(/T_\w+/)[0].replace("T_", "");
 		var newL = document.createElement("li");
 		newL.textContent = FUEL_OPTIONS[t].name;
+		newL.className = "T_"+t;
 		var newP = document.createElement("div");
 		newP.textContent = val;
 		newL.appendChild(newP);
 		priceList.appendChild(newL);
 	}
+	var dateDiv = document.getElementById("d-date");
+	var days = (new Date() - new Date(parseInt(row.getElementsByClassName("T_DATE")[0].textContent)))/TO_DAYS;
+	var ago = "";
+	if (days<1) ago = " hoy";
+	else ago = " hace "+Math.floor(days)+" día" + ((days>2) ? "s" : "");
+	dateDiv.textContent = "Precios actualizados "+ago;
 
 	google.maps.event.addListenerOnce(map, "mousedown", function() {
 		document.getElementById("detail").className = "";
@@ -427,6 +430,7 @@ function populateTable(types) {
 	table.innerHTML = "";
 	var path = document.location.pathname.split("/");
 	var cities = [];
+	var today = new Date;
 	for (var p in data) {
 		var p_link = encodeName(p);
 		for (var t in data[p]) {
@@ -442,7 +446,7 @@ function populateTable(types) {
 				var a_town = document.createElement("a");
 				a_town.href = s_link;
 				a_town.title = "Todas las gasolineras de " + t;
-				a_town.textContent = t.toUpperCase();
+				a_town.textContent = t; // .toUpperCase();
 				td_town.className = "T_LOC";
 				td_town.appendChild(a_town);
 				tr.appendChild(td_town);
@@ -451,12 +455,16 @@ function populateTable(types) {
 				a_s.href = "/ficha/" + p_link + "/" + t_link + "/" + encodeName(s);
 				a_s.textContent = toTitle(s);
 				a_s.title = "Detalles de la gasolinera en " + t + ", " + a_s.textContent;
-				td_s.appendChild(a_s);
 				td_s.className = "T_ADDR";
 				td_s.setAttribute("label", label);
 				var logo = getLogo(label);
-				if (logo) td_s.style.backgroundImage = "url('/img/logos/"+logo+"_mini.png')";
+				if (logo) {
+					var dl = document.createElement("div");
+					dl.className = "logo "+logo;
+					td_s.appendChild(dl);
+				}
 				tr.appendChild(td_s);
+				td_s.appendChild(a_s);
 				var td_dist = document.createElement("td");
 				td_dist.className = "T_DIST";
 				// Marcadores
@@ -466,9 +474,9 @@ function populateTable(types) {
 						icon: {
 							path: google.maps.SymbolPath.CIRCLE,
 							strokeOpacity: 1.0,
-							strokeWeight: 2,
+							strokeWeight: 1,
 							fillOpacity: .8,
-							scale: 8
+							scale: 6
 						}, 
 						map: map, position: pos };
 					var marker = new google.maps.Marker(options);
@@ -485,8 +493,23 @@ function populateTable(types) {
 						showDetail(marker);
 					});
 					marker.set("id", tr.id);
+					bounds.extend(pos);
+					td_dist.innerHTML = "<div title='Mostrar en el mapa' class='icon locate'></div><span></span>";
 				}
 				tr.appendChild(td_dist);
+				// Fecha de actualización
+				var td_date = document.createElement("td");
+				td_date.className = "T_DATE";
+				var dd = document.createElement("div");
+				var date = new Date(dataPTS.date);
+				var days = (today-date)/TO_DAYS;
+				dd.className = "icon clock";
+				if (days<1) dd.className += " new";
+				else if (days>7) dd.className += " old";
+				td_date.title = date.toLocaleDateString();
+				td_date.innerHTML = "<span>"+date.getTime()+"</span>";
+				td_date.appendChild(dd);
+				tr.appendChild(td_date);
 				// Precios
 				for (var o in FUEL_OPTIONS) {
 					otd = document.createElement("td");
@@ -500,6 +523,7 @@ function populateTable(types) {
 				table.appendChild(tr);
 				Stats.add(dataPTS["options"]);
 			}
+			map.fitBounds (bounds);
 		}
 	}
 	Stats.run();
