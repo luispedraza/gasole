@@ -28,9 +28,6 @@ body {
 	}
 }
 
-
-
-
 #list {
 	width: 730px;
 	float: right;
@@ -42,6 +39,9 @@ body {
 	float: left;
 	color: #fff;
 	padding: 5px;
+}
+#control h2 {
+	width: 100px;
 }
 #summary {
 	font-size: 12px;
@@ -245,6 +245,7 @@ body {
 	margin-bottom: 20px;
 }
 .panel {
+	position: relative;
 	padding: 0 5px 0 35px;
 	background-repeat: no-repeat;
 	background-size: 20px;
@@ -261,13 +262,15 @@ body {
 	opacity: 1;
 }
 #cities {
+	width: 200px;
+	float: right;
 	position: relative;
 }
 #cities p {
-	width: 250px;
+	width: 190px;
 	border: 1px solid #fff;
 	padding: 3px;
-	background-position: 240px 10px;
+	background-position: 180px 10px;
 	background-repeat: no-repeat;
 	background-image: url('/img/arrow_white.png');
 	cursor: pointer;
@@ -278,16 +281,25 @@ body {
 	left: 0;
 	top: 22px;
 	height: 0;
+	opacity: 0;
+	-webkit-transition: all .25s ease-in;
+	   -moz-transition: all .25s ease-in;
+	    -ms-transition: all .25s ease-in;
+	     -o-transition: all .25s ease-in;
+	        transition: all .25s ease-in;
 	overflow: hidden;
 	z-index: 100;
 	border: 1px solid #333;
+	width: 190px;
 }
 #cities:hover ul {
 	height: 200px;
+	opacity: 1;
 	overflow: scroll;
 }
 #cities-list {
-	background-color: #fff;
+	background: rgb(255,255,255);
+	background: rgba(255,255,255, 0.9);
 	width: 250px;
 }
 #cities-list a {
@@ -353,7 +365,6 @@ body {
 }
 #p-filter {
 	background-image: url("/img/filter.png");
-	position: relative;
 	height: 40px;
 }
 .floater-r {
@@ -373,7 +384,6 @@ body {
 }
 #p-distance {
 	height: 90px;
-	position: relative;
 	background-image: url("/img/distance.png");
 }
 #distance-info {

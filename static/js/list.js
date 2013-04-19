@@ -8,7 +8,6 @@ var markerCenter=null;
 var markerDetail=null;
 var pagerN = 15;
 var pagerCurrent = null;
-var infoWindow = null;
 var cluster = null;
 var bounds = new google.maps.LatLngBounds();
 var TO_DAYS = 86400000;
@@ -54,7 +53,6 @@ var COLORS = {
 }
 
 function newReference(loc) {
-	if (infoWindow) infoWindow.close();
 	var location = loc;
 	if(!location) location = document.getElementById("from").value;
 	var geocoder = new google.maps.Geocoder();
@@ -65,22 +63,15 @@ function newReference(loc) {
 				markerCenter = new google.maps.Marker({
 	            	map: map,
 	            	position: res[0].geometry.location,
-	            	draggable: true
-				});
-				google.maps.event.addListener(markerCenter, 'click', function(e) {
-					if (infoWindow) infoWindow.close();
-					infoWindow = new google.maps.InfoWindow({
-						content: "Punto de referencia:<br /> " + this.place.bold()
-					})
-					infoWindow.open(map, this);
+	            	icon: '/img/center_mark.png'
 				});
 			} else {
 				markerCenter.setPosition(res[0].geometry.location);
 			}
-			
 			markerCenter.set("place", res[0].formatted_address);
 			map.panTo(res[0].geometry.location);
-			if(!loc) map.setZoom(14);
+			bounds.extend(markerCenter.position);
+			map.fitBounds(bounds);
 			calcDistances();
 			var nearest = document.getElementById("table-data").getElementsByTagName("tr")[0];
 			if (nearest) {
