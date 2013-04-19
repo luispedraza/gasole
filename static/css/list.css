@@ -136,6 +136,11 @@ body {
 	height: 20px;
 	background: rgb(20,20,20);
 	background: rgba(20,20,20,0.8);
+	-webkit-transition: height .25s ease-in;
+	   -moz-transition: height .25s ease-in;
+	    -ms-transition: height .25s ease-in;
+	     -o-transition: height .25s ease-in;
+	        transition: height .25s ease-in;
 }
 #legend .title {
 	padding: 5px;
