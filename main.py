@@ -179,7 +179,7 @@ class Detail(BaseAuthHandler):
         self.render("base.html",
             title = title,
             styles=['/css/detail.css'],
-            scripts=[GOOGLE_VIS_API, GOOGLE_MAPS_API] + get_js('detail.js',DEBUG),
+            scripts=get_js('detail.js',DEBUG),
             content=jinja_env.get_template("detail.html").render(
                 title=title,
                 edit_station=edit_station,
@@ -266,7 +266,7 @@ class Api(BaseHandler):
             data = memcache.get(prov) or store2data(prov_kname=prov).get(prov)
             if not town:
                 info = {"_data": {prov: data or {"error": "Provincia no encontrada"}}}
-            elif data and town:
+            elif data:
                 town = decode_param(town)
                 data = data.get(town)
                 if not station:

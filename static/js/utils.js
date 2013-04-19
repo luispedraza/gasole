@@ -5,14 +5,14 @@ var FUEL_OPTIONS = {"1": {"short": "G95", "name": "Gasolina 95"},
 				"6": {"short": "GOB", "name": "Gasóleo B"},
 				"7": {"short": "GOC", "name": "Gasóleo C"},
 				"8": {"short": "BIOD", "name": "Biodiésel"}}
-var FUEL_COLORS = {
-	"G95": "#006633",
-	"G98": "#339933",
-	"GOA": "#000",
-	"NGO": "#aaa",
-	"GOB": "#CC3333",
-	"GOC": "#FF3300",
-	"BIOD": "#FFCC33"
+var CHART_OPTIONS = {
+	"G95": {color: "#006633", name: "Gasolina 95"},
+	"G98": {color: "#339933", name: "Gasolina 98"},
+	"GOA": {color: "#000", name: "Gasóleo A"},
+	"NGO": {color: "#aaa", name: "Nuevo Gasóleo A"},
+	"GOB": {color: "#CC3333", name: "Gasóleo B"},
+	"GOC": {color: "#FF3300", name: "Gasóleo C"},
+	"BIOD": {color: "#FFCC33", name: "Biodiésel"}
 }
 
 var PROVS = {

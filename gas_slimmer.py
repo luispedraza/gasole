@@ -9,6 +9,7 @@ MAPBOX_CSS = 'http://api.tiles.mapbox.com/mapbox.js/v0.6.7/mapbox.css'
 
 JS_PATH = '/js/my_js_files/'
 JS_PATH_MIN = '/js/min/'
+JS_PATH_LIBS = '/js/my_js_libs/'
 
 D3_API = 'http://d3js.org/d3.v3.min.js'
 OPENLAYERS_API = 'http://openlayers.org/api/2.12/OpenLayers.js'
@@ -16,26 +17,31 @@ OPENLAYERS_API = 'http://openlayers.org/api/2.12/OpenLayers.js'
 MEDIA_JS = {
 	'home.js': {
 		'src':		['search.js', 'home.js', 'utils.js'],
+		'libs': 	[],
 		'extern':	['google_maps_api_v3.js'],
 		'api':		[GOOGLE_MAPS_API]
 		},
 	'detail.js': {
 		'src': 		['utils.js','detail.js','search.js'],
+		'libs': 	['canvasjs.js'],
 		'extern':	['google_maps_api_v3.js'],
 		'api': 		[GOOGLE_MAPS_API]
 		},
 	'list.js': {
 		'src':		['libs/markerclustererplus.min.js','utils.js','list.js','search.js'],
+		'libs': 	[],
 		'extern':	['google_maps_api_v3.js'],
 		'api':		[GOOGLE_MAPS_API]
 		},
 	'cantidad.js' : {
 		'src':		['g_cantidad.js','search.js'],
+		'libs': 	[],
 		'extern':	['google_maps_api_v3.js'],
 		'api':		[GOOGLE_MAPS_API]
 		},
 	'precio.js': {
 		'src':		['g_precio.js','search.js', 'utils.js'],
+		'libs': 	[],
 		'extern':	['google_maps_api_v3.js'],
 		'api':		[D3_API, OPENLAYERS_API, GOOGLE_MAPS_API]
 		},
@@ -43,6 +49,6 @@ MEDIA_JS = {
 
 def get_js(target, debug=False):
 	if debug:
-		return [a for a in MEDIA_JS[target]['api']]+[JS_PATH+s for s in MEDIA_JS[target]['src']]
+		return [a for a in MEDIA_JS[target]['api']]+[JS_PATH+s for s in MEDIA_JS[target]['src']]+[JS_PATH_LIBS+s for s in MEDIA_JS[target]['libs']]
 	else:
 		return [a for a in MEDIA_JS[target]['api']]+[JS_PATH_MIN+target]

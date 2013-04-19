@@ -9,6 +9,7 @@ import subprocess
 MEDIA_JS_PATH = './static/js/'
 MEDIA_JS_OUPUT = './static/js/min/'
 MEDIA_JS_EXTERN = './static/js/extern/'
+MEDIA_JS_LIBS = './static/js/libs/'
 
 
 # for target in MEDIA_JS:
@@ -27,6 +28,8 @@ for target in MEDIA_JS:
 	params = []
 	for s in scripts['src']:
 		params += ['--js', MEDIA_JS_PATH+s]
+	for s in scripts['libs']:
+		params += ['--js', MEDIA_JS_LIBS+s]
 	# for x in scripts['extern']:
 	# 	params += ['--externs', MEDIA_JS_EXTERN+x]
 	params += ['--js_output_file', MEDIA_JS_OUPUT+target]

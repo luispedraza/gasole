@@ -8,6 +8,9 @@
 	height: 600px;
 	float: left;
 	background-color: black;
+	background-image: url(/img/grass.png);
+	background-position: bottom;
+	background-repeat: no-repeat;
 }
 #station-logo {
 	font-size: 25px;
@@ -87,7 +90,7 @@
 }
 #chart {
 	width: 100%;
-	height: 250px;
+	height: 300px;
 	clear: both;
 }
 #comments {

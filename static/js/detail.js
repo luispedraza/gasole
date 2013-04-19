@@ -225,42 +225,62 @@ function processData(info) {
 		var points = total_points/n_comments;
 		document.getElementById("points").innerHTML = points.toFixed(1) + " (" + n_comments + " valoraciones)";
 	}
-
-	var chart_data = new google.visualization.DataTable();
-	chart_data.addColumn('date', 'Fecha');
-	var chart_colors = []
-	var history = info._history;
-	var init = false;
-	for (var h in history){
-		if (!init) {
-			for (var o in history[h]) {
-				chart_data.addColumn('number', o);
-				chart_colors.push(FUEL_COLORS[o]);
-			}
-			init = true;
+    /* Gráfico canvasjs */
+    var history = info._history;
+    var values = {};
+    var minY=100,maxY=-100;
+    for (var h=0; h<history.length; h++) {
+    	var hdata = history[h];
+		var date = new Date(hdata.d);
+		for (var o in hdata.p) {
+			if (!values.hasOwnProperty(o)) values[o] = [];
+			var yval = hdata.p[o];
+			if (yval<minY) minY=yval;
+			if (yval>maxY) maxY=yval;
+			values[o].push({x: date, y: yval});
 		}
-		var date = h.split("-");
-		var values = [];
-		for (var o in history[h]) {
-				values.push(history[h][o]);
-			}
-
-		chart_data.addRows([
-			[new Date(date[0], date[1]-1, date[2])].concat(values)
-		]);
 	}
-	chart_data.sort(0);
+	console.log(values);
+	var theData = [];
 	
-	var options = {
-      title: 'Precios',
-      theme: 'maximized',
-      pointSize: 5,
-      colors: chart_colors
-
-    };
-	var chart = new google.visualization.LineChart(document.getElementById('chart'));
-    chart.draw(chart_data, options);
-
+	for (var o in values) {
+		theData.push({
+			name: o,
+			showInLegend: true,
+            markerType: "circle",
+            markerBorderColor: "#fff",
+            markerSize: 5,
+			type: "area",
+			color: CHART_OPTIONS[o].color,
+			legendText: CHART_OPTIONS[o].name,
+			legendMarkerType: "square",
+			dataPoints: values[o]
+		});
+	}
+	console.log(theData);
+	theData.sort(function(a,b) {
+		return -(a.dataPoints[0].y - b.dataPoints[0].y)
+	});
+    var options = {
+    	title: {
+    		text: "Evolución de los precios"
+    	},
+    	axisX: {
+    		title: "Fecha",
+    		valueFormatString: "DD-MM",
+    		labelAngle: -45
+    	},
+    	axisY: {
+    		title: "Precio (€)",
+    		valueFormatString: "#.###",
+    		minimum: minY-.1,
+    		maximum: maxY+.1,
+    		interval: .1
+    	},
+    	data: theData
+    }
+    var chart = new CanvasJS.Chart("chart", options);
+    chart.render();
     /* Puntuaciones (estrellas) */
     initPoints();
 
