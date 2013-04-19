@@ -270,6 +270,7 @@ body {
 	width: 200px;
 	float: right;
 	position: relative;
+	overflow: visible;
 }
 #cities p {
 	width: 190px;

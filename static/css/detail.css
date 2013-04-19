@@ -7,8 +7,28 @@
 	width: 300px;
 	height: 600px;
 	float: left;
-	background-color: black;
-	background-image: url(/img/grass.png);
+	position: relative;
+	/*background-color: black;*/
+
+	background: rgb(0,0,0); /* Old browsers */
+	/* IE9 SVG, needs conditional override of 'filter' to 'none' */
+	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzAwMDAwMCIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjUxJSIgc3RvcC1jb2xvcj0iIzQ0NDQ0NCIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+	background: -moz-linear-gradient(left,  rgba(0,0,0,1) 0%, rgba(68,68,68,1) 51%, rgba(0,0,0,1) 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgba(0,0,0,1)), color-stop(51%,rgba(68,68,68,1)), color-stop(100%,rgba(0,0,0,1))); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(left,  rgba(0,0,0,1) 0%,rgba(68,68,68,1) 51%,rgba(0,0,0,1) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(left,  rgba(0,0,0,1) 0%,rgba(68,68,68,1) 51%,rgba(0,0,0,1) 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(left,  rgba(0,0,0,1) 0%,rgba(68,68,68,1) 51%,rgba(0,0,0,1) 100%); /* IE10+ */
+	background: linear-gradient(to right,  rgba(0,0,0,1) 0%,rgba(68,68,68,1) 51%,rgba(0,0,0,1) 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#000000', endColorstr='#000000',GradientType=1 ); /* IE6-8 */
+}
+#price_board::before {
+	content: " ";
+	position: absolute;
+	left: -10px;
+	bottom: 0;
+	width: 320px;
+	height: 150px;
+	background-image: url(/img/grass.png); /* fallback */
 	background-position: bottom;
 	background-repeat: no-repeat;
 }
@@ -21,38 +41,63 @@
 	border-bottom: 3px solid white;
 	padding: 10px;
 	height: 50px;
+	color: #fff;
 }
 #price_board .sec_name {
-	width: 120px;
+	width: 110px;
 	float: left;
+	height: 40px;
+	padding: 5px;
+	border: 1px solid #fff;
+	font-size: 1.4em;
 }
 #price_board .price {
 	font-family: 'digital-7', sans-serif;
 	font-size: 50px;
+	height: 50px;
 	width: 150px;
 	float: right;
+	border: 1px inset #fff;
+	background-color: #000;
 }
-
-.T_G95 {
-	color: #006633;
+.price .back {
+	position: relative;
+	width: .6em;
+	float: left;
+	margin: 2px;
+	text-align: right;
+	color: #333;
 }
-.T_G98 {
-	color: #339933;
-}
-.T_GOA {
+.back .digit {
+	width: 100%;
+	position: absolute;
 	color: #fff;
+	top: 0;
+	left: 0;
 }
-.T_NGO {
-	color: #aaa;
+.price .back.point {
+	width: 5px;
 }
-.T_GOB {
-	color: #CC3333;
+.T_G95 .sec_name {
+	background-color: #006633;
 }
-.T_GOC {
-	color: #FF3300;
+.T_G98 .sec_name {
+	background-color: #339933;
 }
-.T_BIOD {
-	color: #FFCC33;
+.T_GOA .sec_name {
+	background-color: #000;
+}
+.T_NGO .sec_name {
+	background-color: #aaa;
+}
+.T_GOB .sec_name {
+	background-color: #CC3333;
+}
+.T_GOC .sec_name {
+	background-color: #FF3300;
+}
+.T_BIOD .sec_name {
+	background-color: #FFCC33;
 }
 
 
