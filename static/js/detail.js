@@ -246,7 +246,7 @@ function processData(info) {
 			}
 
 		chart_data.addRows([
-			[new Date(date[0], date[1]-1, date[2])].concat(values),
+			[new Date(date[0], date[1]-1, date[2])].concat(values)
 		]);
 	}
 	chart_data.sort(0);

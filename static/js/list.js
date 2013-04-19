@@ -12,9 +12,13 @@ var infoWindow = null;
 var cluster = null;
 var bounds = new google.maps.LatLngBounds();
 var TO_DAYS = 86400000;
-var Stats = {
-	types: {}, n: 0, init: false,
-	add: function(station) {
+
+/** @constructor */
+function stats() {
+	this.types = {};
+	this.n = 0;
+	this.init = false;
+	this.add =function(station) {
 		if (this.init) return;
 		for (var t in station) {
 			var val = station[t];
@@ -27,8 +31,8 @@ var Stats = {
 			} else this.types[t] = {max: val, min: val, mean: val, n: 1};
 		}
 		this.n++;
-	},
-	run: function() {
+	};
+	this.run = function() {
 		// Peso relativo de cada tipo de combustible
 		var N=0;
 		for (var t in this.types) {
@@ -37,8 +41,9 @@ var Stats = {
 		}
 		for (var t in this.types) this.types[t].w = this.types[t].n/N;
 		this.init = true;
-	}
+	};
 }
+var Stats = new stats();
 var COLORS = {
 	min: "#36AE34",
 	minStroke: "#fff",
@@ -351,7 +356,7 @@ function showDetail(marker) {
 		position: marker.position,
 		map: map,
 		animation: google.maps.Animation.BOUNCE,
-		icon: '/img/pump_mark.png',
+		icon: '/img/pump_mark.png'
 	}); 
 	else {
 		markerDetail.setMap(map); 
@@ -385,12 +390,16 @@ function showDetail(marker) {
 		priceList.appendChild(newL);
 	}
 	var dateDiv = document.getElementById("d-date");
+	var clockDiv = document.getElementById("d-clock");
 	var days = (new Date() - new Date(parseInt(row.getElementsByClassName("T_DATE")[0].textContent)))/TO_DAYS;
-	var ago = "";
-	if (days<1) ago = " hoy";
-	else ago = " hace "+Math.floor(days)+" día" + ((days>2) ? "s" : "");
+	var ago = "", cname="clock";
+	if (days<1) {ago = " hoy"; cname+=" new"}
+	else {
+		ago = " hace "+Math.floor(days)+" día" + ((days>2) ? "s" : "");
+		cname += (days<=7) ? " med" : " old";
+	}
 	dateDiv.textContent = "Precios actualizados "+ago;
-
+	clockDiv.className = cname;
 	google.maps.event.addListenerOnce(map, "mousedown", function() {
 		document.getElementById("detail").className = "";
 		markerDetail.setMap(null);
@@ -399,7 +408,7 @@ function showDetail(marker) {
 function populateInfo() {
 	var divInfo = document.getElementById("info");
 	divInfo.innerHTML = "<p>Se han encontrado " + Stats.n + " puntos de venta.</p>";
-	var divSum = document.getElementById("summary");
+	var divSum = document.getElementById("summary-b");
 	for (var t in Stats.types) {
 		var data = Stats.types[t];
 		var tr = document.createElement("tr");
@@ -503,7 +512,7 @@ function populateTable(types) {
 				var dd = document.createElement("div");
 				var date = new Date(dataPTS.date);
 				var days = (today-date)/TO_DAYS;
-				dd.className = "icon clock";
+				dd.className = "icon clock med";
 				if (days<1) dd.className += " new";
 				else if (days>7) dd.className += " old";
 				td_date.title = date.toLocaleDateString();

@@ -54,35 +54,50 @@ body {
 #summary tr.data {
 	border-top: 1px solid #fff;
 }
-#summary .min {
-	color: #288627;
+#summary-h .price {
+	border: 1px solid #fff;
 }
-#summary .max {
-	color: #D30000;
+#summary-h td.min {
+	background-color: #4EC149;
 }
-#summary td.price {
+#summary-h td.mean {
+	background-color: #53AAD2;
+}
+#summary-h td.max {
+	background-color: #FF322E;
+}
+#summary-b td.min {
+	color: #4EC149;
+}
+#summary-b td.mean {
+	color: #53AAD2;
+}
+#summary-b td.max {
+	color: #FF322E;
+}
+#summary-b td.price {
 	font-family: 'digital-7', sans-serif;
 	font-size: 18px;
 }
-#summary tr.T_1 {
+#summary-b tr.T_1 {
 	background-color: #004924;
 }
-#summary tr.T_3 {
+#summary-b tr.T_3 {
 	background-color: #257125;
 }
-#summary tr.T_4 {
+#summary-b tr.T_4 {
 	background-color: #333;
 }
-#summary tr.T_5 {
+#summary-b tr.T_5 {
 	background-color: #222;
 }
-#summary tr.T_6 {
+#summary-b tr.T_6 {
 	background-color: #A52828;
 }
-#summary tr.T_7 {
+#summary-b tr.T_7 {
 	background-color: #CB2800;
 }
-#summary tr.T_8 {
+#summary-b tr.T_8 {
 	background-color: #f1aa41;
 }
 #summary span {
@@ -103,11 +118,40 @@ body {
 }
 #toolbar {
 	font-size: 12px;
-	height: 12px;
+	height: 20px;
+	background-color: #333;
+	color: #fff;
+	position: relative;
 }
 #toolbar div {
-	float: left;
 	padding: 1px;
+	float: left;
+}
+#legend {
+	width: 300px;
+	overflow: hidden;
+	z-index: 100;
+	position: absolute;
+	right: 0;
+	height: 20px;
+	background: rgb(20,20,20);
+	background: rgba(20,20,20,0.8);
+}
+#legend .title {
+	padding: 5px;
+	width: 100%;
+}
+#legend .item {
+	border-top: 2px solid #fff;
+	padding: 5px;
+	width: 100%;
+}
+#legend .subitem {
+	padding: 2px;
+	margin-right: 10px;
+}
+#legend:hover {
+	height: 200px;
 }
 #detail {
 	color: white;
@@ -141,6 +185,10 @@ body {
 	display: block;
 	margin-top: 10px;
 	width: 150px;
+	font-size: .9em;
+}
+#d-title {
+	border-bottom: 1px dotted #fff;
 }
 #d-prices {
 	float: right;
@@ -164,20 +212,35 @@ body {
 	font-size: 30px;
 	font-family: 'digital-7', sans-serif;
 }
+#d-updated {
+	padding: 2px;
+	height: 25px;
+}
+#d-updated div {
+	float: left;
+	margin-right: 3px;
+}
+#d-info {
+	width: 200px;
+	float: left;
+}
+#d-clock {
+	margin-right: 5px;
+}
+#d-date {
+	width: 150px;
+	font-size: .9em;
+}
 #publi_730x90 {
 	width: 730px;
 	height: 90px;
-	border: 1px dotted black;
 	float: right;
 	margin-bottom: 2px;
-	background-color: red;
 }
 #publi_300x250 {
 	width: 300px;
 	height: 250px;
-	border: 1px dotted black;
 	float: left;
-	background-color: red;
 	margin-top: 20px;
 	margin-bottom: 20px;
 }
@@ -527,8 +590,8 @@ th.off, td.off,tr.r_off, tr.f_off, tr.p_off {
 	background-repeat: no-repeat;
 	overflow: hidden;
 }
-.clock {
-	background-image: url(/img/clock.png);
+.clock.med {
+	background-image: url(/img/clock_blue.png);
 	width: 20px;
 	height: 20px;
 }
@@ -547,8 +610,27 @@ th.off, td.off,tr.r_off, tr.f_off, tr.p_off {
 	width: 20px;
 	height: 20px;
 }
-
-
+.marker_green {
+	background-image: url(/img/marker_green.png);
+	width: 10px;
+	height: 10px;
+}
+.marker_blue {
+	background-image: url(/img/marker_blue.png);
+	width: 10px;
+	height: 10px;
+}
+.marker_red {
+	background-image: url(/img/marker_red.png);
+	width: 10px;
+	height: 10px;
+}
+.low, .medium, .high {
+	background-image: url(/img/cluster.png);
+}
+.low {width:40px; height:40px; background-position: -2px -2px}
+.medium {width:50px; height:50px; background-position: -44px -2px}
+.high {width:60px; height:60px; background-position: -2px -54px}
 
 /* Sprites logos */
 .logo {position: absolute; left: 0; overflow:hidden; background-repeat: no-repeat;background-image:url(/img/logos/logos.png);}

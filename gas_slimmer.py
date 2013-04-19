@@ -15,23 +15,28 @@ OPENLAYERS_API = 'http://openlayers.org/api/2.12/OpenLayers.js'
 
 MEDIA_JS = {
 	'home.js': {
-		'src':		['search.js'],
+		'src':		['search.js', 'home.js', 'utils.js'],
+		'extern':	['google_maps_api_v3.js'],
 		'api':		[GOOGLE_MAPS_API]
 		},
 	'detail.js': {
 		'src': 		['utils.js','detail.js','search.js'],
+		'extern':	['google_maps_api_v3.js'],
 		'api': 		[GOOGLE_MAPS_API]
 		},
 	'list.js': {
 		'src':		['libs/markerclustererplus.min.js','utils.js','list.js','search.js'],
+		'extern':	['google_maps_api_v3.js'],
 		'api':		[GOOGLE_MAPS_API]
 		},
 	'cantidad.js' : {
 		'src':		['g_cantidad.js','search.js'],
+		'extern':	['google_maps_api_v3.js'],
 		'api':		[GOOGLE_MAPS_API]
 		},
 	'precio.js': {
-		'src':		['g_precio.js','search.js'],
+		'src':		['g_precio.js','search.js', 'utils.js'],
+		'extern':	['google_maps_api_v3.js'],
 		'api':		[D3_API, OPENLAYERS_API, GOOGLE_MAPS_API]
 		},
 	}

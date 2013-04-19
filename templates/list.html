@@ -6,8 +6,11 @@
 	<h2>Resumen</h2>
 	<div id="info"></div>
 	<table id="summary">
-		<tr><th rowspan="2">Tipo</th><th rowspan="2">Puntos de venta</th><th colspan="3">Precios</th></tr>
-		<tr><td class="min">MÍNIMO</td><td class="mean">MEDIO</td><td class="max">MÁXIMO</td></tr>
+		<thead id="summary-h">
+			<tr><th rowspan="2">Tipo</th><th rowspan="2">Puntos de venta</th><th colspan="3">Precios</th></tr>
+			<tr><td class="price min">MÍNIMO</td><td class="price mean">MEDIO</td><td class="price max">MÁXIMO</td></tr>
+		</thead>
+		<tbody id="summary-b"></tbody>
 	</table>
 	</div>
 
@@ -55,25 +58,68 @@
 	</div>
 	</div>
 
-	<div class="panel clearer"><div id="publi_300x250"></div></div>
+	<div class="panel clearer">
+		<div id="publi_300x250">
+			<script type="text/javascript"><!--
+			google_ad_client = "ca-pub-9285487390483271";
+			/* gasole detail */
+			google_ad_slot = "9453571524";
+			google_ad_width = 300;
+			google_ad_height = 250;
+			//-->
+			</script>
+			<script type="text/javascript"
+			src=".http://pagead2.googlesyndication.com/pagead/show_ads.js">
+			</script>
+		</div>
+	</div>
 
 </div> <!-- control -->
 
 <div id="publi_730x90">
-
+	<script type="text/javascript"><!--
+	google_ad_client = "ca-pub-9285487390483271";
+	/* gasole top */
+	google_ad_slot = "8520711925";
+	google_ad_width = 728;
+	google_ad_height = 90;
+	//-->
+	</script>
+	<script type="text/javascript"
+	src=".http://pagead2.googlesyndication.com/pagead/show_ads.js">
+	</script>
 </div>
 
 <div id="map_area">
 	<div id="toolbar">
 		<div id="m-density" title="Muestra la gasolineras agrupadas según su densidad"><label for="cluster">Mapa de concentración</label><input type="checkbox" id="cluster" name="cluster" onclick="javascript:mapCluster();"></div>
-		<div>Leyenda</div>
+		<div id="legend">
+			<div class="title">Leyenda</div>
+			<div class="item">
+			<div class="title">Precios de la gasolinera</div>
+			<div class="subitem"><div class="icon marker_green"></div>Bajos</div>
+			<div class="subitem"><div class="icon marker_blue"></div>Medios</div>
+			<div class="subitem"><div class="icon marker_red"></div>Altos</div>
+			</div>
+			<div class="item">
+			<div class="title">Concentración</div>
+			<div class="subitem">Baja (1-9)<br><div class="cluster low"></div></div>
+			<div class="subitem">Media (10-99)<br><div class="cluster medium"></div></div>
+			<div class="subitem">Alta (+100)<br><div class="cluster high"></div></div>
+			</div>
+		</div>
 	</div>
 	<div id="google_map"></div>
 	<div id="detail">
 		<div id="d-title"></div>
 		<ul id="d-prices"></ul>
-		<div id="d-date"></div>
-		<a id="d-link">Ver detalles y opiniones</a>
+		<div id="d-info">
+			<div id="d-updated">
+				<div id="d-clock" class="clock old" style="float:left;"></div>
+				<div id="d-date" style="float:left;"></div>
+			</div>
+			<a id="d-link">&#8853; Ver detalles y opiniones</a>
+		</div>
 	</div>
 </div>
 

@@ -156,7 +156,7 @@ function mySlider(div) {
 	})
 }
 
-window.onload = function() {
+window.addEventListener("load", function() {
 	var sliders = document.getElementsByClassName("my-slider");
 	for (var i=0; i<sliders.length; i++) {
 		mySlider(sliders[i]);
@@ -171,4 +171,4 @@ window.onload = function() {
 		}
 	}
 	initGeoloc();
-}
+});

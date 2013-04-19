@@ -14,6 +14,73 @@ var FUEL_COLORS = {
 	"GOC": "#FF3300",
 	"BIOD": "#FFCC33"
 }
+
+var PROVS = {
+	"Álava": "01",
+	"Albacete": "02",
+	"Alicante": "03",
+	"Almería": "04",
+	"Asturias": "33",
+	"Ávila": "05",
+	"Badajoz": "06",
+	"Balears (Illes)": "07",
+	"Barcelona": "08",
+	"Burgos": "09",
+	"Cáceres": "10",
+	"Cádiz": "11",
+	"Cantabria": "39",
+	"Castellón / Castelló": "12",
+	"Ceuta": "51",
+	"Ciudad Real": "13",
+	"Córdoba": "14",
+	"Coruña (A)": "15",
+	"Cuenca": "16",
+	"Girona": "17",
+	"Granada": "18",
+	"Guadalajara": "19",
+	"Guipúzcoa": "20",
+	"Huelva": "21",
+	"Huesca": "22",
+	"Jaén": "23",
+	"León": "24",
+	"Lleida": "25",
+	"Lugo": "27",
+	"Madrid": "28",
+	"Málaga": "29",
+	"Melilla": "52",
+	"Murcia": "30",
+	"Navarra": "31",
+	"Ourense": "32",
+	"Palencia": "34",
+	"Palmas (Las)": "35",
+	"Pontevedra": "36",
+	"Rioja (La)": "26",
+	"Salamanca": "37",
+	"Santa Cruz De Tenerife": "38",
+	"Segovia": "40",
+	"Sevilla": "41",
+	"Soria": "42",
+	"Tarragona": "43",
+	"Teruel": "44",
+	"Toledo": "45",
+	"Valencia / València": "46",
+	"Valladolid": "47",
+	"Vizcaya": "48",
+	"Zamora": "49",
+	"Zaragoza": "50"};
+
+var info = null;
+var LS_EXPIRE = 3600000;				// 1 hora
+var APIS = 	{ 	"gasolineras": "api",
+				"resultados": "geo",
+				"ficha": "api"
+			};
+
+/* Obtener nombre de provincia a partir de id */
+function getProvName(id) {
+	for (k in PROVS) if (PROVS[k] == id) return k;
+}
+
 function toTitle(s) {
 	return s.replace(" [N]", "")
 		.replace(/^CARRETERA ?|^CR\.? ?/i, "CTRA. ")
@@ -73,21 +140,13 @@ function checkLocalStorage() {
 	}
 }
 
-var info = null;
-var LOCAL_EXPIRATION = 3600000;	// 1 hora
-var APIS = 	{ 	"gasolineras": "api",
-				"resultados": "geo",
-				"ficha": "api"
-			}
-
 function getApiData(url, key, callback) {
 	var req = new XMLHttpRequest();
 	req.onload = function(r) {
 		info = JSON.parse(r.target.responseText);
-		console.log("datos obtenidos: ", info);
 		if (key) {
 			localStorage.setItem(key, JSON.stringify(info));
-			localStorage.setItem("timestamp", new Date().getTime());
+			if (!localStorage.timestamp) localStorage.setItem("timestamp", new Date().getTime());
 		}
 		callback(info);
 	}
@@ -95,67 +154,28 @@ function getApiData(url, key, callback) {
 	req.send();
 }
 
-function clearCurrentStorage() {
-	if (!checkLocalStorage()) return;
-	// Limpia los datos locales de la página actual
-	var pathArray = window.location.pathname.split("/");
-	var option = pathArray[1];		// ficha
-	if (option=="ficha") {
-		localStorage.removeItem(pathArray.slice(2).join("*"));
-	}
-}
-
 function getData(callback) {
 	var pathArray = window.location.pathname.split("/");
-	var option = pathArray[1];		// resultados, gasolineras, ficha
-	var where1 = pathArray[2];		
-	var where2 = pathArray[3];
-	var key = null;	
+	var option = pathArray[1];
+	var key = null, info = null;
 	if (checkLocalStorage()) {
 		// Limpieza de datos antiguos
-		var timestamp = localStorage["timestamp"];
-		if (timestamp && (new Date().getTime() - parseInt(timestamp))>LOCAL_EXPIRATION) {		
-			console.log("datos antiguos");
-			localStorage.clear();
-		}
-		
-		var storedData = null;
-		if (option == "resultados") {
-			key = where1;
-			storedData = localStorage[key];
-		} else if (option == "gasolineras") {
-			if (where2) {
-				key = [where1,where2].join("*");
-				storedData = localStorage[key];
-				if (!storedData) storedData = localStorage[where1];
-			} 
-			else {
-				key = where1;
-				storedData = localStorage[key];
-			}
-		} else if (option == "ficha") {
-			var where3 = pathArray[4];
-			key = [where1,where2,where3].join("*");
-			storedData = localStorage[key];
-		}
+		var ts = localStorage["timestamp"];
+		if (ts && (new Date().getTime() - parseInt(ts))>LS_EXPIRE) localStorage.clear();
+		key = pathArray.slice(1).join("***");
+		var storedData = localStorage[key];
 		if (storedData) info = JSON.parse(storedData);
-	}
-	if (info) {
-		if ((option=="gasolineras") && (where2)) {
-			var prov  = decodeName(where1);
-			var town = decodeName(where2);
-			tempData = {};
-			tempData["_data"] = {};
-			tempData["_data"][prov] = {};
-			tempData["_data"][prov][town] = info._data[prov][town];
-			info = tempData;
+		else if ((option=="gasolineras") && (pathArray[3])) {
+			storedData = localStorage[pathArray.slice(1,3).join("***")];
+			if (storedData) {
+				var prov  = decodeName(pathArray[2]);
+				var town = decodeName(pathArray[3]);
+				info = {"_data": {}};
+				info._data[prov] = {};
+				info._data[prov][town] = JSON.parse(storedData)._data[prov][town];
+			}
 		}
-		console.log("datos recuperados: ", info);
-		callback(info);
-	} else {
-		// Buscamos datos nuevos
-		console.log(key);
-		getApiData(document.URL.replace(option, APIS[option]), key, callback);
 	}
-	return null;
+	if (info) callback(info);
+	else getApiData(document.URL.replace(option, APIS[option]), key, callback);
 }

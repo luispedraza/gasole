@@ -143,3 +143,26 @@ ul.droplist li:hover {
 .T_BIOD {
 	color: #FFCC33;
 }
+
+#prov-current {
+	background: rgb(8,8,8);
+	background: rgba(8,8,8,0.8);
+	border-radius: 3px;
+	position: absolute;
+	right: 0;
+	top: 30px;
+	color: white;
+	width: 150px;
+	padding: 5px;
+	opacity: 0;
+	font-size: .9em;
+	text-align: right;
+	-webkit-transition: opacity .2s ease-in;
+	   -moz-transition: opacity .2s ease-in;
+	    -ms-transition: opacity .2s ease-in;
+	     -o-transition: opacity .2s ease-in;
+	        transition: opacity .2s ease-in;
+}
+#prov-current.on {
+	opacity: 1;
+}

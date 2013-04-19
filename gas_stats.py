@@ -4,6 +4,7 @@
 from gas_db import *
 from gas_update import ResultIter
 import numpy as np
+from google.appengine.api.runtime import *
 
 BINS = 20
 GEOBINS = 120
@@ -80,6 +81,7 @@ def compute_stats():
 				datas = datat[s]
 				add_data(datas.get("latlon"),datas["options"],[p,t,s],statsp)
 				add_data(datas.get("latlon"),datas["options"],[p,t,s],stats)
+		logging.info(memory_usage().current())
 	compute(stats)
 	for p in stats['provinces']:
 		# estadísticos de provincia:
