@@ -180,7 +180,8 @@ def get_history(prov, town, station):
 	result = []
 	q = HistoryData.all().ancestor(db.Key.from_path('Province', prov, 'Town', town, 'GasStation', station)).order('date')
 	for h in q:
-		newdata = {"d": h.date.isoformat(), "p": {k: getattr(h, k) for k in h.dynamic_properties()}};
+		newdata = {k: getattr(h, k) for k in h.dynamic_properties()}
+		newdata["d"] = h.date.isoformat()
 		result.append(newdata)
 	return result
 

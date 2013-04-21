@@ -12,7 +12,7 @@ var CHART_OPTIONS = {
 	"NGO": {color: "#aaa", name: "Nuevo Gasóleo A"},
 	"GOB": {color: "#CC3333", name: "Gasóleo B"},
 	"GOC": {color: "#FF3300", name: "Gasóleo C"},
-	"BIOD": {color: "#FFCC33", name: "Biodiésel"}
+	"BIOD": {color: "#f1aa41", name: "Biodiésel"}
 }
 
 var PROVS = {

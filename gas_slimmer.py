@@ -23,7 +23,7 @@ MEDIA_JS = {
 		},
 	'detail.js': {
 		'src': 		['utils.js','detail.js','search.js'],
-		'libs': 	['canvasjs.js'],
+		'libs': 	['amcharts.js'],
 		'extern':	['google_maps_api_v3.js'],
 		'api': 		[GOOGLE_MAPS_API]
 		},

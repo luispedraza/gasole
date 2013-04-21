@@ -20,11 +20,13 @@ function initMap(latlon) {
 		zoom: 15,
 		mapTypeId: google.maps.MapTypeId.ROADMAP
 	};
-	map = new google.maps.Map(document.getElementById("google_map"),
+	map = new google.maps.Map(document.getElementById("map"),
 		mapOptions);
 	markerCenter = new google.maps.Marker({
     	map: map,
-    	position: position
+    	position: position,
+    	animation: google.maps.Animation.DROP,
+		icon: '/img/pump_mark.png'
 	});
 }
 
@@ -82,8 +84,8 @@ function insertLogo(label) {
 function initPrice(price) {
 	for (var p in price) {
 		var type = FUEL_OPTIONS[p]["short"];
-		document.getElementById("sec_"+type).style.display = "block";
-		var priceDiv = document.getElementById("p_"+type);
+		document.getElementById("sec-"+type).style.display = "block";
+		var priceDiv = document.getElementById(type);
 		var digits = price[p].toFixed(3);
 		for (var d=0; d<digits.length; d++){
 			var digitBack = document.createElement("div");
@@ -237,62 +239,19 @@ function processData(info) {
 		var points = total_points/n_comments;
 		document.getElementById("points").innerHTML = points.toFixed(1) + " (" + n_comments + " valoraciones)";
 	}
-    /* Gráfico canvasjs */
-    var history = info._history;
-    var values = {};
-    var minY=100,maxY=-100;
-    for (var h=0; h<history.length; h++) {
-    	var hdata = history[h];
-		var date = new Date(hdata.d);
-		for (var o in hdata.p) {
-			if (!values.hasOwnProperty(o)) values[o] = [];
-			var yval = hdata.p[o];
-			if (yval<minY) minY=yval;
-			if (yval>maxY) maxY=yval;
-			values[o].push({x: date, y: yval});
-		}
+
+	// theData.sort(function(a,b) {
+	// 	return -(a.dataPoints[0].y - b.dataPoints[0].y)
+	// });
+    /* Amchart */
+    amChart(info._history);
+	// this method is called when chart is inited as we listen for "dataUpdated" event
+	function zoomChart() {
+		// different zoom methods can be used - zoomToIndexes, zoomToDates, zoomToCategoryValues
+		amchart.zoomToIndexes(chartData.length - 40, chartData.length - 1);
 	}
-	console.log(values);
-	var theData = [];
-	
-	for (var o in values) {
-		theData.push({
-			name: o,
-			showInLegend: true,
-            markerType: "circle",
-            markerBorderColor: "#fff",
-            markerSize: 5,
-			type: "area",
-			color: CHART_OPTIONS[o].color,
-			legendText: CHART_OPTIONS[o].name,
-			legendMarkerType: "square",
-			dataPoints: values[o]
-		});
-	}
-	console.log(theData);
-	theData.sort(function(a,b) {
-		return -(a.dataPoints[0].y - b.dataPoints[0].y)
-	});
-    var options = {
-    	title: {
-    		text: "Evolución de los precios"
-    	},
-    	axisX: {
-    		title: "Fecha",
-    		valueFormatString: "DD-MM",
-    		labelAngle: -45
-    	},
-    	axisY: {
-    		title: "Precio (€)",
-    		valueFormatString: "#.###",
-    		minimum: minY-.1,
-    		maximum: maxY+.1,
-    		interval: .1
-    	},
-    	data: theData
-    }
-    var chart = new CanvasJS.Chart("chart", options);
-    chart.render();
+
+
     /* Puntuaciones (estrellas) */
     initPoints();
 
@@ -302,7 +261,70 @@ function processData(info) {
     document.getElementById("send_comment").addEventListener("click", function() {
     	// Es necesario para recargar la página cuando se comenta
     	clearCurrentStorage();
-    })
+    });
+
+}
+
+function amChart(chartData) {
+	var chart;
+	for (var i in chartData) chartData[i].d = new Date(chartData[i].d);
+	AmCharts.ready(function() {
+	    // SERIAL CHART
+	    chart = new AmCharts.AmSerialChart();
+	    chart.pathToImages = "http://www.amcharts.com/lib/images/";
+	    chart.zoomOutButton = {
+	        backgroundColor: '#000000',
+	        backgroundAlpha: 0.15
+    	};
+	    chart.dataProvider = chartData;
+	    chart.marginTop = 10;
+	    chart.autoMarginOffset = 3;
+	    chart.marginRight = 0;        
+	    chart.categoryField = "d";
+	    chart.addListener("dataUpdated", zoomChart);
+	    // AXES
+	    // Category
+	    var categoryAxis = chart.categoryAxis;
+	    categoryAxis.parseDates = true;
+	    categoryAxis.gridAlpha = 0.07;
+	    categoryAxis.axisColor = "#DADADA";
+	    categoryAxis.startOnAxis = true;
+	    categoryAxis.showLastLabel = false;
+	    // Value
+	    var valueAxis = new AmCharts.ValueAxis();
+	    valueAxis.gridAlpha = 0.07;
+	    valueAxis.title = "Precio (€/l";
+	    chart.addValueAxis(valueAxis);
+	    for (var o in CHART_OPTIONS) {
+	    	var graph = new AmCharts.AmGraph();
+		    graph.type = "line";
+		    graph.title = CHART_OPTIONS[o].name;
+		    graph.valueField = o;
+		    graph.lineAlpha = 1;
+		    graph.lineThickness = 2;
+		    // graph.fillAlphas = 0.3;
+		    graph.lineColor = CHART_OPTIONS[o].color;
+		    chart.addGraph(graph);
+	    }
+	    // LEGEND
+	    var legend = new AmCharts.AmLegend();
+	    legend.position = "top";
+	    chart.addLegend(legend);
+	    // SCROLLBAR
+	    var chartScrollbar = new AmCharts.ChartScrollbar();
+	    chart.addChartScrollbar(chartScrollbar);
+	    // CURSOR
+	    var chartCursor = new AmCharts.ChartCursor();
+	    chartCursor.zoomable = false; // as the chart displayes not too many values, we disabled zooming
+	    chartCursor.cursorAlpha = 0;
+	    chart.addChartCursor(chartCursor);
+	    // WRITE
+	    chart.write("chart");
+	    function zoomChart() {
+		    // different zoom methods can be used - zoomToIndexes, zoomToDates, zoomToCategoryValues
+		    chart.zoomToIndexes(chartData.length - 40, chartData.length - 1);
+		}
+	});
 }
 
 window.addEventListener("load", function() {

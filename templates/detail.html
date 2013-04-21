@@ -1,42 +1,42 @@
-<div id="price_board">
+<div id="price-board">
 	<div id="station-logo"></div>
-	<div id="sec_G95" class="section T_G95">
-		<div class="sec_name">Gasolina 95</div>
-		<div id="p_G95" class="price"></div>
+	<div id="sec-G95" class="section G95">
+		<div class="name">Gasolina 95</div>
+		<div id="G95" class="price"></div>
 	</div>
-	<div id="sec_G98" class="section  T_G98">
-		<div class="sec_name">Gasolina 98</div>
-		<div id="p_G98" class="price"></div>
+	<div id="sec-G98" class="section  G98">
+		<div class="name">Gasolina 98</div>
+		<div id="G98" class="price"></div>
 	</div>
-	<div id="sec_GOA" class="section T_GOA">
-		<div class="sec_name">Gasóleo A</div>
-		<div id="p_GOA" class="price"></div>
+	<div id="sec-GOA" class="section GOA">
+		<div class="name">Gasóleo A</div>
+		<div id="GOA" class="price"></div>
 	</div>
-	<div id="sec_NGO" class="section T_NGO">
-		<div class="sec_name">Nuevo Gasóleo A</div>
-		<div id="p_NGO" class="price"></div>
+	<div id="sec-NGO" class="section NGO">
+		<div class="name">Nuevo Gasóleo A</div>
+		<div id="NGO" class="price"></div>
 	</div>
-	<div id="sec_GOB" class="section T_GOB">
-		<div class="sec_name">Gasóleo B</div>
-		<div id="p_GOB" class="price"></div>
+	<div id="sec-GOB" class="section GOB">
+		<div class="name">Gasóleo B</div>
+		<div id="GOB" class="price"></div>
 	</div>
-	<div id="sec_GOC" class="section T_GOC">
-		<div class="sec_name">Gasóleo C</div>
-		<div id="p_GOC" class="price"></div>
+	<div id="sec-GOC" class="section GOC">
+		<div class="name">Gasóleo C</div>
+		<div id="GOC" class="price"></div>
 	</div>
-	<div id="sec_BIOD" class="section T_BIOD">
-		<div class="sec_name">Biodiésel</div>
-		<div id="p_BIOD" class="price"></div>
+	<div id="sec-BIOD" class="section BIOD">
+		<div class="name">Biodiésel</div>
+		<div id="BIOD" class="price"></div>
 	</div>
 
-	<div id="ads_detail">
+	<div id="ads-detail">
 		
 	</div>
 </div>
 
 <div id="detail">
 	<h1>Detalle de la {{title}}</h1>
-	<div id="social_share">
+	<div id="social-share">
 	<!-- FB -->
 	<div class="fb-like" data-send="true" data-layout="button_count" data-width="100" data-show-faces="false" data-action="recommend"></div>
 	<!-- TT -->
@@ -55,22 +55,22 @@
 	</script>
 	</div> <!-- #social_share -->
 
-	<div id="ads_top"></div>
+	<div id="ads-top"></div>
 
-
-
-	<div id="detail_info">
-		<div id="detail_info_fields">
-			<div class="field">Dirección</div> 	<div class="field_value" id="address"></div><br>
-			<div class="field">Horario</div> 	<div class="field_value" id="hours"></div><br>
-			<div class="field">Valoración media</div> 	<div class="field_value" id="points">Nadie ha valorado aún este establecimiento. <a href="#comments">¿Quieres hacerlo tú??</a></div><br>
+	<div id="detail-info">
+		<div id="detail-content">
+			<h2>Dirección</h2>
+			<div class="value" id="address"></div>
+			<h2>Horario</h2> 	
+			<div class="value" id="hours"></div>
+			<h2>Valoración media</h2> 	
+			<div class="value" id="points">Nadie ha valorado aún este establecimiento. <a href="#comments">¿Quieres hacerlo tú??</a></div>
 		</div>
-		<div id="google_map"></div>
+		<div id="map"></div>
 		<div id="chart"></div>
-		<div id="price-chart"
 	</div>
 
-	
+</div><!--detail-->
 
 	{% if edit_station|count %}
 	<div id="edit">
@@ -199,5 +199,5 @@
 			<div id="old_comments"></div>
 		</div>
 	</div>
-</div>
+
 
