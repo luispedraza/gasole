@@ -59,50 +59,50 @@
 
 	<div id="detail-info">
 		<div id="detail-content">
-			<h2>Dirección</h2>
-			<div class="value" id="address"></div>
 			<h2>Horario</h2> 	
-			<div class="value" id="hours"></div>
+			<div class="info" id="hours"></div>
 			<h2>Valoración media</h2> 	
-			<div class="value" id="points">Nadie ha valorado aún este establecimiento. <a href="#comments">¿Quieres hacerlo tú??</a></div>
+			<div class="info" id="points">Nadie ha valorado aún este establecimiento. <a href="#comments">¿Quieres hacerlo tú??</a></div>
 		</div>
 		<div id="map"></div>
 		<div id="chart"></div>
 	</div>
-
 </div><!--detail-->
 
-	{% if edit_station|count %}
-	<div id="edit">
-		<h1>Edición de la estación</h1>
-		<form method="post">
-			<label for="email">E-mail: </label><input name="email" value="{{edit_station['email']}}"/><br>
-			<label for="web">Página web: </label><input name="web"  value="{{edit_station['link']}}"/><br>
-			<label for="phone">Teléfono: </label><input name="phone"  value="{{edit_station['phone']}}"/><br>
-			<p>Localización:</p>
-			<label for="lat">Latitud: </label><input name="lat"  value="{{edit_station['geopt'].lat}}"/><br>
-			<label for="lat">Longitud: </label><input name="lon"  value="{{edit_station['geopt'].lon}}"/><br>
-			<input type="hidden" name="edit_station" value="true"/>
-			<input type="submit" value="Enviar datos" />
-		</form>
-	</div>
-	{% endif %}
-	<div id="comments">
-		<h1>Opina sobre esta gasolinera</h1>
-			{% if error|count %}
-			<div class="c_error">
-			<p><b>Se han detectado errores en el formulario:</b></p>
-			<ul id="error_list">
-				{% for e in error %}
-				<li>{{error[e]}}</li>
-				{% endfor %}
-			</ul>
-			</div>
-			{% endif %}
-		
+{% if edit_station|count %}
+<div id="edit">
+	<h1>Edición de la estación</h1>
+	<form method="post">
+		<label for="email">E-mail: </label><input name="email" value="{{edit_station['email']}}"/><br>
+		<label for="web">Página web: </label><input name="web"  value="{{edit_station['link']}}"/><br>
+		<label for="phone">Teléfono: </label><input name="phone"  value="{{edit_station['phone']}}"/><br>
+		<p>Localización:</p>
+		<label for="lat">Latitud: </label><input name="lat"  value="{{edit_station['geopt'].lat}}"/><br>
+		<label for="lat">Longitud: </label><input name="lon"  value="{{edit_station['geopt'].lon}}"/><br>
+		<input type="hidden" name="edit_station" value="true"/>
+		<input type="submit" value="Enviar datos" />
+	</form>
+</div>
+{% endif %}
+
+<div id="comments" class="clearer">
+	<div id="comments-new">
+	<h2>Tu comentario</h2>
+		{% if error|count %}
+		<div id="error">
+		<p><b>Se han detectado errores en el formulario:</b></p>
+		<ul>
+			{% for e in error %}
+			<li>{{error[e]}}</li>
+			{% endfor %}
+		</ul>
+		</div>
+		{% endif %}
+	
 		{% if not user %}
-		<div id="user_login">
-			<div id="social_login">
+		<div class="clearer">
+			<div class="in">Inicia sesión… </div>
+			<div id="social-login">
 				<a href="/login/facebook"><div class="login fb_login" title="Identifícate con tu perfil de Facebook"></div></a>
 				<a href="/login/twitter"><div class="login tt_login" title="Identifícate con tu perfil de Twitter"></div></a>
 				<a href="/login/google"><div class="login gp_login" title="Identifícate con tu perfil de Google+"></div></a>
@@ -112,92 +112,105 @@
 		{% endif %}
 
 
-		<form method="post">
+	<form method="post">
+		{% if user %}
+		<img class="avatar" src="{{user.avatar_url}}">
+		<p id="username">Estás identificado como:<br><a href="{{user.link}}">{{user.name}}</a></p><p><a href="/logout">cerrar sesión</a></p>
+		<input type="hidden" name="c_authid" value="{{user.auth_ids[0]}}"><br>
+		<input type="hidden" name="c_name" id="c_name" value="{{user.name}}"><br>
+		<input type="hidden" name="c_link" id="c_link" value="{{user.link}}">
+		
+		{% else %}
+		<div><br>O identifícate para dejar un comentario<br></div>
+		<div id="user-data">
+			<div class="section">
+			<div class="icon c_name in"></div><label class="in" for="c_name">NOMBRE<sup>*</sup></label><input type="text" name="c_name" id="c_name" value="{{data['c_name']}}" placeholder="ej.: Antonio Ruiz">
+			</div>
 			
-			{% if user %}
-			<img class="avatar" src="{{user.avatar_url}}">
-			<p id="username">Estás identificado como <a href="{{user.link}}">{{user.name}}</a></p><p><a href="/logout">cerrar sesión</a></p>
-			<input type="hidden" name="c_authid" value="{{user.auth_ids[0]}}"><br>
-			<input type="hidden" name="c_name" id="c_name" value="{{user.name}}"><br>
-			<input type="hidden" name="c_link" id="c_link" value="{{user.link}}">
-			
-			{% else %}
-			<div id="user_data">
-				<div class="section left">
-				<label for="c_name" class="c_name">Nombre<sup> *</sup></label><input type="text" name="c_name" id="c_name" value="{{data['c_name']}}" placeholder="ej.: Antonio Ruiz">
+			<div class="section">
+			<div class="icon c_email in"></div><label class="in" for="c_email">E-MAIL<sup>*</sup></label><input type="email" name="c_email" id="c_email" value="{{data['c_email']}}" placeholder="ej.: aruiz777@gmail.com">
+			<p>(No será mostrado)</p>
+			</div>
+		
+			<div class="section">
+			<div class="icon c_link in"></div><label class="in" for="c_link">ENLACE</label><input type="text" name="c_link" id="c_link" value="{{data['c_link']}}" placeholder="http://…">
+			</div>
+		
+		</div>
+		{% endif %}
+		<div id="new_comment">
+			<div id="section_points" class="section">
+			<div class="icon c_points in"></div><label class="in">VALORACIÓN<sup>*</sup></label>
+				<div id="c_points_div">
+					{% if data %}
+					<input type="text" id="c_points" name="c_points" readonly value="{{data['c_points']}}">
+					{% else %}
+					<input type="text" id="c_points" name="c_points" readonly value="">
+					{% endif %}
+					<div class="in star soff" id="star_0"></div>
+					<div class="in star soff" id="star_1"></div>
+					<div class="in star soff" id="star_2"></div>
+					<div class="in star soff" id="star_3"></div>
+					<div class="in star soff" id="star_4"></div><br>
+					<p class="in" id="c_points_text">asigna una puntuación</p>
 				</div>
-				<div class="section right">
-					<label for="c_email" class="c_email">E-mail<sup> *</sup> (no se mostrará)</label><input type="email" name="c_email" id="c_email" value="{{data['c_email']}}" placeholder="ej.: aruiz777@gmail.com">
-				</div>
-				<div class="section full">
-				<label for="c_link" class="c_link">Enlace</label><input type="text" name="c_link" id="c_link" value="{{data['c_link']}}" placeholder="http://…">
-				</div>
+				
 			</div>
 
-			{% endif %}
-			<div id="new_comment">
-				<div class="section left" id="section_title">
-				<label for="c_title" class="c_title">Título<sup> *</sup></label><input id="c_title" type="text" name="c_title" value="{{data['c_title']}}" placeholder="Titular del comentario">
-				</div>
-				<div class="section right" id="section_points">
-				<label for="c_points" class="c_points">Valoración<sup> *</sup></label>
-					<div id="c_points_div">
-						{% if data %}
-						<input type="text" id="c_points" name="c_points" readonly value="{{data['c_points']}}">
-						{% else %}
-						<input type="text" id="c_points" name="c_points" readonly value="¿?">
-						{% endif %}
-						<div id="c_points_text">selecciona una puntuación</div>
-						<div class="star shit" id="star_0"></div>
-						<div class="star" id="star_1"></div>
-						<div class="star" id="star_2"></div>
-						<div class="star" id="star_3"></div>
-						<div class="star" id="star_4"></div>
-						<div class="star" id="star_5"></div>
-						<div class="star" id="star_6"></div>
-						<div class="star" id="star_7"></div>
-						<div class="star" id="star_8"></div>
-						<div class="star" id="star_9"></div>
-						<div class="star" id="star_10"></div>
-					</div>
-				</div>
-				<div class="section full">
-				<label for="c_content" class="c_content">Comentario<sup> *</sup>
-					<div id="replyto">
-					<div id="replyto_cancel">Cancelar</div>
+			<div class="section">
+			<div class="icon c_content in"></div><label class="in" for="c_content">COMENTARIO<sup>*</sup></label>
+			
+				<div id="replyto">
+					<div id="replyto_cancel" class="button">Cancelar</div>
 					<p>En respuesta a:</p>
 					<div id="replyto_name"></div>
 					<div id="replyto_msg"></div>
 					<input type="hidden" id="c_replyto" name="c_replyto" value="{{data['c_replyto']}}">
-					</div>
-				</label><textarea id="c_content" name="c_content">{{data['c_content']}}</textarea>
 				</div>
+			<textarea id="c_content" name="c_content">{{data['c_content']}}</textarea>
+			</div>
+			
 
+			<!-- captcha -->
+			<div id="captcha" class="section">
 				
-
-				<!-- captcha -->
-				<div id="captcha">
+					<div class="icon c_captcha in"></div><label class="in">CAPTCHA</label><input type="text" id="recaptcha_response_field" name="recaptcha_response_field"/>
+				
 				<script type="text/javascript">
-					var RecaptchaOptions = {lang:'es',theme:'clean'};
+					var RecaptchaOptions = {lang:'es',theme:'custom',custom_theme_widget:'recaptcha_widget'};
 				</script>
+				<div id="recaptcha_widget" style="display:none">
+					<div class="recaptcha_only_if_incorrect_sol" style="color:red">Incorrecto. Inténtalo de nuevo.</div>
+					<p class="recaptcha_only_if_image">Escribe las palabras:</p>
+					<p class="recaptcha_only_if_audio">Escribe los números:</p>
+					<div id="recaptcha_image"></div>
+					<div class="in"><a class="button captcha_reload" href="javascript:Recaptcha.reload()" title="Recargar el CAPTCHA"></a></div>
+					<div class="in recaptcha_only_if_image"><a href="javascript:Recaptcha.switch_type('audio')" title="Formato Audio" class="button captcha_audio"></a></div>
+					<div class="in recaptcha_only_if_audio"><a href="javascript:Recaptcha.switch_type('image')" title="Formato Imagen" class="button captcha_image"></a></div>
+					<div class="in"><a href="javascript:Recaptcha.showhelp()" title="Ayuda" class="button captcha_help"></a></div>
+				</div>
 				<script type="text/javascript" src="http://www.google.com/recaptcha/api/challenge?k=6Lfg290SAAAAAF7lz7UcKF7Sn0KOCQne8TWwqjAF&hl=es">
 				</script>
 				<noscript>
 				<iframe src="http://www.google.com/recaptcha/api/noscript?k=6Lfg290SAAAAAF7lz7UcKF7Sn0KOCQne8TWwqjAF" height="200" width="300" frameborder="0">
 				</iframe><br>
-				<textarea name="recaptcha_challenge_field" rows="2" cols="30"></textarea>
+				<textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea>
 				<input type="hidden" name="recaptcha_response_field" value="manual_challenge">
 				</noscript>
-				</div>
-				<!-- fin captcha -->
-				<input type="submit" id="send_comment" value="Enviar">
-				<p>Antes de enviar tu comentario, asegúrate de haber rellenado todos los campos obligatorios (*) y haber resuelto el captcha de la izquierda</p>
-			</div><!-- new_comment -->
-		</form>
-		<div id="comments_history">
-			<h1>Todas las opiniones sobre esta gasolinera</h1>
-			<div id="old_comments"></div>
-		</div>
+			</div>
+			<!-- fin captcha -->
+			<div class="section">
+				<input class="button" type="submit" id="send_comment" value="Enviar">
+				<p>Antes de enviar tu comentario, asegúrate de haber rellenado todos los campos obligatorios (*) y haber resuelto el captcha.</p>
+			</div>
+		</div><!-- new_comment -->
+	</form>
+	</div><!-- comments-new-->
+
+	<div id="comments-old">
+		<h2>Todos los comentarios</h2>
+		<div id="old_comments"></div>
 	</div>
+</div>
 
 

@@ -218,7 +218,7 @@ class Detail(BaseAuthHandler):
             if not len(error):
                 hashemail = md5(email).hexdigest()
                 avatar = "http://www.gravatar.com/avatar/"+hashemail+"?s=100&d="+urllib.quote_plus(u'http://www.gasole.net/img/avatar.png')
-                link=self.request.get("c_link").strip()
+                link = self.request.get("c_link").strip()
                 self._on_signin({'name':name,'link':link,'avatar':avatar,'id':hashemail}, None, provider='gasole',redirect=False)
                 user = self.current_user
                 self.auth.unset_session()
@@ -230,9 +230,6 @@ class Detail(BaseAuthHandler):
                 error["c_points"] = u"Olvidaste asignar una valoración a esta gasolinera."
             else:
                 points=int(points)*10
-            title=remove_html_tags(self.request.get("c_title").strip())
-            if not title:
-                error["c_title"] = u"Por favor, pon un título a tu comentario."
         content=remove_html_tags(self.request.get("c_content").strip())
         if not content:
             error["c_content"] = u"El texto del comentario está vacío."

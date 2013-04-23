@@ -1,14 +1,8 @@
 var POINTS = [
-				"un asco de lugar",				// 0
 				"deja mucho que desear",		// 1
-				"mejor evitarla",				// 2
-				"las hay mejores",				// 3
-				"tiene deficiencias",			// 4
-				"una del montón",				// 5
-				"está bien en general",			// 6
-				"por encima de la media", 		// 7
+				"las hay mejores",				// 2
+				"está bien en general",			// 3
 				"muy recomendable",				// 8
-				"de las mejores",				// 9
 				"¡excelente!"					// 10
 			]
 
@@ -31,41 +25,43 @@ function initMap(latlon) {
 }
 
 function initPoints() {
+	function selStar(i){
+		var stars = document.getElementsByClassName("star");
+		for (var s=0; s<stars.length; s++) {
+			var id=parseInt(stars[s].id.split("_")[1]);
+			var cname = stars[s].className;
+			if (id<=i) stars[s].className = cname.replace("off", "on");
+			else stars[s].className = cname.replace("on", "off");
+		}
+	}
 	var stars = document.getElementsByClassName("star");
-	document.getElementById("c_points_div").addEventListener("mouseleave", function() {
-		var val = parseInt(document.getElementById("c_points").value);
-		console.log(val);
+	document.getElementById("c_points_div").addEventListener("mouseout", function() {
+		var val = document.getElementById("c_points").value;
 		if (!val){
-			document.getElementById("c_points_text").textContent = "no olvides asignar una puntuación";
+			document.getElementById("c_points_text").textContent = "debes asignar una puntuación";
 		}
 		else {
-			document.getElementById("c_points_text").textContent = POINTS[val];
+			val = parseInt(val)-1;
+			selStar(val);
+			var p_div = document.getElementById("c_points_text");
+			p_div.textContent = POINTS[val];
+			p_div.className = "sel";
 		}
 		
 	})
 	for (var s=0; s<stars.length; s++) {
 		stars[s].addEventListener("mouseover", function() {
-			var id = parseInt(this.id.split("_")[1]);
-			var stars = document.getElementsByClassName("star");
-			for (var s=1; s<stars.length; s++) {
-				var _id=parseInt(stars[s].id.split("_")[1]);
-				stars[s].className = stars[s].className.replace(" on", "");
-				if (_id<=id) stars[s].className += " on";
-			}
-			var shit = document.getElementById("star_0");
-			if (id==0) shit.className += " on";
-			else shit.className = shit.className.replace(" on", "");
-			document.getElementById("c_points_text").textContent = POINTS[id];
+			var id = this.id.split("_")[1];
+			selStar(parseInt(id));
+			var p_div = document.getElementById("c_points_text");
+			p_div.textContent = POINTS[id];
+			p_div.className = "";
 		})
 		stars[s].addEventListener("click", function() {
 			var id = this.id.split("_")[1];
-			document.getElementById("c_points").value = parseInt(id);
-			var stars = document.getElementsByClassName("star");
-			for (var s=0; s<stars.length; s++) {
-				stars[s].className = stars[s].className.replace(" sel", "");
-			}
-			this.className += " sel";
-
+			document.getElementById("c_points").value = parseInt(id)+1;
+			var p_div = document.getElementById("c_points_text");
+			p_div.className = "sel";
 		})
 	}
 }
@@ -108,14 +104,12 @@ function fillReplyTo(id) {
 	document.getElementById("replyto").style.display = "block";
 	document.getElementById("comments").scrollIntoView();
 	document.getElementById("c_replyto").value = id;
-	document.getElementById("section_title").style.display = "none";
 	document.getElementById("section_points").style.display = "none";
 	document.getElementById("replyto_cancel").addEventListener("click", function() {
 		document.getElementById("replyto").style.display = "none";
 		document.getElementById("replyto_name").innerHTML = "";
 		document.getElementById("replyto_msg").innerHTML = "";
 		document.getElementById("c_replyto").value = "";
-		document.getElementById("section_title").style.display = "block";
 		document.getElementById("section_points").style.display = "block";
 	})
 }
@@ -199,7 +193,7 @@ function processData(info) {
 
 		var newCReply = document.createElement("div");
 		newCReply.textContent = "responder…";
-		newCReply.className = "reply_btn";
+		newCReply.className = "reply button";
 		newCReply.id = "replyto-"+comments[c].id;
 		newCReply.addEventListener("click", function(e) {
 			var id = this.id.split("-")[1];
@@ -255,12 +249,12 @@ function processData(info) {
     /* Puntuaciones (estrellas) */
     initPoints();
 
-    if (document.getElementById("error_list")) {
+    if (document.getElementById("error")) {
     	document.getElementById("comments").scrollIntoView();
     }
     document.getElementById("send_comment").addEventListener("click", function() {
-    	// Es necesario para recargar la página cuando se comenta
-    	clearCurrentStorage();
+		if (!checkLocalStorage()) return;
+		localStorage.removeItem(getKey());
     });
 
 }

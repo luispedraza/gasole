@@ -153,16 +153,19 @@ function getApiData(url, key, callback) {
 	req.open("GET", url);
 	req.send();
 }
-
+function getKey() {
+	return window.location.pathname.split("/").slice(1).join("***");
+}
 function getData(callback) {
+	var key = null, info = null;
 	var pathArray = window.location.pathname.split("/");
 	var option = pathArray[1];
-	var key = null, info = null;
 	if (checkLocalStorage()) {
 		// Limpieza de datos antiguos
 		var ts = localStorage["timestamp"];
 		if (ts && (new Date().getTime() - parseInt(ts))>LS_EXPIRE) localStorage.clear();
-		key = pathArray.slice(1).join("***");
+		key = getKey();
+		
 		var storedData = localStorage[key];
 		if (storedData) info = JSON.parse(storedData);
 		else if ((option=="gasolineras") && (pathArray[3])) {
