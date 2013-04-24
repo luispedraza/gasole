@@ -26,7 +26,8 @@ function initMap(latlon) {
 
 function initPoints() {
 	function selStar(i){
-		var stars = document.getElementsByClassName("star");
+		var stars = document.getElementById("c_points_div").getElementsByClassName("star");
+		console.log(stars);
 		for (var s=0; s<stars.length; s++) {
 			var id=parseInt(stars[s].id.split("_")[1]);
 			var cname = stars[s].className;
@@ -34,11 +35,12 @@ function initPoints() {
 			else stars[s].className = cname.replace("on", "off");
 		}
 	}
-	var stars = document.getElementsByClassName("star");
+	var stars = document.getElementById("c_points_div").getElementsByClassName("star");
 	document.getElementById("c_points_div").addEventListener("mouseout", function() {
 		var val = document.getElementById("c_points").value;
 		if (!val){
 			document.getElementById("c_points_text").textContent = "debes asignar una puntuación";
+			selStar(-1);
 		}
 		else {
 			val = parseInt(val)-1;
@@ -51,6 +53,7 @@ function initPoints() {
 	})
 	for (var s=0; s<stars.length; s++) {
 		stars[s].addEventListener("mouseover", function() {
+			document.getElementById("c_points_div").className = "";
 			var id = this.id.split("_")[1];
 			selStar(parseInt(id));
 			var p_div = document.getElementById("c_points_text");
@@ -65,7 +68,63 @@ function initPoints() {
 		})
 	}
 }
-
+function resetError(d) {
+	document.getElementById("error_"+d.id).style.display = "none";
+	d.className = "";
+}
+function onBlurName(d) {
+	var val = clearHtmlTags(d.value);
+	d.value = val;
+	var de = document.getElementById("error_"+d.id);
+	if (!val.length) {
+		d.className = "error";
+		de.style.display = "block";
+		de.textContent = "Debes indicar tu nombre";
+	}
+	else {
+		d.className = "ok";
+		de.style.display = "none";
+	}
+}
+function onBlurEmail(d) {
+	function validEmail(s) {
+		var re = new RegExp("[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?");
+		return re.test(s);
+	}
+	var val = clearHtmlTags(d.value);
+	d.value = val;
+	var de = document.getElementById("error_"+d.id);
+	if (!val.length) {
+		de.textContent = "Debes indicar tu e-mail";
+	}
+	else {
+		val = val.toLowerCase().replace(/^\s+|\s+$/g,'');
+		if (validEmail(val)) {
+			d.value = val;
+			d.className = "ok";
+			de.style.display = "none";
+			return;
+		} else {
+			de.textContent = "El e-mail no parece válido";
+		}
+	}
+	d.className = "error";
+	de.style.display = "block";
+}
+function onBlurContent(d) {
+	var val = clearHtmlTags(d.value);
+	d.value = val;
+	var de = document.getElementById("error_"+d.id);
+	if (!val.length) {
+		de.textContent = "¡No olvides escribir tu comentario!";
+		d.className = "error";
+		de.style.display = "block";
+	}
+	else {
+		de.style.display ="none";
+		d.className = "ok";
+	}
+}
 function insertLogo(label) {
 	var logoid = getLogo(label);
 	if (logoid) {
@@ -150,20 +209,25 @@ function processData(info) {
 
 		if (comments[c].points!=null) {
 			var newCPoints = document.createElement("div");
-			var points = parseInt(comments[c].points)/10;
-			var c_points = "\""+POINTS[points]+"\" ("+points+"/10)";
-			newCPoints.textContent = c_points;
-			if (points==0) {
-				newCPoints.className = "c_points_0";
-			} else {
-				newCPoints.className = "c_points";
-				newCPoints.style.backgroundImage = "url('/img/star_"+points+".svg')";	
+			var points = parseInt(comments[c].points);
+			total_points+=points;
+			points-=1;
+			newCPoints.textContent = POINTS[points];
+			newCPoints.className = "c_points";
+			for (var p=0; p<5; p++) {
+				var star = document.createElement("div");
+				star.className = "in star";
+				star.className += (p<=points) ? " son" : " soff";
+				newCPoints.appendChild(star);
 			}
 			newComment.appendChild(newCPoints);
-			// La puntuación de la gasolinera:
-			total_points += points;
 			n_comments++;
 		}
+
+		var newCAvatar = document.createElement("img");
+		newCAvatar.className = "c_avatar";
+		newCAvatar.src = comments[c].avatar;
+		newComment.appendChild(newCAvatar);
 
 		var newCName = document.createElement("div");
 		newCName.className = "c_name";
@@ -174,11 +238,7 @@ function processData(info) {
 		newCDate.className = "c_date";
 		newCDate.textContent = new Date(comments[c].date).toLocaleString().split(" ")[0];
 		newComment.appendChild(newCDate);
-		var newCAvatar = document.createElement("img");
-		newCAvatar.className = "c_avatar";
-		newCAvatar.src = comments[c].avatar;
-		newComment.appendChild(newCAvatar);
-
+		
 		if (comments[c].title) {
 			var newCTitle = document.createElement("div");
 			newCTitle.className = "c_title";
@@ -234,9 +294,6 @@ function processData(info) {
 		document.getElementById("points").innerHTML = points.toFixed(1) + " (" + n_comments + " valoraciones)";
 	}
 
-	// theData.sort(function(a,b) {
-	// 	return -(a.dataPoints[0].y - b.dataPoints[0].y)
-	// });
     /* Amchart */
     amChart(info._history);
 	// this method is called when chart is inited as we listen for "dataUpdated" event
@@ -248,15 +305,6 @@ function processData(info) {
 
     /* Puntuaciones (estrellas) */
     initPoints();
-
-    if (document.getElementById("error")) {
-    	document.getElementById("comments").scrollIntoView();
-    }
-    document.getElementById("send_comment").addEventListener("click", function() {
-		if (!checkLocalStorage()) return;
-		localStorage.removeItem(getKey());
-    });
-
 }
 
 function amChart(chartData) {
@@ -322,5 +370,25 @@ function amChart(chartData) {
 }
 
 window.addEventListener("load", function() {
+	var result = document.getElementById("result");
+	if (result) {
+		result.scrollIntoView();
+		if (checkLocalStorage()) localStorage.removeItem(getKey());
+	}
+	var error = document.getElementById("error");
+	if (error) {
+		error.scrollIntoView();
+		var lis = error.getElementsByTagName("li");
+		for (var l=0; l<lis.length; l++) {
+			var cname = lis[l].id.replace("e_", "");
+			var e = null;
+			if (cname == "c_points") {
+				document.getElementById("c_points_div").className = "perror";
+			} else {
+				var e = document.getElementById(cname);
+				if (e) e.className = "error";
+			}
+		}
+	}
 	getData(processData);
 })

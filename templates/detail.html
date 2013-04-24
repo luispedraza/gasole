@@ -90,14 +90,17 @@
 	<h2>Tu comentario</h2>
 		{% if error|count %}
 		<div id="error">
-		<p><b>Se han detectado errores en el formulario:</b></p>
+		<p>Se han detectado {{error|count}} errores en el formulario:</p>
 		<ul>
 			{% for e in error %}
-			<li>{{error[e]}}</li>
+			<li id="{{'e_'+e}}">{{error[e]}}</li>
 			{% endfor %}
 		</ul>
 		</div>
 		{% endif %}
+		{% if result %}
+		<div id="result">El comentario ha sido publicado</div>
+		{%endif %}
 	
 		{% if not user %}
 		<div class="clearer">
@@ -121,19 +124,21 @@
 		<input type="hidden" name="c_link" id="c_link" value="{{user.link}}">
 		
 		{% else %}
-		<div><br>O identifícate para dejar un comentario<br></div>
+		<div>O identifícate para dejar un comentario</div>
 		<div id="user-data">
 			<div class="section">
-			<div class="icon c_name in"></div><label class="in" for="c_name">NOMBRE<sup>*</sup></label><input type="text" name="c_name" id="c_name" value="{{data['c_name']}}" placeholder="ej.: Antonio Ruiz">
+			<div class="icon c_name in"></div><label class="in" for="c_name">NOMBRE<sup>*</sup></label><input onfocus="resetError(this);" onblur="onBlurName(this);" type="text" name="c_name" id="c_name" value="{{data['c_name']}}" placeholder="ej.: Antonio Ruiz">
+			<div id="error_c_name" class="error"></div>
 			</div>
 			
 			<div class="section">
-			<div class="icon c_email in"></div><label class="in" for="c_email">E-MAIL<sup>*</sup></label><input type="email" name="c_email" id="c_email" value="{{data['c_email']}}" placeholder="ej.: aruiz777@gmail.com">
-			<p>(No será mostrado)</p>
+			<div class="icon c_email in"></div><label class="in" for="c_email">E-MAIL<sup>*</sup></label><input onfocus="resetError(this);" onblur="onBlurEmail(this);" type="email" name="c_email" id="c_email" value="{{data['c_email']}}" placeholder="ej.: aruiz777@gmail.com">
+			<p class="info">(No será mostrado)</p>
+			<div id="error_c_email" class="error">Error de e-mail</div>
 			</div>
 		
 			<div class="section">
-			<div class="icon c_link in"></div><label class="in" for="c_link">ENLACE</label><input type="text" name="c_link" id="c_link" value="{{data['c_link']}}" placeholder="http://…">
+			<div class="icon c_link in"></div><label class="in" for="c_link">WEB</label><input type="text" name="c_link" id="c_link" value="{{data['c_link']}}" placeholder="http://…">
 			</div>
 		
 		</div>
@@ -154,12 +159,10 @@
 					<div class="in star soff" id="star_4"></div><br>
 					<p class="in" id="c_points_text">asigna una puntuación</p>
 				</div>
-				
 			</div>
 
 			<div class="section">
 			<div class="icon c_content in"></div><label class="in" for="c_content">COMENTARIO<sup>*</sup></label>
-			
 				<div id="replyto">
 					<div id="replyto_cancel" class="button">Cancelar</div>
 					<p>En respuesta a:</p>
@@ -167,10 +170,9 @@
 					<div id="replyto_msg"></div>
 					<input type="hidden" id="c_replyto" name="c_replyto" value="{{data['c_replyto']}}">
 				</div>
-			<textarea id="c_content" name="c_content">{{data['c_content']}}</textarea>
+			<textarea  onfocus="resetError(this);" onblur="onBlurContent(this);" id="c_content" name="c_content">{{data['c_content']}}</textarea>
+			<div id="error_c_content" class="error">Error de contenido</div>
 			</div>
-			
-
 			<!-- captcha -->
 			<div id="captcha" class="section">
 				
@@ -181,8 +183,8 @@
 				</script>
 				<div id="recaptcha_widget" style="display:none">
 					<div class="recaptcha_only_if_incorrect_sol" style="color:red">Incorrecto. Inténtalo de nuevo.</div>
-					<p class="recaptcha_only_if_image">Escribe las palabras:</p>
-					<p class="recaptcha_only_if_audio">Escribe los números:</p>
+					<p class="info recaptcha_only_if_image">Escribe las palabras:</p>
+					<p class="info recaptcha_only_if_audio">Escribe los números:</p>
 					<div id="recaptcha_image"></div>
 					<div class="in"><a class="button captcha_reload" href="javascript:Recaptcha.reload()" title="Recargar el CAPTCHA"></a></div>
 					<div class="in recaptcha_only_if_image"><a href="javascript:Recaptcha.switch_type('audio')" title="Formato Audio" class="button captcha_audio"></a></div>

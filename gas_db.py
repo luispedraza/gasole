@@ -38,12 +38,9 @@ class Comment(db.Model):
 	link = db.StringProperty()
 	avatar = db.LinkProperty()
 	points = db.RatingProperty()
-	title = db.StringProperty()
 	content = db.TextProperty(required=True)
 	date = db.DateTimeProperty(auto_now_add=True)
 	replyto = db.IntegerProperty()
-	# def get_author(self):
-	# 	return User.get_by_auth_id(self.userid)
 
 def data2store(data):
 	_provinces = []
@@ -195,7 +192,6 @@ def get_comments(prov, town, station):
 			"avatar": c.avatar,
 			"link": c.link or "",
 			"points": c.points,
-			"title": c.title, 
 			"content": c.content,
 			"replyto": c.replyto,
 			"id": c.key().id()})

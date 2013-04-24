@@ -22,9 +22,8 @@ def decode_param(s):
     return s.decode('utf-8').replace("_", " ").replace("|", "/")
 
 def remove_html_tags(data):
-    s = re.compile('< *script *>.+</ *script *>')
     p = re.compile(r'<.*?>')
-    return p.sub('', s.sub('', data))
+    return p.sub('', data)
 
 def get_points(s):
     try:
@@ -158,7 +157,7 @@ class List(BaseAuthHandler):
             content=jinja_env.get_template("list.html").render())
 
 class Detail(BaseAuthHandler):
-    def get(self, province, town, station, error={}):
+    def get(self, province, town, station, error={}, result=None):
         user = {}
         if self.logged_in:
             user = self.current_user
@@ -185,6 +184,7 @@ class Detail(BaseAuthHandler):
                 edit_station=edit_station,
                 data=data,
                 error=error,
+                result=result,
                 user=user
                 ))
     def post(self, province, town, station):
@@ -223,13 +223,13 @@ class Detail(BaseAuthHandler):
                 user = self.current_user
                 self.auth.unset_session()
         replyto = self.request.get("c_replyto")
-        points = title = None
+        points = None
         if not replyto:
             points=get_points(self.request.get("c_points"))
             if not points:
-                error["c_points"] = u"Olvidaste asignar una valoración a esta gasolinera."
+                error["c_points"] = u"Olvidaste valorar esta gasolinera."
             else:
-                points=int(points)*10
+                points=int(points)
         content=remove_html_tags(self.request.get("c_content").strip())
         if not content:
             error["c_content"] = u"El texto del comentario está vacío."
@@ -241,6 +241,7 @@ class Detail(BaseAuthHandler):
             remote_ip=self.request.remote_addr)
         if not captcha_result.is_valid:
              error["c_captcha"] = u"La solución del captcha no es correcta."
+        result = None
         if not len(error) and user:
             comment = Comment(
                 userid=user.key.id(),
@@ -248,12 +249,12 @@ class Detail(BaseAuthHandler):
                 avatar=db.Link(user.avatar_url),
                 link=user.link,
                 points=db.Rating(points) if points!=None else None,
-                title=title if title else None,
                 content=db.Text(content),
                 replyto=int(replyto) if replyto else None,
                 parent=db.Key.from_path('Province',p,'Town',t,'GasStation',s))
             comment.put()
-        self.get(province=province, town=town, station=station, error=error)
+            result = "El comentario se ha publicado con éxito."
+        self.get(province=province, town=town, station=station, error=error, result=result)
 
 class Api(BaseHandler):
     def get(self, prov, town, station):

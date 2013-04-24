@@ -81,6 +81,9 @@ function getProvName(id) {
 	for (k in PROVS) if (PROVS[k] == id) return k;
 }
 
+function clearHtmlTags(s) {
+	return s.replace(/(<([^>]+)>)/ig,"")
+}
 function toTitle(s) {
 	return s.replace(" [N]", "")
 		.replace(/^CARRETERA ?|^CR\.? ?/i, "CTRA. ")
