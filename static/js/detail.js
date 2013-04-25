@@ -1,9 +1,9 @@
 var POINTS = [
-				"deja mucho que desear",		// 1
-				"las hay mejores",				// 2
-				"está bien en general",			// 3
-				"muy recomendable",				// 8
-				"¡excelente!"					// 10
+				"Deja mucho que desear",		// 1
+				"Las hay mejores",				// 2
+				"Está bien en general",			// 3
+				"Muy recomendable",				// 8
+				"¡Excelente!"					// 10
 			]
 
 function initMap(latlon) {
@@ -24,10 +24,10 @@ function initMap(latlon) {
 	});
 }
 
+var timeOut=null;
 function initPoints() {
 	function selStar(i){
 		var stars = document.getElementById("c_points_div").getElementsByClassName("star");
-		console.log(stars);
 		for (var s=0; s<stars.length; s++) {
 			var id=parseInt(stars[s].id.split("_")[1]);
 			var cname = stars[s].className;
@@ -36,36 +36,43 @@ function initPoints() {
 		}
 	}
 	var stars = document.getElementById("c_points_div").getElementsByClassName("star");
-	document.getElementById("c_points_div").addEventListener("mouseout", function() {
-		var val = document.getElementById("c_points").value;
-		if (!val){
-			document.getElementById("c_points_text").textContent = "debes asignar una puntuación";
-			selStar(-1);
-		}
-		else {
-			val = parseInt(val)-1;
-			selStar(val);
-			var p_div = document.getElementById("c_points_text");
-			p_div.textContent = POINTS[val];
-			p_div.className = "sel";
-		}
-		
-	})
+	// document.getElementById("c_points_div")
 	for (var s=0; s<stars.length; s++) {
+		stars[s].addEventListener("mouseout", function() {
+			var val = document.getElementById("c_points").value;
+			var msg = document.getElementById("c_points_text");
+			console.log("out");
+			if (!val){
+				timeOut = setTimeout(function() {
+					msg.textContent = "Debes asignar una puntuación";
+					msg.className = "error";
+					msg.style.display = "block";
+					selStar(-1);
+				}, 500);
+			}
+			else {
+				val = parseInt(val)-1;
+				selStar(val);
+				msg.textContent = POINTS[val];
+				msg.className = "sel";
+			}
+			
+		});
 		stars[s].addEventListener("mouseover", function() {
+			console.log("over");
+			if (timeOut) clearTimeout(timeOut);
 			document.getElementById("c_points_div").className = "";
 			var id = this.id.split("_")[1];
 			selStar(parseInt(id));
-			var p_div = document.getElementById("c_points_text");
-			p_div.textContent = POINTS[id];
-			p_div.className = "";
-		})
+			var msg = document.getElementById("c_points_text");
+			msg.textContent = POINTS[id];
+			msg.className = "sel";
+		});
 		stars[s].addEventListener("click", function() {
 			var id = this.id.split("_")[1];
 			document.getElementById("c_points").value = parseInt(id)+1;
-			var p_div = document.getElementById("c_points_text");
-			p_div.className = "sel";
-		})
+			document.getElementById("c_points_text").className = "sel";
+		});
 	}
 }
 function resetError(d) {
@@ -156,7 +163,6 @@ function initPrice(price) {
 	}
 }
 function fillReplyTo(id) {
-	console.log(id);
 	var comment = document.getElementById("comment-"+id);
 	document.getElementById("replyto_name").innerHTML = comment.getElementsByClassName("c_name")[0].textContent.bold();
 	document.getElementById("replyto_msg").innerHTML = comment.getElementsByClassName("c_content")[0].innerHTML;
@@ -216,7 +222,7 @@ function processData(info) {
 			newCPoints.className = "c_points";
 			for (var p=0; p<5; p++) {
 				var star = document.createElement("div");
-				star.className = "in star";
+				star.className = "star_mini";
 				star.className += (p<=points) ? " son" : " soff";
 				newCPoints.appendChild(star);
 			}
@@ -236,7 +242,7 @@ function processData(info) {
 		newComment.appendChild(newCName);
 		var newCDate = document.createElement("div");
 		newCDate.className = "c_date";
-		newCDate.textContent = new Date(comments[c].date).toLocaleString().split(" ")[0];
+		newCDate.textContent = new Date(comments[c].date).toLocaleDateString();
 		newComment.appendChild(newCDate);
 		
 		if (comments[c].title) {

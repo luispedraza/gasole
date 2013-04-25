@@ -133,7 +133,7 @@
 			
 			<div class="section">
 			<div class="icon c_email in"></div><label class="in" for="c_email">E-MAIL<sup>*</sup></label><input onfocus="resetError(this);" onblur="onBlurEmail(this);" type="email" name="c_email" id="c_email" value="{{data['c_email']}}" placeholder="ej.: aruiz777@gmail.com">
-			<p class="info">(No será mostrado)</p>
+			<p class="info">No será mostrado</p>
 			<div id="error_c_email" class="error">Error de e-mail</div>
 			</div>
 		
@@ -157,8 +157,9 @@
 					<div class="in star soff" id="star_2"></div>
 					<div class="in star soff" id="star_3"></div>
 					<div class="in star soff" id="star_4"></div><br>
-					<p class="in" id="c_points_text">asigna una puntuación</p>
 				</div>
+				<p class="info">Asigna una puntuación</p>
+				<div class="sel" id="c_points_text"></div>
 			</div>
 
 			<div class="section">
@@ -183,8 +184,8 @@
 				</script>
 				<div id="recaptcha_widget" style="display:none">
 					<div class="recaptcha_only_if_incorrect_sol" style="color:red">Incorrecto. Inténtalo de nuevo.</div>
-					<p class="info recaptcha_only_if_image">Escribe las palabras:</p>
-					<p class="info recaptcha_only_if_audio">Escribe los números:</p>
+					<p class="info recaptcha_only_if_image">Escribe las palabras</p>
+					<p class="info recaptcha_only_if_audio">Escribe los números</p>
 					<div id="recaptcha_image"></div>
 					<div class="in"><a class="button captcha_reload" href="javascript:Recaptcha.reload()" title="Recargar el CAPTCHA"></a></div>
 					<div class="in recaptcha_only_if_image"><a href="javascript:Recaptcha.switch_type('audio')" title="Formato Audio" class="button captcha_audio"></a></div>
