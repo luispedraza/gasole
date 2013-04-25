@@ -33,8 +33,8 @@ def get_points(s):
 
 class MainHandler(BaseAuthHandler):
     def get(self):
-        f
         self.render("base.html", 
+            title = u"GasOle.net: Gasolina barata en España.",
             styles =['/css/home.css'],
             scripts=get_js('home.js',DEBUG),
             content=jinja_env.get_template("home.html").render(
