@@ -130,7 +130,7 @@ body {
 #legend {
 	width: 300px;
 	overflow: hidden;
-	z-index: 100;
+	z-index: 50;
 	position: absolute;
 	right: 0;
 	height: 20px;

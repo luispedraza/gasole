@@ -54,6 +54,7 @@
 	position: relative;
 }
 #prov-list {
+	z-index: 50;
 	color: #fff;
 	position: absolute;
 	right: 0;
@@ -61,10 +62,7 @@
 	background: rgb(8,8,8);
 	background: rgba(8,8,8,0.8);
 	padding: 5px;
-	width: 120px;
-	background-position: 110px 10px;
-	background-repeat: no-repeat;
-	background-image: url('/img/arrow_white.png');
+	width: 130px;
 	cursor: pointer;
 }
 ul.droplist  {
@@ -92,7 +90,24 @@ ul.droplist li:hover {
 	border-top: 1px solid #fff;
 	margin-top: 10px;
 }
-
+#prov-current {
+	background: rgb(8,8,8);
+	background: rgba(8,8,8,0.8);
+	border-radius: 3px;
+	position: absolute;
+	right: 0;
+	top: 30px;
+	color: white;
+	width: 130px;
+	padding: 5px;
+	opacity: 0;
+	font-size: .9em;
+	text-align: right;
+	-webkit-transition: opacity .2s ease-in;
+	   -moz-transition: opacity .2s ease-in;
+	    -ms-transition: opacity .2s ease-in;
+	        transition: opacity .2s ease-in;
+}
 /* Panel de precios */
 .section {
 	clear: both;
@@ -144,25 +159,6 @@ ul.droplist li:hover {
 	color: #FFCC33;
 }
 
-#prov-current {
-	background: rgb(8,8,8);
-	background: rgba(8,8,8,0.8);
-	border-radius: 3px;
-	position: absolute;
-	right: 0;
-	top: 30px;
-	color: white;
-	width: 150px;
-	padding: 5px;
-	opacity: 0;
-	font-size: .9em;
-	text-align: right;
-	-webkit-transition: opacity .2s ease-in;
-	   -moz-transition: opacity .2s ease-in;
-	    -ms-transition: opacity .2s ease-in;
-	     -o-transition: opacity .2s ease-in;
-	        transition: opacity .2s ease-in;
-}
 #prov-current.on {
 	opacity: 1;
 }

@@ -53,7 +53,7 @@ body {
 }
 body h1 {
 	font-size: 1.6em;
-	margin-top: 1em;
+	margin-top: .5em;
 	margin-bottom: .5em;
 }
 body h2 {
@@ -92,73 +92,66 @@ ul.menu {
 	background-color: #222;
 }
 li.menu {
-	display: inline-block;
+	float: left;
 	position: relative;
-
 }
 li.menu > .item {
+	min-width: 30px; 
 	display: block;
 	border-bottom-width: 5px;
 	border-bottom-style: solid;
-	width: 120px;
+	width: 140px;
 	color: #fff;
 	cursor: pointer;
-	padding: 5px 5px 5px 35px;
+	padding: 5px;
 	height: 30px;
 	text-align: left;
 	font-size: 14px;
-	background-repeat: no-repeat;
 	text-decoration: none;
 	color: #fff;
-	background-position: 5px 5px;
-	background-size: 25px;
+	vertical-align: top;
 }
 li.menu.home a {
+	width: 0;
 	background-color: #333;
 	border-color: #111;
-	width: 0;
-	background-image: url('/img/m_home.png');
-	text-indent: -1000px;
 }
 li.menu.stats a {
 	background-color: #d24e33;
 	border-color: #7e2516;
-	background-image: url('/img/m_stats.png');
 }
 li.menu.info a {
 	background-color: #f1aa41;
 	border-color: #be770e;
-	background-image: url('/img/m_info.png');
 }
 li.menu.cards a {
 	background-color: #339933;
 	border-color: #006633;
-	background-image: url('/img/m_cards.png');
 }
 li.menu.news > a {
 	background-color: #3399CC;
 	border-color: #006699;
-	background-image: url('/img/m_news.png');
 }
 li.menu.search .item {
 	background-color: #8b4163;
 	border-color: #58110e;
 	width: 410px;
 }
-.description {
-	background-repeat: no-repeat;
+.m_desc {
 	background-color: #f7f7cf;
 	width: 300px;
-	background-position: 10px 0px;
 	position: absolute;
 	left: 0;
 	top: 44px;
 	height: 0px;
-	-webkit-transition: height .2s;
+	-webkit-transition: height .2s ease;
+	   -moz-transition: height .2s ease;
+	    -ms-transition: height .2s ease;
+	        transition: height .2s ease;
 	font-size: 12px;
 	overflow: hidden;
 }
-li.menu:hover > .description {
+li.menu:hover > .m_desc {
 	height: 30px;
 	border-width: 0px 1px 1px 1px;
 	border-color: black;
@@ -166,21 +159,6 @@ li.menu:hover > .description {
 	z-index: 100;
 	padding: 5px;
 	box-shadow: 1px 1px 3px 1px #888;
-}
-.description.home {
-	background-image: url('/img/arrow_home.png');
-}
-.description.stats {
-	background-image: url('/img/arrow_stats.png');
-}
-.description.info {
-	background-image: url('/img/arrow_info.png');
-}
-.description.cards {
-	background-image: url('/img/arrow_cards.png');
-}
-.description.news {
-	background-image: url('/img/arrow_news.png');
 }
 
 /* FOOTER */
@@ -253,23 +231,18 @@ footer a:hover{
 	font-size: 16px;
 }
 .menu.search input[type=submit] {
-	background:url('/img/search_icon.png');
+	background-color: #58110e;
 	cursor:pointer;
 	height:30px;
 	width:30px;
-	background-size: 20px;
-	background-position: 5px 5px;
-	background-repeat: no-repeat;
 	border: 1px solid #58110e;
 	border-radius: 3px;
+	border: 1px solid #fff;
 }
 .menu.search:hover #search-box {
 	display: block;
 }
 #search-box {
-	background-image: url('/img/arrow_search.png');
-	background-position: 10px 0px;
-	background-repeat: no-repeat;
 	display: none;
 	position: absolute;
 	left: 0;
@@ -328,7 +301,7 @@ footer a:hover{
 	float: left;
 }
 .my-slider .val {
-	background-color: #58110e;
+	background-color: #622D46;
 	color: #fff;
 	height: 20px;
 	white-space: nowrap;
@@ -336,9 +309,14 @@ footer a:hover{
 	background-position: bottom;
 	background-image: url('/img/rule.png');
 	background-repeat: repeat-x;
+	border-right: 1px dotted #fff;
+}
+.my-slider:hover .val {
+	color: #622D46;
 }
 .my-slider .new-val {
-	background-color: pink;
+	color: #fff;
+	background-color: #58110e;
 	height: 20px;
 	white-space: nowrap;
 	padding: 2px;
@@ -349,13 +327,13 @@ footer a:hover{
 	border: 1px solid #fff;
 	cursor: pointer;
 	border-radius: 3px;
-	background-image: url('/img/my_location.png');
-	background-repeat: no-repeat;
-	background-position: 2px 2px;
 	width: 180px;
 	height: 20px;
 	float: right;
-	text-align: center;
+	font-size: 14px;
+}
+#current-loc span {
+	vertical-align: middle;
 }
 #current-loc:hover {
 	background-color: #58110e;
@@ -373,4 +351,27 @@ footer a:hover{
         height: 0;
 }
 
+/* sprites */
+.arrow {
+	position: absolute;
+	top: 0;
+	left: 10px;
+}
+
+.s_base {display:inline-block; overflow:hidden; background-repeat: no-repeat;background-image:url(/img/s_base.png);}
+
+.a_cards {width:10px; height:5px; background-position: -2px -2px}
+.a_home {width:10px; height:5px; background-position: -14px -2px}
+.a_info {width:10px; height:5px; background-position: -2px -9px}
+.a_news {width:10px; height:5px; background-position: -14px -9px}
+.a_search {width:10px; height:5px; background-position: -2px -16px}
+.a_stats {width:10px; height:5px; background-position: -14px -16px}
+.arrow_white {width:10px; height:5px; background-position: -2px -23px}
+.m_cards {width:25px; height:25px; background-position: -2px -30px}
+.m_home {width:25px; height:25px; background-position: -2px -57px}
+.m_info {width:25px; height:25px; background-position: -2px -84px}
+.m_news {width:25px; height:25px; background-position: -2px -111px}
+.m_stats {width:25px; height:25px; background-position: -2px -138px}
+.search_gps {width:20px; height:20px; background-position: -2px -165px}
+.search_icon {width:25px; height:25px; background-position: -2px -187px}
 
