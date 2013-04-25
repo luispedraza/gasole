@@ -33,6 +33,7 @@ def get_points(s):
 
 class MainHandler(BaseAuthHandler):
     def get(self):
+        f
         self.render("base.html", 
             styles =['/css/home.css'],
             scripts=get_js('home.js',DEBUG),
@@ -314,13 +315,14 @@ class Info(BaseAuthHandler):
 def handle_404(request, response, exception):
     #http://webapp-improved.appspot.com/guide/exceptions.html
     logging.exception(exception)
-    t = jinja_env.get_template("404.html")
-    response.write(t.render())
     response.set_status(404)
+    response.write(jinja_env.get_template("404.html").render())
+    
 def handle_500(request, response, exception):
     logging.exception(exception)
-    response.write('Error en el servidor.')
     response.set_status(500)
+    response.write(jinja_env.get_template("500.html").render())
+    
 
 
 # webapp2 config
