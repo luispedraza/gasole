@@ -38,8 +38,6 @@ handlers:
   static_dir: static/js/min
 - url: /img
   static_dir: static/img
-- url: /icon
-  static_dir: static/icon
 - url: /font
   static_dir: static/font
 - url: .*

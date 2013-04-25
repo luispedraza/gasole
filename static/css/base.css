@@ -117,28 +117,28 @@ li.menu.home a {
 	background-color: #333;
 	border-color: #111;
 	width: 0;
-	background-image: url('/icon/_home.png');
+	background-image: url('/img/m_home.png');
 	text-indent: -1000px;
 }
 li.menu.stats a {
 	background-color: #d24e33;
 	border-color: #7e2516;
-	background-image: url('/icon/_graficos.png');
+	background-image: url('/img/m_stats.png');
 }
 li.menu.info a {
 	background-color: #f1aa41;
 	border-color: #be770e;
-	background-image: url('/icon/_info.png');
+	background-image: url('/img/m_info.png');
 }
 li.menu.cards a {
 	background-color: #339933;
 	border-color: #006633;
-	background-image: url('/icon/_tarjetas.png');
+	background-image: url('/img/m_cards.png');
 }
 li.menu.news > a {
 	background-color: #3399CC;
 	border-color: #006699;
-	background-image: url('/icon/_news.png');
+	background-image: url('/img/m_news.png');
 }
 li.menu.search .item {
 	background-color: #8b4163;
@@ -253,7 +253,7 @@ footer a:hover{
 	font-size: 16px;
 }
 .menu.search input[type=submit] {
-	background:url('/icon/search_icon.png');
+	background:url('/img/search_icon.png');
 	cursor:pointer;
 	height:30px;
 	width:30px;
