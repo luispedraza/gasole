@@ -222,7 +222,7 @@ function processData(info) {
 			newCPoints.className = "c_points";
 			for (var p=0; p<5; p++) {
 				var star = document.createElement("div");
-				star.className = "s_base star_mini";
+				star.className = "sprt star_mini";
 				star.className += (p<=points) ? " son" : " soff";
 				newCPoints.appendChild(star);
 			}
@@ -341,16 +341,18 @@ function amChart(chartData) {
 	    // Value
 	    var valueAxis = new AmCharts.ValueAxis();
 	    valueAxis.gridAlpha = 0.07;
-	    valueAxis.title = "Precio (€/l";
+	    valueAxis.title = "Precio (€/l)";
 	    chart.addValueAxis(valueAxis);
-	    for (var o in CHART_OPTIONS) {
+	    for (var o=0; o<CHART_OPTIONS.length; o++) {
+	    	var t = CHART_OPTIONS[o].id;
+	    	if (!chartData[chartData.length-1].hasOwnProperty(t)) continue;
 	    	var graph = new AmCharts.AmGraph();
 		    graph.type = "line";
 		    graph.title = CHART_OPTIONS[o].name;
-		    graph.valueField = o;
+		    graph.valueField = t;
 		    graph.lineAlpha = 1;
-		    graph.lineThickness = 2;
-		    // graph.fillAlphas = 0.3;
+		    graph.lineThickness = 1;
+		    graph.fillAlphas = 0.8;
 		    graph.lineColor = CHART_OPTIONS[o].color;
 		    chart.addGraph(graph);
 	    }

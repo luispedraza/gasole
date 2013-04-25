@@ -106,10 +106,10 @@
 		<div class="clearer">
 			<div class="in">Inicia sesión… </div>
 			<div id="social-login">
-				<a href="/login/facebook"><div class="login s_base logo_fb" title="Identifícate con tu perfil de Facebook"></div></a>
-				<a href="/login/twitter"><div class="login s_base logo_tt" title="Identifícate con tu perfil de Twitter"></div></a>
-				<a href="/login/google"><div class="login s_base logo_gp" title="Identifícate con tu perfil de Google+"></div></a>
-				<a href="/login/foursquare"><div class="login s_base logo_fs" title="Identifícate con tu perfil de Foursquare"></div></a>
+				<a href="/login/facebook"><div class="login sprt logo_fb" title="Identifícate con tu perfil de Facebook"></div></a>
+				<a href="/login/twitter"><div class="login sprt logo_tt" title="Identifícate con tu perfil de Twitter"></div></a>
+				<a href="/login/google"><div class="login sprt logo_gp" title="Identifícate con tu perfil de Google+"></div></a>
+				<a href="/login/foursquare"><div class="login sprt logo_fs" title="Identifícate con tu perfil de Foursquare"></div></a>
 			</div>
 		</div>
 		{% endif %}
@@ -127,43 +127,43 @@
 		<div>O identifícate para dejar un comentario</div>
 		<div id="user-data">
 			<div class="section">
-			<div class="s_base ic_name"></div><label class="in" for="c_name">NOMBRE<sup>*</sup></label><input onfocus="resetError(this);" onblur="onBlurName(this);" type="text" name="c_name" id="c_name" value="{{data['c_name']}}" placeholder="ej.: Antonio Ruiz">
+			<div class="sprt ic_name"></div><label class="in" for="c_name">NOMBRE<sup>*</sup></label><input onfocus="resetError(this);" onblur="onBlurName(this);" type="text" name="c_name" id="c_name" value="{{data['c_name']}}" placeholder="ej.: Antonio Ruiz">
 			<div id="error_c_name" class="error"></div>
 			</div>
 			
 			<div class="section">
-			<div class="s_base ic_email"></div><label class="in" for="c_email">E-MAIL<sup>*</sup></label><input onfocus="resetError(this);" onblur="onBlurEmail(this);" type="email" name="c_email" id="c_email" value="{{data['c_email']}}" placeholder="ej.: aruiz777@gmail.com">
+			<div class="sprt ic_email"></div><label class="in" for="c_email">E-MAIL<sup>*</sup></label><input onfocus="resetError(this);" onblur="onBlurEmail(this);" type="email" name="c_email" id="c_email" value="{{data['c_email']}}" placeholder="ej.: aruiz777@gmail.com">
 			<p class="info">No será mostrado</p>
 			<div id="error_c_email" class="error">Error de e-mail</div>
 			</div>
 		
 			<div class="section">
-			<div class="s_base ic_link"></div><label class="in" for="c_link">WEB</label><input type="text" name="c_link" id="c_link" value="{{data['c_link']}}" placeholder="http://…">
+			<div class="sprt ic_link"></div><label class="in" for="c_link">WEB</label><input type="text" name="c_link" id="c_link" value="{{data['c_link']}}" placeholder="http://…">
 			</div>
 		
 		</div>
 		{% endif %}
 		<div id="new_comment">
 			<div id="section_points" class="section">
-			<div class="s_base ic_points"></div><label class="in">VALORACIÓN<sup>*</sup></label>
+			<div class="sprt ic_points"></div><label class="in">VALORACIÓN<sup>*</sup></label>
 				<div id="c_points_div">
 					{% if data %}
 					<input type="text" id="c_points" name="c_points" readonly value="{{data['c_points']}}">
 					{% else %}
 					<input type="text" id="c_points" name="c_points" readonly value="">
 					{% endif %}
-					<div class="s_base star soff" id="star_0"></div>
-					<div class="s_base star soff" id="star_1"></div>
-					<div class="s_base star soff" id="star_2"></div>
-					<div class="s_base star soff" id="star_3"></div>
-					<div class="s_base star soff" id="star_4"></div><br>
+					<div class="sprt star soff" id="star_0"></div>
+					<div class="sprt star soff" id="star_1"></div>
+					<div class="sprt star soff" id="star_2"></div>
+					<div class="sprt star soff" id="star_3"></div>
+					<div class="sprt star soff" id="star_4"></div><br>
 				</div>
 				<p class="info">Asigna una puntuación</p>
 				<div class="sel" id="c_points_text"></div>
 			</div>
 
 			<div class="section">
-			<div class="s_base ic_content"></div><label class="in" for="c_content">COMENTARIO<sup>*</sup></label>
+			<div class="sprt ic_content"></div><label class="in" for="c_content">COMENTARIO<sup>*</sup></label>
 				<div id="replyto">
 					<div id="replyto_cancel" class="button">Cancelar</div>
 					<p>En respuesta a:</p>
@@ -177,7 +177,7 @@
 			<!-- captcha -->
 			<div id="captcha" class="section">
 				
-					<div class="s_base ic_captcha"></div><label class="in">CAPTCHA</label><input type="text" id="recaptcha_response_field" name="recaptcha_response_field"/>
+					<div class="sprt ic_captcha"></div><label class="in">CAPTCHA</label><input type="text" id="recaptcha_response_field" name="recaptcha_response_field"/>
 				
 				<script type="text/javascript">
 					var RecaptchaOptions = {lang:'es',theme:'custom',custom_theme_widget:'recaptcha_widget'};
@@ -187,10 +187,10 @@
 					<p class="info recaptcha_only_if_image">Escribe las palabras</p>
 					<p class="info recaptcha_only_if_audio">Escribe los números</p>
 					<div id="recaptcha_image"></div>
-					<div class="button in"><a class="s_base ic_reload" href="javascript:Recaptcha.reload()" title="Recargar el CAPTCHA"></a></div>
-					<div class="button in recaptcha_only_if_image"><a href="javascript:Recaptcha.switch_type('audio')" title="Formato Audio" class="s_base ic_audio"></a></div>
-					<div class="button in recaptcha_only_if_audio"><a href="javascript:Recaptcha.switch_type('image')" title="Formato Imagen" class="s_base ic_image"></a></div>
-					<div class="button in"><a href="javascript:Recaptcha.showhelp()" title="Ayuda" class="s_base ic_help"></a></div>
+					<div class="button in"><a class="sprt ic_reload" href="javascript:Recaptcha.reload()" title="Recargar el CAPTCHA"></a></div>
+					<div class="button in recaptcha_only_if_image"><a href="javascript:Recaptcha.switch_type('audio')" title="Formato Audio" class="sprt ic_audio"></a></div>
+					<div class="button in recaptcha_only_if_audio"><a href="javascript:Recaptcha.switch_type('image')" title="Formato Imagen" class="sprt ic_image"></a></div>
+					<div class="button in"><a href="javascript:Recaptcha.showhelp()" title="Ayuda" class="sprt ic_help"></a></div>
 				</div>
 				<script type="text/javascript" src="http://www.google.com/recaptcha/api/challenge?k=6Lfg290SAAAAAF7lz7UcKF7Sn0KOCQne8TWwqjAF&hl=es">
 				</script>

@@ -133,7 +133,7 @@ body {
 	z-index: 50;
 	position: absolute;
 	right: 0;
-	height: 20px;
+	height: 18px;
 	background: rgb(20,20,20);
 	background: rgba(20,20,20,0.8);
 	-webkit-transition: height .25s ease-in;

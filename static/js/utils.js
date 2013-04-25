@@ -4,16 +4,15 @@ var FUEL_OPTIONS = {"1": {"short": "G95", "name": "Gasolina 95"},
 				"5": {"short": "NGO", "name": "Nuevo Gasóleo A"},
 				"6": {"short": "GOB", "name": "Gasóleo B"},
 				"7": {"short": "GOC", "name": "Gasóleo C"},
-				"8": {"short": "BIOD", "name": "Biodiésel"}}
-var CHART_OPTIONS = {
-	"G95": {color: "#006633", name: "Gasolina 95"},
-	"G98": {color: "#339933", name: "Gasolina 98"},
-	"GOA": {color: "#000", name: "Gasóleo A"},
-	"NGO": {color: "#aaa", name: "Nuevo Gasóleo A"},
-	"GOB": {color: "#CC3333", name: "Gasóleo B"},
-	"GOC": {color: "#FF3300", name: "Gasóleo C"},
-	"BIOD": {color: "#f1aa41", name: "Biodiésel"}
-}
+				"8": {"short": "BIOD", "name": "Biodiésel"}};
+var CHART_OPTIONS = [
+	{id: "G98", color: "#339933", name: "Gasolina 98"},
+	{id: "G95", color: "#006633", name: "Gasolina 95"},
+	{id: "NGO", color: "#aaa", name: "Nuevo Gasóleo A"},
+	{id: "BIOD", color: "#f1aa41", name: "Biodiésel"},
+	{id: "GOA", color: "#000", name: "Gasóleo A"},
+	{id: "GOC", color: "#FF3300", name: "Gasóleo C"},
+	{id: "GOB", color: "#CC3333", name: "Gasóleo B"}];
 
 var PROVS = {
 	"Álava": "01",
