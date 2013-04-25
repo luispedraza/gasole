@@ -222,7 +222,7 @@ function processData(info) {
 			newCPoints.className = "c_points";
 			for (var p=0; p<5; p++) {
 				var star = document.createElement("div");
-				star.className = "star_mini";
+				star.className = "s_base star_mini";
 				star.className += (p<=points) ? " son" : " soff";
 				newCPoints.appendChild(star);
 			}

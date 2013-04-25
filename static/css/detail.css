@@ -169,7 +169,7 @@ h2 {
 
 .in {
 	display: inline-block;
-	margin-right: 8px;
+	margin-left: 5px;
 }
 #user-data {
 	margin-top: 20px;
@@ -215,54 +215,11 @@ div.error {
 	font-size: .9em;
 }
 
-.icon {
-	width: 15px;
-	height: 13px;
-	background-repeat: no-repeat;
-}
-#comments-new .c_name {
-	background-image: url('/img/name.png');
-}
-#comments-new .c_email {
-	background-image: url('/img/email.png');
-}
-#comments-new .c_link {
-	background-image: url('/img/link.png');
-}
-#comments-new .c_points {
-	background-image: url('/img/points.png');
-}
-#comments-new .c_content {
-	background-image: url('/img/content.png');
-}
-.c_captcha {
-	background-image: url('/img/captcha.png');
-}
 .login {
-	width: 30px;
-	height: 30px;
 	cursor: pointer;
-	background-repeat: no-repeat;
-	display: inline-block;
 	margin-left: 5px;
 	border-radius: 5px;
 	border: 3px solid #fff;
-}
-.fb_login {
-	background-color: #3B5B99;
-	background-image: url('/img/fb_logo.png');
-}
-.tt_login {
-	background-color: #00ACED;
-	background-image: url('/img/tt_logo.png');
-}
-.gp_login {
-	background-color: #DD4B39;
-	background-image: url('/img/gp_logo.png');
-}
-.fs_login {
-	background-color: #0072b1;
-	background-image: url('/img/fs_logo.png');
 }
 
 #replyto {
@@ -313,36 +270,13 @@ div.error {
 }
 .star {
 	margin: 0;
-	background-repeat: no-repeat;
-	width: 20px;
-	height: 20px;
-	padding: 0;
 	cursor: pointer;
-	display: inline-block;
 }
 .star_mini {
 	margin: 0;
-	background-repeat: no-repeat;
-	width: 12px;
-	height: 12px;
-	padding: 0;
-	display: inline-block;
-	margin-left: 3px;
-}
-.star.son {
-	background-image: url('/img/star_on.png');
+	margin-left: 2px;
 }
 
-.star.soff {
-	background-image: url('/img/star_off.png');
-}
-.star_mini.son {
-	background-image: url('/img/star_mini_on.png');
-}
-
-.star_mini.soff {
-	background-image: url('/img/star_mini_off.png');
-}
 .comment .title {
 	font-size: 1.2em;
 }
@@ -379,7 +313,7 @@ div.error {
 	cursor: pointer;
 }
 .button:hover {
-	background-color: #888;
+	background-color: #555;
 }
 
 #recaptcha_image {
@@ -397,34 +331,6 @@ div.error {
 #recaptcha_image a:hover {
 	background-color: #333;
 	color: white;
-}
-.captcha_reload {
-	display: inline-block;
-	background-image: url(/img/captcha_reload.png);
-	background-repeat: no-repeat;
-	width: 25px;
-	height: 25px;
-}
-.captcha_audio {
-	display: inline-block;
-	background-image: url(/img/captcha_audio.png);
-	background-repeat: no-repeat;
-	width: 25px;
-	height: 25px;
-}
-.captcha_image {
-	display: inline-block;
-	background-image: url(/img/captcha_image.png);
-	background-repeat: no-repeat;
-	width: 25px;
-	height: 25px;
-}
-.captcha_help {
-	display: inline-block;
-	background-image: url(/img/captcha_help.png);
-	background-repeat: no-repeat;
-	width: 25px;
-	height: 25px;
 }
 #old_comments .c_block {
 	clear: both;
