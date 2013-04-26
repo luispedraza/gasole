@@ -457,14 +457,17 @@ function populateTable(types) {
 				a_s.title = "Detalles de la gasolinera en " + t + ", " + a_s.textContent;
 				td_s.className = "T_ADDR";
 				td_s.setAttribute("label", label);
+				var td_ref = document.createElement("div");
+				td_ref.className = "ref";
 				var logo = getLogo(label);
 				if (logo) {
 					var dl = document.createElement("div");
 					dl.className = "logo "+logo;
-					td_s.appendChild(dl);
+					td_ref.appendChild(dl);
 				}
+				td_ref.appendChild(a_s);
+				td_s.appendChild(td_ref);
 				tr.appendChild(td_s);
-				td_s.appendChild(a_s);
 				var td_dist = document.createElement("td");
 				td_dist.className = "T_DIST";
 				// Marcadores
@@ -494,7 +497,7 @@ function populateTable(types) {
 					});
 					marker.set("id", tr.id);
 					bounds.extend(pos);
-					td_dist.innerHTML = "<div title='Mostrar en el mapa' class='sprt locate'></div><span></span>";
+					td_dist.innerHTML = "<div class='ref'><div title='Mostrar en el mapa' class='sprt locate'></div><span></span></div>";
 				}
 				tr.appendChild(td_dist);
 				// Fecha de actualización

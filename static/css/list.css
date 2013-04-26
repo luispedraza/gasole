@@ -125,12 +125,13 @@ body {
 	float: left;
 }
 #legend {
+	border-left: 1px solid #333;
 	width: 300px;
 	overflow: hidden;
 	z-index: 50;
 	position: absolute;
 	right: 0;
-	height: 18px;
+	height: 16px;
 	-webkit-transition: height .25s ease-in;
 	   -moz-transition: height .25s ease-in;
 	    -ms-transition: height .25s ease-in;
@@ -145,7 +146,7 @@ body {
 	background: rgb(255,255,255);
 	background: rgba(255,255,255,0.8);
 	color: #333;
-	border-top: 1px solid #ccc;
+	border-bottom: 1px dotted #333;
 	padding: 5px;
 	width: 100%;
 }
@@ -154,7 +155,7 @@ body {
 	margin-right: 10px;
 }
 #legend:hover {
-	height: 300px;
+	height: 302px;
 }
 #detail {
 	color: white;
@@ -418,6 +419,8 @@ th.T_LOC, th.T_ADDR, th.T_DIST, th.T_DATE {
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	display: block;
+	padding: 2px;
+	height: 20px;
 }
 td.T_ADDR a {
 	display: block;
@@ -515,9 +518,9 @@ th.off, td.off,tr.r_off, tr.f_off, tr.p_off {
 }
 #table td {
 	padding: 2px;
-	position: relative;
 	overflow: hidden;
 	border-left: 1px solid #eee;
+	vertical-align: middle;
 }
 .T_ADDR a {
 	margin-left: 30px;
@@ -578,40 +581,44 @@ th.off, td.off,tr.r_off, tr.f_off, tr.p_off {
 .high {width:60px; height:60px; background-position: -2px -54px}
 
 /* Sprites logos */
-.logo {position: absolute; left: 0; overflow:hidden; background-repeat: no-repeat;background-image:url(/img/logos/logos.png);}
+.ref {
+	height: 20px;
+	position: relative;
+}
+.logo {width:30px; height:20px; position: absolute; left: 0; overflow:hidden; background-repeat: no-repeat;background-image:url(/img/logos/logos.png);}
 
-.abycer {width:30px; height:20px; background-position: -2px -2px}
-.agla {width:30px; height:20px; background-position: -34px -2px}
-.alcampo {width:30px; height:20px; background-position: -66px -2px}
-.an_energeticos {width:30px; height:20px; background-position: -98px -2px}
-.andamur {width:30px; height:20px; background-position: -130px -2px}
-.avia {width:30px; height:20px; background-position: -162px -2px}
-.bonarea {width:30px; height:20px; background-position: -194px -2px}
-.bp {width:30px; height:20px; background-position: -2px -24px}
-.buquerin {width:30px; height:20px; background-position: -34px -24px}
-.campsa {width:30px; height:20px; background-position: -66px -24px}
-.carmoned {width:30px; height:20px; background-position: -98px -24px}
-.carrefour {width:30px; height:20px; background-position: -130px -24px}
-.cepsa {width:30px; height:20px; background-position: -162px -24px}
-.empresoil {width:30px; height:20px; background-position: -194px -24px}
-.eroski {width:30px; height:20px; background-position: -2px -46px}
-.esclatoil {width:30px; height:20px; background-position: -34px -46px}
-.galp {width:30px; height:20px; background-position: -66px -46px}
-.gasolben {width:30px; height:20px; background-position: -98px -46px}
-.iberdoex {width:30px; height:20px; background-position: -130px -46px}
-.leclerc {width:30px; height:20px; background-position: -162px -46px}
-.makro {width:30px; height:20px; background-position: -194px -46px}
-.meroil {width:30px; height:20px; background-position: -2px -68px}
-.norpetrol {width:30px; height:20px; background-position: -34px -68px}
-.petrem {width:30px; height:20px; background-position: -66px -68px}
-.petrocat {width:30px; height:20px; background-position: -98px -68px}
-.petromiralles {width:30px; height:20px; background-position: -130px -68px}
-.petronor {width:30px; height:20px; background-position: -162px -68px}
-.repostar {width:30px; height:20px; background-position: -194px -68px}
-.repsol {width:30px; height:20px; background-position: -2px -90px}
-.saras {width:30px; height:20px; background-position: -34px -90px}
-.shell {width:30px; height:20px; background-position: -66px -90px}
-.simply {width:30px; height:20px; background-position: -98px -90px}
-.staroil {width:30px; height:20px; background-position: -130px -90px}
-.tamoil {width:30px; height:20px; background-position: -162px -90px}
-.valcarce {width:30px; height:20px; background-position: -194px -90px}
+.abycer {background-position: -2px -2px}
+.agla {background-position: -34px -2px}
+.alcampo {background-position: -66px -2px}
+.an_energeticos {background-position: -98px -2px}
+.andamur {background-position: -130px -2px}
+.avia {background-position: -162px -2px}
+.bonarea {background-position: -194px -2px}
+.bp {background-position: -2px -24px}
+.buquerin {background-position: -34px -24px}
+.campsa {background-position: -66px -24px}
+.carmoned {background-position: -98px -24px}
+.carrefour {background-position: -130px -24px}
+.cepsa {background-position: -162px -24px}
+.empresoil {background-position: -194px -24px}
+.eroski {background-position: -2px -46px}
+.esclatoil {background-position: -34px -46px}
+.galp {background-position: -66px -46px}
+.gasolben {background-position: -98px -46px}
+.iberdoex {background-position: -130px -46px}
+.leclerc {background-position: -162px -46px}
+.makro {background-position: -194px -46px}
+.meroil {background-position: -2px -68px}
+.norpetrol {background-position: -34px -68px}
+.petrem {background-position: -66px -68px}
+.petrocat {background-position: -98px -68px}
+.petromiralles {background-position: -130px -68px}
+.petronor {background-position: -162px -68px}
+.repostar {background-position: -194px -68px}
+.repsol {background-position: -2px -90px}
+.saras {background-position: -34px -90px}
+.shell {background-position: -66px -90px}
+.simply {background-position: -98px -90px}
+.staroil {background-position: -130px -90px}
+.tamoil {background-position: -162px -90px}
+.valcarce {background-position: -194px -90px}
