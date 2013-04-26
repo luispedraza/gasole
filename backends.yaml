@@ -1,5 +1,5 @@
 backends:
 - name: update
-  class: B2
+  class: B1
   instances: 1
   options: dynamic

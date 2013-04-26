@@ -1,8 +1,6 @@
 cron:
 - description: periodic update
   url: /tasks/update
-  schedule: every 2 hours
-# - description: history update
-#   url: /tasks/history
-#   schedule: every day 22:00
-#   timezone: Europe/Brussels
+  schedule: every 1 hours
+
+  
