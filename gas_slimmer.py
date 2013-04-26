@@ -21,6 +21,12 @@ MEDIA_JS = {
 		'extern':	['google_maps_api_v3.js'],
 		'api':		[GOOGLE_MAPS_API]
 		},
+	'm_home.js': {
+		'src':		['search.js', 'm_home.js', 'utils.js'],
+		'libs': 	[],
+		'extern':	['google_maps_api_v3.js'],
+		'api':		[GOOGLE_MAPS_API]
+		},
 	'detail.js': {
 		'src': 		['utils.js','detail.js','search.js'],
 		'libs': 	['amcharts.js'],

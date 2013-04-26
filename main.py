@@ -40,6 +40,10 @@ class MainHandler(BaseAuthHandler):
             content=jinja_env.get_template("home.html").render(
                 map=jinja_env.get_template("spain.svg").render()))
 
+class MobileHandler(BaseHandler):
+    def get(self):
+        self.render("mobile.html")
+
 class AdminHandler(BaseHandler):
     def get(self):
         log_url = users.create_login_url(self.request.uri)
@@ -263,6 +267,7 @@ class Api(BaseHandler):
         if prov:
             prov = decode_param(prov)
             data = memcache.get(prov) or store2data(prov_kname=prov).get(prov)
+            logging.info(type(data))
             if not town:
                 info = {"_data": {prov: data or {"error": "Provincia no encontrada"}}}
             elif data:
@@ -339,6 +344,7 @@ app_config = {
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
+    ('/m/*', MobileHandler),
     ('/admin/?', AdminHandler),
     ('/admin/update/?(\w+)?', AdminUpdate),
     ('/admin/search/?', AdminSearch),
