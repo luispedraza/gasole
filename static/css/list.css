@@ -406,12 +406,15 @@ th.T_LOC, th.T_ADDR, th.T_DIST, th.T_DATE {
 	position: absolute;
 	left: -50px;
 	top: 2px;
-	cursor: pointer;
 	-webkit-transition: left .2s ease-in;
 	   -moz-transition: left .2s ease-in;
 	    -ms-transition: left .2s ease-in;
 	        transition: left .2s ease-in;
 }
+.T_DIST {
+	cursor: pointer;	
+}
+
 #table a {
 	text-decoration: none;
 	color: black;
@@ -517,7 +520,7 @@ th.off, td.off,tr.r_off, tr.f_off, tr.p_off {
 	width: 100%;
 }
 #table td {
-	padding: 2px;
+	padding: 1px;
 	overflow: hidden;
 	border-left: 1px solid #eee;
 	vertical-align: middle;
@@ -526,13 +529,13 @@ th.off, td.off,tr.r_off, tr.f_off, tr.p_off {
 	margin-left: 30px;
 }
 #table a:hover {
-	text-decoration: underline;
+	color: #006699;
 }
 #table th {
 	cursor: pointer;
 }
 #table-data tr:hover, #table-data tr:hover a {
-	background-color: #BFE6FF;
+	background-color: #DBF6FF;
 }
 
 #pager {
