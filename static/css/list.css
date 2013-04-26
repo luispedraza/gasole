@@ -131,28 +131,30 @@ body {
 	position: absolute;
 	right: 0;
 	height: 18px;
-	background: rgb(20,20,20);
-	background: rgba(20,20,20,0.8);
 	-webkit-transition: height .25s ease-in;
 	   -moz-transition: height .25s ease-in;
 	    -ms-transition: height .25s ease-in;
 	        transition: height .25s ease-in;
 }
 #legend .title {
+	font-size: 1.1em;
 	padding: 5px;
 	width: 100%;
 }
 #legend .item {
-	border-top: 2px solid #fff;
+	background: rgb(255,255,255);
+	background: rgba(255,255,255,0.8);
+	color: #333;
+	border-top: 1px solid #ccc;
 	padding: 5px;
 	width: 100%;
 }
 #legend .subitem {
-	padding: 2px;
+	padding: 5px;
 	margin-right: 10px;
 }
 #legend:hover {
-	height: 200px;
+	height: 300px;
 }
 #detail {
 	color: white;
@@ -478,22 +480,13 @@ th.T_8 {
 	text-align: left;
 	border-left: 1px solid #fff;
 }
-th div.sort {
-	margin-bottom: 3px;
-	width: 10px;
-	height: 20px;
-	background-image: url('/img/sort_off.png');
-	background-repeat: no-repeat;
+th .sprt.sort {
 	-webkit-transition: all .5s;
 	-moz-transition: all .5s;
 	-ie-transition: all .5s;
 	transition: all .5s;
 }
-th.sort_up div.sort {
-	background-image: url('/img/sort_on.png');
-}
-th.sort_down div.sort {
-	background-image: url('/img/sort_on.png');
+.sort_down .sort {
 	-webkit-transform: rotate(180deg);
 	-moz-transform: rotate(180deg);
 	-ms-transform: rotate(180deg);
@@ -569,51 +562,15 @@ th.off, td.off,tr.r_off, tr.f_off, tr.p_off {
 	color: red;
 	font-size: 16px;
 }
+
+/* Sprites cluster, para mapa y leyenda */
 .cluster {
 	background: rgb(255,255,255);
 	background: rgba(255,255,255, 0.8);
-	border: 2px solid #888;
+	border: 1px solid #888;
 	border-radius: 5px;
 	padding: 0 1px 3px 0;
 	background-repeat: no-repeat;
-}
-
-/* Sprites iconos */
-.icon {
-	background-repeat: no-repeat;
-	overflow: hidden;
-}
-.clock.med {
-	background-image: url(/img/clock_blue.png);
-	width: 20px;
-	height: 20px;
-}
-.clock.old {
-	background-image: url(/img/clock_red.png);
-	width: 20px;
-	height: 20px;
-}
-.clock.new {
-	background-image: url(/img/clock_green.png);
-	width: 20px;
-	height: 20px;
-}
-.marker_green {
-	background-image: url(/img/marker_green.png);
-	width: 10px;
-	height: 10px;
-}
-.marker_blue {
-	background-image: url(/img/marker_blue.png);
-	width: 10px;
-	height: 10px;
-}
-.marker_red {
-	background-image: url(/img/marker_red.png);
-	width: 10px;
-	height: 10px;
-}
-.low, .medium, .high {
 	background-image: url(/img/cluster.png);
 }
 .low {width:40px; height:40px; background-position: -2px -2px}
