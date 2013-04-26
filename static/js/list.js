@@ -383,11 +383,11 @@ function showDetail(marker) {
 	var dateDiv = document.getElementById("d-date");
 	var clockDiv = document.getElementById("d-clock");
 	var days = (new Date() - new Date(parseInt(row.getElementsByClassName("T_DATE")[0].textContent)))/TO_DAYS;
-	var ago = "", cname="clock";
-	if (days<1) {ago = " hoy"; cname+=" new"}
+	var ago = "", cname="sprt clock";
+	if (days<1) {ago = " hoy"; cname+="_new"}
 	else {
 		ago = " hace "+Math.floor(days)+" día" + ((days>2) ? "s" : "");
-		cname += (days<=7) ? " med" : " old";
+		cname += (days<=7) ? "_med" : "_old";
 	}
 	dateDiv.textContent = "Precios actualizados "+ago;
 	clockDiv.className = cname;
@@ -494,7 +494,7 @@ function populateTable(types) {
 					});
 					marker.set("id", tr.id);
 					bounds.extend(pos);
-					td_dist.innerHTML = "<div title='Mostrar en el mapa' class='icon locate'></div><span></span>";
+					td_dist.innerHTML = "<div title='Mostrar en el mapa' class='sprt locate'></div><span></span>";
 				}
 				tr.appendChild(td_dist);
 				// Fecha de actualización
@@ -503,9 +503,10 @@ function populateTable(types) {
 				var dd = document.createElement("div");
 				var date = new Date(dataPTS.date);
 				var days = (today-date)/TO_DAYS;
-				dd.className = "icon clock med";
-				if (days<1) dd.className += " new";
-				else if (days>7) dd.className += " old";
+				dd.className = "sprt clock";
+				if (days<1) dd.className += "_new";
+				else if (days>7) dd.className += "_old";
+				else dd.className += "_med";
 				td_date.title = date.toLocaleDateString();
 				td_date.innerHTML = "<span>"+date.getTime()+"</span>";
 				td_date.appendChild(dd);
