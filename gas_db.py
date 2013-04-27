@@ -5,11 +5,9 @@ from google.appengine.ext import db
 from google.appengine.api import memcache
 from gas_update import *
 import logging
-from math import fabs
-from webapp2_extras.appengine.auth.models import User
 import os
 DEBUG = os.environ['SERVER_SOFTWARE'].startswith('Dev')
-
+MEMCACHE_T = 18000 	# 5 horas
 ## Modelo de provincia
 class Province(db.Model):
 	pass
@@ -64,22 +62,22 @@ def data2store(data):
 					_stations.append(GasStation(
 						key_name = s,
 						parent = db.Key.from_path('Province', p, 'Town', t),
-						label = data[p][t][s]["label"],
-						hours = data[p][t][s]["hours"]))
+						label = data[p][t][s]["l"],
+						hours = data[p][t][s]["h"]))
 					update_price = True
-				elif cachep[t][s]["date"]<data[p][t][s]["date"]:
-					cachep[t][s]["options"].update(data[p][t][s]["options"])
-					cachep[t][s]["date"] = data[p][t][s]["date"]
+				elif cachep[t][s]["d"]<data[p][t][s]["d"]:
+					cachep[t][s]["o"].update(data[p][t][s]["o"])
+					cachep[t][s]["d"] = data[p][t][s]["d"]
 					update_price = True
 				if update_price:
 					parent_key = db.Key.from_path('Province', p, 'Town', t, 'GasStation', s)
-					props = dict((FUEL_OPTIONS[o]["short"], cachep[t][s]["options"][o]) for o in cachep[t][s]["options"])
+					props = dict((FUEL_OPTIONS[o]["short"], cachep[t][s]["o"][o]) for o in cachep[t][s]["o"])
 					_prices.append(PriceData(key_name = s, 
 						parent = parent_key, 
-						date=cachep[t][s]["date"], **props))
+						date=cachep[t][s]["d"], **props))
 					_history.append(HistoryData(parent = parent_key,
-						date=cachep[t][s]["date"], **props))
-		memcache.set(p, cachep)
+						date=cachep[t][s]["d"], **props))
+		memcache.set(p, cachep, time=MEMCACHE_T)
 	# if DEBUG:
 	# 	logging.info("Guardando en modo debug: put")
 	# 	db.put(_provinces + _towns + _stations + _prices + _history)
@@ -90,17 +88,9 @@ def data2store(data):
 	# 	logging.info(put_result.content)
 	db.put(_provinces + _towns + _stations + _prices + _history)
 	logging.info("Insertadas %s provincias" % len(_provinces))
-	# for e in _provinces:
-	# 	logging.info(e.key().name())
 	logging.info("Insertadas %s ciudades" % len(_towns))
-	# for e in _towns:
-	# 	logging.info(e.key().name())
 	logging.info("Insertadas %s estaciones" % len(_stations))
-	# for e in _stations:
-	# 	logging.info("%s, %s" %(e.key().name(), e.key().parent().name()))
 	logging.info("Actualizados %s precios" % len(_prices))
-	# for e in _prices:
-	# 	logging.info("%s, %s, %s" %(e.date, e.key().parent().name(), e.key().parent().parent().name()))
 	logging.info("Guardando %s históricos" % len(_history))
 
 # obtenemos información de la base de datos
@@ -124,23 +114,8 @@ def store2data(option=None, prov_kname=None):
 			option   = prices,
 			hours    = station.hours,
 			latlon   = latlon)
-	memcache.set(prov_kname, result.data.get(prov_kname))
+	memcache.set(prov_kname, result.data.get(prov_kname), time=MEMCACHE_T)
 	return result.data
-
-# def get_latlon(prov, town=None, station=None):
-# 	latlon_cache = memcache.get("latlon_" + prov) or {}
-# 	if not latlon_cache:
-# 		q = GeoData.all().ancestor(db.Key.from_path('Province', prov))
-# 		for g in q:
-# 			latlon_cache.setdefault(g.key().parent().name(), {})[g.key().name()] = [g.geopt.lat, g.geopt.lon]
-# 		memcache.set("latlon_" + prov, latlon_cache)
-# 	if station:
-# 		return {prov: {town: {station: latlon_cache.get(town, {}).get(station)}}}
-# 	elif town:
-# 		return {prov: {town: latlon_cache.get(town)}}
-# 	if latlon_cache:
-# 		return {prov: latlon_cache}
-# 	return {"error": "Datos no encontrados"}
 
 def get_near(lat, lon, dist):
 	near = ResultIter()
@@ -154,7 +129,6 @@ def get_near(lat, lon, dist):
 	for g in q:
 		if abs(g.geopt.lon-lon) < dlon:
 			keys.append(db.Key.from_path('PriceData', g.key().name(), parent=g.key()))
-			# logging.info(db.Key.from_path('GasStation', g.key().name(), parent=g.key()))
 	q = PriceData.get(keys)
 	for price in q:
 		prices = {FUEL_REVERSE[o]: getattr(price, o) for o in price.dynamic_properties()}
@@ -197,22 +171,6 @@ def get_comments(prov, town, station):
 			"id": c.key().id()})
 	return result
 
-# def compute_stats():
-# 	data_stats = memcache.get("stats")
-# 	if not data_stats:
-# 		data_stats = {}
-# 		q = Province.all()
-# 		for province in q:
-# 			p = province.key().name()
-# 			datap = memcache.get(o) or store2data(prov_kname=p).get(p)
-# 			opationsp = {}
-# 			for t in datap.keys():
-# 				for s in datap[t].keys():
-# 					station = datap[t][s]
-# 					price = station["options"].get(option)
-# 					if price:
-# 						opationsp[o].append(getattr(station.options, o)) for o in station.options
-
 def mean_val(array):
 	return sum(values)/len(values)
 
@@ -229,7 +187,7 @@ def get_means(option):
 			for t in datap.keys():
 				for s in datap[t].keys():
 					station = datap[t][s]
-					price = station["options"].get(option)
+					price = station["o"].get(option)
 					if price:
 						values.append(price)
 			if len(values):

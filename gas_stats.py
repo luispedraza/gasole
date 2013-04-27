@@ -79,8 +79,8 @@ def compute_stats():
 			datat = datap[t]
 			for s in datat: # para todas las estaciones
 				datas = datat[s]
-				add_data(datas.get("latlon"),datas["options"],[p,t,s],statsp)
-				add_data(datas.get("latlon"),datas["options"],[p,t,s],stats)
+				add_data(datas.get("g"),datas["o"],[p,t,s],statsp)
+				add_data(datas.get("g"),datas["o"],[p,t,s],stats)
 		logging.info(memory_usage().current())
 	compute(stats)
 	for p in stats['provinces']:

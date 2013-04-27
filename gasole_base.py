@@ -11,7 +11,6 @@ import secrets
 from webapp2_extras import auth, sessions
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
-#styles_dir = os.path.join(os.path.dirname(__file__), 'styles')
 jinja_env = Environment(loader = FileSystemLoader(template_dir), autoescape = False)
 
 def dumper(o):

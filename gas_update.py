@@ -81,7 +81,7 @@ class ResultIter(Result):
 				town = prov[t]
 				for s in town:
 					st = town[s]
-					yield [p, t, s, st["date"], st["label"], st["hours"], st["options"], st.get("latlon")]
+					yield [p, t, s, st["d"], st["l"], st["h"], st["o"], st.get("g")]
 	def as_table(self):
 		for row in self:
 			row = [x if x else "" for x in row]
@@ -111,12 +111,12 @@ class ResultIter(Result):
 		town = make_clean_name(town)
 		s = data.setdefault(province,{}).setdefault(town, {}).get(station)
 		if not s:
-			data[province][town][station] = {"date":date,"label":label,"hours":hours,"options":option}
+			data[province][town][station] = {"d":date,"l":label,"h":hours,"o":option}
 			if latlon:
-				data[province][town][station]["latlon"] = latlon
+				data[province][town][station]["g"] = latlon
 		else:
-			s["options"].update(option)
-			s["date"] = date
+			s["o"].update(option)
+			s["d"] = date
 
 # Actualización por descarga de archivo CSV
 def gas_update_csv(option="1"):
@@ -147,50 +147,6 @@ def gas_update_csv(option="1"):
 			break
 	headers = ["Lat.", "Lon.", "Info", "Precio"]
 	return Result(headers=headers, data=data)
-
-#Actualización por descarga de archivo xls
-# def gas_update_xls_old(option="1"):
-# 	logging.info("comienzo gas_update_xls %s" %memory_usage().current())
-# 	result = ResultIter()
-# 	if type(option) == str or type(option) == unicode:
-# 		if option == "0":
-# 			option = sorted(FUEL_OPTIONS.keys())[1:]
-# 			logging.info("Buscando datos de todos los tipos de combustible")
-# 		else:
-# 			option = [option]
-# 	def handle_xls_result(rpc, o, result=result):
-# 		logging.info("procesando %s: %s" %(o, memory_usage().current()))
-# 		bs = BeautifulSoup(StringIO(rpc.get_result().content))
-# 		rows = bs.find('table').findAll('tr')
-# 		for tr in rows[2:]:
-# 			if not tr.findAll('b'):
-# 				table_data = [td.text for td in tr.findAll('td')]
-# 				if table_data[7] == "P":	# guardo sólo gaslineras de venta público
-# 					thedate = table_data[4].split("/")
-# 					result.add_item(province = table_data[0],
-# 						town     = table_data[1],
-# 						station  = table_data[2] + " [" + re.sub("\s+", "", table_data[3]) + "]",
-# 						date     = date(int(thedate[2]), int(thedate[1]), int(thedate[0])),
-# 						label    = table_data[6],
-# 						hours    = table_data[9],
-# 						option   = {o: float(re.sub(",", ".", table_data[5]))})
-# 		bs.decompose()
-# 		gc.collect()
-# 		logging.info("fin procesando %s: %s" %(o, memory_usage().current()))
-
-# 	def create_xls_callback(rpc, o):
-# 		return lambda: handle_xls_result(rpc, o)
-
-# 	rpcs = []
-# 	for o in option:
-# 		logging.info("Obteniendo %s" %FUEL_OPTIONS[o]["name"])
-# 		rpc = urlfetch.create_rpc(deadline=55)
-# 		rpc.callback = create_xls_callback(rpc, o)
-# 		urlfetch.make_fetch_call(rpc, URL_XLS + o)
-# 		rpcs.append(rpc)
-# 	for rpc in rpcs:
-# 		rpc.wait()
-# 	return result
 
 def gas_update_xls(option="1"):
 	logging.info("comienzo gas_update_xls (lxml) %s" %memory_usage().current())
@@ -231,38 +187,6 @@ def gas_update_xls(option="1"):
 	for rpc in rpcs:
 		rpc.wait()
 	return result
-
-
-# def gas_update_xls(option="1"):
-# 	logging.info("comienzo gas_update_xls %s" %memory_usage().current())
-# 	result = ResultIter()
-# 	if type(option) == str or type(option) == unicode:
-# 		if option == "0":
-# 			option = sorted(FUEL_OPTIONS.keys())[1:]
-# 			logging.info("Buscando datos de todos los tipos de combustible")
-# 		else:
-# 			option = [option]
-
-# 	for o in option:
-# 		logging.info("Obteniendo %s" %FUEL_OPTIONS[o]["name"])
-# 		info = urlfetch.fetch(URL_XLS + o, deadline=20)
-# 		if info.status_code == 200:
-# 			logging.info("procesando %s: %s" %(o, memory_usage().current()))
-# 			rows = BeautifulSoup(StringIO(info.content)).find('table').findAll('tr')
-# 			for tr in rows[2:]:
-# 				if not tr.findAll('b'):
-# 					table_data = [td.text for td in tr.findAll('td')]
-# 					if table_data[7] == "P":	# guardo sólo gaslineras de venta público
-# 						thedate = table_data[4].split("/")
-# 						result.add_item(province = table_data[0],
-# 							town     = table_data[1],
-# 							station  = table_data[2] + " [" + re.sub("\s+", "", table_data[3]) + "]",
-# 							date     = date(int(thedate[2]), int(thedate[1]), int(thedate[0])),
-# 							label    = table_data[6],
-# 							hours    = table_data[9],
-# 							option   = {o: float(re.sub(",", ".", table_data[5]))})
-# 			logging.info("fin procesando %s: %s" %(o, memory_usage().current()))
-# 	return result
 
 # Actualización por búsqueda directa
 def gas_update_search(option="1", prov="01"):

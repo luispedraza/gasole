@@ -439,7 +439,7 @@ function populateTable(types) {
 			cities.push([t, s_link]);
 			for (var s in data[p][t]) {
 				var dataPTS = data[p][t][s];
-				var label = dataPTS["label"];
+				var label = dataPTS["l"];
 				var tr = document.createElement("tr");
 				tr.className = "r_on";
 				var td_town = document.createElement("td");
@@ -471,8 +471,8 @@ function populateTable(types) {
 				var td_dist = document.createElement("td");
 				td_dist.className = "T_DIST";
 				// Marcadores
-				if (dataPTS.hasOwnProperty("latlon")) {
-					var pos = new google.maps.LatLng(dataPTS.latlon[0], dataPTS.latlon[1]);
+				if (dataPTS.hasOwnProperty("g")) {
+					var pos = new google.maps.LatLng(dataPTS.g[0], dataPTS.g[1]);
 					var options = { 
 						icon: {
 							path: google.maps.SymbolPath.CIRCLE,
@@ -486,11 +486,11 @@ function populateTable(types) {
 					google.maps.event.addListener(marker, 'click', function(e) {
 						showDetail(this);
 					});
-					marker.set("price", dataPTS["options"]);
+					marker.set("price", dataPTS["o"]);
 					tr.id="tr-"+markers.length;
 					td_dist.id="td-"+markers.length;
 					markers.push(marker);
-					td_dist.setAttribute("data-geo", dataPTS["latlon"].join(","));
+					td_dist.setAttribute("data-geo", dataPTS.g.join(","));
 					td_dist.addEventListener("click", function() {
 						var marker = markers[this.id.split("-")[1]];
 						showDetail(marker);
@@ -517,7 +517,7 @@ function populateTable(types) {
 				// Precios
 				for (var o in FUEL_OPTIONS) {
 					otd = document.createElement("td");
-					var price = dataPTS["options"][o];
+					var price = dataPTS["o"][o];
 					if (price) {
 						otd.textContent = price.toFixed(3);
 						otd.className = "T_" + o + " on";
@@ -525,7 +525,7 @@ function populateTable(types) {
 					tr.appendChild(otd);
 				}
 				table.appendChild(tr);
-				Stats.add(dataPTS["options"]);
+				Stats.add(dataPTS["o"]);
 			}
 			map.fitBounds (bounds);
 		}

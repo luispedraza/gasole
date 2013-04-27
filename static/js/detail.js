@@ -183,16 +183,16 @@ function processData(info) {
 	console.log(info);
 	data = info["_data"];
 	var province, town, station, date, label, hours, latlon, price;
-	for (var p in data) province= p
-		for (var t in data[p]) town=t;
-			for (var s in data[p][t]) {
-				station=s;
-				date = data[p][t][s]["date"];
-				label = data[p][t][s]["label"];
-				hours = data[p][t][s]["hours"];
-				latlon = data[p][t][s]["latlon"];
-				price = data[p][t][s]["options"];
-			}
+	for (var p in data) province = p;
+	for (var t in data[p]) town = t;
+	for (var s in data[p][t]) {
+		station=s;
+		date = data[p][t][s]["d"];
+		label = data[p][t][s]["l"];
+		hours = data[p][t][s]["h"];
+		latlon = data[p][t][s]["g"];
+		price = data[p][t][s]["o"];
+	}
 
 	document.getElementById("address").textContent = toTitle(station) + " (" + town + ", " + province + ")";
 	document.getElementById("hours").textContent = hours;
