@@ -13,6 +13,12 @@ from webapp2_extras import auth, sessions
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = Environment(loader = FileSystemLoader(template_dir), autoescape = False)
 
+def dumper(o):
+	if hasattr(o, 'isoformat'):
+		return o.isoformat()
+	else:
+		raise TypeError, 'Object of type %s with value of %s is not JSON serializable' % (type(o), repr(o)) 
+
 # Basic handler with common functions
 class BaseHandler(webapp2.RequestHandler):
 	def dispatch(self):
@@ -42,6 +48,7 @@ class BaseHandler(webapp2.RequestHandler):
   		"""Returns true if a user is currently logged in, false otherwise"""
   		return self.auth.get_user_by_session() is not None
 
+
 	def write(self, *a, **kw):
 		self.response.out.write(*a, **kw)
 
@@ -62,7 +69,7 @@ class BaseHandler(webapp2.RequestHandler):
 		logging.info("Usuario: %s" %self.user)
 
 	def render_json(self, d):
-		json_txt = json.dumps(d)
+		json_txt = json.dumps(d, default=dumper)
 		self.response.headers['Content-Type'] = 'application/json; charset=UTF-8'
 		self.write(json_txt)
 
