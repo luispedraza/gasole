@@ -504,7 +504,7 @@ function populateTable(types) {
 				var td_date = document.createElement("td");
 				td_date.className = "T_DATE";
 				var dd = document.createElement("div");
-				var date = new Date(dataPTS.date);
+				var date = new Date(dataPTS.d);
 				var days = (today-date)/TO_DAYS;
 				dd.className = "sprt clock";
 				if (days<1) dd.className += "_new";
