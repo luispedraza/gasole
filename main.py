@@ -17,17 +17,6 @@ import urllib
 import re
 from gas_slimmer import *
 from gas_stats import *
-from time import time
-
-TIME=0
-
-def tic():
-    global TIME 
-    TIME = time();
-def toc():
-    global TIME
-    logging.info("Tiempo transcurrido (ms): " + str((time()-TIME)*1000))
-
 
 def decode_param(s):
     return s.decode('utf-8').replace("_", " ").replace("|", "/")
@@ -272,33 +261,28 @@ class Detail(BaseAuthHandler):
             result = "El comentario se ha publicado con éxito."
         self.get(province=province, town=town, station=station, error=error, result=result)
 
-# class Gzip(BaseHandler):
-#     def get(self, prov, town, station):
-#         tic()
-#         info = {}
-#         if prov:
-#             prov = decode_param(prov)
-#             data = memcache.get("gzip"+prov) or store2data(prov_kname=prov).get(prov)
-#             logging.info(type(data))
-#         self.response.headers['Content-Type'] = 'application/json/gzip; charset=utf-8'
-#         self.response.headers['Content-Encoding'] = 'gzip'
-#         self.write(data)
-#         toc()
-
 class Api(BaseHandler):
     def get(self, prov, town, station):
-        tic()
-        info = None
-        prov = decode_param(prov)
-        if station:
-            info = getStationJson(prov, decode_param(town), decode_param(station))
-        elif prov=="All":
-            info = memcache.get("All").decode('zlib')
-        else:
-            info = getProvinceJson(prov)
-        self.response.headers['Content-Type'] = 'application/json; charset=utf-8'
-        self.write(info)
-        toc()
+        info = {}
+        if prov:
+            prov = decode_param(prov)
+            data = memcache.get(prov) or store2data(prov_kname=prov).get(prov)
+            logging.info(type(data))
+            if not town:
+                info = {"_data": {prov: data or {"error": "Provincia no encontrada"}}}
+            elif data:
+                town = decode_param(town)
+                data = data.get(town)
+                if not station:
+                    info = {"_data": {prov: {town: data or {"error": "Ciudad no encontrada"}}}}
+                elif data and station:
+                    station = decode_param(station)
+                    data = data.get(station)
+                    info = {"_data": {prov: {town: {station: data or {"error": "Estación no encontrada"}}}},
+                    "_history": get_history(prov, town, station),
+                    "_comments" : get_comments(prov, town, station)
+                    }
+        self.render_json(info)
 
 class StatsApi(BaseHandler):
     def get(self, prov, town):
@@ -344,6 +328,8 @@ def handle_500(request, response, exception):
     response.set_status(500)
     response.write(jinja_env.get_template("500.html").render())
     
+
+
 # webapp2 config
 app_config = {
     'webapp2_extras.sessions': {
