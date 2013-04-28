@@ -130,7 +130,7 @@ def data2store(data):
 		json_data = json.dumps({"_data": {p: cachep}})
 		memcache.set(p, json_data, time=MEMCACHE_T)
 		ApiJson(key_name=p, json=json_data).put()
-	memcache.set("All", json.dumps(data).encode('zlib'))
+	# memcache.set("All", json.dumps(data).encode('zlib'))
 	# if DEBUG:
 	# 	logging.info("Guardando en modo debug: put")
 	# 	db.put(_provinces + _towns + _stations + _prices + _history)
