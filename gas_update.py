@@ -18,7 +18,7 @@ import urllib
 from zipfile import ZipFile
 import time
 from StringIO import StringIO
-from datetime import date
+from datetime import date as Date
 from bs4 import BeautifulSoup
 from lxml import html
 import re
@@ -59,7 +59,7 @@ def make_clean_name(s):
 # Resultado de una actualizacion de Internet (csv, xls, search)
 class Result(object):
 	def __init__(self, headers=[], data=[]):
-		self.date = date.today()
+		self.date = Date.today()
 		self.headers = headers
 		self.data = data
 	def __iter__(self):
@@ -69,7 +69,7 @@ class Result(object):
 class ResultIter(Result):
 	def __init__(self):
 		headers = [u"Provincia", u"Localidad", u"Dirección", u"Fecha", u"Rótulo", u"Horario", u"Precio", u"Lat.,Lon."]
-		self.date = date.today()
+		self.date = Date.today()
 		self.headers = headers
 		self.data = {}
 
@@ -85,7 +85,7 @@ class ResultIter(Result):
 	def as_table(self):
 		for row in self:
 			row = [x if x else "" for x in row]
-			row[3] = "/".join(row[3].isoformat().split("-")[1:])
+			row[3] = "-".join(map(str,row[3]))
 			options = [str(row[6].get(o, "")) for o in FUEL_OPTIONS]
 			row[-1] = "("+",".join(row[-1])+")" if row[-1] else ""
 			yield "<td>"+"</td><td>".join(row[:6]+options+row[7:])+"</td>"
@@ -122,7 +122,7 @@ class ResultIter(Result):
 def gas_update_csv(option="1"):
 	# file path:
 	o = FUEL_OPTIONS[option]["short"]
-	zipFileURL = URL_CSV+'eess_'+o+'_'+date.today().strftime("%d%m%Y")+'.zip'
+	zipFileURL = URL_CSV+'eess_'+o+'_'+Date.today().strftime("%d%m%Y")+'.zip'
 	# download new data
 	response = urlfetch.fetch(zipFileURL)
 	if response.status_code != 200:
@@ -164,11 +164,12 @@ def gas_update_xls(option="1"):
 		for tr in rows[3:]:
 			row_data = [td.text for td in tr.getchildren()]
 			if row_data[7] == "P":	# guardo sólo gaslineras de venta público
-				thedate = row_data[4].split("/")
+				date = map(int, row_data[4].split("/"))
+				date.reverse();
 				result.add_item(province = row_data[0],
 					town     = row_data[1],
 					station  = row_data[2] + " [" + re.sub("\s+", "", row_data[3]) + "]",
-					date     = date(int(thedate[2]), int(thedate[1]), int(thedate[0])),
+					date     = date,
 					label    = row_data[6],
 					hours    = row_data[9],
 					option   = {o: float(re.sub(",", ".", row_data[5]))})
@@ -220,12 +221,13 @@ def gas_update_search(option="1", prov="01"):
 				latlon = re.search("(?<=centrar\().+(?=\))", cells[-1].prettify())
 				if latlon:
 					latlon = latlon.group().split(",")[:2]
-				thedate = cells[4].text.split("/")
+				date = map(int, row_data[4].split("/"))
+				date.reverse()
 				result.add_item(
 					province = cells[0].text,
 					town     = cells[1].text,
 					station  = cells[2].text + " [" + re.sub("\s+", "", cells[3].text) + "]",
-					date     = date(int(thedate[2]), int(thedate[1]), int(thedate[0])),
+					date     = date,
 					label    = cells[6].text,
 					hours    = cells[9].text,
 					latlon   = latlon,

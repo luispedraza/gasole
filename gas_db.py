@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import json
+from datetime import date as Date
 from google.appengine.ext import db
 from google.appengine.api import memcache
 from gas_update import *
@@ -8,6 +10,11 @@ import logging
 import os
 DEBUG = os.environ['SERVER_SOFTWARE'].startswith('Dev')
 MEMCACHE_T = 18000 	# 5 horas
+
+## Guarda los últimos datos en formato json
+class ApiJson(db.Model):
+	json = db.TextProperty(required=True)
+
 ## Modelo de provincia
 class Province(db.Model):
 	pass
@@ -40,18 +47,63 @@ class Comment(db.Model):
 	date = db.DateTimeProperty(auto_now_add=True)
 	replyto = db.IntegerProperty()
 
+def getProvinceData(p):
+	jsondata = memcache.get(p)
+	if jsondata:
+		logging.info("encontrado data en cache")
+		return json.loads(jsondata)["_data"][p]
+	model = ApiJson.get_by_key_name(p)
+	if model:
+		logging.info("encontrado data en db")
+		memcache.set(p, model.json)
+		return json.loads(model.json)["_data"][p]
+	data = {"_data": store2data(prov_kname=p)}
+	jsondata = json.dumps(data)
+	ApiJson(key_name=p, json=jsondata).put()
+	memcache.set(p, jsondata)
+	return data["_data"][p]
+
+def getProvinceJson(p):
+	jsondata = memcache.get(p)
+	if jsondata:
+		return jsondata
+	model = ApiJson.get_by_key_name(p)
+	if model:
+		memcache.set(p, model.json)
+		return model.json
+	jsondata = json.dumps({"_data": store2data(prov_kname=p)})
+	ApiJson(key_name=p, json=jsondata).put()
+	memcache.set(p, jsondata)
+	return jsondata
+
+def getStationJson(p, t, s):
+	skey = p+t+s
+	jsondata = memcache.get(skey)
+	if jsondata:
+		return jsondata
+	model = ApiJson.get_by_key_name(skey)
+	if model:
+		memcache.set(skey, model.json)
+		return model.json
+	jsondata = json.dumps({"_data": store2data(prov_kname=p),
+		"_history": get_history(p, t, s),
+		"_comments" : get_comments(p, t, s)})
+	ApiJson(key_name=skey, json=jsondata).put()
+	memcache.set(skey, jsondata)
+	return jsondata
+
 def data2store(data):
 	_provinces = []
 	_towns = []
 	_stations = []
 	_prices = []
 	_history = []
-	for p in data.keys(): # recorremos las provincias
-		cachep = memcache.get(p) or store2data(prov_kname=p).get(p)
+	for p in data: # recorremos las provincias
+		cachep = getProvinceData(p)
 		if not cachep: 		# nueva provincia
 			cachep = {}
 			_provinces.append(Province(key_name=p))
-		for t in data[p].keys(): # recorremos las ciudades
+		for t in data[p]: # recorremos las ciudades
 			if not cachep.has_key(t):	# nueva ciudad
 				cachep[t] = {}
 				_towns.append(Town(key_name=t, parent=db.Key.from_path('Province', p)))
@@ -65,19 +117,20 @@ def data2store(data):
 						label = data[p][t][s]["l"],
 						hours = data[p][t][s]["h"]))
 					update_price = True
-				elif cachep[t][s]["d"]<data[p][t][s]["d"]:
+				elif cachep[t][s]["d"] != data[p][t][s]["d"]:
 					cachep[t][s]["o"].update(data[p][t][s]["o"])
 					cachep[t][s]["d"] = data[p][t][s]["d"]
 					update_price = True
 				if update_price:
 					parent_key = db.Key.from_path('Province', p, 'Town', t, 'GasStation', s)
+					date = Date(*cachep[t][s]["d"])
 					props = dict((FUEL_OPTIONS[o]["short"], cachep[t][s]["o"][o]) for o in cachep[t][s]["o"])
-					_prices.append(PriceData(key_name = s, 
-						parent = parent_key, 
-						date=cachep[t][s]["d"], **props))
-					_history.append(HistoryData(parent = parent_key,
-						date=cachep[t][s]["d"], **props))
-		memcache.set(p, cachep, time=MEMCACHE_T)
+					_prices.append(PriceData(key_name = s, parent = parent_key, date = date, **props))
+					_history.append(HistoryData(parent = parent_key, date = date, **props))
+		json_data = json.dumps({"_data": {p: cachep}})
+		memcache.set(p, json_data, time=MEMCACHE_T)
+		ApiJson(key_name=p, json=json_data).put()
+	memcache.set("All", json.dumps(data).encode('zlib'))
 	# if DEBUG:
 	# 	logging.info("Guardando en modo debug: put")
 	# 	db.put(_provinces + _towns + _stations + _prices + _history)
@@ -105,16 +158,16 @@ def store2data(option=None, prov_kname=None):
 		latlon = None
 		if (station.geopt):
 			latlon = [station.geopt.lat, station.geopt.lon]
+		date = price.date
 		result.add_item(
 			province = price.key().parent().parent().parent().name(),
 			town     = price.key().parent().parent().name(),
 			station  = price.key().name(),
 			label    = station.label,
-			date     = price.date,
+			date     = [date.year, date.month, date.day],
 			option   = prices,
 			hours    = station.hours,
 			latlon   = latlon)
-	memcache.set(prov_kname, result.data.get(prov_kname), time=MEMCACHE_T)
 	return result.data
 
 def get_near(lat, lon, dist):
@@ -136,12 +189,13 @@ def get_near(lat, lon, dist):
 		latlon = None
 		if (station.geopt):
 			latlon = [station.geopt.lat, station.geopt.lon]
+		date = price.date
 		near.add_item(
 			province = price.key().parent().parent().parent().name(),
 			town     = price.key().parent().parent().name(),
 			station  = price.key().name(),
 			label    = station.label,
-			date     = price.date,
+			date     = [date.year, date.month, date.day],
 			option   = prices,
 			hours    = station.hours,
 			latlon   = latlon)
@@ -171,29 +225,29 @@ def get_comments(prov, town, station):
 			"id": c.key().id()})
 	return result
 
-def mean_val(array):
-	return sum(values)/len(values)
+# def mean_val(array):
+# 	return sum(values)/len(values)
 
 # precios medios de combustible por provincia
-def get_means(option):
-	data = memcache.get("means_"+option)
-	if not data:
-		data = {}
-		q = Province.all()
-		for province in q:
-			values = []
-			p = province.key().name()
-			datap = memcache.get(p) or store2data(prov_kname=p).get(p)
-			for t in datap.keys():
-				for s in datap[t].keys():
-					station = datap[t][s]
-					price = station["o"].get(option)
-					if price:
-						values.append(price)
-			if len(values):
-				data[p] = value = mean_val(values)
-			else:
-				data[p] = None
-		memcache.set("means_"+option, data)
-	return data
+# def get_means(option):
+# 	data = memcache.get("means_"+option)
+# 	if not data:
+# 		data = {}
+# 		q = Province.all()
+# 		for province in q:
+# 			values = []
+# 			p = province.key().name()
+# 			datap = memcache.get(p) or store2data(prov_kname=p).get(p)
+# 			for t in datap.keys():
+# 				for s in datap[t].keys():
+# 					station = datap[t][s]
+# 					price = station["o"].get(option)
+# 					if price:
+# 						values.append(price)
+# 			if len(values):
+# 				data[p] = value = mean_val(values)
+# 			else:
+# 				data[p] = None
+# 		memcache.set("means_"+option, data)
+# 	return data
 
