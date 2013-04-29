@@ -49,20 +49,7 @@ class Comment(db.Model):
 	replyto = db.IntegerProperty()
 
 def getProvinceData(p):
-	jsondata = memcache.get(p)
-	if jsondata:
-		logging.info("encontrado data en cache")
-		return json.loads(jsondata)["_data"][p]
-	model = ApiJson.get_by_key_name(p)
-	if model:
-		logging.info("encontrado data en db")
-		memcache.set(p, model.json)
-		return json.loads(model.json)["_data"][p]
-	data = {"_data": store2data(prov_kname=p)}
-	jsondata = json.dumps(data)
-	ApiJson(key_name=p, json=jsondata).put()
-	memcache.set(p, jsondata)
-	return data["_data"][p]
+	return json.loads(getProvinceJson(p))["_data"][p]
 
 def getProvinceJson(p):
 	jsondata = memcache.get(p)
@@ -108,21 +95,24 @@ def data2store(data):
 			_provinces.append(Province(key_name=p))
 		for t in datap: # recorremos las ciudades
 			datat = datap[t]
-			if not cachep.has_key(t):	# nueva ciudad
-				cachep[t] = {}
+			cachet = cachep.get(t)
+			if not cachet:	# nueva ciudad
+				cachet = cachep[t] = {}
 				_towns.append(Town(key_name=t, parent=db.Key.from_path('Province', p)))
-			cachet = cachep[t]
 			for s in datat: # recorremos las estaciones
 				datas = datat[s]
+				caches = cachet.get(s)
 				update_price = False
-				if not cachet.has_key(s): # nueva estación
+				if not caches: # nueva estación
 					_stations.append(GasStation(
 						key_name = s,
 						parent = db.Key.from_path('Province', p, 'Town', t),
 						label = datas["l"],
 						hours = datas["h"]))
 					update_price = True
-				elif cachet[s]["d"]!=datas["d"]: # distinta fecha
+				elif caches["d"]!=datas["d"]: # distinta fecha
+					caches["o"]=datas["o"]
+					caches["d"]=datas["d"]
 					update_price = True
 				if update_price:
 					parent_key = db.Key.from_path('Province', p, 'Town', t, 'GasStation', s)
@@ -133,18 +123,19 @@ def data2store(data):
 		newdata = _provinces+_towns+_stations+_prices+_history
 		if len(newdata):
 			try:
-				logging.info("==========Guardando datos de "+p)
+				logging.info("==========Guardando datos de %s" %p)
 				db.run_in_transaction(db.put,newdata)
-				logging.info("Insertadas %s ciudades" % len(_towns))
-				logging.info("Insertadas %s estaciones" % len(_stations))
-				logging.info("Actualizados %s precios" % len(_prices))
-				logging.info("Guardando %s históricos" % len(_history))
-				json_data = json.dumps({"_data": {p: datap}})
+				logging.info("%s ciudades" %len(_towns))
+				logging.info("%s estaciones" %len(_stations))
+				logging.info("%s precios" %len(_prices))
+				logging.info("%s históricos" %len(_history))
+				json_data = json.dumps({"_data": {p: cachep}})
 				memcache.set(p, json_data)
 				ApiJson(key_name=p, json=json_data).put()
 				logging.info("Uso de memoria: %s" %memory_usage().current())
-			except:
-				logging.error("No se han podido guardar los datos")
+			except Exception, e:
+				logging.error("***************No se han podido guardar los datos de %s" %p)
+				logging.error(str(e))
 		del newdata
 
 	# memcache.set("All", json.dumps(data).encode('zlib'))
