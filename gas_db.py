@@ -14,7 +14,6 @@ MEMCACHE_T = 18000 	# 5 horas
 ## Guarda los últimos datos en formato json
 class ApiJson(db.Model):
 	json = db.TextProperty(required=True)
-
 ## Modelo de provincia
 class Province(db.Model):
 	pass
@@ -85,7 +84,8 @@ def getStationJson(p, t, s):
 	if model:
 		memcache.set(skey, model.json)
 		return model.json
-	jsondata = json.dumps({"_data": store2data(prov_kname=p),
+	data = getProvinceData(p)
+	jsondata = json.dumps({"_data": {p: {t: {s: data[t][s]}}},
 		"_history": get_history(p, t, s),
 		"_comments" : get_comments(p, t, s)})
 	ApiJson(key_name=skey, json=jsondata).put()
@@ -128,7 +128,7 @@ def data2store(data):
 					_prices.append(PriceData(key_name = s, parent = parent_key, date = date, **props))
 					_history.append(HistoryData(parent = parent_key, date = date, **props))
 		json_data = json.dumps({"_data": {p: cachep}})
-		memcache.set(p, json_data, time=MEMCACHE_T)
+		memcache.set(p, json_data)
 		ApiJson(key_name=p, json=json_data).put()
 	memcache.set("All", json.dumps(data).encode('zlib'))
 	# if DEBUG:
