@@ -8,6 +8,8 @@ from google.appengine.api import memcache
 from gas_update import *
 import logging
 import os
+from google.appengine.api.runtime import memory_usage
+
 DEBUG = os.environ['SERVER_SOFTWARE'].startswith('Dev')
 MEMCACHE_T = 18000 	# 5 horas
 
@@ -93,59 +95,60 @@ def getStationJson(p, t, s):
 	return jsondata
 
 def data2store(data):
-	_provinces = []
-	_towns = []
-	_stations = []
-	_prices = []
-	_history = []
 	for p in data: # recorremos las provincias
+		_provinces = []
+		_towns = []
+		_stations = []
+		_prices = []
+		_history = []
+		datap = data[p]
 		cachep = getProvinceData(p)
-		if not cachep: 		# nueva provincia
+		if not cachep: # nueva provincia
 			cachep = {}
 			_provinces.append(Province(key_name=p))
-		for t in data[p]: # recorremos las ciudades
+		for t in datap: # recorremos las ciudades
+			datat = datap[t]
 			if not cachep.has_key(t):	# nueva ciudad
 				cachep[t] = {}
 				_towns.append(Town(key_name=t, parent=db.Key.from_path('Province', p)))
-			for s in data[p][t].keys(): # recorremos las estaciones
+			cachet = cachep[t]
+			for s in datat: # recorremos las estaciones
+				datas = datat[s]
 				update_price = False
-				if not cachep[t].has_key(s): # nueva estación
-					cachep[t][s] = data[p][t][s]
+				if not cachet.has_key(s): # nueva estación
 					_stations.append(GasStation(
 						key_name = s,
 						parent = db.Key.from_path('Province', p, 'Town', t),
-						label = data[p][t][s]["l"],
-						hours = data[p][t][s]["h"]))
+						label = datas["l"],
+						hours = datas["h"]))
 					update_price = True
-				elif cachep[t][s]["d"] != data[p][t][s]["d"]:
-					cachep[t][s]["o"].update(data[p][t][s]["o"])
-					cachep[t][s]["d"] = data[p][t][s]["d"]
+				elif cachet[s]["d"]!=datas["d"]: # distinta fecha
 					update_price = True
 				if update_price:
 					parent_key = db.Key.from_path('Province', p, 'Town', t, 'GasStation', s)
-					date = Date(*cachep[t][s]["d"])
-					props = dict((FUEL_OPTIONS[o]["short"], cachep[t][s]["o"][o]) for o in cachep[t][s]["o"])
-					_prices.append(PriceData(key_name = s, parent = parent_key, date = date, **props))
-					_history.append(HistoryData(parent = parent_key, date = date, **props))
-		json_data = json.dumps({"_data": {p: cachep}})
-		memcache.set(p, json_data)
-		ApiJson(key_name=p, json=json_data).put()
-	memcache.set("All", json.dumps(data).encode('zlib'))
-	# if DEBUG:
-	# 	logging.info("Guardando en modo debug: put")
-	# 	db.put(_provinces + _towns + _stations + _prices + _history)
-	# else:
-	# 	logging.info("Guardando en modo release: put_async")
-	# 	put_future = db.put_async(_provinces + _towns + _stations + _prices + _history)
-	# 	put_result = put_future.get_result()
-	# 	logging.info(put_result.content)
-	db.put(_provinces + _towns + _stations + _prices + _history)
-	logging.info("Insertadas %s provincias" % len(_provinces))
-	logging.info("Insertadas %s ciudades" % len(_towns))
-	logging.info("Insertadas %s estaciones" % len(_stations))
-	logging.info("Actualizados %s precios" % len(_prices))
-	logging.info("Guardando %s históricos" % len(_history))
+					date = Date(*datas["d"])
+					props = dict((FUEL_OPTIONS[o]["short"], datas["o"][o]) for o in datas["o"])
+					_prices.append(PriceData(key_name=s, parent=parent_key, date=date, **props))
+					_history.append(HistoryData(parent=parent_key, date=date, **props))
+		newdata = _provinces+_towns+_stations+_prices+_history
+		if len(newdata):
+			try:
+				logging.info("==========Guardando datos de "+p)
+				db.run_in_transaction(db.put,newdata)
+				logging.info("Insertadas %s ciudades" % len(_towns))
+				logging.info("Insertadas %s estaciones" % len(_stations))
+				logging.info("Actualizados %s precios" % len(_prices))
+				logging.info("Guardando %s históricos" % len(_history))
+				json_data = json.dumps({"_data": {p: datap}})
+				memcache.set(p, json_data)
+				ApiJson(key_name=p, json=json_data).put()
+				logging.info("Uso de memoria: %s" %memory_usage().current())
+			except:
+				logging.error("No se han podido guardar los datos")
+		del newdata
 
+	# memcache.set("All", json.dumps(data).encode('zlib'))
+	
 # obtenemos información de la base de datos
 def store2data(option=None, prov_kname=None):
 	q = PriceData.all()

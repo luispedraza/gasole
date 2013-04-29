@@ -25,7 +25,7 @@ import re
 # import time
 from google.appengine.api import urlfetch
 import logging
-from google.appengine.api.runtime import *
+from google.appengine.api.runtime import memory_usage
 import gc
 
 FUEL_OPTIONS = {"0": {"short": u"Todos", "name": u"Todos los tipos"},
