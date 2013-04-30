@@ -29,119 +29,137 @@
 	<link rel="stylesheet" type="text/css" href="/css/theme.lungo.css" />
 	<link rel="stylesheet" type="text/css" href="/css/lungo.icon.css" />
 	<link rel="stylesheet" type="text/css" href="/css/mobile.css" />
+	
 	<script type="text/javascript" src="/js/my_js_files/libs/quo.js"></script>
 	<script type="text/javascript" src="/js/my_js_files/libs/lungo.js"></script>
+	<script type="text/javascript" src="/js/my_js_files/utils.js"></script>
 	<script type="text/javascript" src="/js/my_js_files/mobile.js"></script>
+	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD5XZNFlQsyWtYDeKual-OcqmP_5pgwbds&sensor=true&region=ES&libraries=adsense"></script>
 </head>
 
 
 <body class="app">
     <section id="main" data-transition="slide">
-        <header data-title="GasOlé [mobile]">
+        <header data-title="GasOlé">
         	<nav>
         		<a href="#menu" data-router="aside" data-icon="menu"></a>
         	</nav>
 
         </header>
 
-        <article id="home" class="active text align_center">
-            <h1>Bienvenido a GasOlé.net</h1>
-            <div id="map">
-
-			</div><!--map-->
-            
+        <article id="home-art" class="active list indented scroll" data-transition="slide">
+            <li class="dark"><strong>Bienvenido a GasOlé.net</strong></li>
+            <li class="feature">
+            	<strong>Elige un combustible</strong>
+            	<div class="form">
+						<label class="select">
+		                	<select class="custom">
+		                		<option value="1">Gasolina 95</option>
+		                		<option value="3">Gasolina 98</option>
+		                		<option value="4">Gasóleo Automoción</option>
+		                		<option value="5">Nuevo Gasóleo A</option>
+		                		<option value="6">Gasóleo B</option>
+		                		<option value="7">Gasóleo C</option>
+		                		<option value="8">Biodiésel</option>
+		                	</select>
+		                </label>
+		        
+				</div>
+            </li>
+            <li class="feature">
+            	<strong>Busca un lugar…</strong>
+            	<div class="form">
+						<fieldset data-icon="search">
+		                	<input type="search" placeholder="Gran Vía 27, Madrid" id="search-input">	
+		            	</fieldset>
+		            	<div class="one row">
+		            		<div class="three columns">
+		            			<strong><a data-icon="pushpin" href="#" id="location">Mi posición</a></strong>
+		            		</div>
+		            		<div class="five columns">
+		            			<a href="#" data-icon="search" class="button accept" id="search-button">Buscar</a>
+		            		</div>
+		            	</div>
+				</div>
+				
+            </li>
+            <li class="feature" id="search-results" style="display:none;">
+            	<ul id="search-results-lis"></ul>
+            </li>
         </article>
 
-
-
-		<article id="search" class="text align_center">
-			<h1>Buscador</h1>
-			<ul>
-				<li class="feature">
-					<div class="form">
-					<label>Busca un lugar</label><br>
-						<fieldset>
-		                <input type="text">
-		            	</fieldset>
-		            </div>
-				</li>
-				<li class="feature">
-					<a href="#" class="button anchor margin bottom">Encontrar Cercanas</a>
-					
-				</li>
+		<article id="list-art" class="list scroll" data-transition="slide">
+			<ul id="list">
 			</ul>
-
-
-
 		</article>
 
-		<article id="provinces" class="list scroll">
+		<article id="provinces-art" class="list scroll">
 			<h1>Todas las Provincias</h1>
 			<ul id="province" class="droplist">
-				<li><a title="Todas las gasolineras de Álava" href="/gasolineras/Álava">Álava</a></li>
-				<li><a title="Todas las gasolineras de Albacete" href="/gasolineras/Albacete">Albacete</a></li>
-				<li><a title="Todas las gasolineras de Alicante" href="/gasolineras/Alicante">Alicante</a></li>
-				<li><a title="Todas las gasolineras de Almería" href="/gasolineras/Almería">Almería</a></li>
-				<li><a title="Todas las gasolineras de Asturias" href="/gasolineras/Asturias">Asturias</a></li>
-				<li><a title="Todas las gasolineras de Ávila" href="/gasolineras/Ávila">Ávila</a></li>
-				<li><a title="Todas las gasolineras de Badajoz" href="/gasolineras/Badajoz">Badajoz</a></li>
-				<li><a title="Todas las gasolineras de Illes Baleras" href="/gasolineras/Balears_(Illes)">Balears (Illes)</a></li>
-				<li><a title="Todas las gasolineras de Barcelona" href="/gasolineras/Barcelona">Barcelona</a></li>
-				<li><a title="Todas las gasolineras de Burgos" href="/gasolineras/Burgos">Burgos</a></li>
-				<li><a title="Todas las gasolineras de Cáceres" href="/gasolineras/Cáceres">Cáceres</a></li>
-				<li><a title="Todas las gasolineras de Cádiz" href="/gasolineras/Cádiz">Cádiz</a></li>
-				<li><a title="Todas las gasolineras de Cantabria" href="/gasolineras/Cantabria">Cantabria</a></li>
-				<li><a title="Todas las gasolineras de Castelló" href="/gasolineras/Castellón_|_Castelló">Castellón/Castelló</a></li>
-				<li><a title="Todas las gasolineras de Ceuta" href="/gasolineras/Ceuta">Ceuta</a></li>
-				<li><a title="Todas las gasolineras de Ciudad Real" href="/gasolineras/Ciudad_Real">Ciudad Real</a></li>
-				<li><a title="Todas las gasolineras de Córdoba" href="/gasolineras/Córdoba">Córdoba</a></li>
-				<li><a title="Todas las gasolineras de A Coruña" href="/gasolineras/Coruña_(A)">Coruña (A)</a></li>
-				<li><a title="Todas las gasolineras de Cuenca" href="/gasolineras/Cuenca">Cuenca</a></li>
-				<li><a title="Todas las gasolineras de Girona" href="/gasolineras/Girona">Girona</a></li>
-				<li><a title="Todas las gasolineras de Granada" href="/gasolineras/Granada">Granada</a></li>
-				<li><a title="Todas las gasolineras de Guadalajara" href="/gasolineras/Guadalajara">Guadalajara</a></li>
-				<li><a title="Todas las gasolineras de Guipúzcoa" href="/gasolineras/Guipúzcoa">Guipúzcoa</a></li>
-				<li><a title="Todas las gasolineras de Huelva" href="/gasolineras/Huelva">Huelva</a></li>
-				<li><a title="Todas las gasolineras de Huesca" href="/gasolineras/Huesca">Huesca</a></li>
-				<li><a title="Todas las gasolineras de Jaén" href="/gasolineras/Jaén">Jaén</a></li>
-				<li><a title="Todas las gasolineras de León" href="/gasolineras/León">León</a></li>
-				<li><a title="Todas las gasolineras de Lleida" href="/gasolineras/Lleida">Lleida</a></li>
-				<li><a title="Todas las gasolineras de Lugo" href="/gasolineras/Lugo">Lugo</a></li>
-				<li><a title="Todas las gasolineras de Madrid" href="/gasolineras/Madrid">Madrid</a></li>
-				<li><a title="Todas las gasolineras de Málaga" href="/gasolineras/Málaga">Málaga</a></li>
-				<li><a title="Todas las gasolineras de Melilla" href="/gasolineras/Melilla">Melilla</a></li>
-				<li><a title="Todas las gasolineras de Murcia" href="/gasolineras/Murcia">Murcia</a></li>
-				<li><a title="Todas las gasolineras de Navarra" href="/gasolineras/Navarra">Navarra</a></li>
-				<li><a title="Todas las gasolineras de Ourense" href="/gasolineras/Ourense">Ourense</a></li>
-				<li><a title="Todas las gasolineras de Palencia" href="/gasolineras/Palencia">Palencia</a></li>
-				<li><a title="Todas las gasolineras de Las Palmas" href="/gasolineras/Palmas_(Las)">Palmas, Las</a></li>
-				<li><a title="Todas las gasolineras de Pontevedra" href="/gasolineras/Pontevedra">Pontevedra</a></li>
-				<li><a title="Todas las gasolineras de La Rioja" href="/gasolineras/Rioja_(La)">Rioja, La</a></li>
-				<li><a title="Todas las gasolineras de Salamanca" href="/gasolineras/Salamanca">Salamanca</a></li>
-				<li><a title="Todas las gasolineras de Santa Cruz de Tenerife" href="/gasolineras/Santa_Cruz_De_Tenerife">Santa Cruz de Tenerife</a></li>
-				<li><a title="Todas las gasolineras de Segovia" href="/gasolineras/Segovia">Segovia</a></li>
-				<li><a title="Todas las gasolineras de Sevilla" href="/gasolineras/Sevilla">Sevilla</a></li>
-				<li><a title="Todas las gasolineras de Soria" href="/gasolineras/Soria">Soria</a></li>
-				<li><a title="Todas las gasolineras de Tarragona" href="/gasolineras/Tarragona">Tarragona</a></li>
-				<li><a title="Todas las gasolineras de Teruel" href="/gasolineras/Teruel">Teruel</a></li>
-				<li><a title="Todas las gasolineras de Toledo" href="/gasolineras/Toledo">Toledo</a></li>
-				<li><a title="Todas las gasolineras de València" href="/gasolineras/Valencia_|_València">Valencia/València</a></li>
-				<li><a title="Todas las gasolineras de Valladolid" href="/gasolineras/Valladolid">Valladolid</a></li>
-				<li><a title="Todas las gasolineras de Vizcaya" href="/gasolineras/Vizcaya">Vizcaya</a></li>
-				<li><a title="Todas las gasolineras de Zamora" href="/gasolineras/Zamora">Zamora</a></li>
-				<li><a title="Todas las gasolineras de Zaragoza" href="/gasolineras/Zaragoza">Zaragoza</a></li>
+				<li class="p selectable">Álava</li>
+				<li class="p selectable">Albacete</li>
+				<li class="p selectable">Alicante</li>
+				<li class="p selectable">Almería</li>
+				<li class="p selectable">Asturias</li>
+				<li class="p selectable">Ávila</li>
+				<li class="p selectable">Badajoz</li>
+				<li class="p selectable">Balears (Illes)</li>
+				<li class="p selectable">Barcelona</li>
+				<li class="p selectable">Burgos</li>
+				<li class="p selectable">Cáceres</li>
+				<li class="p selectable">Cádiz</li>
+				<li class="p selectable">Cantabria</li>
+				<li class="p selectable">Castellón/Castelló</li>
+				<li class="p selectable">Ceuta</li>
+				<li class="p selectable">Ciudad Real</li>
+				<li class="p selectable">Córdoba</li>
+				<li class="p selectable">Coruña (A)</li>
+				<li class="p selectable">Cuenca</li>
+				<li class="p selectable">Girona</li>
+				<li class="p selectable">Granada</li>
+				<li class="p selectable">Guadalajara</li>
+				<li class="p selectable">Guipúzcoa</li>
+				<li class="p selectable">Huelva</li>
+				<li class="p selectable">Huesca</li>
+				<li class="p selectable">Jaén</li>
+				<li class="p selectable">León</li>
+				<li class="p selectable">Lleida</li>
+				<li class="p selectable">Lugo</li>
+				<li class="p selectable">Madrid</li>
+				<li class="p selectable">Málaga</li>
+				<li class="p selectable">Melilla</li>
+				<li class="p selectable">Murcia</li>
+				<li class="p selectable">Navarra</li>
+				<li class="p selectable">Ourense</li>
+				<li class="p selectable">Palencia</li>
+				<li class="p selectable">Palmas, Las</li>
+				<li class="p selectable">Pontevedra</li>
+				<li class="p selectable">Rioja, La</li>
+				<li class="p selectable">Salamanca</li>
+				<li class="p selectable">Santa Cruz de Tenerife</li>
+				<li class="p selectable">Segovia</li>
+				<li class="p selectable">Sevilla</li>
+				<li class="p selectable">Soria</li>
+				<li class="p selectable">Tarragona</li>
+				<li class="p selectable">Teruel</li>
+				<li class="p selectable">Toledo</li>
+				<li class="p selectable">Valencia/València</li>
+				<li class="p selectable">Valladolid</li>
+				<li class="p selectable">Vizcaya</li>
+				<li class="p selectable">Zamora</li>
+				<li class="p selectable">Zaragoza</li>
 			</ul>
 		</article>
 
-		<article id="stats" class="text align_center">
+		<article id="stats-art" class="text align_center">
 			<h1>Gráficos</h1>
 		</article>
 
-		<article id="info" class="text align_center">
+		<article id="info-art" class="text align_center">
 			<h1>Información</h1>
 		</article>
 
-		<article id="news" class="text align_center">
+		<article id="news-art" class="text align_center">
 			<h1>Noticias</h1>
 		</article>
     </section>
@@ -150,12 +168,11 @@
 		<header data-title="Menú"></header>
 		<article class="active list">
 			<ul>
-				<li><a href="#home" data-router="article"><strong>Inicio</strong></a></li>
-				<li><a href="#search" data-router="article"><strong>Buscador</strong></a></li>
-				<li><a href="#provinces" data-router="article"><strong>Provincias</strong></a></li>
-				<li><a href="#stats" data-router="article"><strong>Gráficos</strong></a></li>
-				<li><a href="#info" data-router="article"><strong>Información</strong></a></li>
-				<li><a href="#news" data-router="article"><strong>Noticias</strong></a></li>
+				<li><a href="#home-art" data-router="article"><strong>Buscador</strong></a></li>
+				<li><a href="#provinces-art" data-router="article"><strong>Provincias</strong></a></li>
+				<li><a href="#stats-art" data-router="article"><strong>Gráficos</strong></a></li>
+				<li><a href="#info-art" data-router="article"><strong>Información</strong></a></li>
+				<li><a href="#news-art" data-router="article"><strong>Noticias</strong></a></li>
 			</ul>
 
 

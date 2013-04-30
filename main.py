@@ -351,7 +351,6 @@ app_config = {
         }
     }
 
-
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/admin/?', AdminHandler),

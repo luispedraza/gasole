@@ -13,7 +13,7 @@ handlers:
 #   script: clean_history.app
 - url: /m
   static_files: static/html/mobile.html
-  upload: static/txt/robots.txt
+  upload: static/html/mobile.html
 - url: /backends/update
   script: backends.app
 - url: /robots.txt
@@ -37,7 +37,7 @@ handlers:
   static_dir: static/js/
 - url: /js/my_js_libs
   static_dir: static/js/libs/
-- url: /js/min
+- url: /js/.*.js
   static_dir: static/js/min
 - url: /img
   static_dir: static/img

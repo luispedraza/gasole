@@ -21,3 +21,7 @@
 .prov:hover {
 	opacity: 0.5;
 }
+
+.p {
+	cursor: pointer;
+}

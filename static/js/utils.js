@@ -158,6 +158,7 @@ function getApiData(url, key, callback) {
 function getKey() {
 	return window.location.pathname.split("/").slice(1).join("***");
 }
+
 function getData(callback) {
 	var key = null, info = null;
 	var pathArray = window.location.pathname.split("/");
@@ -167,7 +168,6 @@ function getData(callback) {
 		var ts = localStorage["timestamp"];
 		if (ts && (new Date().getTime() - parseInt(ts))>LS_EXPIRE) localStorage.clear();
 		key = getKey();
-		
 		var storedData = localStorage[key];
 		if (storedData) info = JSON.parse(storedData);
 		else if ((option=="gasolineras") && (pathArray[3])) {

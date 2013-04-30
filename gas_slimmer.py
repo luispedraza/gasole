@@ -8,7 +8,7 @@ MAPBOX_API = 'http://api.tiles.mapbox.com/mapbox.js/v0.6.7/mapbox.js'
 MAPBOX_CSS = 'http://api.tiles.mapbox.com/mapbox.js/v0.6.7/mapbox.css'
 
 JS_PATH = '/js/my_js_files/'
-JS_PATH_MIN = '/js/min/'
+JS_PATH_MIN = '/js/'
 JS_PATH_LIBS = '/js/my_js_libs/'
 
 D3_API = 'http://d3js.org/d3.v3.min.js'
@@ -21,8 +21,8 @@ MEDIA_JS = {
 		'extern':	['google_maps_api_v3.js'],
 		'api':		[GOOGLE_MAPS_API]
 		},
-	'm_home.js': {
-		'src':		['search.js', 'm_home.js', 'utils.js'],
+	'mobile.js': {
+		'src':		['search.js', 'mobile.js', 'utils.js'],
 		'libs': 	[],
 		'extern':	['google_maps_api_v3.js'],
 		'api':		[GOOGLE_MAPS_API]
