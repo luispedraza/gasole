@@ -16,6 +16,10 @@ MEMCACHE_T = 18000 	# 5 horas
 ## Guarda los últimos datos en formato json
 class ApiJson(db.Model):
 	json = db.TextProperty(required=True)
+## Guarda todos los datos en formato json
+class ApiAllJson(db.Model):
+	json = db.BlobProperty(required=True)
+	date = db.DateTimeProperty(auto_now_add=True)
 ## Modelo de provincia
 class Province(db.Model):
 	pass
@@ -81,6 +85,14 @@ def getStationJson(p, t, s):
 	ApiJson(key_name=skey, json=jsondata).put()
 	memcache.set(skey, jsondata)
 	return jsondata
+
+# Obtiene todo en formato JSON
+def getAll():
+	alldata = memcache.get("All")
+	if not alldata:
+		alldata = ApiJson.all().sort('-date').get().json
+	return 
+
 
 @db.transactional
 def updateDB(dnew, dold):
@@ -166,7 +178,12 @@ def data2store(data):
 				logging.error("***************No se han podido guardar los datos de %s" %p)
 				logging.error(str(e))
 		del newdata
-	memcache.set("All", json.dumps(data).encode('zlib'))
+	try:
+		alldata = json.dumps(data).encode('zlib')
+		memcache.set("All", alldata)
+		ApiAllJson(json=alldata).put()
+	except Exception, e:
+		logging.error("No se ha podido guardar el Gzip")
 	
 # obtenemos información de la base de datos
 def store2data(option=None, prov_kname=None):

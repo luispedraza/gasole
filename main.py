@@ -290,6 +290,7 @@ class Api(BaseHandler):
             info = getStationJson(prov, decode_param(town), decode_param(station))
         elif prov=="All":
             info = memcache.get("All").decode('zlib')
+            self.response.headers['Content-Encoding'] = 'gzip'
         else:
             info = getProvinceJson(prov)
         self.response.headers['Content-Type'] = 'application/json; charset=utf-8'

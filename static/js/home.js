@@ -73,4 +73,13 @@ window.addEventListener("load", function() {
 			c.textContent = pname;
 		});
 	}
+
+	var req = new XMLHttpRequest();
+	req.onload = function(r) {
+		console.log(r)
+		info = JSON.parse(r.target.responseText);
+		console.log(info)
+	}
+	req.open("GET", "/api/All");
+	req.send();
 })
