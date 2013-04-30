@@ -79,6 +79,7 @@ window.addEventListener("load", function() {
 		info = JSON.parse(this.responseText);
 		console.log(info)
 	}
+
 	req.open("GET", "/api/All");
 	req.send();
 })

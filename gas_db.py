@@ -90,9 +90,9 @@ def getStationJson(p, t, s):
 def getAll():
 	alldata = memcache.get("All")
 	if not alldata:
-		alldata = ApiJson.all().sort('-date').get().json
-	return 
-
+		alldata = ApiAllJson.all().order('-date').get().json
+		memcache.set("All", alldata)
+	return alldata
 
 @db.transactional
 def updateDB(dnew, dold):
