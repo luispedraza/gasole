@@ -75,9 +75,8 @@ window.addEventListener("load", function() {
 	}
 
 	var req = new XMLHttpRequest();
-	req.onload = function(r) {
-		console.log(r)
-		info = JSON.parse(r.target.responseText);
+	req.onload = function() {
+		info = JSON.parse(this.responseText);
 		console.log(info)
 	}
 	req.open("GET", "/api/All");
