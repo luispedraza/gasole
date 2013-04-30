@@ -164,12 +164,18 @@ def data2store(data):
 			try:
 				logging.info("==========Guardando datos de %s" %p)
 				updateDB(dnew=newdata, dold=_del_prices)
-				logging.info("%s ciudades" %len(_towns))
-				logging.info("%s estaciones" %len(_stations))
-				logging.info("%s precios" %len(_prices))
-				logging.info("%s históricos" %len(_history))
-				logging.info("%s estaciones CERRADAS" %len(_closed))
-				logging.info("%s precios BORRADOS" %len(_del_prices))
+				if len(_towns):
+					logging.info("%s ciudades" %len(_towns))
+				if len(_stations):
+					logging.info("%s estaciones" %len(_stations))
+				if len(_prices):
+					logging.info("%s precios" %len(_prices))
+				if len(_history):
+					logging.info("%s históricos" %len(_history))
+				if len(_closed):
+					logging.info("%s estaciones CERRADAS" %len(_closed))
+				if len(_del_prices):
+					logging.info("%s precios BORRADOS" %len(_del_prices))
 				json_data = json.dumps({"_data": {p: datap}})
 				memcache.set(p, json_data)
 				ApiJson(key_name=p, json=json_data).put()
