@@ -51,10 +51,6 @@ class MainHandler(BaseAuthHandler):
             content=jinja_env.get_template("home.html").render(
                 map=jinja_env.get_template("spain.svg").render()))
 
-class MobileHandler(BaseHandler):
-    def get(self):
-        self.render("mobile.html")
-
 class AdminHandler(BaseHandler):
     def get(self):
         log_url = users.create_login_url(self.request.uri)
@@ -358,7 +354,6 @@ app_config = {
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
-    ('/m/*', MobileHandler),
     ('/admin/?', AdminHandler),
     ('/admin/update/?(\w+)?', AdminUpdate),
     ('/admin/search/?', AdminSearch),

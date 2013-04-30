@@ -31,6 +31,7 @@ class GasStation(db.Model):
 	hours = db.StringProperty()
 	geopt = db.GeoPtProperty()
 	date = db.DateTimeProperty(auto_now_add=True)
+	closed = db.BooleanProperty()	# indica que la estación ya no opera
 ## Modelo de precios
 class PriceData(db.Expando):
 	date = db.DateProperty()
@@ -83,11 +84,12 @@ def getStationJson(p, t, s):
 
 def data2store(data):
 	for p in data: # recorremos las provincias
-		_provinces = []
-		_towns = []
-		_stations = []
-		_prices = []
-		_history = []
+		_provinces = []		# nuevas provincias
+		_towns = []			# nuevas ciudades
+		_stations = []		# nuevas gasolineras
+		_prices = []		# precios nuevos o actualizados
+		_history = []		# nuevos históricos (tantos como _prices)
+		_closed = []		# estaciones cerradas
 		datap = data[p]
 		cachep = getProvinceData(p)
 		if not cachep: # nueva provincia
@@ -108,19 +110,35 @@ def data2store(data):
 						key_name = s,
 						parent = db.Key.from_path('Province', p, 'Town', t),
 						label = datas["l"],
-						hours = datas["h"]))
+						hours = datas["h"],
+						closed = False))
 					update_price = True
-				elif caches["d"]!=datas["d"]: # distinta fecha
-					caches["o"]=datas["o"]
-					caches["d"]=datas["d"]
-					update_price = True
+				else:
+					geopt = caches.get("g")
+					if geopt:
+						datas["g"]=geopt
+					if caches["d"]!=datas["d"]: # distinta fecha
+						update_price = True
+					del cachet[s]				# la borramos de cachep: detección de cerradas
 				if update_price:
 					parent_key = db.Key.from_path('Province', p, 'Town', t, 'GasStation', s)
 					date = Date(*datas["d"])
 					props = dict((FUEL_OPTIONS[o]["short"], datas["o"][o]) for o in datas["o"])
 					_prices.append(PriceData(key_name=s, parent=parent_key, date=date, **props))
 					_history.append(HistoryData(parent=parent_key, date=date, **props))
-		newdata = _provinces+_towns+_stations+_prices+_history
+			if len(cachet)==0: 	# no quedan estaciones, para optimizar la búsqueda de cerradas
+				del cachep[t]	# eliminamos la ciudad de cache
+		# Estaciones cerradas, las que quedan en cachep:
+		for t in cachep:
+			for s in cachep[t]:
+				caches = cachep[t][s]
+				_closed.append(GasStation(
+					key_name = s,
+					parent = db.Key.from_path('Province', p, 'Town', t),
+					label = caches["l"],
+					hours = caches["h"],
+					closed = True))
+		newdata = _provinces+_towns+_stations+_prices+_history+_closed
 		if len(newdata):
 			try:
 				logging.info("==========Guardando datos de %s" %p)
@@ -129,7 +147,8 @@ def data2store(data):
 				logging.info("%s estaciones" %len(_stations))
 				logging.info("%s precios" %len(_prices))
 				logging.info("%s históricos" %len(_history))
-				json_data = json.dumps({"_data": {p: cachep}})
+				logging.info("%s CERRADAS" %len(_closed))
+				json_data = json.dumps({"_data": {p: datap}})
 				memcache.set(p, json_data)
 				ApiJson(key_name=p, json=json_data).put()
 				logging.info("Uso de memoria: %s" %memory_usage().current())
@@ -137,8 +156,7 @@ def data2store(data):
 				logging.error("***************No se han podido guardar los datos de %s" %p)
 				logging.error(str(e))
 		del newdata
-
-	# memcache.set("All", json.dumps(data).encode('zlib'))
+	memcache.set("All", json.dumps(data).encode('zlib'))
 	
 # obtenemos información de la base de datos
 def store2data(option=None, prov_kname=None):

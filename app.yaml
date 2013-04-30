@@ -11,6 +11,9 @@ builtins:
 handlers:
 # - url: /clean
 #   script: clean_history.app
+- url: /m
+  static_files: static/html/mobile.html
+  upload: static/txt/robots.txt
 - url: /backends/update
   script: backends.app
 - url: /robots.txt
