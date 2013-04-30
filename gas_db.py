@@ -82,6 +82,13 @@ def getStationJson(p, t, s):
 	memcache.set(skey, jsondata)
 	return jsondata
 
+@db.transactional
+def updateDB(dnew, dold):
+	if len(dnew):
+		db.put(dnew)
+	if len(dold):
+		db.delete(dold)
+
 def data2store(data):
 	for p in data: # recorremos las provincias
 		_provinces = []		# nuevas provincias
@@ -90,6 +97,7 @@ def data2store(data):
 		_prices = []		# precios nuevos o actualizados
 		_history = []		# nuevos históricos (tantos como _prices)
 		_closed = []		# estaciones cerradas
+		_del_prices = []	# precios actuales a borrar
 		datap = data[p]
 		cachep = getProvinceData(p)
 		if not cachep: # nueva provincia
@@ -138,16 +146,18 @@ def data2store(data):
 					label = caches["l"],
 					hours = caches["h"],
 					closed = True))
+				_del_prices.append(db.Key.from_path('Province', p, 'Town', t, 'GasStation', s, 'PriceData', s))
 		newdata = _provinces+_towns+_stations+_prices+_history+_closed
 		if len(newdata):
 			try:
 				logging.info("==========Guardando datos de %s" %p)
-				db.run_in_transaction(db.put,newdata)
+				updateDB(dnew=newdata, dold=_del_prices)
 				logging.info("%s ciudades" %len(_towns))
 				logging.info("%s estaciones" %len(_stations))
 				logging.info("%s precios" %len(_prices))
 				logging.info("%s históricos" %len(_history))
-				logging.info("%s CERRADAS" %len(_closed))
+				logging.info("%s estaciones CERRADAS" %len(_closed))
+				logging.info("%s precios BORRADOS" %len(_del_prices))
 				json_data = json.dumps({"_data": {p: datap}})
 				memcache.set(p, json_data)
 				ApiJson(key_name=p, json=json_data).put()
