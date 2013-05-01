@@ -7,6 +7,15 @@ function dist(a, b) {
 		return true;
 	}
 }
+
+function initMap() {
+	var mapOptions = {
+		zoom: 8,
+		center: new google.maps.LatLng(-34.397, 150.644),
+		mapTypeId: google.maps.MapTypeId.ROADMAP
+	};
+	map = new google.maps.Map(document.getElementById("googlemap"), mapOptions);
+}
 /** @constructor */
 function Gasole() {
 	this.loc = null;
@@ -64,7 +73,7 @@ function showList(data) {
 		var right = "<div class='right'>"+item[3]+"</div>";
 		list.append("<li>"+title+subtitle+right+"</li>");
 	}
-	Lungo.Router.article("main", "list-art");
+	Lungo.Router.article("results-sec", "list-art");
 }
 
 window.addEventListener("load", function() {
@@ -82,6 +91,11 @@ window.addEventListener("load", function() {
 		req.open("GET", "/api/All");
 		req.send();
 	}
+	initMap();
+
+
+
+
 	$$('.p').tap(function() {
 		var data = gasole.provinceData($$(this).text(), "1");
 		showList(data);

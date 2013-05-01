@@ -88,18 +88,35 @@
 			</li>
 		</article>
 	</section>
-	<section id="re" data-transition="slide">
-		<header data-title="GasOlé">
+
+	<section id="results-sec" data-transition="slide">
+		<header data-title="Resultados">
 			<nav>
-				<a href="#menu" data-router="aside" data-icon="menu"></a>
+				<a href="#back" data-router="section" data-icon="home"></a>
 			</nav>
 		</header>
-		<article id="list-art" class="list scroll" data-transition="slide">
+		<article id="list-art" class="active list scroll" data-transition="slide">
 			<ul id="list">
 			</ul>
 		</article>
-
-		<article id="provinces-art" class="list scroll">
+		<article id="map-art">
+			<div id="googlemap"></div>
+		</article>
+		<footer>
+			<nav>
+				<a href="#list-art" data-router="article">Lista</a>
+				<a href="#map-art" data-router="article">Mapa</a>
+			</nav>
+		</footer>
+	</section>
+	
+	<section id="provinces-sec" data-transition="slide">
+		<header data-title="Ptovincias">
+			<nav>
+				<a href="#back" data-router="section" data-icon="home"></a>
+			</nav>
+		</header>
+		<article id="provinces-art" class="active list scroll">
 			<h1>Todas las Provincias</h1>
 			<ul id="province" class="droplist">
 				<li class="p selectable">Álava</li>
@@ -158,21 +175,35 @@
 		</article>
 	</section>
 
-	<section id="re" data-transition="slide">
-		<header data-title="GasOlé">
+	<section id="stats-sec" data-transition="slide">
+		<header data-title="Gráficos">
 			<nav>
-				<a href="#menu" data-router="aside" data-icon="menu"></a>
+				<a href="#back" data-router="section" data-icon="home"></a>
 			</nav>
 		</header>
-		<article id="stats-art" class="text align_center">
+		<article id="stats-art" class="active text align_center">
 			<h1>Gráficos</h1>
 		</article>
+	</section>
 
-		<article id="info-art" class="text align_center">
+	<section id="info-sec" data-transition="slide">
+		<header data-title="Información">
+			<nav>
+				<a href="#back" data-router="section" data-icon="home"></a>
+			</nav>
+		</header>
+		<article id="info-art" class="active text align_center">
 			<h1>Información</h1>
 		</article>
+	</section>
 
-		<article id="news-art" class="text align_center">
+	<section id="news-sec" data-transition="slide">
+		<header data-title="Noticias">
+			<nav>
+				<a href="#back" data-router="section" data-icon="home"></a>
+			</nav>
+		</header>
+		<article id="news-art" class="active text align_center">
 			<h1>Noticias</h1>
 		</article>
 	</section>
@@ -181,14 +212,12 @@
 		<header data-title="Menú"></header>
 		<article class="active list">
 			<ul>
-				<li><a href="#home-art" data-router="section"><strong>Buscador</strong></a></li>
-				<li><a href="#provinces-art" data-router="section"><strong>Provincias</strong></a></li>
-				<li><a href="#stats-art" data-router="section"><strong>Gráficos</strong></a></li>
-				<li><a href="#info-art" data-router="section"><strong>Información</strong></a></li>
-				<li><a href="#news-art" data-router="section"><strong>Noticias</strong></a></li>
+				<li><a href="#home-sec" data-router="section"><strong>Buscador</strong></a></li>
+				<li><a href="#provinces-sec" data-router="section"><strong>Provincias</strong></a></li>
+				<li><a href="#stats-sec" data-router="section"><strong>Gráficos</strong></a></li>
+				<li><a href="#info-sec" data-router="section"><strong>Información</strong></a></li>
+				<li><a href="#news-sec" data-router="section"><strong>Noticias</strong></a></li>
 			</ul>
-
-
 		</article>
 	</aside>
 </body>
