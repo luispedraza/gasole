@@ -1,14 +1,18 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*
+import sys
+if 'lib' not in sys.path:
+    sys.path.insert(0, 'libs')
 import webapp2
 from jinja2 import Environment, FileSystemLoader
 import os
 from google.appengine.api import users
 import logging
 import json
-from simpleauth import SimpleAuthHandler
 import secrets
 from webapp2_extras import auth, sessions
+
+from simpleauth import SimpleAuthHandler
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = Environment(loader = FileSystemLoader(template_dir), autoescape = False)

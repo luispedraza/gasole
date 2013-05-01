@@ -1,8 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import sys
-if 'lib' not in sys.path:
-    sys.path.insert(0, 'libs')
     
 from gasole_base import *
 from gas_update import *

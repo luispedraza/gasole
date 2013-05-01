@@ -11,19 +11,19 @@
 	<link rel="apple-touch-icon" sizes="144x144" href="/img/touch-icon-ipad-retina.png" />
 	<meta name="apple-mobile-web-app-capable" content="yes" />
 	<!-- iPhone -->
-    <link href="/img/apple-startup-ihone.png" media="(device-width: 320px) and (-webkit-device-pixel-ratio: 1)" rel="apple-touch-startup-image">
-    <!-- iPhone (Retina) -->
-    <link href="/img/apple-startup-ihone.png" media="(device-width: 320px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image">
-    <!-- iPhone 5 -->
-    <link href="/img/apple-startup-ihone.png"  media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image">
-    <!-- iPad Portrait -->
-    <link href="/img/apple-startup-ihone.png" media="(device-width: 768px) and (device-height: 1024px) and (orientation: portrait) and (-webkit-device-pixel-ratio: 1)" rel="apple-touch-startup-image">
-    <!-- iPad Landscape -->
-    <link href="/img/apple-startup-ihone.png" media="(device-width: 768px) and (device-height: 1024px) and (orientation: landscape) and (-webkit-device-pixel-ratio: 1)" rel="apple-touch-startup-image">
-    <!-- iPad Portrait (Retina) -->
-    <link href="/img/apple-startup-ihone.png" media="(device-width: 768px) and (device-height: 1024px) and (orientation: portrait) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image">
-    <!-- iPad Landscape (Retina) -->
-    <link href="/img/apple-startup-ihone.png" media="(device-width: 768px) and (device-height: 1024px) and (orientation: landscape) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image">
+	<link href="/img/apple-startup-ihone.png" media="(device-width: 320px) and (-webkit-device-pixel-ratio: 1)" rel="apple-touch-startup-image">
+	<!-- iPhone (Retina) -->
+	<link href="/img/apple-startup-ihone.png" media="(device-width: 320px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image">
+	<!-- iPhone 5 -->
+	<link href="/img/apple-startup-ihone.png"  media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image">
+	<!-- iPad Portrait -->
+	<link href="/img/apple-startup-ihone.png" media="(device-width: 768px) and (device-height: 1024px) and (orientation: portrait) and (-webkit-device-pixel-ratio: 1)" rel="apple-touch-startup-image">
+	<!-- iPad Landscape -->
+	<link href="/img/apple-startup-ihone.png" media="(device-width: 768px) and (device-height: 1024px) and (orientation: landscape) and (-webkit-device-pixel-ratio: 1)" rel="apple-touch-startup-image">
+	<!-- iPad Portrait (Retina) -->
+	<link href="/img/apple-startup-ihone.png" media="(device-width: 768px) and (device-height: 1024px) and (orientation: portrait) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image">
+	<!-- iPad Landscape (Retina) -->
+	<link href="/img/apple-startup-ihone.png" media="(device-width: 768px) and (device-height: 1024px) and (orientation: landscape) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image">
 
 	<link rel="stylesheet" type="text/css" href="/css/lungo.css" />
 	<link rel="stylesheet" type="text/css" href="/css/theme.lungo.css" />
@@ -39,55 +39,61 @@
 
 
 <body class="app">
-    <section id="main" data-transition="slide">
-        <header data-title="GasOlé">
-        	<nav>
-        		<a href="#menu" data-router="aside" data-icon="menu"></a>
-        	</nav>
+	<section id="main-sec" data-transition="slide">
+		<header data-title="GasOlé">
+			<nav>
+				<a href="#menu" data-router="aside" data-icon="menu"></a>
+			</nav>
+		</header>
 
-        </header>
-
-        <article id="home-art" class="active list indented scroll" data-transition="slide">
-            <li class="dark"><strong>Bienvenido a GasOlé.net</strong></li>
-            <li class="feature">
-            	<strong>Elige un combustible</strong>
-            	<div class="form">
+		<article id="home-art" class="active list indented scroll" data-transition="slide">
+			<div>{{ads}}</div>
+			<li class="dark"><strong>Bienvenido a GasOlé.net</strong></li>
+			<li class="feature">
+				<strong>Elige un combustible</strong>
+				<div class="form">
 						<label class="select">
-		                	<select class="custom">
-		                		<option value="1">Gasolina 95</option>
-		                		<option value="3">Gasolina 98</option>
-		                		<option value="4">Gasóleo Automoción</option>
-		                		<option value="5">Nuevo Gasóleo A</option>
-		                		<option value="6">Gasóleo B</option>
-		                		<option value="7">Gasóleo C</option>
-		                		<option value="8">Biodiésel</option>
-		                	</select>
-		                </label>
-		        
+							<select class="custom">
+								<option value="1">Gasolina 95</option>
+								<option value="3">Gasolina 98</option>
+								<option value="4">Gasóleo Automoción</option>
+								<option value="5">Nuevo Gasóleo A</option>
+								<option value="6">Gasóleo B</option>
+								<option value="7">Gasóleo C</option>
+								<option value="8">Biodiésel</option>
+							</select>
+						</label>
+				
 				</div>
-            </li>
-            <li class="feature">
-            	<strong>Busca un lugar…</strong>
-            	<div class="form">
+			</li>
+			<li class="feature">
+				<strong>Busca un lugar…</strong>
+				<div class="form">
 						<fieldset data-icon="search">
-		                	<input type="search" placeholder="Gran Vía 27, Madrid" id="search-input">	
-		            	</fieldset>
-		            	<div class="one row">
-		            		<div class="three columns">
-		            			<strong><a data-icon="pushpin" href="#" id="location">Mi posición</a></strong>
-		            		</div>
-		            		<div class="five columns">
-		            			<a href="#" data-icon="search" class="button accept" id="search-button">Buscar</a>
-		            		</div>
-		            	</div>
+							<input type="search" placeholder="Gran Vía 27, Madrid" id="search-input">	
+						</fieldset>
+						<div class="one row">
+							<div class="three columns">
+								<strong><a data-icon="pushpin" href="#" id="location">Mi posición</a></strong>
+							</div>
+							<div class="five columns">
+								<a href="#" data-icon="search" class="button accept" id="search-button">Buscar</a>
+							</div>
+						</div>
 				</div>
 				
-            </li>
-            <li class="feature" id="search-results" style="display:none;">
-            	<ul id="search-results-lis"></ul>
-            </li>
-        </article>
-
+			</li>
+			<li class="feature" id="search-results" style="display:none;">
+				<ul id="search-results-lis"></ul>
+			</li>
+		</article>
+	</section>
+	<section id="re" data-transition="slide">
+		<header data-title="GasOlé">
+			<nav>
+				<a href="#menu" data-router="aside" data-icon="menu"></a>
+			</nav>
+		</header>
 		<article id="list-art" class="list scroll" data-transition="slide">
 			<ul id="list">
 			</ul>
@@ -150,7 +156,14 @@
 				<li class="p selectable">Zaragoza</li>
 			</ul>
 		</article>
+	</section>
 
+	<section id="re" data-transition="slide">
+		<header data-title="GasOlé">
+			<nav>
+				<a href="#menu" data-router="aside" data-icon="menu"></a>
+			</nav>
+		</header>
 		<article id="stats-art" class="text align_center">
 			<h1>Gráficos</h1>
 		</article>
@@ -162,23 +175,22 @@
 		<article id="news-art" class="text align_center">
 			<h1>Noticias</h1>
 		</article>
-    </section>
+	</section>
 
 	<aside id="menu">
 		<header data-title="Menú"></header>
 		<article class="active list">
 			<ul>
-				<li><a href="#home-art" data-router="article"><strong>Buscador</strong></a></li>
-				<li><a href="#provinces-art" data-router="article"><strong>Provincias</strong></a></li>
-				<li><a href="#stats-art" data-router="article"><strong>Gráficos</strong></a></li>
-				<li><a href="#info-art" data-router="article"><strong>Información</strong></a></li>
-				<li><a href="#news-art" data-router="article"><strong>Noticias</strong></a></li>
+				<li><a href="#home-art" data-router="section"><strong>Buscador</strong></a></li>
+				<li><a href="#provinces-art" data-router="section"><strong>Provincias</strong></a></li>
+				<li><a href="#stats-art" data-router="section"><strong>Gráficos</strong></a></li>
+				<li><a href="#info-art" data-router="section"><strong>Información</strong></a></li>
+				<li><a href="#news-art" data-router="section"><strong>Noticias</strong></a></li>
 			</ul>
 
 
 		</article>
 	</aside>
-
 </body>
 
 
