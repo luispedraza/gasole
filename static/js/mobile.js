@@ -10,11 +10,14 @@ function dist(a, b) {
 
 function initMap() {
 	var mapOptions = {
-		zoom: 8,
+		zoom: 12,
 		center: new google.maps.LatLng(-34.397, 150.644),
 		mapTypeId: google.maps.MapTypeId.ROADMAP
 	};
-	map = new google.maps.Map(document.getElementById("googlemap"), mapOptions);
+	var mapdiv = document.getElementById("googlemap");
+	map = new google.maps.Map(mapdiv, mapOptions);
+	// mapdiv.style.height = mapdiv.parentElement.clientHeight+"px";
+	// mapdiv.style.width = mapdiv.parentElement.clientWidth+"px";
 }
 /** @constructor */
 function Gasole() {
@@ -60,18 +63,32 @@ function Gasole() {
 		return result;
 	}
 }
-
+var map = null;
 gasole = new Gasole();
 
 function showList(data) {
 	var list = $$("#list");
 	list.html("");
+	var options = { 
+		icon: {
+			path: google.maps.SymbolPath.CIRCLE,
+			strokeOpacity: 1.0,
+			strokeWeight: 1,
+			fillOpacity: .8,
+			scale: 6,
+			strokeColoe: "#0f0"
+		}, 
+		map: map
+	};
 	for (var d=0; d<data.length; d++) {
 		var item = data[d];
 		var title = "<strong>"+item[0]+"</strong>";
 		var subtitle = "<small>"+item[1]+"</small>";
 		var right = "<div class='right'>"+item[3]+"</div>";
 		list.append("<li>"+title+subtitle+right+"</li>");
+		// marker
+		options.position = new google.maps.LatLng(item[2][0], item[2][1]);
+		marker = new google.maps.Marker(options);
 	}
 	Lungo.Router.article("results-sec", "list-art");
 }
