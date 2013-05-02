@@ -10,14 +10,10 @@ function dist(a, b) {
 
 function initMap() {
 	var mapOptions = {
-		zoom: 12,
-		center: new google.maps.LatLng(-34.397, 150.644),
 		mapTypeId: google.maps.MapTypeId.ROADMAP
 	};
-	var mapdiv = document.getElementById("googlemap");
+	var mapdiv = document.getElementById("map-art");
 	map = new google.maps.Map(mapdiv, mapOptions);
-	// mapdiv.style.height = mapdiv.parentElement.clientHeight+"px";
-	// mapdiv.style.width = mapdiv.parentElement.clientWidth+"px";
 }
 /** @constructor */
 function Gasole() {
@@ -28,22 +24,21 @@ function Gasole() {
 		console.log(this.info);
 	}
 	this.provinceData = function(p, o) {
-		var result = [];
+		var result = {};
 		var province = this.info[p];
 		for (var c in province) {
 			var city = province[c];
 			for (var s in city) {
 				var st = city[s];
 				var price = st.o[o];
-				if (price) result.push([s, st.l, st.g, price]);
-				// dirección, rótulo, latlon, precio
+				if (price) result[s]=st;
 			}
 		}
 		console.log(result);
 		return result;
 	}
 	this.nearData = function(o) {
-		var result = [];
+		var result = {};
 		for (var p in this.info) {
 			var infop = this.info[p];
 			for (var t in infop) {
@@ -52,10 +47,8 @@ function Gasole() {
 					var st = infot[s];
 					var geo = st.g;
 					var price = st.o[o];
-
 					if (price && geo && dist(geo, this.loc)) {
-						console.log(price, geo, dist(geo, this.loc));
-						result.push([s, st.l, st.g, price]);
+						result[s] = st;
 					}
 				}
 			}
@@ -80,17 +73,21 @@ function showList(data) {
 		}, 
 		map: map
 	};
-	for (var d=0; d<data.length; d++) {
-		var item = data[d];
-		var title = "<strong>"+item[0]+"</strong>";
-		var subtitle = "<small>"+item[1]+"</small>";
-		var right = "<div class='right'>"+item[3]+"</div>";
+	var bounds = new google.maps.LatLngBounds();
+	for (var s in data) {
+		var item = data[s];
+		var title = "<strong>"+s+"</strong>";
+		var subtitle = "<small>"+item.l+"</small>";
+		var right = "<div class='right'>"+item.o[1]+"</div>";
 		list.append("<li>"+title+subtitle+right+"</li>");
 		// marker
-		options.position = new google.maps.LatLng(item[2][0], item[2][1]);
+		var pos = new google.maps.LatLng(item.g[0], item.g[1]);
+		options.position = pos;
+		bounds.extend(pos);
 		marker = new google.maps.Marker(options);
 	}
 	Lungo.Router.article("results-sec", "list-art");
+	map.fitBounds(bounds);
 }
 
 window.addEventListener("load", function() {
@@ -109,10 +106,9 @@ window.addEventListener("load", function() {
 		req.send();
 	}
 	initMap();
-
-
-
-
+	Lungo.dom("#map-art").on("load", function() {
+		google.maps.event.trigger(map, 'resize');
+	})
 	$$('.p').tap(function() {
 		var data = gasole.provinceData($$(this).text(), "1");
 		showList(data);
