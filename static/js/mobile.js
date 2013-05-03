@@ -17,28 +17,29 @@ function initMap() {
 }
 /** @constructor */
 function Gasole() {
-	this.loc = null;
-	this.info = null;
+	this.type = null;		// tipo de combustible
+	this.loc = null;		// posición del usuario
+	this.info = null; 		// datos de la api
+	this.result = null;		// resultado de búsqueda
 	this.init = function(data) {
 		this.info = data;
 		console.log(this.info);
 	}
 	this.provinceData = function(p, o) {
-		var result = {};
+		this.result = {};
 		var province = this.info[p];
 		for (var c in province) {
 			var city = province[c];
 			for (var s in city) {
 				var st = city[s];
 				var price = st.o[o];
-				if (price) result[s]=st;
+				if (price) this.result[s]=st;
 			}
 		}
-		console.log(result);
-		return result;
+		return this.result;
 	}
 	this.nearData = function(o) {
-		var result = {};
+		this.result = {};
 		for (var p in this.info) {
 			var infop = this.info[p];
 			for (var t in infop) {
@@ -48,12 +49,12 @@ function Gasole() {
 					var geo = st.g;
 					var price = st.o[o];
 					if (price && geo && dist(geo, this.loc)) {
-						result[s] = st;
+						this.result[s] = st;
 					}
 				}
 			}
 		}
-		return result;
+		return this.result;
 	}
 }
 var map = null;
