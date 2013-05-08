@@ -30,3 +30,48 @@
 	width: 100%;
 	height: 500px;
 }
+
+.list li.ads {
+	padding: 0;
+}
+#fuel-types {
+	text-align: center;
+}
+#fuel-types .type {
+	width: 12%;
+	display: inline-block;
+	border: 1px solid #ccc;
+	padding: 3px;
+	margin-right: 3px;
+	cursor: pointer;
+	border-radius: 5px;
+}
+section .list li.sel {
+	color: #fff;
+}
+li.T_1.sel {
+	background-color: #006633;
+}
+li.T_3.sel {
+	background-color: #339933;
+}
+li.T_4.sel {
+	background-color: #000;
+}
+li.T_5.sel {
+	background-color: #555;
+}
+li.T_6.sel {
+	background-color: #CC3333;
+}
+li.T_7.sel {
+	background-color: #FF3300;
+}
+li.T_8.sel {
+	background-color: #f1aa41;
+}
+#fuel-types .icon.type:before{content:"\0061"; font-size: 20px;}
+.icon.locate:before{content:"\0062"; font-size: 20px;}
+#home-art input#search-input {
+	border: 1px solid #ccc;
+}

@@ -8,6 +8,19 @@ function dist(a, b) {
 	}
 }
 
+/** @constructor */
+function Sound(id) {
+	this.html5audio = document.getElementById(id);
+	this.play = function() {
+		if (this.html5audio) {
+			// this.html5audio.pause();
+			// this.html5audio.currentTime=0;
+			this.html5audio.play();
+		}
+	}
+}
+var click = null;
+
 function initMap() {
 	var mapOptions = {
 		mapTypeId: google.maps.MapTypeId.ROADMAP
@@ -17,28 +30,26 @@ function initMap() {
 }
 /** @constructor */
 function Gasole() {
-	this.type = null;		// tipo de combustible
 	this.loc = null;		// posición del usuario
 	this.info = null; 		// datos de la api
-	this.result = null;		// resultado de búsqueda
 	this.init = function(data) {
 		this.info = data;
 		console.log(this.info);
 	}
-	this.provinceData = function(p, o) {
+	this.provinceData = function(p, t) {
 		this.result = {};
 		var province = this.info[p];
 		for (var c in province) {
 			var city = province[c];
 			for (var s in city) {
 				var st = city[s];
-				var price = st.o[o];
+				var price = st.o[t];
 				if (price) this.result[s]=st;
 			}
 		}
 		return this.result;
 	}
-	this.nearData = function(o) {
+	this.nearData = function() {
 		this.result = {};
 		for (var p in this.info) {
 			var infop = this.info[p];
@@ -47,7 +58,7 @@ function Gasole() {
 				for (var s in infot) {
 					var st = infot[s];
 					var geo = st.g;
-					var price = st.o[o];
+					var price = st.o[this.type];
 					if (price && geo && dist(geo, this.loc)) {
 						this.result[s] = st;
 					}
@@ -95,6 +106,8 @@ window.addEventListener("load", function() {
 	Lungo.init({
 		name: "GasOlé"
 	});
+	click = new Sound("click");
+
 	var storedData = localStorage["gasole"];
 	if (storedData) gasole.init(JSON.parse(storedData));
 	else {
@@ -110,6 +123,14 @@ window.addEventListener("load", function() {
 	Lungo.dom("#map-art").on("load", function() {
 		google.maps.event.trigger(map, 'resize');
 	})
+
+	$$('.type').tap(function() {
+		click.play();
+		$$('.type').removeClass('sel');
+		this.className+=" sel";
+		gasole.type=this.getAttribute("data-type");
+
+	});
 	$$('.p').tap(function() {
 		var data = gasole.provinceData($$(this).text(), "1");
 		showList(data);
