@@ -327,6 +327,7 @@ class Info(BaseAuthHandler):
 
 def handle_404(request, response, exception):
     #http://webapp-improved.appspot.com/guide/exceptions.html
+    logging.info(request)
     logging.exception(exception)
     response.set_status(404)
     response.write(jinja_env.get_template("404.html").render())
