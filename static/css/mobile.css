@@ -703,6 +703,15 @@ h1 {
   padding: 2px;
   font-size: 1.2em;
 }
+.sort {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.sort.on {
+  background-color: #333;
+  color: #fff !important;
+}
 
 /** Iconos **/
 .icon:before{font-family:'lungojsicon';font-weight:normal!important}

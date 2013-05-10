@@ -56,7 +56,8 @@ function Gasole() {
 		}
 		return this.result;
 	}
-	this.nearData = function(l) {
+	this.nearData = function(l, sort) {
+		if (typeof(sort)=="undefined") sort="p";
 		result = [];
 		var type = this.type;
 		for (var prov in this.info) {
@@ -71,14 +72,14 @@ function Gasole() {
 						if (geo) {
 							var dist = distance(geo,l,searchRadius);
 							if (dist) {
-								result.push({a:station,r:st.r,g:geo,o:price,t:town,l:st.l,d:dist});
+								result.push({a:station,r:st.r,g:geo,p:price,t:town,l:st.l,d:dist});
 							}
 						}
 					}
 				}
 			}
 		}
-		return result;
+		return result.sort(function(a,b){return (a[sort]<b[sort]) ? -1 : 1;});
 	}
 }
 var searchRadius = 2;
@@ -125,14 +126,14 @@ function showList(data) {
 	}
 	else {
 		var title = "<strong>Se han encontrado "+nResults+" resultados</strong>";
-		title+="<div class='right price'>€/l</div>";
-		title+="<div class='right dist'>km.</div>";
+		title+="<div class='right price sort on'>€/l</div>";
+		title+="<div class='right dist sort'>km.</div>";
 		list.html("<li>"+title+"</li>");
 		for (var i=0;i<nResults;i++) {
 			var item = data[i];
 			var title = "<strong>"+item.l+"</strong>";
 			var subtitle = "<small>"+item.a+"</small>";
-			var price = "<div class='right price'>"+item.o.toFixed(3)+"</div>";
+			var price = "<div class='right price'>"+item.p.toFixed(3)+"</div>";
 			var dist = "<div class='right dist'>"+item.d.toFixed(1)+"</div>";
 			list.append("<li>"+title+price+dist+subtitle+"</li>");
 			// marker
@@ -142,9 +143,8 @@ function showList(data) {
 			marker = new google.maps.Marker(options);
 			markers.push(marker);
 		}
+		list.append("<li><strong>Fin de los resultados</strong></li>");
 	} 
-
-		
 	Lungo.Router.article("results-sec", "list-art");
 }
 
