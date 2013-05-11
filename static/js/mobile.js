@@ -12,20 +12,14 @@ function Sound(id) {
 	this.html5audio = document.getElementById(id);
 	this.play = function() {
 		if (this.html5audio) {
-			// this.html5audio.pause();
-			// this.html5audio.currentTime=0;
+			this.html5audio.pause();
+			this.html5audio.currentTime=0;
 			this.html5audio.play();
 		}
 	}
 }
 var click = null;
 var loader = "<img src='data:image/gif;base64,R0lGODlhEAAQAPQAAMzMzP///83NzfLy8uTk5Pz8/Pb29tPT09zc3Pn5+ebm5unp6dHR0eDg4NfX1+/v7+3t7QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAAFUCAgjmRpnqUwFGwhKoRgqq2YFMaRGjWA8AbZiIBbjQQ8AmmFUJEQhQGJhaKOrCksgEla+KIkYvC6SJKQOISoNSYdeIk1ayA8ExTyeR3F749CACH5BAkKAAAALAAAAAAQABAAAAVoICCKR9KMaCoaxeCoqEAkRX3AwMHWxQIIjJSAZWgUEgzBwCBAEQpMwIDwY1FHgwJCtOW2UDWYIDyqNVVkUbYr6CK+o2eUMKgWrqKhj0FrEM8jQQALPFA3MAc8CQSAMA5ZBjgqDQmHIyEAIfkECQoAAAAsAAAAABAAEAAABWAgII4j85Ao2hRIKgrEUBQJLaSHMe8zgQo6Q8sxS7RIhILhBkgumCTZsXkACBC+0cwF2GoLLoFXREDcDlkAojBICRaFLDCOQtQKjmsQSubtDFU/NXcDBHwkaw1cKQ8MiyEAIfkECQoAAAAsAAAAABAAEAAABVIgII5kaZ6AIJQCMRTFQKiDQx4GrBfGa4uCnAEhQuRgPwCBtwK+kCNFgjh6QlFYgGO7baJ2CxIioSDpwqNggWCGDVVGphly3BkOpXDrKfNm/4AhACH5BAkKAAAALAAAAAAQABAAAAVgICCOZGmeqEAMRTEQwskYbV0Yx7kYSIzQhtgoBxCKBDQCIOcoLBimRiFhSABYU5gIgW01pLUBYkRItAYAqrlhYiwKjiWAcDMWY8QjsCf4DewiBzQ2N1AmKlgvgCiMjSQhACH5BAkKAAAALAAAAAAQABAAAAVfICCOZGmeqEgUxUAIpkA0AMKyxkEiSZEIsJqhYAg+boUFSTAkiBiNHks3sg1ILAfBiS10gyqCg0UaFBCkwy3RYKiIYMAC+RAxiQgYsJdAjw5DN2gILzEEZgVcKYuMJiEAOwAAAAAAAAAAAA==' /><br>";
-
-
-
-
-
-
 
 function initMap() {
 	var mapOptions = {
@@ -38,10 +32,7 @@ function initMap() {
 function Gasole() {
 	this.info = null; 		// datos de la api
 	this.type = "1";
-	this.init = function(data) {
-		this.info = data;
-		console.log(this.info);
-	}
+	this.init = function(data) {this.info = data;};
 	this.provinceData = function(p) {
 		var t = this.type;
 		this.result = {};
@@ -85,18 +76,20 @@ function Gasole() {
 var searchRadius = 2;
 var map = null;
 gasole = new Gasole();
-var myLocation = null;							// mi posición
 /** @constructor */
-function SearchLocations(name) {
-	this.name=name;
-	this.locations=[];
-	this.add = function(p, ll) {
-		this.locations.push({name: p, latlng: ll});
-	}
+function SearchLocations() {
+	this.locs=[];
+	this.length = function() {return this.locs.length};
+	this.add = function(p, ll) { this.locs.push({name: p, latlng: ll})};
+	this.latlng = function() {return (this.length()==1) ? this.locs[0].latlng : null};
+	this.name = function() {return (this.length()==1) ? this.locs[0].name : null};
+	this.get = function(m) {return this.locs[m]};
+	this.select = function(m) {this.locs = [this.locs[m]]};
+	this.clear = function() {this.locs=[]};
 };	
-var searchLocations = null;						// posiciones buscadas
-var bounds = null;								// límites de los resultados
-markers = [];
+var theLocation=new SearchLocations();	// Referencia de búsqueda
+var bounds=null;						// límites de los resultados
+var markers=[];
 
 function clearMarkers() {
 	for (var i=0;i<markers.length;i++) markers[i].setMap(null);
@@ -104,7 +97,7 @@ function clearMarkers() {
 }
 
 function showList(data) {
-	console.log(data);
+	if (!map) initMap();
 	var list = $$("#list");
 	list.html("");
 	var options = { 
@@ -148,6 +141,46 @@ function showList(data) {
 	Lungo.Router.article("results-sec", "list-art");
 }
 
+function searchResults() {
+	var name = $$('#search-input').val();
+	if (name && (name!=theLocation.name())) {
+		console.log("buscar nueva posición");
+		theLocation.clear();
+		var geocoder = new google.maps.Geocoder();
+		geocoder.geocode({'address': name,'region': 'es'},
+			function(r,s) {
+				if (s==google.maps.GeocoderStatus.OK) {
+					for (var i=0; i<r.length; i++) {
+						var addr = r[i].formatted_address;
+						if (addr.match(/España$/)) theLocation.add(addr, [r[i].geometry.location.lat(), r[i].geometry.location.lng()]);
+					}
+					var valid=theLocation.length();
+					if (valid>1) {
+						var title = "<h1>Encontrados "+valid+" lugares:</h1>";
+						var list = "";
+						for (var l=0; l<valid;l++) {
+							list+="<li class='result icon pushpin' data-loc='"+l+"'>"+theLocation.get(l).name+"</li>";
+						}
+						Lungo.Notification.html(title+"<ul>"+list+"</ul>", "Cancelar");
+						$$(".result").tap(function() {
+							Lungo.Notification.hide();
+							theLocation.select(parseInt(this.getAttribute("data-loc")));
+							$$('#search-input').val(theLocation.name());
+							searchResults();
+						});
+						
+					} else {
+						$$('#search-input').val(theLocation.name());
+						searchResults();
+					}
+				}
+			});
+	} else {
+		var geo = theLocation.latlng();
+		if (geo) showList(gasole.nearData(geo));
+	}
+}
+
 function initControl() {
 	Lungo.dom("#map-art").on("load", function() {
 		google.maps.event.trigger(map, 'resize');
@@ -172,78 +205,29 @@ function initControl() {
 		var data = gasole.provinceData($$(this).text(), $$(".sel")[0].getAttribute("data-type"));
 		showList(data);
 	});
-	$$('#search-button').tap(function() {
-		if (myLocation) {
-			showList(gasole.nearData(myLocation.latlng));
-		} else {
-			var name = $$('#search-input')[0].value;
-			if ((!searchLocations)||(searchLocations.name!=name)) {
-				searchLocations = new SearchLocations();
-				var geocoder = new google.maps.Geocoder();
-				geocoder.geocode({'address': name,'region': 'es'}, 
-					function(r,s) {
-						if (s==google.maps.GeocoderStatus.OK) {
-							var valid=0;
-							var dummyul = document.createElement("ul");
-							for (var i=0; i<r.length; i++) {
-								var addr = r[i].formatted_address;
-								if (addr.match(/España$/)) {
-									searchLocations.add(addr, [r[i].geometry.location.lat(), r[i].geometry.location.lng()]);
-									var newL = document.createElement("li");
-									newL.className="result icon pushpin";
-									newL.textContent = addr;
-									newL.setAttribute("data-loc", valid);
-									dummyul.appendChild(newL);
-									valid++;
-								}
-							}
-							if (valid==1) {
-								showList(gasole.nearData(searchLocations.locations[0].latlng));
-							} else if (valid>1) {
-					 			var dummy = document.createElement("div");
-					 			dummy.innerHTML = "<h1>Encontrados "+valid+ " lugares:</h1>";
-					 			dummy.appendChild(dummyul);
-								Lungo.Notification.html(dummy.innerHTML, "Cerrar");
-								$$(".result").tap(function() {
-									Lungo.Notification.hide();
-									showList(gasole.nearData(
-										searchLocations.locations[parseInt(this.getAttribute("data-loc"))].latlng
-										));
-								});
-							};
-						}
-					});
-			}
-		}
-	});
+	$$('#search-button').tap(searchResults);
 	$$('#location').tap(function() {
-		var input = $$('#search-input')[0];
-		if (myLocation) {
-			$$('.locate')[0].style.color="#ccc";
-			input.value="";
-			input.readOnly = false;
-			$$('#search')[0].className = "";
-			myLocation=null;
+		var input = $$('#search-input');
+		var searchDiv = $$('#search');
+		if (searchDiv.hasClass("current")) {
+			$$('.locate').style('color',"#ccc");
+			input.val("").removeAttr('readonly');
+			theLocation.clear();
+			searchDiv.toggleClass("current");
 		} else {
-			Lungo.Notification.show(loader+"Buscando el lugar…");
+			Lungo.Notification.show(loader+"Obteniendo posición…");
 			function posLoad(pos) {
+				theLocation.clear();
 				Lungo.Notification.hide();
-				console.log("hola");
-				Lungo.Notification.hide();
-				console.log(pos);
-				$$('.locate')[0].style.color="#fff";
-				input.value="Mi posición actual";
-				input.readOnly = true;
-				$$('#search')[0].className = "current";
-				myLocation = {	latlng: [pos.coords.latitude, pos.coords.longitude],
-								accuracy: pos.coords.accuracy,
-								name: "mi posición actual"
-							};
+				$$('.locate').style('color',"#fff");
+				searchDiv.toggleClass("current");
+				input.val("Mi posición actual").attr('readonly',true);
+				theLocation.add(input.val(), [pos.coords.latitude, pos.coords.longitude]);
 			}
 			function posError(e) {
 				Lungo.Notification.show("No se puede obtener tu posición","warning", 3);
 			}
-			navigator.geolocation.getCurrentPosition(posLoad, posError, {timeout: 10000});
+			navigator.geolocation.getCurrentPosition(posLoad, posError, {timeout: 5000});
 		}
 	});
 }
@@ -265,7 +249,6 @@ window.addEventListener("load", function() {
 		req.open("GET", "/api/All");
 		req.send();
 	}
-	initMap();
 	initControl();
 	Lungo.Notification.hide();
 })

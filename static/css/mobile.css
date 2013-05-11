@@ -718,6 +718,7 @@ h1 {
 .icon.menu:before{content:"\0045"}
 .icon.type:before{content:"\0061"}
 .icon.locate:before{content:"\0062"}
+.icon.left:before{content:"\0058";font-size: .8em;}
 
 
 
