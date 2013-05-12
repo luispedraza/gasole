@@ -215,10 +215,9 @@ function initControl() {
 			theLocation.clear();
 			searchDiv.toggleClass("current");
 		} else {
-			Lungo.Notification.show(loader+"Obteniendo posición…");
 			function posLoad(pos) {
+				clearInterval(to);
 				theLocation.clear();
-				Lungo.Notification.hide();
 				$$('.locate').style('color',"#fff");
 				searchDiv.toggleClass("current");
 				input.val("Mi posición actual").attr('readonly',true);
@@ -226,9 +225,19 @@ function initControl() {
 			}
 			function posError(e) {
 				Lungo.Notification.show("No se puede obtener tu posición","warning", 3);
+				input.val("");
 			}
+			input.val("Obteniendo posición.");
+			var to = setInterval(function() {
+				input.val(input.val()+".");
+			}, 100);
 			navigator.geolocation.getCurrentPosition(posLoad, posError, {timeout: 5000});
 		}
+	});
+	$$('.sort').tap(function() {
+		showList(gasole.nearData(theLocation.latlng(), ($$(this).hasClass("price")) ? "p" : "d")); 
+		$$('.sort').removeClass("on");
+		$$(this).addClass("on");
 	});
 }
 
