@@ -247,22 +247,21 @@ function initControl() {
 }
 
 window.addEventListener("load", function() {
-	Lungo.Notification.show();
-	var pos = null;
 	Lungo.init({name: "GasOlé"});
-	click = new Sound("click");
-
+	Lungo.Notification.show();
 	var storedData = localStorage["gasole"];
-	if (storedData) gasole.init(JSON.parse(storedData));
-	else {
+	if (!storedData || (parseInt(storedData.ts)>LS_EXPIRE)) {
 		var req = new XMLHttpRequest();
 		req.onload = function() {
 			gasole.init(JSON.parse(this.responseText));
-			localStorage.setItem("gasole", this.responseText);
+			localStorage.setItem("gasole", '{"ts": '+ new Date().getTime() +',"data": '+this.responseText+'}');
+			Lungo.Notification.hide();
 		}
 		req.open("GET", "/api/All");
 		req.send();
+	} else {
+		gasole.init(JSON.parse(storedData).data);
 	}
 	initControl();
-	Lungo.Notification.hide();
+	click = new Sound("click");
 })
