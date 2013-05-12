@@ -13,7 +13,7 @@ function Sound(id) {
 	this.play = function() {
 		if (this.html5audio) {
 			this.html5audio.pause();
-			this.html5audio.currentTime=0;
+			// this.html5audio.currentTime=0;
 			this.html5audio.play();
 		}
 	}
@@ -47,7 +47,9 @@ function Gasole() {
 		}
 		return this.result;
 	}
-	this.nearData = function(l, sort) {
+	this.nearData = function(loc, sort) {
+		var l = loc.latlng(); if (!l) return;
+		var r = loc.radius;
 		if (typeof(sort)=="undefined") sort="p";
 		result = [];
 		var type = this.type;
@@ -61,7 +63,7 @@ function Gasole() {
 					if (price) {
 						var geo = st.g;
 						if (geo) {
-							var dist = distance(geo,l,searchRadius);
+							var dist = distance(geo,l,r);
 							if (dist) {
 								result.push({a:station,r:st.r,g:geo,p:price,t:town,l:st.l,d:dist});
 							}
@@ -73,12 +75,13 @@ function Gasole() {
 		return result.sort(function(a,b){return (a[sort]<b[sort]) ? -1 : 1;});
 	}
 }
-var searchRadius = 2;
+
 var map = null;
 gasole = new Gasole();
 /** @constructor */
 function SearchLocations() {
 	this.locs=[];
+	this.radius=2;
 	this.length = function() {return this.locs.length};
 	this.add = function(p, ll) { this.locs.push({name: p, latlng: ll})};
 	this.latlng = function() {return (this.length()==1) ? this.locs[0].latlng : null};
@@ -97,6 +100,7 @@ function clearMarkers() {
 }
 
 function showList(data) {
+	if (!data) return;
 	if (!map) initMap();
 	var list = $$("#list");
 	list.html("");
@@ -176,8 +180,7 @@ function searchResults() {
 				}
 			});
 	} else {
-		var geo = theLocation.latlng();
-		if (geo) showList(gasole.nearData(geo));
+		showList(gasole.nearData(theLocation));
 	}
 }
 
@@ -196,10 +199,10 @@ function initControl() {
 	});
 	$$('.d').tap(function() {
 		click.play();
-		searchRadius = parseInt(this.getAttribute("data-d"));
+		theLocation.radius = parseInt(this.getAttribute("data-d"));
 		$$('.d').removeClass('sel');
 		this.className+=" sel";
-		$$('#dist').text(searchRadius);
+		$$('#dist').text(theLocation.radius);
 	});
 	$$('.p').tap(function() {
 		var data = gasole.provinceData($$(this).text(), $$(".sel")[0].getAttribute("data-type"));
@@ -235,9 +238,11 @@ function initControl() {
 		}
 	});
 	$$('.sort').tap(function() {
-		showList(gasole.nearData(theLocation.latlng(), ($$(this).hasClass("price")) ? "p" : "d")); 
+		console.log(this);
+		showList(gasole.nearData(theLocation, ($$(this).hasClass("price")) ? "p" : "d")); 
 		$$('.sort').removeClass("on");
-		$$(this).addClass("on");
+		this.className+=" on";
+		console.log(this);
 	});
 }
 
