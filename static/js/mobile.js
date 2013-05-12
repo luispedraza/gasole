@@ -248,9 +248,9 @@ function initControl() {
 
 window.addEventListener("load", function() {
 	Lungo.init({name: "GasOlé"});
-	Lungo.Notification.show();
 	var storedData = localStorage["gasole"];
 	if (!storedData || (parseInt(storedData.ts)>LS_EXPIRE)) {
+		Lungo.Notification.show();
 		var req = new XMLHttpRequest();
 		req.onload = function() {
 			gasole.init(JSON.parse(this.responseText));
