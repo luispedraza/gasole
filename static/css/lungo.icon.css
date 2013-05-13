@@ -44,7 +44,6 @@
 .icon.thumbs-up:before{content:"\004d"}
 .icon.thumbs-down:before{content:"\004e"}
 .icon.help:before{content:"\0050"}
-.icon.warning:before{content:"\0052"}
 .icon.info:before{content:"\0053"}
 .icon.cancel:before{content:"\0054"}
 .icon.check:before{content:"\0051"}
@@ -54,7 +53,6 @@
 .icon.down:before{content:"\0059"}
 .icon.right:before{content:"\005a"}
 .icon.up:before{content:"\005b"}
-.icon.refresh:before{content:"\005c"}
 .icon.share:before{content:"\002e"}
 .icon.settings:before{content:"\004f"}
 .icon.accessibility:before{content:"\0040"}

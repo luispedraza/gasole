@@ -119,13 +119,14 @@ function showList(data) {
 	clearMarkers();
 	var nResults = data.length;
 	if (nResults==0) {
-		list.html("<li class='icon warning'> Ningún resultado. Prueba aumentando el radio de búsqueda.</li>");
+		list.html("<li class='error'><div class='icon warning'></div><strong>Ningún resultado.<br>Prueba aumentando el radio de búsqueda.</strong></li>");
 	}
 	else {
-		var title = "<strong>Se han encontrado "+nResults+" resultados</strong>";
-		title+="<div class='right price sort on'>€/l</div>";
-		title+="<div class='right dist sort'>km.</div>";
-		list.html("<li>"+title+"</li>");
+		var title = "<strong>Se han encontrado "+nResults+" puntos de venta de ";
+		title+=FUEL_OPTIONS[gasole.type].name+" cerca de "+theLocation.name()+"</strong>";
+		var sort="<div class='right price sort on'>€/l</div>";
+		sort+="<div class='right dist sort'>km.</div>";
+		list.html("<li class='title'>"+title+"</li><li><strong>Ordena los resultados:</strong>"+sort+"</li>");
 		for (var i=0;i<nResults;i++) {
 			var item = data[i];
 			var title = "<strong>"+item.l+"</strong>";
@@ -218,15 +219,18 @@ function initControl() {
 			theLocation.clear();
 			searchDiv.toggleClass("current");
 		} else {
+			$$(this).addClass("spinner");
 			function posLoad(pos) {
 				clearInterval(to);
+				$$('.locate').removeClass("spinner").style('color',"#fff");
 				theLocation.clear();
-				$$('.locate').style('color',"#fff");
 				searchDiv.toggleClass("current");
 				input.val("Mi posición actual").attr('readonly',true);
 				theLocation.add(input.val(), [pos.coords.latitude, pos.coords.longitude]);
 			}
 			function posError(e) {
+				clearInterval(to);
+				$$('.locate').removeClass("spinner");
 				Lungo.Notification.show("No se puede obtener tu posición","warning", 3);
 				input.val("");
 			}
@@ -250,7 +254,7 @@ window.addEventListener("load", function() {
 	Lungo.init({name: "GasOlé"});
 	var storedData = localStorage["gasole"];
 	if (!storedData || (parseInt(storedData.ts)>LS_EXPIRE)) {
-		Lungo.Notification.show();
+		Lungo.Notification.show("<div class='icon refresh spinner'></div>Actualizando Datos…");
 		var req = new XMLHttpRequest();
 		req.onload = function() {
 			gasole.init(JSON.parse(this.responseText));

@@ -696,6 +696,14 @@ h1 {
   color: #333;
 }
 /* Lista de resultados de gasolin */
+.list li.title {
+	background-color: #333;
+	color: #fff;
+}
+.list li.error {
+	background-color: #CC3333;
+	color: #fff;
+}
 .list li .right.price, .list li .right.dist {
   width: 3em;
   color: #333;
@@ -714,11 +722,25 @@ h1 {
 }
 
 /** Iconos **/
+@keyframes spin {
+	from {transform: rotate(0deg);}
+	to {transform: rotate(360deg);}
+}
+@-webkit-keyframes spin {
+	from {-webkit-transform: rotate(0deg);}
+	to {-webkit-transform: rotate(360deg);}
+}
+.spinner {
+	animation: spin 1s infinite linear;
+	-webkit-animation: spin 1s infinite linear;
+}
 .icon:before{font-family:'lungojsicon';font-weight:normal!important}
 .icon.menu:before{content:"\0045"}
 .icon.type:before{content:"\0061"}
-.icon.locate:before{content:"\0062"}
+.icon.locate:before{content:"\0062"; padding: 5px;}
 .icon.left:before{content:"\0058";font-size: .8em;}
+.icon.refresh:before{content:"\005c"}
+.icon.warning:before{content:"\0052"}
 
 
 
