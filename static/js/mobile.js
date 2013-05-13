@@ -2,9 +2,11 @@ function distance(a,b,r) {
 	var dlat = Math.abs(a[0]-b[0])*111.03461;
 	if (dlat<r) {
 		var dlon = Math.abs(a[1]-b[1])*85.39383;
-		if (dlon<r) return Math.sqrt(Math.pow(dlat,2)+Math.pow(dlon,2));
+		if (dlon<r) {
+			var dist = Math.sqrt(Math.pow(dlat,2)+Math.pow(dlon,2));
+			if (dist<r) return dist;
+		}
 	}
-	return null;
 }
 
 /** @constructor */

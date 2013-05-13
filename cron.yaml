@@ -1,6 +1,6 @@
 cron:
 - description: periodic update
   url: /tasks/update
-  schedule: every 1 hours
+  schedule: every 1 hours from 06:00 to 23:00
 
   
