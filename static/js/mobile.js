@@ -260,7 +260,7 @@ function initControl() {
 window.addEventListener("load", function() {
 	Lungo.init({name: "GasOlé"});
 	var storedData = localStorage["gasole"];
-	if (!storedData || (parseInt(storedData.ts)>LS_EXPIRE)) {
+	if (!storedData || ((parseInt(storedData.ts)-new Date().getTime())>LS_EXPIRE)) {
 		Lungo.Notification.show("<div class='icon refresh spinner'></div>Actualizando Datos…");
 		var req = new XMLHttpRequest();
 		req.onload = function() {
