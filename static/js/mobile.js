@@ -267,15 +267,15 @@ function showDetail(id) {
 	map.panTo(markers[id].position);
 	map.setZoom(15);
 	Lungo.Router.article("results-sec","map-art");
-	if (!markerDetail) markerDetail = new google.maps.Marker({
-		map: map,
-		position: markers[id].position,
-		animation: google.maps.Animation.BOUNCE,
-		icon: pump_marker
-	});
-	else {
-		console.log("cambiando posición");
-		markerDetail.position = markers[id].position;
+	if (!markerDetail) {
+		markerDetail = new google.maps.Marker({
+			map: map,
+			position: markers[id].position,
+			animation: google.maps.Animation.BOUNCE,
+			icon: pump_marker
+		});
+	} else {
+		markerDetail.setPosition(markers[id].position);
 		markerDetail.setAnimation(google.maps.Animation.BOUNCE);
 	}
 }
