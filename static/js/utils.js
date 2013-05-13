@@ -67,7 +67,7 @@ var PROVS = {
 	"Vizcaya": "48",
 	"Zamora": "49",
 	"Zaragoza": "50"};
-
+var MONTHS = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 var info = null;
 var LS_EXPIRE = 3600000;				// 1 hora
 var APIS = 	{ 	"gasolineras": "api",

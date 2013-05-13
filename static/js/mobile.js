@@ -33,8 +33,9 @@ function initMap() {
 /** @constructor */
 function Gasole() {
 	this.info = null; 		// datos de la api
+	this.date = null;		// fecha de actualización
 	this.type = "1";
-	this.init = function(data) {this.info = data;};
+	this.init = function(data, date) {this.info = data;this.date=date};
 	this.provinceData = function(p) {
 		var t = this.type;
 		this.result = {};
@@ -188,6 +189,10 @@ function searchResults() {
 }
 
 function initControl() {
+	var now = new Date();
+	var date = gasole.date;
+	var when = (now.toLocaleDateString()==date.toLocaleDateString()) ? "hoy" : ("el "+date.getDay()+" de "+MONTHS[date.getMonth()]);
+	$$('#info').text("Precios actualizados "+when+" a las "+date.toLocaleTimeString().split(":").splice(0,2).join(":"));
 	Lungo.dom("#map-art").on("load", function() {
 		google.maps.event.trigger(map, 'resize');
 		map.fitBounds(bounds);
@@ -259,15 +264,19 @@ window.addEventListener("load", function() {
 		Lungo.Notification.show("<div class='icon refresh spinner'></div>Actualizando Datos…");
 		var req = new XMLHttpRequest();
 		req.onload = function() {
-			gasole.init(JSON.parse(this.responseText));
-			localStorage.setItem("gasole", '{"ts": '+ new Date().getTime() +',"data": '+this.responseText+'}');
+			var date = new Date();
+			gasole.init(JSON.parse(this.responseText), date);
+			localStorage.setItem("gasole", '{"ts": '+ date.getTime() +',"data": '+this.responseText+'}');
 			Lungo.Notification.hide();
+			initControl();
 		}
 		req.open("GET", "/api/All");
 		req.send();
 	} else {
-		gasole.init(JSON.parse(storedData).data);
+		var data = JSON.parse(storedData);
+		gasole.init(data.data, new Date(data.ts));
+		initControl();
 	}
-	initControl();
+	
 	click = new Sound("click");
 })
