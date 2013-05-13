@@ -150,6 +150,9 @@ function showList(data) {
 			options.position = pos;
 			bounds.extend(pos);
 			marker = new google.maps.Marker(options);
+			google.maps.event.addListener(marker, 'click', function() {
+				showDetail(markers.indexOf(this));
+			})
 			markers.push(marker);
 		}
 		list.append("<li><strong>Fin de los resultados</strong></li>");
