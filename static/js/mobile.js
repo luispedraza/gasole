@@ -201,7 +201,7 @@ function searchResults() {
 function initControl() {
 	var now = new Date();
 	var date = gasole.date;
-	var when = (now.toLocaleDateString()==date.toLocaleDateString()) ? "hoy" : ("el "+date.getDay()+" de "+MONTHS[date.getMonth()]);
+	var when = (now.toLocaleDateString()==date.toLocaleDateString()) ? "hoy" : ("el "+date.getDate()+" de "+MONTHS[date.getMonth()]);
 	$$('#info').text("Precios actualizados "+when+" a las "+date.toLocaleTimeString().split(":").splice(0,2).join(":"));
 	Lungo.dom("#map-art").on("load", function() {
 		google.maps.event.trigger(map, 'resize');
@@ -286,7 +286,8 @@ function showDetail(id) {
 window.addEventListener("load", function() {
 	Lungo.init({name: "GasOlé"});
 	var storedData = localStorage["gasole"];
-	if (!storedData || ((parseInt(storedData.ts)-new Date().getTime())>LS_EXPIRE)) {
+	if (!storedData || ((new Date().getTime()-parseInt(JSON.parse(storedData).ts))>LS_EXPIRE)) {
+		console.log("buscando nuevos datos");
 		Lungo.Notification.show("<div class='icon refresh spinner'></div>Actualizando Datos…");
 		var req = new XMLHttpRequest();
 		req.onload = function() {
@@ -299,6 +300,7 @@ window.addEventListener("load", function() {
 		req.open("GET", "/api/All");
 		req.send();
 	} else {
+		console.log("datos recuperados");
 		var data = JSON.parse(storedData);
 		gasole.init(data.data, new Date(data.ts));
 		initControl();
