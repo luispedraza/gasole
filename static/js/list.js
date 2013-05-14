@@ -44,14 +44,6 @@ function Stats() {
 }
 
 var stats = new Stats();
-var COLORS = {
-	min: "#36AE34",
-	minStroke: "#fff",
-	max: "#f00",
-	maxStroke: "#fff",
-	mu: "#3399CC",
-	muStroke: "#fff"
-}
 
 function newReference(loc) {
 	var location = loc;

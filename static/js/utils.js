@@ -68,6 +68,14 @@ var PROVS = {
 	"Zamora": "49",
 	"Zaragoza": "50"};
 var MONTHS = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+var COLORS = {
+	min: "#36AE34",
+	minStroke: "#fff",
+	max: "#f00",
+	maxStroke: "#fff",
+	mu: "#3399CC",
+	muStroke: "#fff"
+}
 var info = null;
 var LS_EXPIRE = 3600000;				// 1 hora
 var APIS = 	{ 	"gasolineras": "api",

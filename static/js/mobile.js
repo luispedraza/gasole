@@ -35,14 +35,15 @@ function initMap() {
 /** @constructor */
 function Stats() {
 	this.n = 0;
-	this.max = this.min = this.mean = null;
+	this.max = this.min = this.mu = this.range = null;
 	this.add =function(p) {	
 		if (this.max) {
 			if (p>this.max) this.max=p;
 			else if (p<this.min) this.min=p;
-			this.mean = (this.mean*this.n+p)/(this.n+1);
+			this.mu = (this.mu*this.n+p)/(this.n+1);
+			this.range = this.max-this.min;
 		} else {
-			this.max = this.min = this.mean = p;
+			this.max = this.min = this.mu = p;
 		}
 		this.n++;
 	};
@@ -54,6 +55,14 @@ function Gasole() {
 	this.info = null; 		// datos de la api
 	this.date = null;		// fecha de actualización
 	this.type = "1";
+	this.color = function(p) {
+		if (this.stats.range!=0) {
+			var v = (p-this.stats.min)/this.stats.range;
+			if (v<.33) return COLORS.min;
+			if (v>.66) return COLORS.max;
+		}
+		return COLORS.mu;
+	}
 	this.init = function(data, date) {this.info = data;this.date=date};
 	this.provinceData = function(p) {
 		this.stats = new Stats();
@@ -141,7 +150,7 @@ function showList(data) {
 			strokeWeight: 1,
 			fillOpacity: .8,
 			scale: 6,
-			strokeColor: "#0f0"
+			strokeColor: "fff"
 		}, 
 		map: map
 	};
@@ -154,7 +163,7 @@ function showList(data) {
 	else {
 		var title = "<strong>Se han encontrado "+nResults+" puntos de venta de ";
 		title+=FUEL_OPTIONS[gasole.type].name+" cerca de "+theLocation.name();
-		title+=", con un precio medio de "+gasole.stats.mean.toFixed(3)+" €/l</strong>";
+		title+=", con un precio medio de "+gasole.stats.mu.toFixed(3)+" €/l</strong>";
 		var sort="<div class='right price sort on'>€/l</div>";
 		sort+="<div class='right dist sort'>km.</div>";
 		list.html("<li class='title'>"+title+"</li><li><strong>Ordena los resultados:</strong>"+sort+"</li>");
@@ -172,9 +181,11 @@ function showList(data) {
 			list.append(li);
 			// marker
 			var pos = new google.maps.LatLng(item.g[0], item.g[1]);
-			options.position = pos;
 			bounds.extend(pos);
+			options.position = pos;
 			marker = new google.maps.Marker(options);
+			console.log(gasole.color(item.p));
+			marker.icon.fillColor = gasole.color(item.p);
 			google.maps.event.addListener(marker, 'click', function() {
 				showDetail(markers.indexOf(this));
 			})
