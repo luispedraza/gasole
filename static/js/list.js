@@ -13,7 +13,7 @@ var bounds = new google.maps.LatLngBounds();
 var TO_DAYS = 86400000;
 
 /** @constructor */
-function stats() {
+function Stats() {
 	this.types = {};
 	this.n = 0;
 	this.init = false;
@@ -42,7 +42,8 @@ function stats() {
 		this.init = true;
 	};
 }
-var Stats = new stats();
+
+var stats = new Stats();
 var COLORS = {
 	min: "#36AE34",
 	minStroke: "#fff",
@@ -140,7 +141,7 @@ function markerColor(sel, price) {
 	for (var i=0; i<sel.length; i++) {
 		var current = sel[i];
 		var p = price[current];
-		var s = Stats.types[current];
+		var s = stats.types[current];
 		if (s && p) {
 			if (s.range) mean = (mean*n+((p-s.min)/s.range))/++n;
 			else mean = mean*n+.5/++n;
@@ -307,7 +308,7 @@ function initControl() {
 	var filterT = document.getElementById("fuel-type").getElementsByTagName("li");
 	var filter = [];
 	for (var f=0; f<filterT.length; f++) {
-		if (Stats.types[filterT[f].className.split(" ")[0].split("_")[1]]) {
+		if (stats.types[filterT[f].className.split(" ")[0].split("_")[1]]) {
 			filter.push(filterT[f].className);
 			filterT[f].addEventListener("click", function() {
 				var cname = this.className.split(" ");
@@ -398,10 +399,10 @@ function showDetail(marker) {
 }
 function populateInfo() {
 	var divInfo = document.getElementById("info");
-	divInfo.innerHTML = "<p>Se han encontrado " + Stats.n + " puntos de venta.</p>";
+	divInfo.innerHTML = "<p>Se han encontrado " + stats.n + " puntos de venta.</p>";
 	var divSum = document.getElementById("summary-b");
-	for (var t in Stats.types) {
-		var data = Stats.types[t];
+	for (var t in stats.types) {
+		var data = stats.types[t];
 		var tr = document.createElement("tr");
 		tr.className = "data T_"+t;
 		var td = document.createElement("td");
@@ -525,12 +526,12 @@ function populateTable(types) {
 					tr.appendChild(otd);
 				}
 				table.appendChild(tr);
-				Stats.add(dataPTS["o"]);
+				stats.add(dataPTS["o"]);
 			}
 			map.fitBounds (bounds);
 		}
 	}
-	Stats.run();
+	stats.run();
 	if (cities.length > 1) { // Lista de ciudades
 		var citiesList = document.getElementById("cities-list");
 		cities.sort(function(a, b) {

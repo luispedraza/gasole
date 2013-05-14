@@ -31,13 +31,32 @@ function initMap() {
 	var mapdiv = document.getElementById("map-art");
 	map = new google.maps.Map(mapdiv, mapOptions);
 }
+
+/** @constructor */
+function Stats() {
+	this.n = 0;
+	this.max = this.min = this.mean = null;
+	this.add =function(p) {	
+		if (this.max) {
+			if (p>this.max) this.max=p;
+			else if (p<this.min) this.min=p;
+			this.mean = (this.mean*this.n+p)/(this.n+1);
+		} else {
+			this.max = this.min = this.mean = p;
+		}
+		this.n++;
+	};
+}
+
 /** @constructor */
 function Gasole() {
+	this.stats = null;
 	this.info = null; 		// datos de la api
 	this.date = null;		// fecha de actualización
 	this.type = "1";
 	this.init = function(data, date) {this.info = data;this.date=date};
 	this.provinceData = function(p) {
+		this.stats = new Stats();
 		var t = this.type;
 		this.result = {};
 		var province = this.info[p];
@@ -46,7 +65,10 @@ function Gasole() {
 			for (var s in city) {
 				var st = city[s];
 				var price = st.o[t];
-				if (price) this.result[s]=st;
+				if (price){
+					this.result[s]=st;
+					this.stats.add(price);	
+				}
 			}
 		}
 		return this.result;
@@ -54,6 +76,7 @@ function Gasole() {
 	this.nearData = function(loc, sort) {
 		var l = loc.latlng(); if (!l) return;
 		var r = loc.radius;
+		this.stats = new Stats();
 		if (typeof(sort)=="undefined") sort="p";
 		result = [];
 		var type = this.type;
@@ -70,6 +93,7 @@ function Gasole() {
 							var dist = distance(geo,l,r);
 							if (dist) {
 								result.push({a:station,r:st.r,g:geo,p:price,t:town,l:st.l,d:dist});
+								this.stats.add(price);
 							}
 						}
 					}
@@ -129,7 +153,8 @@ function showList(data) {
 	}
 	else {
 		var title = "<strong>Se han encontrado "+nResults+" puntos de venta de ";
-		title+=FUEL_OPTIONS[gasole.type].name+" cerca de "+theLocation.name()+"</strong>";
+		title+=FUEL_OPTIONS[gasole.type].name+" cerca de "+theLocation.name();
+		title+=", con un precio medio de "+gasole.stats.mean.toFixed(3)+" €/l</strong>";
 		var sort="<div class='right price sort on'>€/l</div>";
 		sort+="<div class='right dist sort'>km.</div>";
 		list.html("<li class='title'>"+title+"</li><li><strong>Ordena los resultados:</strong>"+sort+"</li>");
