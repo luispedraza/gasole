@@ -143,17 +143,6 @@ function showList(data) {
 	if (!map) initMap();
 	var list = $$("#list");
 	list.html("");
-	var options = { 
-		icon: {
-			path: google.maps.SymbolPath.CIRCLE,
-			strokeOpacity: 1.0,
-			strokeWeight: 1,
-			fillOpacity: .8,
-			scale: 6,
-			strokeColor: "fff"
-		}, 
-		map: map
-	};
 	bounds = new google.maps.LatLngBounds();
 	clearMarkers();
 	var nResults = data.length;
@@ -180,12 +169,22 @@ function showList(data) {
 			});
 			list.append(li);
 			// marker
+			var options = { 
+				icon: {
+					path: google.maps.SymbolPath.CIRCLE,
+					strokeOpacity: 1.0,
+					strokeWeight: 1,
+					fillOpacity: .8,
+					scale: 6,
+					strokeColor: "fff",
+					fillColor: gasole.color(item.p)
+				}, 
+				map: map
+			};
 			var pos = new google.maps.LatLng(item.g[0], item.g[1]);
 			bounds.extend(pos);
 			options.position = pos;
 			marker = new google.maps.Marker(options);
-			console.log(gasole.color(item.p));
-			marker.icon.fillColor = gasole.color(item.p);
 			google.maps.event.addListener(marker, 'click', function() {
 				showDetail(markers.indexOf(this));
 			})
