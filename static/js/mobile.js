@@ -9,6 +9,46 @@ function distance(a,b,r) {
 	}
 }
 
+// Distancia de un punto a una recta
+function distanceOrto(p, p1,p2) {
+    // if start and end point are on the same x the distance is the difference in X.
+    if (p1.lng()==p2.lng()) return Math.abs(p.lat()-p1.lat());
+    else {
+        var slope = (p2.lat() - p1.lat())/(p2.lng() - p1.lng());
+        var intercept = p1.lat()-(slope*p1.lng());
+        return Math.abs(slope*p.lng()-p.lat()+intercept)/Math.sqrt(slope*slope+1);
+    }
+}
+// Ramer–Douglas–Peucker algorithm
+// http://karthaus.nl/rdp/js/rdp.js
+function properRDP(points,epsilon){
+	if (typeof(epsilon)=="undefined") epsilon = 0.01; // 1km de distancia aprox. .01 grados
+    var firstPoint=points[0];
+    var lastPoint=points[points.length-1];
+    if (points.length<3){
+        return points;
+    }
+    var index=-1;
+    var dist=0;
+    for (var i=1;i<points.length-1;i++){
+        var cDist=distanceOrto(points[i],firstPoint,lastPoint);
+        if (cDist>dist){
+            dist=cDist;
+            index=i;
+        }
+    }
+    if (dist>epsilon){
+        // iterate
+        var l1=points.slice(0, index+1);
+        var l2=points.slice(index);
+        var r1=properRDP(l1,epsilon);
+        var r2=properRDP(l2,epsilon);
+        // concat r2 to r1 minus the end/startpoint that will be the same
+        var rs=r1.slice(0,r1.length-1).concat(r2);
+        return rs;
+    } else return [firstPoint,lastPoint];
+}
+
 /** @constructor */
 function Sound(id) {
 	this.html5audio = document.getElementById(id);
@@ -25,11 +65,10 @@ var loader = "<img src='data:image/gif;base64,R0lGODlhEAAQAPQAAMzMzP///83NzfLy8u
 var pump_marker = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAwCAYAAABjezibAAAFmklEQVRYhd2ZP3DaSBTGvycyk8YemEljaEwVSiPUXIfSx3NcdyGFSUPK+DLpgT7kaKEJbkzrjFPcpLFc5YoIlFJpzmkw6UjkKjPoXbFaWRYSf2R8xX0zO4NWu9of763e7j4REkjTtPRsNtMVRSkSURFAJqbplJkt13WtVCplmKb5fd2xaJ3GqqruEdEhgAoRxUFFipmnAE6YuTMajT5vFFBV1bKiKE0AetR9TdMi+9m2jaurq6hbhuu6zdFodH4rQE3T0szc9KzmK5vNYn9/H+VyGYVCYeEAjuPAMAwYhgHTNG8AM3OHiJqLXB8L6LnzhIjyAWA8fvwY+/v7C6HiNB6P0ev1YBiGD8rMF8xciXN7JKCqqrtEZMl5trW1hXq9jmq1mggsLNu20Wq18OXLFwk5ZWY9CnIOUNO0NAADQBEQ7nz9+vVSVybR8fEx3rx5sxBSieh3A+74+PgmnGUBxSJAtLjk80CtdvPJ0ymg68ChmNLVahX1eh0AQEQZIjJUVd0NdrlhwVKp9Kd8Iba2ttDtdlG4fx/odASYHOTzilEinRZ/BhDAug48eyauDw6Afh+O4+D58+e+uwFYpmmqc89SVbWsaRrL8unTJ2Zm5rMzZmAz5cUL5rdvr68PDpiZ+cePH1wul/2xS6VSQ3L5Liaivvxdr9djY9utlMkItze88Y+OgFoN29vbaLfbfjMiakpXKwCgadqBDCfZbNafF5FqNFa32dlZ/HPSaWBvT0B2On4IC0L6gABq8sZCuE0pkxGl2RTX02nU2BVN09KKZ0oduF4h7ly6LqAkoKdcLudb0YvBFUVRlIps8OTJk7sFMwwBZVlAv+9bLqgQQ0VBYAOg6zruVOfnQKslQs3FxXycBFAoFJDNZgEAzKwrAPKAcG8ul7tbwN1dUYBI60nJCEJEGQXeqnHncICwWITVwgqy+HHwTuJeQgVZotbixWq1lq/Dsjx6dGvY9QH/Y/mAjuNEt8jngXJZlKTa2xP95cZhiYIs9+SPwG5iHtAwxO9icfWdTFCGIVYO4HpXtEBBFgVi/4fxeLx8oCRxcm/vGm5FBVkUAFMAuLy8XA6ZBDBBH9M0AYhdtm9BADAMI7rHLQZbt49t27i8vAQAEJGhuK7rU71//35x70xm/ZelUomub7VECSnEYCjeIcUCxOSU5o3VOhaJ+jP5/HydN0cdx8Hp6WnwTl+GmY6s6fV6mwOMalurzW9svUPUYDAInpf7pml+9w9NpVLpH7mrfvny5fUZ2LL8B/g6X5qxEAq/wYeHsS63bRtPnz71r13XzY9Go6/3AhWHqVTqBBBW1DRNHDen09WBwgrHTF2PBHQcB63AfPQSTF+BQKC2LOudpmknACpXV1dotVrodrvYTvJixClq/gFot9vBLMOFPI8AoXOxlyyypKsfPnyIRqNxJ1mFINxgMPCvXdctBrMLc6kPL2lkBPMy3W5345CO46DdbofDSs00zaNgRSrccTKZfNvZ2fmLiH4BsPPz5098+PABDx482Bikbdt49eoVPn78KKss13V/Hw6H78JtY9Nv4SQSAJTLZVSr1cSbW8dx0Ov1cHp6GswTWgD0uBzh0gxrMF8TgF8rT2jbNgaDwY28ICDe1uFw+MeiviulgIvF4q+pVKqJgDWDsHEWHY/Hc1CerNls1rQsa86liQBDoDUAMQvsUp3MZrP+KmBSawFKqaq66x34dWbW4zL+zDwlIgMiaX4ig+//SoksKFUqlRpEpDPzBYCLyAGIiqZp/pZ0jHvLm8SLiDrMfEhEelwb13Vj762iWx07TdP87rpuLe4+M6/0sWaR5laSdTWZTOxsNpvxVp6gjOFw+Oy2z9/Iwd3bffjnSe+7XNJQdEMbAQy7mpkrSb5sRunWLpaaTCbfcrnclJn/Ho1GR8t7rKZ/AacjxLFPJTdmAAAAAElFTkSuQmCC";
 
 function initMap() {
-	var mapOptions = {
-		mapTypeId: google.maps.MapTypeId.ROADMAP
-	};
-	var mapdiv = document.getElementById("map-art");
-	map = new google.maps.Map(mapdiv, mapOptions);
+	if (map) return;
+	map = new google.maps.Map(
+		document.getElementById("map-art"),
+		{mapTypeId: google.maps.MapTypeId.ROADMAP,zoom: 7});
 }
 
 /** @constructor */
@@ -87,7 +126,7 @@ function Gasole() {
 		var r = loc.radius;
 		this.stats = new Stats();
 		if (typeof(sort)=="undefined") sort="p";
-		result = [];
+		var result = [];
 		var type = this.type;
 		for (var prov in this.info) {
 			var infop = this.info[prov];
@@ -111,11 +150,40 @@ function Gasole() {
 		}
 		return result.sort(function(a,b){return (a[sort]<b[sort]) ? -1 : 1;});
 	}
+	this.routeData = function(route) {
+		var result = [];
+		var type = this.type;
+		this.stats = new Stats();
+		for (var prov in this.info) {
+			var infop = this.info[prov];
+			for (var town in infop) {
+				var infot = infop[town];
+				for (var station in infot) {
+					var st = infot[station];
+					var price = st.o[type];
+					if (price) {
+						var g = st.g;
+						if (g) {
+							var geo = new google.maps.LatLng(g[0],g[1]);
+							for (var wp=0; wp<route.length-1; wp++) {
+								var area = new google.maps.LatLngBounds(route[wp],route[wp+1]);
+								if (!area.contains(geo)) continue;
+								var dist = distanceOrto(geo,route[wp],route[wp+1]);
+								if (dist<.01) {
+									result.push({a:station,r:st.r,g:g,p:price,t:town,l:st.l,d:dist});
+									this.stats.add(price);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return result;
+	}
 }
 
-var map = null;
-var gasole = new Gasole();
-var markerDetail = null;
+
 
 /** @constructor */
 function SearchLocations() {
@@ -140,7 +208,7 @@ function clearMarkers() {
 
 function showList(data) {
 	if (!data) return;
-	if (!map) initMap();
+	initMap();
 	var list = $$("#list");
 	list.html("");
 	bounds = new google.maps.LatLngBounds();
@@ -232,6 +300,33 @@ function searchResults() {
 	}
 }
 
+function searchRoute() {
+	initMap();
+	if (!directionsRender) directionsRender = new google.maps.DirectionsRenderer();
+	directionsRender.setMap(map);
+	var request = {origin: $$('#origin').val(),
+		destination: $$('#destination').val(),
+		travelMode: google.maps.TravelMode.DRIVING,
+		unitSystem: google.maps.UnitSystem.METRIC,
+		avoidHighways: false,
+		avoidTolls: true};
+	var service = new google.maps.DirectionsService();
+	service.route(request, function(r,s) {
+		console.log(r);
+		console.log(s);
+		if (s==google.maps.DirectionsStatus.OK) {
+			directionsRender.setDirections(r);
+			Lungo.Router.article("results-sec", "map-art");
+			var simple = properRDP(r.routes[0].overview_path);
+			console.log(simple);
+			new google.maps.Polyline({map: map,path: simple});
+			var result = gasole.routeData(simple);
+			showList(result);
+			console.log(result);
+		}
+	});
+}
+
 function initControl() {
 	var now = new Date();
 	var date = gasole.date;
@@ -239,7 +334,7 @@ function initControl() {
 	$$('#info').text("Precios actualizados "+when+" a las "+date.toLocaleTimeString().split(":").splice(0,2).join(":"));
 	Lungo.dom("#map-art").on("load", function() {
 		google.maps.event.trigger(map, 'resize');
-		map.fitBounds(bounds);
+		if (bounds) map.fitBounds(bounds);
 	})
 
 	$$('.type').tap(function() {
@@ -297,6 +392,7 @@ function initControl() {
 		$$('.sort').removeClass("on");
 		this.className+=" on";
 	});
+	$$('#route-button').tap(searchRoute);
 }
 
 function showDetail(id) {
@@ -342,3 +438,8 @@ window.addEventListener("load", function() {
 	
 	click = new Sound("click");
 })
+
+var map = null;
+directionsRender = null;
+var gasole = new Gasole();
+var markerDetail = null;

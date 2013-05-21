@@ -81,8 +81,8 @@
 				<h1>Cerca de este lugar:</h1>
 				<div class="form">
 					<fieldset>
-						<div id="search">
-							<input type=text placeholder="Gran Vía 27, Madrid" id="search-input">
+						<div class="search">
+							<input type=text placeholder="Gran Vía 27, Madrid" id="search-input" class="gasole">
 							<a href="#" id="location" class="icon locate"></a>
 						</div>
 						<a class="button" id="search-button">Buscar</a>
@@ -96,14 +96,42 @@
 	<section id="route-sec" data-tranasition="slide">
 		<header data-title="Gasolineras en Ruta">
 				<nav>
-					<a href="#menu" data-router="aside" data-icon="menu"></a>
+					<a href="#back" data-router="section" data-icon="left" class="button">volver</a>
 				</nav>
 		</header>
-		<article id="route-art" class="active">
+		<article id="route-art" class="active list">
+			<li>
+				<h1>Buscar <span id="typename">Gasolina 95</span></h1>
+				<ul class="selector">	
+					<li data-type="1" class="icon type T_1 sel"><br>G95</li>
+					<li data-type="3" class="icon type T_3"><br>G98</li>
+					<li data-type="4" class="icon type T_4"><br>GOA</li>
+					<li data-type="5" class="icon type T_5"><br>NGO</li>
+					<li data-type="6" class="icon type T_6"><br>GOB</li>
+					<li data-type="7" class="icon type T_7"><br>GOC</li>
+					<li data-type="8" class="icon type T_8"><br>BIOD</li>
+				</ul>
+			</li>
+			<div class="form">
 
+			<fieldset>
+				<h1>Entre el origen de ruta:</h1>
+				<div class="search">
+				<input type=text placeholder="Punto de partida" id="origin" class="gasole">
+				<a href="#" id="loc-1" class="icon locate"></a>
+				</div>
+			
+				<h1>Y el finalde ruta:</h1>
+				<div class="search">
+				<input type=text placeholder="Punto de partida" id="destination" class="gasole">
+				<a href="#" id="loc-2" class="icon locate"></a>
+				</div>
+				
+				<a class="button" id="route-button">Obtener Gasolineras</a>
+			</fieldset>
+			</div>
 
 		</article>
-
 	</section>
 
 	<section id="results-sec" data-transition="slide">

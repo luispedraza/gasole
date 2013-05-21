@@ -634,10 +634,10 @@ li.T_8.sel {
 .d.sel {
   background-color: #007db5;
 }
-#home-art input#search-input {
+fieldset input[type="text"].gasole {
   outline: 0;
   border: 0;
-  padding: 3px;
+  padding: 5px;
   font-size: 1.5em;
   position: absolute;
   left: 0;
@@ -647,20 +647,20 @@ li.T_8.sel {
   width: auto;
   height: 2em;
 }
-#search {
+.search {
   border: 1px solid #ccc;
   position: relative;
   height: 3em;
   margin-bottom: 1em;
 }
-#search.current {
+.search.current {
   background-color: #CC3333;
   color: #fff;
 }
 #home-art .current input#search-input {
   color: #fff;
 }
-#search #location {
+.search #location {
   font-size: 1.5em;
   position: absolute;
   right: 0;
@@ -741,7 +741,7 @@ h1 {
 .icon.left:before{content:"\0058";font-size: .8em;}
 .icon.refresh:before{content:"\005c"}
 .icon.warning:before{content:"\0052"}
-
+.icon.home:before{content:"\0021"}
 
 
 
