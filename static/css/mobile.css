@@ -634,7 +634,7 @@ li.T_8.sel {
 .d.sel {
   background-color: #007db5;
 }
-fieldset input[type="text"].gasole {
+fieldset input[type="text"].location {
   outline: 0;
   border: 0;
   padding: 5px;
@@ -657,7 +657,7 @@ fieldset input[type="text"].gasole {
   background-color: #CC3333;
   color: #fff;
 }
-#home-art .current input#search-input {
+.search.current input.location {
   color: #fff;
 }
 .search #location {
@@ -665,6 +665,9 @@ fieldset input[type="text"].gasole {
   position: absolute;
   right: 0;
   top: 0;
+}
+.icon.locate.found {
+	color: #fff;
 }
 
 h1 {

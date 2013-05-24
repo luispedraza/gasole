@@ -1,7 +1,7 @@
 function distance(a,b,r) {
-	var dlat = Math.abs(a[0]-b[0])*111.03461;
+	var dlat = Math.abs(a[0]-b[0])*Lat2Km;
 	if (dlat<r) {
-		var dlon = Math.abs(a[1]-b[1])*85.39383;
+		var dlon = Math.abs(a[1]-b[1])*Lon2Km;
 		if (dlon<r) {
 			var dist = Math.sqrt(Math.pow(dlat,2)+Math.pow(dlon,2));
 			if (dist<r) return dist;
@@ -22,7 +22,7 @@ function distanceOrto(p, p1,p2) {
 // Ramer–Douglas–Peucker algorithm
 // http://karthaus.nl/rdp/js/rdp.js
 function properRDP(points,epsilon){
-	if (typeof(epsilon)=="undefined") epsilon = 0.01; // 1km de distancia aprox. .01 grados
+	if (typeof(epsilon)=="undefined") epsilon = 1*Km2LL;
     var firstPoint=points[0];
     var lastPoint=points[points.length-1];
     if (points.length<3){
@@ -38,14 +38,12 @@ function properRDP(points,epsilon){
         }
     }
     if (dist>epsilon){
-        // iterate
         var l1=points.slice(0, index+1);
         var l2=points.slice(index);
         var r1=properRDP(l1,epsilon);
         var r2=properRDP(l2,epsilon);
         // concat r2 to r1 minus the end/startpoint that will be the same
-        var rs=r1.slice(0,r1.length-1).concat(r2);
-        return rs;
+         return r1.slice(0,r1.length-1).concat(r2);
     } else return [firstPoint,lastPoint];
 }
 
@@ -154,6 +152,9 @@ function Gasole() {
 		var result = [];
 		var type = this.type;
 		this.stats = new Stats();
+		var dist = Km2LL;
+		// Puntos kilométricos
+
 		for (var prov in this.info) {
 			var infop = this.info[prov];
 			for (var town in infop) {
@@ -164,15 +165,26 @@ function Gasole() {
 					if (price) {
 						var g = st.g;
 						if (g) {
+							var valid = false;
 							var geo = new google.maps.LatLng(g[0],g[1]);
 							for (var wp=0; wp<route.length-1; wp++) {
-								var area = new google.maps.LatLngBounds(route[wp],route[wp+1]);
-								if (!area.contains(geo)) continue;
-								var dist = distanceOrto(geo,route[wp],route[wp+1]);
-								if (dist<.01) {
-									result.push({a:station,r:st.r,g:g,p:price,t:town,l:st.l,d:dist});
-									this.stats.add(price);
+								var d0 = distance(g, [route[wp].lat(), route[wp].lng()], dist);
+								if (d0) valid = true;
+								else {
+									var d1 = distance(g, [route[wp+1].lat(), route[wp+1].lng()], dist);
+									if (d1) valid = true;
+									else {
+										var area = new google.maps.LatLngBounds(route[wp],route[wp+1]);
+										if (area.contains(geo)) {
+											var d = distanceOrto(geo,route[wp],route[wp+1]);
+											if (d<dist) valid = true;
+										}
+									}
 								}
+							}
+							if (valid) {
+								result.push({a:station,r:st.r,g:g,p:price,t:town,l:st.l,d:d});
+								this.stats.add(price);
 							}
 						}
 					}
@@ -197,9 +209,6 @@ function SearchLocations() {
 	this.select = function(m) {this.locs = [this.locs[m]]};
 	this.clear = function() {this.locs=[]};
 };	
-var theLocation=new SearchLocations();	// Referencia de búsqueda
-var bounds=null;						// límites de los resultados
-var markers=[];
 
 function clearMarkers() {
 	for (var i=0;i<markers.length;i++) markers[i].setMap(null);
@@ -302,10 +311,10 @@ function searchResults() {
 
 function searchRoute() {
 	initMap();
-	if (!directionsRender) directionsRender = new google.maps.DirectionsRenderer();
+	if (!directionsRender) directionsRender = new google.maps.DirectionsRenderer({draggable:true});
 	directionsRender.setMap(map);
-	var request = {origin: $$('#origin').val(),
-		destination: $$('#destination').val(),
+	var request = {origin: $$('#originInput').val(),
+		destination: $$('#destinyInput').val(),
 		travelMode: google.maps.TravelMode.DRIVING,
 		unitSystem: google.maps.UnitSystem.METRIC,
 		avoidHighways: false,
@@ -316,13 +325,14 @@ function searchRoute() {
 		console.log(s);
 		if (s==google.maps.DirectionsStatus.OK) {
 			directionsRender.setDirections(r);
-			Lungo.Router.article("results-sec", "map-art");
-			var simple = properRDP(r.routes[0].overview_path);
-			console.log(simple);
-			new google.maps.Polyline({map: map,path: simple});
-			var result = gasole.routeData(simple);
+			// var simple = properRDP(r.routes[0].overview_path);
+			// console.log(simple);
+			// new google.maps.Polyline({map: map,path: simple});
+			// var result = gasole.routeData(simple);
+			var result = gasole.routeData(r.routes[0].overview_path);
 			showList(result);
 			console.log(result);
+			// Lungo.Router.article("results-sec", "map-art");
 		}
 	});
 }
@@ -356,34 +366,37 @@ function initControl() {
 		showList(data);
 	});
 	$$('#search-button').tap(searchResults);
-	$$('#location').tap(function() {
-		var input = $$('#search-input');
-		var searchDiv = $$('#search');
+	$$('.locate').tap(function() {
+		var input = $$("#"+this.id+"Input");
+		var searchDiv = $$("#"+this.id+"Div");
+		var icon = $$(this);
+		var theLoc = null;
+		if (this.id=="location") theLoc=theLocation;
+		else if (this.id=="origin") theLoc=theOrigin;
+		else if (this.id=="destiny") theLoc=theDestiny;
 		if (searchDiv.hasClass("current")) {
-			$$('.locate').style('color',"#ccc");
+			icon.removeClass('found');
 			input.val("").removeAttr('readonly');
-			theLocation.clear();
-			searchDiv.toggleClass("current");
+			theLoc.clear();
+			searchDiv.removeClass("current");
 		} else {
-			$$(this).addClass("spinner");
+			icon.addClass("spinner");
 			function posLoad(pos) {
 				clearInterval(to);
-				$$('.locate').removeClass("spinner").style('color',"#fff");
-				theLocation.clear();
-				searchDiv.toggleClass("current");
+				icon.removeClass('spinner').addClass('found');
+				searchDiv.addClass('current');
 				input.val("Mi posición actual").attr('readonly',true);
-				theLocation.add(input.val(), [pos.coords.latitude, pos.coords.longitude]);
+				theLoc.clear();
+				theLoc.add(input.val(), [pos.coords.latitude, pos.coords.longitude]);
 			}
 			function posError(e) {
 				clearInterval(to);
-				$$('.locate').removeClass("spinner");
+				icon.removeClass('spinner');
 				Lungo.Notification.show("No se puede obtener tu posición","warning", 3);
 				input.val("");
 			}
-			input.val("Obteniendo posición.");
-			var to = setInterval(function() {
-				input.val(input.val()+".");
-			}, 100);
+			input.val("Obteniendo posición");
+			var to = setInterval(function() {input.val(input.val()+".");}, 100);
 			navigator.geolocation.getCurrentPosition(posLoad, posError, {timeout: 5000});
 		}
 	});
@@ -443,3 +456,8 @@ var map = null;
 directionsRender = null;
 var gasole = new Gasole();
 var markerDetail = null;
+var theLocation=new SearchLocations();	// Referencia de búsqueda
+var theOrigin=new SearchLocations(); 	// Origen de un recorrido
+var theDestiny=new SearchLocations(); 	// Destino de un recorrido
+var bounds=null;						// límites de los resultados
+var markers=[];

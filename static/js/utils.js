@@ -1,3 +1,10 @@
+var Lat2Km = 111.03461;
+var Km2Lat = 0.009006;
+var Lon2Km = 85.39383;
+var Km2Lon = 0.01171;
+var LL2Km = 98.2;
+var Km2LL = 0.010183;
+
 var FUEL_OPTIONS = {"1": {"short": "G95", "name": "Gasolina 95"},
 				"3": {"short": "G98", "name": "Gasolina 98"},
 				"4": {"short": "GOA", "name": "Gasóleo Automoción"},
