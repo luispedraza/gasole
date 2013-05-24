@@ -202,10 +202,14 @@ class Detail(BaseAuthHandler):
         # Actualización de datos de la gasolinera:
         if users.is_current_user_admin() and self.request.get("edit_station"):
             sdata = GasStation.get(db.Key.from_path('Province', p, 'Town', t, 'GasStation', s))
-            sdata.geopt = db.GeoPt(float(self.request.get("lat")), float(self.request.get("lon")))
-            sdata.phone = self.request.get("phone")
-            sdata.email = self.request.get("email")
-            sdata.link = self.request.get("link")
+            if self.request.get("lat") and self.request.get("lon"):
+                sdata.geopt = db.GeoPt(float(self.request.get("lat")), float(self.request.get("lon")))
+            if self.request.get("phone"):
+                sdata.phone = self.request.get("phone")
+            if self.request.get("email"):
+                sdata.email = self.request.get("email")
+            if self.request.get("link"):
+                sdata.link = self.request.get("link")
             sdata.put()
             self.get(province=province, town=town, station=station)
             return
