@@ -160,19 +160,24 @@ def gas_update_xls(option="1"):
 	def handle_xls_result(rpc, o, result=result):
 		rpc_res = rpc.get_result()
 		page = html.document_fromstring(rpc_res.content)
-		rows = page.xpath("body/table")[0].findall("tr")
-		for tr in rows[3:]:
-			row_data = [td.text for td in tr.getchildren()]
-			if row_data[7] == "P":	# guardo sólo gaslineras de venta público
-				date = map(int, row_data[4].split("/"))
-				date.reverse();
-				result.add_item(province = row_data[0],
-					town     = row_data[1],
-					station  = row_data[2] + " [" + re.sub("\s+", "", row_data[3]) + "]",
-					date     = date,
-					label    = row_data[6],
-					hours    = row_data[9],
-					option   = {o: float(re.sub(",", ".", row_data[5]))})
+		tables = page.xpath("body/table")
+		if tables:
+			rows = tables[0].findall("tr")
+			for tr in rows[3:]:
+				row_data = [td.text for td in tr.getchildren()]
+				if row_data[7] == "P":	# guardo sólo gaslineras de venta público
+					date = map(int, row_data[4].split("/"))
+					date.reverse();
+					result.add_item(province = row_data[0],
+						town     = row_data[1],
+						station  = row_data[2] + " [" + re.sub("\s+", "", row_data[3]) + "]",
+						date     = date,
+						label    = row_data[6],
+						hours    = row_data[9],
+						option   = {o: float(re.sub(",", ".", row_data[5]))})
+		else:
+			logging.info("sin informacion en %s" %o)
+			return
 		logging.info("fin procesando %s: %s" %(o, memory_usage().current()))
 
 	def create_xls_callback(rpc, o):
