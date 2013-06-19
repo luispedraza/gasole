@@ -140,10 +140,7 @@ function prettyName(s) {
 	return s;
 }
 function decodeArray(a) {
-	for (var n=0; n<a.length; n++) {
-		a[n] = decodeName(a[n]);
-	}
-	return a;
+	for (var n=0; n<a.length; n++) a[n]=decodeName(a[n]); return a;
 }
 function encodeName(s) {
 	return s.replace(/\//g, "|").replace(/ /g, "_");
@@ -157,45 +154,275 @@ function checkLocalStorage() {
 	}
 }
 
-function getApiData(url, key, callback) {
+/* Obtención de datos de la api a partir de la url de la página actual */
+function getApiData(callback) {
+	function getKey() {return window.location.pathname.split("/").slice(1).join("*");}
+	var key = getKey();
+	if (checkLocalStorage()) {
+		if (localStorage.hasOwnProperty(key)) {
+			localData = JSON.parse(localStorage[key]);
+			if ((new Date().getTime()-localData.ts)>LS_EXPIRE) localStorage.removeItem(key);
+			else {callback(localData.data); return;};
+		}
+	} 
 	var req = new XMLHttpRequest();
 	req.onload = function(r) {
-		info = JSON.parse(r.target.responseText);
-		if (key) {
-			localStorage.setItem(key, JSON.stringify(info));
-			if (!localStorage.timestamp) localStorage.setItem("timestamp", new Date().getTime());
-		}
+		var info = JSON.parse(this.responseText);
+		if (checkLocalStorage())
+			localStorage.setItem(key, JSON.stringify(
+				{"ts": new Date().getTime(), "data": info}));
 		callback(info);
-	}
-	req.open("GET", url);
-	req.send();
-}
-function getKey() {
-	return window.location.pathname.split("/").slice(1).join("***");
+	};
+	var option = window.location.pathname.split("/")[1];
+	req.open("GET", document.URL.replace(option, APIS[option]));
+	req.send();	
+	
 }
 
-function getData(callback) {
-	var key = null, info = null;
-	var pathArray = window.location.pathname.split("/");
-	var option = pathArray[1];
-	if (checkLocalStorage()) {
-		// Limpieza de datos antiguos
-		var ts = localStorage["timestamp"];
-		if (ts && (new Date().getTime() - parseInt(ts))>LS_EXPIRE) localStorage.clear();
-		key = getKey();
-		var storedData = localStorage[key];
-		if (storedData) info = JSON.parse(storedData);
-		else if ((option=="gasolineras") && (pathArray[3])) {
-			storedData = localStorage[pathArray.slice(1,3).join("***")];
-			if (storedData) {
-				var prov  = decodeName(pathArray[2]);
-				var town = decodeName(pathArray[3]);
-				info = {"_data": {}};
-				info._data[prov] = {};
-				info._data[prov][town] = JSON.parse(storedData)._data[prov][town];
-			}
+/****************************/
+/* FUNCIONES GEOMETRICAS ****/
+/****************************/
+
+/* Distancia entre dos puntos */
+function distance(a,b,r) {
+	var dlat = Math.abs(a[0]-b[0])*Lat2Km;
+	if (dlat<r) {
+		var dlon = Math.abs(a[1]-b[1])*Lon2Km;
+		if (dlon<r) {
+			var dist = Math.sqrt(Math.pow(dlat,2)+Math.pow(dlon,2));
+			if (dist<r) return dist;
 		}
 	}
-	if (info) callback(info);
-	else getApiData(document.URL.replace(option, APIS[option]), key, callback);
+	return null;
+}
+
+// Distancia de un punto a una recta
+function distanceOrto(p, p1,p2) {d
+    // if start and end point are on the same x the distance is the difference in X.
+    if (p1.lng()==p2.lng()) return Math.abs(p.lat()-p1.lat());
+    else {
+        var slope = (p2.lat() - p1.lat())/(p2.lng() - p1.lng());
+        var intercept = p1.lat()-(slope*p1.lng());
+        return Math.abs(slope*p.lng()-p.lat()+intercept)/Math.sqrt(slope*slope+1);
+    }
+    return null;
+}
+// Ramer–Douglas–Peucker algorithm
+// http://karthaus.nl/rdp/js/rdp.js
+function properRDP(points,epsilon){
+	if (typeof(epsilon)=="undefined") epsilon = 1*Km2LL;
+    var firstPoint=points[0];
+    var lastPoint=points[points.length-1];
+    if (points.length<3){
+        return points;
+    }
+    var index=-1;
+    var dist=0;
+    for (var i=1;i<points.length-1;i++){
+        var cDist=distanceOrto(points[i],firstPoint,lastPoint);
+        if (cDist>dist){
+            dist=cDist;
+            index=i;
+        }
+    }
+    if (dist>epsilon){
+        var l1=points.slice(0, index+1);
+        var l2=points.slice(index);
+        var r1=properRDP(l1,epsilon);
+        var r2=properRDP(l2,epsilon);
+        // concat r2 to r1 minus the end/startpoint that will be the same
+         return r1.slice(0,r1.length-1).concat(r2);
+    } else return [firstPoint,lastPoint];
+}
+
+/********************/
+/* EL OBJETO GASOLE */
+/********************/
+
+/** @constructor */
+function SearchLocations() {
+	this.locs=[];
+	this.radius=2;
+	this.length = function() {return this.locs.length};
+	this.add = function(p, ll) { this.locs.push({name: p, latlng: ll})};
+	this.latlng = function() {return (this.length()==1) ? this.locs[0].latlng : null};
+	this.name = function() {return (this.length()==1) ? this.locs[0].name : null};
+	this.get = function(m) {return this.locs[m]};
+	this.select = function(m) {this.locs = [this.locs[m]]};
+	this.clear = function() {this.locs=[]};
+};	
+
+/** @constructor */
+function Stats() {
+	this.n = 0;
+	this.max = this.min = this.mu = this.range = null;
+	this.add =function(p) {	
+		if (this.max) {
+			if (p>this.max) this.max=p;
+			else if (p<this.min) this.min=p;
+			this.mu = (this.mu*this.n+p)/(this.n+1);
+			this.range = this.max-this.min;
+		} else {
+			this.max = this.min = this.mu = p;
+		}
+		this.n++;
+	};
+}
+
+/** @constructor */
+function Gasole(callback) {
+	this.color = function(p) {
+		if (this.stats.range!=0) {
+			var v = (p-this.stats.min)/this.stats.range;
+			if (v<.33) return COLORS.min;
+			if (v>.66) return COLORS.max;
+		}
+		return COLORS.mu;
+	}
+	this.init = function(data, date) {this.info = data;this.date=date};
+	// Obtiene datos de una provincia como estructura de datos
+	this.provinceDataArray = function(p) {
+		this.stats = new Stats();
+		var type = this.type;
+		result = [];
+		var province = this.info[p];
+		for (var t in province) {
+			var infot = province[t];
+			for (var s in infot) {
+				var st = infot[s];
+				var price = st.o[type];
+				if (price){
+					result.push({a:s,r:st.r,g:st.g,p:price,t:t,l:st.l,d:null});
+					this.stats.add(price);
+				}
+			}
+		}
+		return result;
+	}
+	// Obtiene estructura de gasolineras próximas a una ubicación
+	// @param loc: lugar y radio de búsqueda
+	this.nearData = function(loc) {
+		var l = loc.latlng(); if (!l) return;			// lugar de búsqueda
+		var r = loc.radius;								// radio de búsqueda
+		var result = {};
+		for (var prov in this.info) {					// para todas las provincias…
+			var infop = this.info[prov];				// info de provincia
+			result[prov]={};
+			for (var town in infop) {					// para todas las ciudades…
+				var infot = infop[town];				// info de la ciudad
+				result[prov][town]={};
+				for (var station in infot) {			// para todas las estaciones…
+					var st = infot[station];			// información de la estación
+					var geo = st.g;				
+					if (geo) {
+						var dist = distance(geo,l,r);
+						if (dist) result[prov][town][station] = st;
+					}
+				}
+				if (!Object.keys(result[prov][town]).length) delete result[prov][town];
+			}
+			if (!Object.keys(result[prov]).length) delete result[prov];
+		}
+		return result;
+	}
+	// Obtiene array de gasolineras próximas a una ubicación
+	// @param loc: lugar y radio de búsqueda
+	// @param sort: criterio de ordenación
+	this.nearDataArray = function(loc, sort) {
+		var l = loc.latlng(); if (!l) return;			// lugar de búsqueda
+		var r = loc.radius;								// radio de búsqueda
+		this.stats = new Stats();
+		var result = [];
+		for (var prov in this.info) {					// para todas las provincias…
+			var infop = this.info[prov];				// info de provincia
+			for (var town in infop) {					// para todas las ciudades…
+				var infot = infop[town];				// info de la ciudad
+				for (var station in infot) {			// para todas las estaciones…
+					var st = infot[station];			// información de la estación
+					if (st.o.hasOwnProperty(this.type)) {
+						var geo = st.g;
+						if (geo) {
+							var dist = distance(geo,l,r);
+							if (dist) {
+								var price = st.o[this.type];	// el precio en la estación
+								result.push({a:station,r:st.r,g:geo,p:price,t:town,l:st.l,d:dist});
+								this.stats.add(price);
+							}
+						}
+					}
+				}
+			}
+		}
+		if (sort) return result.sort(function(a,b){return (a[sort]<b[sort]) ? -1 : 1;});
+		return result;
+	}
+	this.routeData = function(route) {
+		var result = [];
+		var type = this.type;
+		this.stats = new Stats();
+		var dist = Km2LL;
+		// Puntos kilométricos
+
+		for (var prov in this.info) {
+			var infop = this.info[prov];
+			for (var town in infop) {
+				var infot = infop[town];
+				for (var station in infot) {
+					var st = infot[station];
+					var price = st.o[type];
+					if (price) {
+						var g = st.g;
+						if (g) {
+							var valid = false;
+							var geo = new google.maps.LatLng(g[0],g[1]);
+							for (var wp=0; wp<route.length-1; wp++) {
+								var d0 = distance(g, [route[wp].lat(), route[wp].lng()], dist);
+								if (d0) valid = true;
+								else {
+									var d1 = distance(g, [route[wp+1].lat(), route[wp+1].lng()], dist);
+									if (d1) valid = true;
+									else {
+										var area = new google.maps.LatLngBounds(route[wp],route[wp+1]);
+										if (area.contains(geo)) {
+											var d = distanceOrto(geo,route[wp],route[wp+1]);
+											if (d<dist) valid = true;
+										}
+									}
+								}
+							}
+							if (valid) {
+								result.push({a:station,r:st.r,g:g,p:price,t:town,l:st.l,d:d});
+								this.stats.add(price);
+							}
+						}
+					}
+				}
+			}
+		}
+		return result;
+	}
+
+	this.callback = callback;
+	this.stats = null;
+	this.info = null; 		// datos de la api
+	this.date = null;		// fecha de actualización
+	this.type = "1";
+	var storedData = localStorage["gasole"];	// datos guardados
+	if (!storedData || ((new Date().getTime()-parseInt(JSON.parse(storedData).ts))>LS_EXPIRE)) {
+		// buscar nuevos datos
+		var req = new XMLHttpRequest();
+		req.gasole = this;
+		req.onload = function() {
+			var date = new Date();
+			this.gasole.init(JSON.parse(this.responseText), date);
+			localStorage.setItem("gasole", '{"ts": '+ date.getTime() +',"data": '+this.responseText+'}');
+			if (this.gasole.callback) this.gasole.callback();
+		}
+		req.open("GET", "/api/All");
+		req.send();
+	} else {
+		var data = JSON.parse(storedData);
+		this.init(data.data, new Date(data.ts));
+		if (this.callback) this.callback();
+	}
 }

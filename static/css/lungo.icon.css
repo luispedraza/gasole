@@ -2,7 +2,7 @@
 
 
 .icon:before{font-family:'lungojsicon';font-weight:normal!important}
-
+.icon.home:before{content:"\0021"}
 .icon.picture:before{content:"\0023"}
 .icon.camera:before{content:"\0024"}
 .icon.music:before{content:"\0025"}

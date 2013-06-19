@@ -398,5 +398,5 @@ window.addEventListener("load", function() {
 			}
 		}
 	}
-	getData(processData);
+	getApiData(processData);
 })

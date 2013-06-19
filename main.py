@@ -283,7 +283,6 @@ class Detail(BaseAuthHandler):
 
 class Api(BaseHandler):
     def get(self, prov, town, station):
-        tic()
         info = None
         prov = decode_param(prov)
         if station:
@@ -294,7 +293,6 @@ class Api(BaseHandler):
             info = getProvinceJson(prov)
         self.response.headers['Content-Type'] = 'application/json; charset=utf-8'
         self.write(info)
-        toc()
 
 class StatsApi(BaseHandler):
     def get(self, prov, town):
@@ -320,14 +318,17 @@ class SearchResults(BaseAuthHandler):
 class Info(BaseAuthHandler):
     def get(self, section):
         content_html = ""
+        scripts = ""
         if section=="combustibles":
             content_html="info_combustibles.html"
         elif section=="tarjetas":
             content_html="info_tarjetas.html"
         elif section=="noticias":
             content_html="info_noticias.html"
+            scripts=get_js('noticias.js',DEBUG)
         self.render("base.html",
-            content=jinja_env.get_template(content_html).render())
+            content=jinja_env.get_template(content_html).render(),
+            scripts=scripts)
 
 def handle_404(request, response, exception):
     #http://webapp-improved.appspot.com/guide/exceptions.html

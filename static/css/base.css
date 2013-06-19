@@ -197,7 +197,15 @@ footer a:hover{
 	margin-top: 10px;
 	margin-bottom: 20px;
 }
-
+#textcontent {
+	padding: 30px;
+	-moz-column-count:2; /* Firefox */
+	-webkit-column-count:2; /* Safari and Chrome */
+	column-count:2;
+	-moz-column-gap:10px; /* Firefox */
+	-webkit-column-gap:10px; /* Safari and Chrome */
+	column-gap:10px;
+}
 #logout {
 	font-size: 14px;
 	position: absolute;

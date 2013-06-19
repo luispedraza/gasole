@@ -149,7 +149,7 @@ h2 {
 	height: 350px;
 	clear: both;
 }
-#comments {
+#edit, #comments {
 	width: 780px;
 	float: right;
 }

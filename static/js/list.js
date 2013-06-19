@@ -1,7 +1,7 @@
-var data;
-var map;
+var data;			// datos obtenidos de la api
+var map;			// el mapa de Google
 var place = "";
-var markers = [];
+var markers = [];	// lista de marcadores sobre el mapa
 var province = "";
 var town = "";
 var markerCenter=null;
@@ -109,8 +109,8 @@ function calcDistances() {
 		var latlon = tds[i].getAttribute("data-geo");
 		if (latlon) {
 			latlon = latlon.split(",");
-			var dlat = (latlon[0] - markerCenter.position.lat()) * 111.03461;
-			var dlon = (latlon[1] - markerCenter.position.lng()) * 85.39383;
+			var dlat = (latlon[0] - markerCenter.position.lat()) * Lat2Km;
+			var dlon = (latlon[1] - markerCenter.position.lng()) * Lon2Km;
 			var dist = Math.sqrt(dlat*dlat+dlon*dlon).toFixed(1);
 			tds[i].getElementsByTagName("span")[0].textContent = dist;
 		}
@@ -541,7 +541,6 @@ function populateTable(types) {
 }
 
 function processData(info) {
-	console.log(info);
 	var h1 = document.getElementById("title");
 	if (info["_near"]) {
 		h1.textContent = "Gasolineras cerca de: " + info["_near"];
@@ -558,8 +557,6 @@ function processData(info) {
 	initMap();
 	populateTable();
 	populateInfo();
-	// para cambiar la imagen http://stackoverflow.com/questions/4416089/google-maps-api-v3-custom-cluster-icon
-	// for (var m=0; m<markers.length; m++) markers[m].setMap(map);
 	initControl();
 	newReference(place);
 	updateMarkers();
@@ -567,5 +564,25 @@ function processData(info) {
 }
 
 window.addEventListener("load", function() {
-	getData(processData);
+	new Gasole(function() {
+		var info = {"_data": {}};
+		var pathArray = decodeArray(window.location.pathname.split("/"));
+		var option = pathArray[1]; // gasolineras, resultados, ficha
+		if (option == "gasolineras") {
+			var prov  = pathArray[2];
+			if (pathArray[3]) {
+				var town = pathArray[3];
+				info._data[prov] = {};
+				info._data[prov][town] = this.info[prov][town];
+			} else info._data[prov] = this.info[prov];
+		} else if (option == "resultados") {
+			var location = new SearchLocations();
+			var place = pathArray[2];
+			location.add(place, [parseFloat(pathArray[3]),parseFloat(pathArray[4])]);
+			location.radius = parseFloat(pathArray[5]);
+			info._data = this.nearData(location);
+			info._near = place;
+		}
+		processData(info);
+	});
 })

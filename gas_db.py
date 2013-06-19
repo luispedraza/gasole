@@ -11,7 +11,6 @@ import os
 from google.appengine.api.runtime import memory_usage
 
 DEBUG = os.environ['SERVER_SOFTWARE'].startswith('Dev')
-MEMCACHE_T = 18000 	# 5 horas
 
 ## Guarda los últimos datos en formato json
 class ApiJson(db.Model):

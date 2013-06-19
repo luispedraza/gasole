@@ -1,52 +1,3 @@
-function distance(a,b,r) {
-	var dlat = Math.abs(a[0]-b[0])*Lat2Km;
-	if (dlat<r) {
-		var dlon = Math.abs(a[1]-b[1])*Lon2Km;
-		if (dlon<r) {
-			var dist = Math.sqrt(Math.pow(dlat,2)+Math.pow(dlon,2));
-			if (dist<r) return dist;
-		}
-	}
-}
-
-// Distancia de un punto a una recta
-function distanceOrto(p, p1,p2) {
-    // if start and end point are on the same x the distance is the difference in X.
-    if (p1.lng()==p2.lng()) return Math.abs(p.lat()-p1.lat());
-    else {
-        var slope = (p2.lat() - p1.lat())/(p2.lng() - p1.lng());
-        var intercept = p1.lat()-(slope*p1.lng());
-        return Math.abs(slope*p.lng()-p.lat()+intercept)/Math.sqrt(slope*slope+1);
-    }
-}
-// Ramer–Douglas–Peucker algorithm
-// http://karthaus.nl/rdp/js/rdp.js
-function properRDP(points,epsilon){
-	if (typeof(epsilon)=="undefined") epsilon = 1*Km2LL;
-    var firstPoint=points[0];
-    var lastPoint=points[points.length-1];
-    if (points.length<3){
-        return points;
-    }
-    var index=-1;
-    var dist=0;
-    for (var i=1;i<points.length-1;i++){
-        var cDist=distanceOrto(points[i],firstPoint,lastPoint);
-        if (cDist>dist){
-            dist=cDist;
-            index=i;
-        }
-    }
-    if (dist>epsilon){
-        var l1=points.slice(0, index+1);
-        var l2=points.slice(index);
-        var r1=properRDP(l1,epsilon);
-        var r2=properRDP(l2,epsilon);
-        // concat r2 to r1 minus the end/startpoint that will be the same
-         return r1.slice(0,r1.length-1).concat(r2);
-    } else return [firstPoint,lastPoint];
-}
-
 /** @constructor */
 function Sound(id) {
 	this.html5audio = document.getElementById(id);
@@ -69,153 +20,12 @@ function initMap() {
 		{mapTypeId: google.maps.MapTypeId.ROADMAP,zoom: 7});
 }
 
-/** @constructor */
-function Stats() {
-	this.n = 0;
-	this.max = this.min = this.mu = this.range = null;
-	this.add =function(p) {	
-		if (this.max) {
-			if (p>this.max) this.max=p;
-			else if (p<this.min) this.min=p;
-			this.mu = (this.mu*this.n+p)/(this.n+1);
-			this.range = this.max-this.min;
-		} else {
-			this.max = this.min = this.mu = p;
-		}
-		this.n++;
-	};
-}
-
-/** @constructor */
-function Gasole() {
-	this.stats = null;
-	this.info = null; 		// datos de la api
-	this.date = null;		// fecha de actualización
-	this.type = "1";
-	this.color = function(p) {
-		if (this.stats.range!=0) {
-			var v = (p-this.stats.min)/this.stats.range;
-			if (v<.33) return COLORS.min;
-			if (v>.66) return COLORS.max;
-		}
-		return COLORS.mu;
-	}
-	this.init = function(data, date) {this.info = data;this.date=date};
-	this.provinceData = function(p) {
-		this.stats = new Stats();
-		var t = this.type;
-		this.result = {};
-		var province = this.info[p];
-		for (var c in province) {
-			var city = province[c];
-			for (var s in city) {
-				var st = city[s];
-				var price = st.o[t];
-				if (price){
-					this.result[s]=st;
-					this.stats.add(price);	
-				}
-			}
-		}
-		return this.result;
-	}
-	this.nearData = function(loc, sort) {
-		var l = loc.latlng(); if (!l) return;
-		var r = loc.radius;
-		this.stats = new Stats();
-		if (typeof(sort)=="undefined") sort="p";
-		var result = [];
-		var type = this.type;
-		for (var prov in this.info) {
-			var infop = this.info[prov];
-			for (var town in infop) {
-				var infot = infop[town];
-				for (var station in infot) {
-					var st = infot[station];
-					var price = st.o[type];
-					if (price) {
-						var geo = st.g;
-						if (geo) {
-							var dist = distance(geo,l,r);
-							if (dist) {
-								result.push({a:station,r:st.r,g:geo,p:price,t:town,l:st.l,d:dist});
-								this.stats.add(price);
-							}
-						}
-					}
-				}
-			}
-		}
-		return result.sort(function(a,b){return (a[sort]<b[sort]) ? -1 : 1;});
-	}
-	this.routeData = function(route) {
-		var result = [];
-		var type = this.type;
-		this.stats = new Stats();
-		var dist = Km2LL;
-		// Puntos kilométricos
-
-		for (var prov in this.info) {
-			var infop = this.info[prov];
-			for (var town in infop) {
-				var infot = infop[town];
-				for (var station in infot) {
-					var st = infot[station];
-					var price = st.o[type];
-					if (price) {
-						var g = st.g;
-						if (g) {
-							var valid = false;
-							var geo = new google.maps.LatLng(g[0],g[1]);
-							for (var wp=0; wp<route.length-1; wp++) {
-								var d0 = distance(g, [route[wp].lat(), route[wp].lng()], dist);
-								if (d0) valid = true;
-								else {
-									var d1 = distance(g, [route[wp+1].lat(), route[wp+1].lng()], dist);
-									if (d1) valid = true;
-									else {
-										var area = new google.maps.LatLngBounds(route[wp],route[wp+1]);
-										if (area.contains(geo)) {
-											var d = distanceOrto(geo,route[wp],route[wp+1]);
-											if (d<dist) valid = true;
-										}
-									}
-								}
-							}
-							if (valid) {
-								result.push({a:station,r:st.r,g:g,p:price,t:town,l:st.l,d:d});
-								this.stats.add(price);
-							}
-						}
-					}
-				}
-			}
-		}
-		return result;
-	}
-}
-
-
-
-/** @constructor */
-function SearchLocations() {
-	this.locs=[];
-	this.radius=2;
-	this.length = function() {return this.locs.length};
-	this.add = function(p, ll) { this.locs.push({name: p, latlng: ll})};
-	this.latlng = function() {return (this.length()==1) ? this.locs[0].latlng : null};
-	this.name = function() {return (this.length()==1) ? this.locs[0].name : null};
-	this.get = function(m) {return this.locs[m]};
-	this.select = function(m) {this.locs = [this.locs[m]]};
-	this.clear = function() {this.locs=[]};
-};	
-
 function clearMarkers() {
 	for (var i=0;i<markers.length;i++) markers[i].setMap(null);
 		markers=[];
 }
 
-function showList(data) {
+function showList(data, hasDist) {
 	if (!data) return;
 	initMap();
 	var list = $$("#list");
@@ -231,14 +41,14 @@ function showList(data) {
 		title+=FUEL_OPTIONS[gasole.type].name+" cerca de "+theLocation.name();
 		title+=", con un precio medio de "+gasole.stats.mu.toFixed(3)+" €/l</strong>";
 		var sort="<div class='right price sort on'>€/l</div>";
-		sort+="<div class='right dist sort'>km.</div>";
+		if (hasDist) sort+="<div class='right dist sort'>km.</div>";
 		list.html("<li class='title'>"+title+"</li><li><strong>Ordena los resultados:</strong>"+sort+"</li>");
 		for (var i=0;i<nResults;i++) {
 			var item = data[i];
 			var title = "<strong>"+item.l+"</strong>";
 			var subtitle = "<small>"+item.a+"</small>";
 			var price = "<div class='right price'>"+item.p.toFixed(3)+"</div>";
-			var dist = "<div class='right dist'>"+item.d.toFixed(1)+"</div>";
+			var dist = (hasDist) ? ("<div class='right dist'>"+item.d.toFixed(1)+"</div>") : "";
 			var li = document.createElement("li");
 			li.id = "s-"+i;
 			$$(li).html(title+price+dist+subtitle).tap(function() {
@@ -246,25 +56,27 @@ function showList(data) {
 			});
 			list.append(li);
 			// marker
-			var pos = new google.maps.LatLng(item.g[0], item.g[1]);
-			bounds.extend(pos);
-			marker = new google.maps.Marker({
-				position: pos,
-				map: map,
-				icon: {
-					path: google.maps.SymbolPath.CIRCLE,
-					strokeOpacity: 1.0,
-					strokeWeight: 1,
-					fillOpacity: .8,
-					scale: 6,
-					strokeColor: "fff",
-					fillColor: gasole.color(item.p)
-				}
-			});
-			google.maps.event.addListener(marker, 'click', function() {
-				showDetail(markers.indexOf(this));
-			})
-			markers.push(marker);
+			if (item.g) {
+				var pos = new google.maps.LatLng(item.g[0], item.g[1]);
+				bounds.extend(pos);
+				marker = new google.maps.Marker({
+					position: pos,
+					map: map,
+					icon: {
+						path: google.maps.SymbolPath.CIRCLE,
+						strokeOpacity: 1.0,
+						strokeWeight: 1,
+						fillOpacity: .8,
+						scale: 6,
+						strokeColor: "fff",
+						fillColor: gasole.color(item.p)
+					}
+				});
+				google.maps.event.addListener(marker, 'click', function() {
+					showDetail(markers.indexOf(this));
+				})
+				markers.push(marker);
+			}
 		}
 		list.append("<li><strong>Fin de los resultados</strong></li>");
 	} 
@@ -305,7 +117,7 @@ function searchResults() {
 				}
 			});
 	} else {
-		showList(gasole.nearData(theLocation));
+		showList(gasole.nearDataArray(theLocation, "p"));
 	}
 }
 
@@ -337,16 +149,14 @@ function searchRoute() {
 	});
 }
 
-function initControl() {
-	var now = new Date();
+function initControl(gasole) {
 	var date = gasole.date;
-	var when = (now.toLocaleDateString()==date.toLocaleDateString()) ? "hoy" : ("el "+date.getDate()+" de "+MONTHS[date.getMonth()]);
+	var when = (new Date().toLocaleDateString()==date.toLocaleDateString()) ? "hoy" : ("el "+date.getDate()+" de "+MONTHS[date.getMonth()]);
 	$$('#info').text("Precios actualizados "+when+" a las "+date.toLocaleTimeString().split(":").splice(0,2).join(":"));
 	Lungo.dom("#map-art").on("load", function() {
 		google.maps.event.trigger(map, 'resize');
 		if (bounds) map.fitBounds(bounds);
 	})
-
 	$$('.type').tap(function() {
 		click.play();
 		gasole.type = this.getAttribute("data-type");
@@ -362,7 +172,8 @@ function initControl() {
 		$$('#dist').text(theLocation.radius);
 	});
 	$$('.p').tap(function() {
-		var data = gasole.provinceData($$(this).text(), $$(".sel")[0].getAttribute("data-type"));
+		var data = gasole.provinceDataArray($$(this).text());
+		console.log(data);
 		showList(data);
 	});
 	$$('#search-button').tap(searchResults);
@@ -401,7 +212,7 @@ function initControl() {
 		}
 	});
 	$$('.sort').tap(function() {
-		showList(gasole.nearData(theLocation, ($$(this).hasClass("price")) ? "p" : "d")); 
+		showList(gasole.nearDataArray(theLocation, ($$(this).hasClass("price")) ? "p" : "d")); 
 		$$('.sort').removeClass("on");
 		this.className+=" on";
 	});
@@ -409,7 +220,6 @@ function initControl() {
 }
 
 function showDetail(id) {
-	console.log(id);
 	map.panTo(markers[id].position);
 	map.setZoom(15);
 	Lungo.Router.article("results-sec","map-art");
@@ -428,33 +238,17 @@ function showDetail(id) {
 
 window.addEventListener("load", function() {
 	Lungo.init({name: "GasOlé"});
-	var storedData = localStorage["gasole"];
-	if (!storedData || ((new Date().getTime()-parseInt(JSON.parse(storedData).ts))>LS_EXPIRE)) {
-		console.log("buscando nuevos datos");
-		Lungo.Notification.show("<div class='icon refresh spinner'></div>Actualizando Datos…");
-		var req = new XMLHttpRequest();
-		req.onload = function() {
-			var date = new Date();
-			gasole.init(JSON.parse(this.responseText), date);
-			localStorage.setItem("gasole", '{"ts": '+ date.getTime() +',"data": '+this.responseText+'}');
-			Lungo.Notification.hide();
-			initControl();
-		}
-		req.open("GET", "/api/All");
-		req.send();
-	} else {
-		console.log("datos recuperados");
-		var data = JSON.parse(storedData);
-		gasole.init(data.data, new Date(data.ts));
-		initControl();
-	}
-	
+	Lungo.Notification.show("<div class='icon refresh spinner'></div>Actualizando Datos…");
+	gasole = new Gasole(function() {
+		console.log("callback");
+		Lungo.Notification.hide();
+		initControl(this);
+	})
 	click = new Sound("click");
 })
-
+var gasole = null;
 var map = null;
-directionsRender = null;
-var gasole = new Gasole();
+var directionsRender = null;
 var markerDetail = null;
 var theLocation=new SearchLocations();	// Referencia de búsqueda
 var theOrigin=new SearchLocations(); 	// Origen de un recorrido
