@@ -197,7 +197,7 @@ function distance(a,b,r) {
 }
 
 // Distancia de un punto a una recta
-function distanceOrto(p, p1,p2) {d
+function distanceOrto(p, p1,p2) {
     // if start and end point are on the same x the distance is the difference in X.
     if (p1.lng()==p2.lng()) return Math.abs(p.lat()-p1.lat());
     else {
@@ -205,7 +205,6 @@ function distanceOrto(p, p1,p2) {d
         var intercept = p1.lat()-(slope*p1.lng());
         return Math.abs(slope*p.lng()-p.lat()+intercept)/Math.sqrt(slope*slope+1);
     }
-    return null;
 }
 // Ramer–Douglas–Peucker algorithm
 // http://karthaus.nl/rdp/js/rdp.js
