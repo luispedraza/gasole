@@ -189,7 +189,7 @@ def gas_update_xls(option="1"):
 		option = [option]
 	for o in option:
 		logging.info("Obteniendo %s" %FUEL_OPTIONS[o]["name"])
-		rpc = urlfetch.create_rpc(deadline=10)
+		rpc = urlfetch.create_rpc(deadline=55)
 		rpc.callback = create_xls_callback(rpc, o)
 		urlfetch.make_fetch_call(rpc, URL_XLS+o)
 		rpcs.append(rpc)
@@ -229,7 +229,7 @@ def gas_update_search(option="1", prov="01"):
 				latlon = re.search("(?<=centrar\().+(?=\))", cells[-1].prettify())
 				if latlon:
 					latlon = latlon.group().split(",")[:2]
-				date = map(int, row_data[4].split("/"))
+				date = map(int, cells[4].text.split("/"))
 				date.reverse()
 				result.add_item(
 					province = cells[0].text,

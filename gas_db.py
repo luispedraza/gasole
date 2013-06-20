@@ -106,6 +106,7 @@ def updateDB(dnew, dold):
 def data2store(data):
 	if not data:
 		return
+	cachedata = json.loads(getAll().decode('zlib'))
 	for p in data: # recorremos las provincias
 		_provinces = []		# nuevas provincias
 		_towns = []			# nuevas ciudades
@@ -115,7 +116,7 @@ def data2store(data):
 		_closed = []		# estaciones cerradas
 		_del_prices = []	# precios actuales a borrar
 		datap = data[p]
-		cachep = getProvinceData(p)
+		cachep = cachedata[p]
 		if not cachep: # nueva provincia
 			cachep = {}
 			_provinces.append(Province(key_name=p))
@@ -181,7 +182,6 @@ def data2store(data):
 				if len(_del_prices):
 					logging.info("%s precios BORRADOS" %len(_del_prices))
 				json_data = json.dumps({"_data": {p: datap}})
-				memcache.set(p, json_data)
 				ApiJson(key_name=p, json=json_data).put()
 				logging.info("Uso de memoria: %s" %memory_usage().current())
 			except Exception, e:
