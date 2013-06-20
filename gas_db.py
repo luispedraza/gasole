@@ -86,11 +86,14 @@ def getStationJson(p, t, s):
 	return jsondata
 
 # Obtiene todo en formato JSON
-def getAll():
-	alldata = memcache.get("All")
-	if not alldata:
-		alldata = ApiAllJson.all().order('-date').get().json
-		memcache.set("All", alldata)
+def getAll(when=None):
+	if when:
+		alldata = ApiAllJson.all().filter('date <=', when).order('-date').get().json
+	else:
+		alldata = memcache.get("All")
+		if not alldata:
+			alldata = ApiAllJson.all().order('-date').get().json
+			memcache.set("All", alldata)
 	return alldata
 
 @db.transactional
@@ -101,6 +104,8 @@ def updateDB(dnew, dold):
 		db.delete(dold)
 
 def data2store(data):
+	if not data:
+		return
 	for p in data: # recorremos las provincias
 		_provinces = []		# nuevas provincias
 		_towns = []			# nuevas ciudades

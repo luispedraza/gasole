@@ -15,6 +15,7 @@ import re
 from gas_slimmer import *
 from gas_stats import *
 from time import time
+import datetime
 
 TIME=0
 
@@ -288,7 +289,10 @@ class Api(BaseHandler):
         if station:
             info = getStationJson(prov, decode_param(town), decode_param(station))
         elif prov=="All":
-            info = getAll().decode('zlib')
+            when = None
+            if town:
+                when = datetime.datetime.combine(datetime.date(*map(int,town.split("-"))), datetime.time(12))
+            info = getAll(when).decode('zlib')
         else:
             info = getProvinceJson(prov)
         self.response.headers['Content-Type'] = 'application/json; charset=utf-8'
