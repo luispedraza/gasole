@@ -76,8 +76,8 @@ window.addEventListener("load", function() {
 	var gasole = new Gasole();
 	var stats = new GasoleStats(gasole.info, 20, 20).stats;
 	for (var o in stats) {
-		document.getElementById("p_"+FUEL_OPTIONS[o].short).textContent = stats[o].mu.toFixed(3);
-		document.getElementById("min_"+FUEL_OPTIONS[o].short).textContent = stats[o].min.toFixed(3);
-		document.getElementById("max_"+FUEL_OPTIONS[o].short).textContent = stats[o].max.toFixed(3);
+		document.getElementById("p_"+FUEL_OPTIONS[o]["short"]).textContent = stats[o].mu.toFixed(3);
+		document.getElementById("min_"+FUEL_OPTIONS[o]["short"]).textContent = stats[o].min.toFixed(3);
+		document.getElementById("max_"+FUEL_OPTIONS[o]["short"]).textContent = stats[o].max.toFixed(3);
 	}
 })
