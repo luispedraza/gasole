@@ -73,13 +73,11 @@ window.addEventListener("load", function() {
 			c.textContent = pname;
 		});
 	}
-
-	var req = new XMLHttpRequest();
-	req.onload = function() {
-		info = JSON.parse(this.responseText);
-		console.log(info)
+	var gasole = new Gasole();
+	var stats = new GasoleStats(gasole.info, 20, 20).stats;
+	for (var o in stats) {
+		document.getElementById("p_"+FUEL_OPTIONS[o].short).textContent = stats[o].mu.toFixed(3);
+		document.getElementById("min_"+FUEL_OPTIONS[o].short).textContent = stats[o].min.toFixed(3);
+		document.getElementById("max_"+FUEL_OPTIONS[o].short).textContent = stats[o].max.toFixed(3);
 	}
-
-	req.open("GET", "/api/All");
-	req.send();
 })

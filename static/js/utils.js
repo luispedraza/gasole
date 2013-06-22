@@ -253,26 +253,47 @@ function SearchLocations() {
 
 /** @constructor */
 function Stats() {
+	// estadisticas para resultados de un tipo de combustible
 	this.n = 0;
 	this.max = this.min = this.mu = this.range = null;
-	this.add =function(p) {	
-		if (this.max) {
-			if (p>this.max) this.max=p;
-			else if (p<this.min) this.min=p;
-			this.mu = (this.mu*this.n+p)/(this.n+1);
-			this.range = this.max-this.min;
+	this.smin = [];		// estaciones con mínimo
+	this.smax = [];		// estaciones con máximo
+	this.g = null;
+	this.range = function() {
+		if (this.range==null) this.range=this.max-this.min;
+		return this.range;
+	}
+	this.add =function(p, s, g) {
+		if (this.mu) {
+			if (p>this.max) {this.max=p;this.smax=s;}
+			else if (p==this.max) this.smax = this.smax.concat(s);
+			else if (p<this.min) {this.min=p;this.smin=s}
+			else if (p==this.min) this.smin = this.smin.concat(s);
+			this.mu = (this.mu*this.n+p)/(++this.n);
 		} else {
 			this.max = this.min = this.mu = p;
+			this.smin = s;
+			this.smax = s;
+			this.n = 1;
 		}
-		this.n++;
+		if (g) {
+			if (this.g) {
+				if (g[0]<this.g[0]) this.g[0]=g[0];
+				else if (g[0]>this.g[1]) this.g[1]=g[0];
+				if (g[1]<this.g[2]) this.g[2]=g[1];
+				else if (g[1]>this.g[3]) this.g[3]=g[1];
+			} else this.g = [g[0],g[0],g[1],g[1]];	
+		}
+		
 	};
 }
 
 /** @constructor */
 function Gasole(callback) {
 	this.color = function(p) {
-		if (this.stats.range!=0) {
-			var v = (p-this.stats.min)/this.stats.range;
+		var range = this.stats.range();
+		if (range!=0) {
+			var v = (p-this.stats.min)/range;
 			if (v<.33) return COLORS.min;
 			if (v>.66) return COLORS.max;
 		}
@@ -423,5 +444,40 @@ function Gasole(callback) {
 		var data = JSON.parse(storedData);
 		this.init(data.data, new Date(data.ts));
 		if (this.callback) this.callback();
+	}
+}
+
+/** @constructor **/
+function GasoleStats(gasoleData, pBins, gBins) {
+	// Estadisticas de todos los datos de gasole
+	this.stats = {};									// estadísticas nacionales
+	this.provinces = {};								// estadísticas provinciales
+	for (var p in gasoleData) {
+		var datap = gasoleData[p];						// datos de la provincia
+		var statp = this.provinces[p] = {};				// estadisticas provinciales, optiones y límites geográficos
+		for (var t in datap) {
+			var datat = datap[t];						// datos de la ciudad
+			for (var s in datat) {
+				datas = datat[s];						// datos de la estación
+				var g = datas.g;						// posición de la estación
+				for (var o in datas.o) {				// tipos de combustible
+					if (!statp.hasOwnProperty(o)) statp[o] = new Stats();
+					statp[o].add(datas.o[o],[[p,t,s]],g);
+				}
+			}
+		}	
+	}
+	// Estadísticas nacionales:
+	for (var p in this.provinces) {
+		var statp = this.provinces[p];		// estadísticas provinciales
+		var stat = this.stats;
+		for (var o in statp) {
+			if (!stat.hasOwnProperty(o)) stat[o] = new Stats();
+			// pequeño apaño para agregado datos estadísticos
+			var gmin = statp[o].g ? [statp[o].g[0],statp[o].g[2]] : null;
+			var gmax = statp[o].g ? [statp[o].g[1],statp[o].g[3]] : null;
+			stat[o].add(statp[o].min,statp[o].smin,gmin);
+			stat[o].add(statp[o].max,statp[o].smax,gmax);
+		}
 	}
 }

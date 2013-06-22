@@ -8,6 +8,7 @@ from google.appengine.api.runtime import *
 
 BINS = 20
 GEOBINS = 120
+
 def compute_stats():
 	def init_stats():
 		return {
@@ -69,11 +70,10 @@ def compute_stats():
 					 where['_p'][o]['x'] = edges.tolist()
 
 
-	q = Province.all()
+	jsonData = json.loads(getAll().decode('zlib'))
 	stats = init_all()
-	for province in q:	# para todas las provincias
-		p = province.key().name()
-		datap = memcache.get(p) or store2data(prov_kname=p).get(p)
+	for p in jsonData:	# para todas las provincias
+		datap = jsonData[p]
 		statsp = stats['provinces'].setdefault(p, init_province())
 		for t in datap: # para todas las ciudades
 			datat = datap[t]
