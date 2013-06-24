@@ -265,15 +265,15 @@ function Stats() {
 	}
 	this.add =function(p, s, g) {
 		if (this.mu) {
-			if (p>this.max) {this.max=p;this.smax=s;}
-			else if (p==this.max) this.smax = this.smax.concat(s);
-			else if (p<this.min) {this.min=p;this.smin=s}
-			else if (p==this.min) this.smin = this.smin.concat(s);
+			if (p>this.max) {this.max=p;this.smax=[s];}
+			else if (p==this.max) this.smax.push(s);
+			else if (p<this.min) {this.min=p;this.smin=[s]}
+			else if (p==this.min) this.smin.push(s);
 			this.mu = (this.mu*this.n+p)/(++this.n);
 		} else {
 			this.max = this.min = this.mu = p;
-			this.smin = s;
-			this.smax = s;
+			this.smin = [s];
+			this.smax = [s];
 			this.n = 1;
 		}
 		if (g) {
@@ -288,6 +288,30 @@ function Stats() {
 	};
 }
 
+/** @constructor **/
+function GasoleStats(gasoleData) {
+	// Estadisticas de todos los datos de gasole
+	var stats = this.stats = {};						// estadísticas nacionales
+	this.provinces = {};								// estadísticas provinciales
+	for (var p in gasoleData) {
+		var datap = gasoleData[p];						// datos de la provincia
+		var statp = this.provinces[p] = {};				// estadisticas provinciales, optiones y límites geográficos
+		for (var t in datap) {
+			var datat = datap[t];						// datos de la ciudad
+			for (var s in datat) {
+				datas = datat[s];						// datos de la estación
+				var g = datas.g;						// posición de la estación
+				for (var o in datas.o) {				// tipos de combustible
+					if (!statp.hasOwnProperty(o)) statp[o] = new Stats();
+					if (!stats.hasOwnProperty(o)) stats[o] = new Stats();
+					statp[o].add(datas.o[o],[p,t,s],g);
+					stats[o].add(datas.o[o],[p,t,s],g);
+				}
+			}
+		}	
+	}
+}
+
 /** @constructor */
 function Gasole(callback) {
 	this.color = function(p) {
@@ -299,7 +323,11 @@ function Gasole(callback) {
 		}
 		return COLORS.mu;
 	}
-	this.init = function(data, date) {this.info = data;this.date=date};
+	this.init = function(data, date, stats) {
+		this.info = data;
+		this.date = date; 
+		this.stats = stats ? stats : new GasoleStats(this.info);
+	};
 	// Obtiene datos de una provincia como estructura de datos
 	this.provinceDataArray = function(p) {
 		this.stats = new Stats();
@@ -435,49 +463,14 @@ function Gasole(callback) {
 		req.onload = function() {
 			var date = new Date();
 			this.gasole.init(JSON.parse(this.responseText), date);
-			localStorage.setItem("gasole", '{"ts": '+ date.getTime() +',"data": '+this.responseText+'}');
+			localStorage.setItem("gasole", '{"ts": '+ date.getTime() +',"data": '+this.responseText+',"stats": '+JSON.stringify(this.gasole.stats)+'}');
 			if (this.gasole.callback) this.gasole.callback();
 		}
 		req.open("GET", "/api/All");
 		req.send();
 	} else {
 		var data = JSON.parse(storedData);
-		this.init(data.data, new Date(data.ts));
+		this.init(data.data, new Date(data.ts), data.stats);
 		if (this.callback) this.callback();
-	}
-}
-
-/** @constructor **/
-function GasoleStats(gasoleData, pBins, gBins) {
-	// Estadisticas de todos los datos de gasole
-	this.stats = {};									// estadísticas nacionales
-	this.provinces = {};								// estadísticas provinciales
-	for (var p in gasoleData) {
-		var datap = gasoleData[p];						// datos de la provincia
-		var statp = this.provinces[p] = {};				// estadisticas provinciales, optiones y límites geográficos
-		for (var t in datap) {
-			var datat = datap[t];						// datos de la ciudad
-			for (var s in datat) {
-				datas = datat[s];						// datos de la estación
-				var g = datas.g;						// posición de la estación
-				for (var o in datas.o) {				// tipos de combustible
-					if (!statp.hasOwnProperty(o)) statp[o] = new Stats();
-					statp[o].add(datas.o[o],[[p,t,s]],g);
-				}
-			}
-		}	
-	}
-	// Estadísticas nacionales:
-	for (var p in this.provinces) {
-		var statp = this.provinces[p];		// estadísticas provinciales
-		var stat = this.stats;
-		for (var o in statp) {
-			if (!stat.hasOwnProperty(o)) stat[o] = new Stats();
-			// pequeño apaño para agregado datos estadísticos
-			var gmin = statp[o].g ? [statp[o].g[0],statp[o].g[2]] : null;
-			var gmax = statp[o].g ? [statp[o].g[1],statp[o].g[3]] : null;
-			stat[o].add(statp[o].min,statp[o].smin,gmin);
-			stat[o].add(statp[o].max,statp[o].smax,gmax);
-		}
 	}
 }

@@ -11,39 +11,14 @@ var pagerCurrent = null;
 var cluster = null;
 var bounds = new google.maps.LatLngBounds();
 var TO_DAYS = 86400000;
+var stats = null;
 
-/** @constructor */
-function Stats() {
-	this.types = {};
-	this.n = 0;
-	this.init = false;
-	this.add =function(station) {
-		if (this.init) return;
-		for (var t in station) {
-			var val = station[t];
-			if (this.types.hasOwnProperty(t)) {
-				var data = this.types[t];
-				if (val>data.max) data.max=val;
-				else if (val<data.min) data.min=val;
-				data.mean = (data.mean*data.n+val)/(data.n+1);
-				data.n++;
-			} else this.types[t] = {max: val, min: val, mean: val, n: 1};
-		}
-		this.n++;
-	};
-	this.run = function() {
-		// Peso relativo de cada tipo de combustible
-		var N=0;
-		for (var t in this.types) {
-			N+=this.types[t].n;
-			this.types[t].range = this.types[t].max - this.types[t].min;
-		}
-		for (var t in this.types) this.types[t].w = this.types[t].n/N;
-		this.init = true;
-	};
+// Pesos para colores de gasolinera
+function computeWeights(stats) {
+	var N=0;
+	for (var t in stats) N+=stats[t].n;
+	for (var t in stats) stats[t].w = stats[t].n/N;
 }
-
-var stats = new Stats();
 
 function newReference(loc) {
 	var location = loc;
@@ -133,9 +108,10 @@ function markerColor(sel, price) {
 	for (var i=0; i<sel.length; i++) {
 		var current = sel[i];
 		var p = price[current];
-		var s = stats.types[current];
+		var s = stats[current];
 		if (s && p) {
-			if (s.range) mean = (mean*n+((p-s.min)/s.range))/++n;
+			var range = s.max-s.min;
+			if (range) mean = (mean*n+((p-s.min)/range))/++n;
 			else mean = mean*n+.5/++n;
 		}
 	}
@@ -300,7 +276,7 @@ function initControl() {
 	var filterT = document.getElementById("fuel-type").getElementsByTagName("li");
 	var filter = [];
 	for (var f=0; f<filterT.length; f++) {
-		if (stats.types[filterT[f].className.split(" ")[0].split("_")[1]]) {
+		if (stats[filterT[f].className.split(" ")[0].split("_")[1]]) {
 			filter.push(filterT[f].className);
 			filterT[f].addEventListener("click", function() {
 				var cname = this.className.split(" ");
@@ -391,10 +367,10 @@ function showDetail(marker) {
 }
 function populateInfo() {
 	var divInfo = document.getElementById("info");
-	divInfo.innerHTML = "<p>Se han encontrado " + stats.n + " puntos de venta.</p>";
+	divInfo.innerHTML = "<p>Se han encontrado los siguientes puntos de venta:</p>";
 	var divSum = document.getElementById("summary-b");
-	for (var t in stats.types) {
-		var data = stats.types[t];
+	for (var t in stats) {
+		var data = stats[t];
 		var tr = document.createElement("tr");
 		tr.className = "data T_"+t;
 		var td = document.createElement("td");
@@ -404,7 +380,7 @@ function populateInfo() {
 		td = document.createElement("td");
 		td.innerHTML = "<span>"+data.min.toFixed(3)+"</span>"; td.className="price min"; tr.appendChild(td);
 		td = document.createElement("td");
-		td.innerHTML = "<span>"+data.mean.toFixed(3)+"</span>"; td.className="price mean"; tr.appendChild(td);
+		td.innerHTML = "<span>"+data.mu.toFixed(3)+"</span>"; td.className="price mean"; tr.appendChild(td);
 		td = document.createElement("td");
 		td.innerHTML = "<span>"+data.max.toFixed(3)+"</span>"; td.className="price max"; tr.appendChild(td);
 		divSum.appendChild(tr);
@@ -518,12 +494,10 @@ function populateTable(types) {
 					tr.appendChild(otd);
 				}
 				table.appendChild(tr);
-				stats.add(dataPTS["o"]);
 			}
 			map.fitBounds (bounds);
 		}
 	}
-	stats.run();
 	if (cities.length > 1) { // Lista de ciudades
 		var citiesList = document.getElementById("cities-list");
 		cities.sort(function(a, b) {
@@ -583,6 +557,8 @@ window.addEventListener("load", function() {
 			info._data = this.nearData(location);
 			info._near = place;
 		}
+		stats = new GasoleStats(info._data).stats;
+		computeWeights(stats);
 		processData(info);
 	});
 })

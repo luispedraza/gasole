@@ -309,42 +309,42 @@ def handle_500(request, response, exception):
     response.set_status(500)
     response.write(jinja_env.get_template("500.html").render())
 
-# class Stats(BaseAuthHandler):
-#     def get(self, g_type, province, city):
-#         if not province and not city:
-#             pass
-#         the_scripts = []
-#         the_styles = []
-#         title = ""
-#         if (g_type=="precio"):
-#             the_scripts = get_js('precio.js',DEBUG)
-#             the_styles=['/css/graficos.css']
-#             title = u"El Precio del Combustible en España."
-#         elif (g_type=="cantidad"):
-#             the_scripts = [GOOGLE_MAPS_VIS_API, MAPBOX_API]+get_js('cantidad.js',DEBUG)
-#             the_styles=["/css/g_cantidad.css", MAPBOX_CSS]
-#         elif (g_type=="variedad"):
-#             the_scripts = [GOOGLE_MAPS_VIS_API, 
-#                 '/js/stats.js', 
-#                 '/js/libs/polymaps.min.js', 
-#                 '/js/libs/jquery.min.js', 
-#                 '/js/libs/raphael.min.js', 
-#                 '/js/libs/kartograph.min.js',
-#                 'http://d3js.org/d3.v3.min.js']
-#             the_styles=["/css/g_variedad.css"]
-#         self.render("base.html",
-#             title=u"Gráficos: "+title,
-#             scripts = the_scripts,
-#             styles  = the_styles,
-#             content = jinja_env.get_template("g_"+g_type+".html").render(
-#                 map = jinja_env.get_template("spain.svg").render()))
+class Stats(BaseAuthHandler):
+    def get(self, g_type, province, city):
+        if not province and not city:
+            pass
+        the_scripts = []
+        the_styles = []
+        title = ""
+        if (g_type=="precio"):
+            the_scripts = get_js('precio.js',DEBUG)
+            the_styles=['/css/graficos.css']
+            title = u"El Precio del Combustible en España."
+        elif (g_type=="cantidad"):
+            the_scripts = [GOOGLE_MAPS_VIS_API, MAPBOX_API]+get_js('cantidad.js',DEBUG)
+            the_styles=["/css/g_cantidad.css", MAPBOX_CSS]
+        elif (g_type=="variedad"):
+            the_scripts = [GOOGLE_MAPS_VIS_API, 
+                '/js/stats.js', 
+                '/js/libs/polymaps.min.js', 
+                '/js/libs/jquery.min.js', 
+                '/js/libs/raphael.min.js', 
+                '/js/libs/kartograph.min.js',
+                'http://d3js.org/d3.v3.min.js']
+            the_styles=["/css/g_variedad.css"]
+        self.render("base.html",
+            title=u"Gráficos: "+title,
+            scripts = the_scripts,
+            styles  = the_styles,
+            content = jinja_env.get_template("g_"+g_type+".html").render(
+                map = jinja_env.get_template("spain.svg").render()))
         
-# class StatsApi(BaseHandler):
-#     def get(self, prov, town):
-#         info = {}
-#         if not prov and not town:
-#             info = compute_stats()
-#             self.render_json(info)
+class StatsApi(BaseHandler):
+    def get(self, prov, town):
+        info = {}
+        if not prov and not town:
+            info = compute_stats()
+            self.render_json(info)
 
 # webapp2 config
 app_config = {
@@ -362,8 +362,8 @@ app = webapp2.WSGIApplication([
     ('/admin/?', AdminHandler),
     ('/admin/update/?(\w+)?', AdminUpdate),
     ('/admin/search/?', AdminSearch),
-    # ('/graficos/([^ \/]+)/?([^ \/]+)?/?([^ \/]+)?/?', Stats),
-    # ('/stats/?([^ \/]+)?/?([^ \/]+)?/?', StatsApi),
+    ('/graficos/([^ \/]+)/?([^ \/]+)?/?([^ \/]+)?/?', Stats),
+    ('/stats/?([^ \/]+)?/?([^ \/]+)?/?', StatsApi),
     ('/data/(\w+)/(\w+)', Data),
     ('/gasolineras/?([^ \/]+)/?([^ \/]+)?/?', List),
     ('/ficha/?([^ \/]+)/?([^ \/]+)?/?([^ \/]+)?', Detail),
