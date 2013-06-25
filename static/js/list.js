@@ -13,6 +13,7 @@ var bounds = new google.maps.LatLngBounds();
 var TO_DAYS = 86400000;
 var stats = null;
 
+var pump_svg = "M212.275-47.775c2.913,2.906,4.371,6.415,4.375,10.525v215.8c0.005,4.14-1.453,7.673-4.375,10.6l-0.025,0.025 c-2.927,2.922-6.46,4.381-10.6,4.375H159.2c-4.14,0.006-7.674-1.453-10.601-4.375l-0.024-0.025c-2.923-2.927-4.381-6.46-4.375-10.6 v-146h-18.55V89.95c0,6.667-3.334,10-10,10H95.05l-29.95,118H126v24.301h-256V216.1h60.65l-29.3-116.15h-20.6 c-6.667,0-10-3.333-10-10v-163.7c0-6.667,3.333-10,10-10h44.3V-90c0-6.667,3.333-10,10-10h126.3c6.667,0,10,3.333,10,10v6.25 h44.301c6.666,0,10,3.333,10,10v76.3h33.55c4.14-0.006,7.673,1.453,10.6,4.375l0.025,0.025c1.849,1.854,3.107,3.954,3.774,6.3 c0.058,0.197,0.099,0.397,0.125,0.6c0.099,0.252,0.173,0.519,0.226,0.8c0.168,0.93,0.251,1.896,0.25,2.9v146h12.45V3.9 c-5.996-2.521-10.996-5.596-15-9.225l-0.051-0.05c-0.477-0.45-0.935-0.9-1.375-1.35c-0.571-0.565-1.104-1.132-1.6-1.7 c-0.016-0.018-0.032-0.034-0.05-0.05c-1.509-1.708-2.851-3.507-4.025-5.4v0.025c-1.046-1.694-1.929-3.461-2.649-5.3 c-1.189-2.647-2.073-5.447-2.65-8.4v-0.025c-0.3-1.553-0.524-3.161-0.675-4.825v-0.05c-0.594-7.077,0.448-15.043,3.125-23.9 l-23.75-24.025c-2.877-2.978-4.311-6.502-4.3-10.575c-0.003-4.168,1.497-7.71,4.5-10.625l0.024-0.025 c2.932-2.868,6.457-4.301,10.575-4.3h0.05c4.098,0.047,7.598,1.539,10.5,4.475l53,53.65H212.275z M82,60.1H-89.05V-42.186H82V60.1z ";
 // Pesos para colores de gasolinera
 function computeWeights(stats) {
 	var N=0;
@@ -116,9 +117,9 @@ function markerColor(sel, price) {
 		}
 	}
 	if (n==0) return null;
-	if (mean<.33) return [COLORS.minStroke, COLORS.min];
-	if (mean<.66) return [COLORS.muStroke, COLORS.mu];
-	return [COLORS.maxStroke, COLORS.max];
+	if (mean<.33) return COLORS.min;
+	if (mean<.66) return COLORS.mu;
+	return COLORS.max;
 }
 function updateMarkers() {
 	var rows = document.getElementById("table-data").getElementsByTagName("tr");
@@ -130,8 +131,7 @@ function updateMarkers() {
 				var color = markerColor(selection, marker.get("price"));
 				if (color) {
 					marker.setMap(map);
-					marker.icon.strokeColor = color[0];
-					marker.icon.fillColor = color[1];
+					marker.icon.fillColor = color;
 					continue;
 				}
 			}
@@ -444,11 +444,13 @@ function populateTable(types) {
 					var pos = new google.maps.LatLng(dataPTS.g[0], dataPTS.g[1]);
 					var options = { 
 						icon: {
-							path: google.maps.SymbolPath.CIRCLE,
-							strokeOpacity: 1.0,
+							path: pump_svg,
+							// path: google.maps.SymbolPath.CIRCLE,
+							strokeColor: COLORS.stroke,
+							strokeOpacity: 1,
 							strokeWeight: 1,
-							fillOpacity: .8,
-							scale: 6
+							fillOpacity: .9,
+							scale: .07
 						}, 
 						map: map, position: pos };
 					var marker = new google.maps.Marker(options);
