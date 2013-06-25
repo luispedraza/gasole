@@ -81,6 +81,7 @@ var COLORS = {
 	max: "#f00",
 	mu: "#3399CC"
 }
+
 var info = null;
 var LS_EXPIRE = 3600000;				// 1 hora
 var APIS = 	{ 	"gasolineras": "api",
