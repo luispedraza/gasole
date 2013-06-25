@@ -40,10 +40,10 @@ MEDIA_JS = {
 		'api':		[GOOGLE_MAPS_API]
 		},
 	'cantidad.js' : {
-		'src':		['g_cantidad.js','search.js'],
+		'src':		['utils.js','g_cantidad.js','search.js'],
 		'libs': 	[],
 		'extern':	['google_maps_api_v3.js'],
-		'api':		[GOOGLE_MAPS_API]
+		'api':		[GOOGLE_MAPS_VIS_API]
 		},
 	'precio.js': {
 		'src':		['g_precio.js','search.js', 'utils.js'],

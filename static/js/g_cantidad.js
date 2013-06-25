@@ -12,26 +12,22 @@ function initialize() {
 }
 
 function drawData(data) {
-	console.log("procesando)")
 	var heatmapData = [];
-	var latSum = lonSum = 0;
 	for (p in data) {
 		for (t in data[p]) {
 			for (s in data[p][t]) {
-				if (data[p][t][s]["latlon"]) {
-					var pos = new google.maps.LatLng(data[p][t][s]["latlon"][0], data[p][t][s]["latlon"][1]);
-					latSum += pos.lat();
-					lonSum += pos.lng();
+				if (data[p][t][s].g) {
+					var pos = new google.maps.LatLng(data[p][t][s].g[0], data[p][t][s].g[1]);
 					heatmapData.push(pos);
 				}
 			}
 		}
 	}
-	map.panTo(new google.maps.LatLng(latSum/heatmapData.length, lonSum/heatmapData.length));
+	
 	var heatmap = new google.maps.visualization.HeatmapLayer({
 		data: heatmapData,
 		dissipating: true,
-		radius: 15,
+		radius: 20,
 		gradient: ['transparent', "#00f", "#0f0", "#f00"],
 		map: map
 	});
@@ -40,17 +36,8 @@ function drawData(data) {
 
 window.addEventListener("load", function(){
 	initialize();
-	var req = new XMLHttpRequest();
-	req.onload = function(r) {
-		data = JSON.parse(r.target.responseText);
-		if (data) {
-			console.log(data);
-			// drawData(data._data);
-		}
-		
-	}
-	var url = document.URL;
-	req.open("GET", document.URL.replace("graficos/cantidad", "stats"), true)
-	req.send();
-
+	new Gasole(function() {
+		console.log(this);
+		drawData(this.info);
+	});
 })
