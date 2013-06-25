@@ -69,9 +69,14 @@ fjs.parentNode.insertBefore(js, fjs);
 <!-- End FB Like -->
 
 <header id="header">
-	<a href="/"><div id="logo">Gasolé</div></a>
+	{% if user %}
+	<div id="user">
+		<a href="{{user.link}}"><img class="avatar" src="{{user.avatar_url}}"></a>
+		<a id="logout" href="/logout">Desconectar</a>
+	</div>
+	{% endif %}
+	<a href="/" id="logo">GasOlé</a>
 	<p>Toda la información sobre gasolinas y otros combustibles</p>
-	<a id="logout" href="/logout">[x] Salir</a>
 </header>
 
 <nav>

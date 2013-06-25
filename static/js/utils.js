@@ -153,9 +153,10 @@ function checkLocalStorage() {
 	}
 }
 
+function getKey() {return window.location.pathname.split("/").slice(1).join("*");}
+
 /* Obtención de datos de la api a partir de la url de la página actual */
-function getApiData(callback) {
-	function getKey() {return window.location.pathname.split("/").slice(1).join("*");}
+function getApiData(callback) {	
 	var key = getKey();
 	if (checkLocalStorage()) {
 		if (localStorage.hasOwnProperty(key)) {

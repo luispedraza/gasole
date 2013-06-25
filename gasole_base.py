@@ -177,5 +177,8 @@ class BaseAuthHandler(BaseHandler, SimpleAuthHandler):
 			attr = (v, data.get(k)) if isinstance(v, str) else v(data)
 			user_attrs.setdefault(*attr)
 		return user_attrs
+	def get_logged_user(self):
+		if self.logged_in:
+			return self.current_user
 
 

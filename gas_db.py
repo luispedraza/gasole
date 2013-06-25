@@ -72,16 +72,17 @@ def getStationJson(p, t, s):
 	skey = p+t+s
 	jsondata = memcache.get(skey)
 	if jsondata:
+		logging.info("Datos de gasolinera encontrados en memcache")
 		return jsondata
-	model = ApiJson.get_by_key_name(skey)
-	if model:
-		memcache.set(skey, model.json)
-		return model.json
-	data = getProvinceData(p)
-	jsondata = json.dumps({"_data": {p: {t: {s: data[t][s]}}},
-		"_history": get_history(p, t, s),
-		"_comments" : get_comments(p, t, s)})
-	ApiJson(key_name=skey, json=jsondata).put()
+	# model = ApiJson.get_by_key_name(skey)
+	# if model:
+	# 	memcache.set(skey, model.json)
+	# 	return model.json
+	# data = getProvinceData(p)
+	jsondata = json.dumps({
+		"_history": get_history(p,t,s),
+		"_comments" : get_comments(p,t,s)})
+	# ApiJson(key_name=skey, json=jsondata).put()
 	memcache.set(skey, jsondata)
 	return jsondata
 
@@ -273,6 +274,19 @@ def get_comments(prov, town, station):
 			"replyto": c.replyto,
 			"id": c.key().id()})
 	return result
+
+def add_comment(p, t, s, user, points, content, replyto):
+	comment = Comment(
+		userid=user.key.id(),
+		name=user.name,
+		avatar=db.Link(user.avatar_url),
+		link=user.link,
+		points=db.Rating(points) if points!=None else None,
+		content=db.Text(content),
+		replyto=int(replyto) if replyto else None,
+		parent=db.Key.from_path('Province',p,'Town',t,'GasStation',s))
+	comment.put()
+	memcache.delete(p+t+s)
 
 # def mean_val(array):
 # 	return sum(values)/len(values)

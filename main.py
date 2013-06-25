@@ -19,7 +19,6 @@ import datetime
 from gas_stats import *
 
 TIME=0
-
 def tic():
     global TIME 
     TIME = time();
@@ -138,9 +137,6 @@ class List(BaseAuthHandler):
 
 class Detail(BaseAuthHandler):
     def get(self, province, town, station, error={}, result=None):
-        user = {}
-        if self.logged_in:
-            user = self.current_user
         # Vista de detalle de una gasolinera
         data = {}
         if error:
@@ -155,10 +151,12 @@ class Detail(BaseAuthHandler):
             sdata = GasStation.get(db.Key.from_path('Province', p, 'Town', t, 'GasStation', s))
             if sdata:
                 edit_station = {k: getattr(sdata,k) or "" for k in sdata.properties()}
+        user = self.get_logged_user()
         self.render("base.html",
             title = title,
             styles=['/css/detail.css'],
             scripts=get_js('detail.js',DEBUG),
+            user = user,
             content=jinja_env.get_template("detail.html").render(
                 title=title,
                 edit_station=edit_station,
@@ -227,16 +225,8 @@ class Detail(BaseAuthHandler):
              error["c_captcha"] = u"La solución del captcha no es correcta."
         result = None
         if not len(error) and user:
-            comment = Comment(
-                userid=user.key.id(),
-                name=user.name,
-                avatar=db.Link(user.avatar_url),
-                link=user.link,
-                points=db.Rating(points) if points!=None else None,
-                content=db.Text(content),
-                replyto=int(replyto) if replyto else None,
-                parent=db.Key.from_path('Province',p,'Town',t,'GasStation',s))
-            comment.put()
+            logging.info("nuevo comentario")
+            add_comment(p, t, s, user, points, content, replyto)
             result = "El comentario se ha publicado con éxito."
         self.get(province=province, town=town, station=station, error=error, result=result)
 

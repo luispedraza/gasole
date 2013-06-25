@@ -181,27 +181,13 @@ function fillReplyTo(id) {
 
 function processData(info) {
 	console.log(info);
-	data = info["_data"];
-	var province, town, station, date, label, hours, latlon, price;
-	for (var p in data) province = p;
-	for (var t in data[p]) town = t;
-	for (var s in data[p][t]) {
-		station=s;
-		date = data[p][t][s]["d"];
-		label = data[p][t][s]["l"];
-		hours = data[p][t][s]["h"];
-		latlon = data[p][t][s]["g"];
-		price = data[p][t][s]["o"];
-	}
-
-	document.getElementById("address").textContent = toTitle(station) + " (" + town + ", " + province + ")";
-	document.getElementById("hours").textContent = hours;
-	insertLogo(label);
-	initMap(latlon);
-	initPrice(price);
-
+	document.getElementById("address").textContent = toTitle(info.s) + " (" + info.t + ", " + info.p + ")";
+	document.getElementById("hours").textContent = info.i.h;
+	insertLogo(info.i.l);
+	initMap(info.i.g);
+	initPrice(info.i.o);
 	var commentsDiv = document.getElementById("old_comments");
-	var comments = info._comments;
+	var comments = info.c;
 	var total_points = 0;
 	var n_comments = 0;
 	for (var c=0; c<comments.length; c++) {
@@ -301,7 +287,7 @@ function processData(info) {
 	}
 
     /* Amchart */
-    amChart(info._history);
+    amChart(info.h);
 	// this method is called when chart is inited as we listen for "dataUpdated" event
 	function zoomChart() {
 		// different zoom methods can be used - zoomToIndexes, zoomToDates, zoomToCategoryValues
@@ -378,6 +364,7 @@ function amChart(chartData) {
 }
 
 window.addEventListener("load", function() {
+	// Resultado de una acción anterior: un comentario
 	var result = document.getElementById("result");
 	if (result) {
 		result.scrollIntoView();
@@ -398,5 +385,14 @@ window.addEventListener("load", function() {
 			}
 		}
 	}
-	getApiData(processData);
+	var path = decodeArray(window.location.pathname.split("/"));
+	var sdata = {'p':path[2], 't': path[3], 's': path[4]};		// toda la información de la aestación
+	new Gasole(function() {
+		sdata.i = this.info[sdata.p][sdata.t][sdata.s];
+		getApiData(function(d) {
+			sdata.c = d._comments;
+			sdata.h = d._history;
+			processData(sdata);
+		})
+	})
 })

@@ -76,7 +76,8 @@ header p {
 	margin-left: 5px;
 	font-size: 13px;
 }
-header #logo {
+#logo {
+	display: block;
 	width: 300px;
 	height: 80px;
 	background-image: url('/img/logo.png');
@@ -206,11 +207,13 @@ footer a:hover{
 	-webkit-column-gap:10px; /* Safari and Chrome */
 	column-gap:10px;
 }
-#logout {
+#user {
 	font-size: 14px;
-	position: absolute;
-	right: 0;
-	top: 0;
+	float: right;
+}
+#user a {
+	color: #fff;
+	text-decoration: none;
 }
 
 /* Formulario de búsqueda */
