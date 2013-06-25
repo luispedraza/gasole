@@ -402,7 +402,6 @@ function showDetail(marker) {
 }
 function populateInfo() {
 	var divInfo = document.getElementById("info");
-	divInfo.innerHTML = "<p>Se han encontrado los siguientes puntos de venta:</p>";
 	var divSum = document.getElementById("summary-b");
 	for (var t in stats) {
 		var data = stats[t];

@@ -242,9 +242,10 @@ body {
 #publi_300x250 {
 	width: 300px;
 	height: 250px;
-	float: left;
 	margin-top: 20px;
 	margin-bottom: 20px;
+	margin-left: auto;
+	margin-right: auto;
 }
 .panel {
 	position: relative;
@@ -260,10 +261,16 @@ body {
 	vertical-align: middle;
 	margin-top: 5px;
 }
-.p_head h2 {
+.p_head h2, .p_head h1 {
 	display: inline-block;
 	margin: 0;
 	padding-left: 10px;
+	font-size: 1.2em;
+	max-width: 300px;
+}
+.p_head h1 {
+	font-size: 1.5em;
+	margin-bottom: .5em;
 }
 .p_content {
 	margin-top: 10px;
@@ -565,9 +572,12 @@ th.off, td.off,tr.r_off, tr.f_off, tr.p_off {
 	background-color: #555;
 	color: #fff;
 }
-#pager-links p {
-	color: red;
-	font-size: 16px;
+#pager-links {
+	width: 650px;
+	float: right;
+}
+.pag_less, .pag_more {
+	font-size: .7em;
 }
 
 /* Sprites cluster, para mapa y leyenda */
