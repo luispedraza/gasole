@@ -76,7 +76,7 @@ var PROVS = {
 	"Zaragoza": "50"};
 var MONTHS = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 var COLORS = {
-	stroke: "#333",
+	stroke: "#fff",
 	min: "#36AE34",
 	max: "#f00",
 	mu: "#3399CC"
