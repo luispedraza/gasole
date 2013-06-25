@@ -125,26 +125,24 @@ body {
 	float: left;
 }
 #legend {
-	border-left: 1px solid #333;
+	cursor: help;
+	border: 1px solid #333;
 	width: 300px;
 	overflow: hidden;
 	z-index: 50;
 	position: absolute;
 	right: 0;
 	height: 16px;
-	-webkit-transition: height .25s ease-in;
-	   -moz-transition: height .25s ease-in;
-	    -ms-transition: height .25s ease-in;
-	        transition: height .25s ease-in;
+	-webkit-transition: height .2s ease-in;
+	    -ms-transition: height .2s ease-in;
+	        transition: height .2s ease-in;
 }
 #legend .title {
-	font-size: 1.1em;
+	font-size: 1em;
 	padding: 5px;
 	width: 100%;
 }
 #legend .item {
-	background: rgb(255,255,255);
-	background: rgba(255,255,255,0.8);
 	color: #333;
 	border-bottom: 1px dotted #333;
 	padding: 5px;
@@ -155,7 +153,8 @@ body {
 	margin-right: 10px;
 }
 #legend:hover {
-	height: 302px;
+	height: 320px;
+	background: rgb(255,255,255);
 }
 #detail {
 	color: white;
