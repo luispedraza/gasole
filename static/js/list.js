@@ -18,7 +18,7 @@ var stats = null;
 var MARKER_IMG = {
 	max: new google.maps.MarkerImage("/img/sprt.png", new google.maps.Size(25, 25, "px", "px"), new google.maps.Point(139,24), null, null),
 	min: new google.maps.MarkerImage("/img/sprt.png", new google.maps.Size(25, 25, "px", "px"), new google.maps.Point(112,24), null, null),
-	mu: new google.maps.MarkerImage("/img/sprt.png", new google.maps.Size(25, 25, "px", "px"), new google.maps.Point(220,24), null, null),
+	mu: new google.maps.MarkerImage("/img/sprt.png", new google.maps.Size(25, 25, "px", "px"), new google.maps.Point(220,24), null, null)
 }
 
 
@@ -336,6 +336,13 @@ function initControl() {
 				this.hasAttribute("data-float"));
 		})
 	}
+	// Para que no haga scroll el documento cuando se hace scroll en cities-list
+	document.getElementById("cities-list").addEventListener("mouseover", function() {
+		document.body.style.overflow = "hidden";
+	})
+	document.getElementById("cities-list").addEventListener("mouseout", function() {
+		document.body.style.overflow = "auto";
+	})
 }
 function showDetail(marker) {
 	map.panTo(marker.position);
