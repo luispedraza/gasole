@@ -65,20 +65,21 @@ function newReference(loc) {
 /* Paginación de la tabla */
 function paginateTable(index) {
 	var rows = document.getElementById("table-data").getElementsByClassName("r_on");
+	var rlen = rows.length;
 	var pager = document.getElementById("pager-links");
-	if (!rows.length) {
+	if (!rlen) {
 		pager.innerHTML = "<p>No hay resultados coincidentes con los criterios de búsqueda.<br>Comprueba el filtro y tipos de combustible seleccionados.</p>"; return;	
 	}
-	if (index === "more") index = Math.min(pagerCurrent+pagerN, parseInt(rows.length/pagerN)*pagerN);
+	if (index === "more") index = Math.min(pagerCurrent+pagerN, parseInt(rlen/pagerN)*pagerN);
 	else if (index === "less") index = Math.max(pagerCurrent-pagerN, 0);
-	if (index>=rows.length) return;
+	if (index>=rlen) return;
 	pager.innerHTML = "";
-	for (var r=0; r<rows.length; r++) {
+	for (var r=0; r<rlen; r++) {
 		rows[r].className = rows[r].className.replace(" p_off", "");
 		if ((r<index)||(r>=index+pagerN)) rows[r].className+=" p_off";
 		if (r%pagerN == 0) {
 			var p = document.createElement("div");
-			p.innerHTML = ((r+1) + "<br/>" + Math.min(r+pagerN, rows.length));
+			p.innerHTML = ((r+1) + "<br/>" + Math.min(r+pagerN, rlen));
 			p.setAttribute("onclick", "javascript:paginateTable(" + r + ");");
 			(r==index) ? (p.className="p current"):(p.className="p");
 			pager.appendChild(p);
@@ -89,7 +90,7 @@ function paginateTable(index) {
 /* Cálculo de distancias al marcador de referencia */
 function calcDistances() {
 	var tds = document.getElementById("table-data").getElementsByClassName("T_DIST");
-	for (var i=0; i<tds.length; i++) {
+	for (var i=0, tdslen=tds.length; i<tdslen; i++) {
 		var latlon = tds[i].getAttribute("data-geo");
 		if (latlon) {
 			latlon = latlon.split(",");
@@ -103,7 +104,7 @@ function calcDistances() {
 }
 function mapCluster() {
 	if (document.getElementById("cluster").checked) {
-		for (var m=0; m<markers.length; m++) {
+		for (var m=0, mlen=markers.length; m<mlen; m++) {
 			if (markers[m].getMap()) cluster.addMarker(markers[m]);
 		}
 	} else {
@@ -204,15 +205,17 @@ function initMap() {
 function sortTable(cname, reverse, isfloat) {
 	if (typeof reverse == "undefined") reverse = false;
 	function quickSort(a) {
+		var alen = a.length;
 		/* Ordenación QuickSort de una tabla */
-		if (a.length<=1) return a;
-		var npivot = Math.floor(Math.random()*a.length);
-		for (var p=npivot+1; p<a.length; p++)
+		if (alen<=1) return a;
+		var npivot = Math.floor(Math.random()*alen);
+		for (var p=npivot+1; p<alen; p++)
 			if (a[p][0]!=a[npivot][0]) break;
 		var pivot = a.splice(p-1, 1);
+		alen = a.length;
 		var less = [];
 		var greater = [];
-		for (var i=0; i<a.length; i++) {
+		for (var i=0; i<alen; i++) {
 			if (a[i][0]<=pivot[0][0])
 				less.push(a[i]);
 			else greater.push(a[i]);
@@ -222,7 +225,7 @@ function sortTable(cname, reverse, isfloat) {
 	var table_data = document.getElementById("table-data");
 	var values = table_data.getElementsByClassName(cname);
 	var array = [];
-	for (var v=0; v<values.length; v++)
+	for (var v=0, vlen=values.length; v<vlen; v++)
 		if (values[v].textContent) {
 			var newval = (isfloat ? parseFloat(values[v].textContent) : values[v].textContent);
 			array.push([newval, v]);
@@ -231,12 +234,12 @@ function sortTable(cname, reverse, isfloat) {
 	if (reverse) array.reverse();
 	var rows = table_data.getElementsByTagName("tr");
 	var static_rows = [];
-	for (var r=0; r<rows.length; r++) static_rows.push(rows[r]);
-	for (var e=0; e<array.length; e++) {
+	for (var r=0, rlen=rows.length; r<rlen; r++) static_rows.push(rows[r]);
+	for (var e=0, alen=array.length; e<alen; e++) {
 		table_data.insertBefore(static_rows[array[e][1]], table_data.children[e]);
 	}
 	var headers = document.getElementById("table").getElementsByTagName("th");
-	for (var h=0; h<headers.length; h++) {
+	for (var h=0, hlen=headers.length; h<hlen; h++) {
 		headers[h].className = headers[h].className.replace(" sort_up", "").replace(" sort_down", "");
 		if (headers[h].className.match(cname)) {
 			headers[h].className = headers[h].className + ((reverse) ? (" sort_down") : (" sort_up"));
@@ -254,7 +257,7 @@ function filterTypes(filter) {
 		var c_on=type + " on";
 		var c_na=type;
 		var cells=document.getElementById("table").getElementsByClassName(type);
-		for (var c=0; c<cells.length; c++) {
+		for (var c=0, clen=cells.length; c<clen; c++) {
 			var cell = cells[c];
 			if (f[1]=="off") cell.className = c_off;
 			else if (cell.textContent) cells[c].className = c_on;
@@ -262,7 +265,7 @@ function filterTypes(filter) {
 		}
 	}
 	var rows = document.getElementById("table-data").getElementsByTagName("tr");
-	for (var r=0; r<rows.length; r++)
+	for (var r=0, rlen=rows.length; r<rlen; r++)
 		rows[r].className = rows[r].getElementsByClassName("on").length ? "r_on" : "r_off";
 }
 /* Filtro de resultados por contenido de texto */
@@ -279,10 +282,10 @@ function filterText() {
 	if (filtervalue.length) {
 		var terms = filtervalue.split(/ +/);
 		var rows = document.getElementById("table-data").getElementsByTagName("tr");
-		for (var f=0; f<rows.length; f++) {
+		for (var f=0, rlen=rows.length; f<rlen; f++) {
 			var row = rows[f];
 			if (row.className=="r_off") continue;
-			for (var t=0; t<terms.length; t++) {
+			for (var t=0, tlen=terms.length; t<tlen; t++) {
 				if (terms[t].length) {
 					var found = false;
 					var term = RegExp(cleanFilter(terms[t]));
@@ -295,7 +298,7 @@ function filterText() {
 		}
 	} else {
 		var rows = document.getElementById("table-data").getElementsByClassName("f_off");
-		for (var f=0; f<rows.length; f++) rows[f].className="r_on";
+		for (var f=0, rlen=rows.length; f<rlen; f++) rows[f].className="r_on";
 	}
 }
 
@@ -368,7 +371,7 @@ function showDetail(marker) {
 	var priceList = document.getElementById("d-prices");
 	priceList.innerHTML = "";
 	var prices = row.getElementsByTagName("td");
-	for (var p=4; p<prices.length; p++) {
+	for (var p=4, plen=prices.length; p<plen; p++) {
 		var val = prices[p].textContent;
 		if (!val) continue;
 		var t = prices[p].className.match(/T_\w+/)[0].replace("T_", "");
@@ -531,14 +534,15 @@ function populateTable(types) {
 			map.fitBounds (bounds);
 		}
 	}
-	if (cities.length > 1) { // Lista de ciudades
+	var clen = cities.length;
+	if (clen>1) { // Lista de ciudades
 		var citiesList = document.getElementById("cities-list");
 		cities.sort(function(a, b) {
 			if (a[0].toLowerCase()<b[0].toLowerCase()) return -1;
 			if (a[0].toLowerCase()>b[0].toLowerCase()) return 1;
 			return 0;
 		});
-		for (var c=0; c<cities.length; c++) {
+		for (var c=0; c<clen; c++) {
 			var newCity = document.createElement("li");
 			newCity.innerHTML = cities[c][0].link(cities[c][1]);
 			citiesList.appendChild(newCity);
