@@ -170,9 +170,9 @@ footer {
 footer ul {
 	list-style: none;
 	padding: 0;
-	-moz-column-count:5; /* Firefox */
-	-webkit-column-count:5; /* Safari and Chrome */
-	column-count:5;
+	-moz-column-count:6; /* Firefox */
+	-webkit-column-count:6; /* Safari and Chrome */
+	column-count:6;
 	-moz-column-gap:10px; /* Firefox */
 	-webkit-column-gap:10px; /* Safari and Chrome */
 	column-gap:10px;
@@ -180,13 +180,18 @@ footer ul {
 	-webkit-column-rule:1px outset #fff; /* Safari and Chrome */
 	column-rule:1px outset #fff;
 }
+footer li {
+	margin-bottom: .2em;
+}
 footer a {
 	text-decoration: none;
 	color: #fff;
 }
 footer a:hover{
-	text-decoration: underline;
-	font-weight: bold;
+	/*text-decoration: underline;
+	font-weight: bold;*/
+	background-color: #fff;
+	color: #333;
 }
 .footer_section {
 	display: inline-block;
