@@ -220,10 +220,17 @@ footer ul a:hover{
 	column-gap:10px;
 }
 #user {
-	font-size: 14px;
+	width: 50px;
+	font-size: 12px;
 	float: right;
 }
+#user img {
+	border: 1px solid #fff;
+	margin-bottom: 5px;
+}
 #user a {
+	display: block;
+	width: 50px;
 	color: #fff;
 	text-decoration: none;
 }
