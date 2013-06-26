@@ -24,8 +24,8 @@ function initMap(latlon) {
 	});
 }
 
-var timeOut=null;
 function initPoints() {
+	var timeOut=null;
 	function selStar(i){
 		var stars = document.getElementById("c_points_div").getElementsByClassName("star");
 		for (var s=0; s<stars.length; s++) {
@@ -36,12 +36,10 @@ function initPoints() {
 		}
 	}
 	var stars = document.getElementById("c_points_div").getElementsByClassName("star");
-	// document.getElementById("c_points_div")
-	for (var s=0; s<stars.length; s++) {
+	for (var s=0, sl=stars.length; s<sl; s++) {
 		stars[s].addEventListener("mouseout", function() {
 			var val = document.getElementById("c_points").value;
 			var msg = document.getElementById("c_points_text");
-			console.log("out");
 			if (!val){
 				timeOut = setTimeout(function() {
 					msg.textContent = "Debes asignar una puntuación";
@@ -59,7 +57,6 @@ function initPoints() {
 			
 		});
 		stars[s].addEventListener("mouseover", function() {
-			console.log("over");
 			if (timeOut) clearTimeout(timeOut);
 			document.getElementById("c_points_div").className = "";
 			var id = this.id.split("_")[1];
@@ -179,18 +176,13 @@ function fillReplyTo(id) {
 	})
 }
 
-function processData(info) {
-	console.log(info);
-	document.getElementById("address").textContent = toTitle(info.s) + " (" + info.t + ", " + info.p + ")";
-	document.getElementById("hours").textContent = info.i.h;
-	insertLogo(info.i.l);
-	initMap(info.i.g);
-	initPrice(info.i.o);
+/* Rellena los comentarios de la gasolinera */
+function fillComments(comments) {
 	var commentsDiv = document.getElementById("old_comments");
-	var comments = info.c;
 	var total_points = 0;
 	var n_comments = 0;
-	for (var c=0; c<comments.length; c++) {
+	var comments_length = comments.length;
+	for (var c=0; c<comments_length; c++) {
 		var newCommentBlock = document.createElement("div");
 		newCommentBlock.className = "c_block";
 		newCommentBlock.id = "block-"+comments[c].id;
@@ -266,8 +258,20 @@ function processData(info) {
 		} else {
 			commentsDiv.appendChild(newCommentBlock);	
 		}
-
 	}
+	if (total_points!=0) {
+		var points = total_points/n_comments;
+		document.getElementById("points").innerHTML = points.toFixed(1) + " (" + n_comments + " valoraciones)";
+	}
+}
+function processData(info) {
+	console.log(info);
+	document.getElementById("address").textContent = toTitle(info.s) + " (" + info.t + ", " + info.p + ")";
+	document.getElementById("hours").textContent = info.i.h;
+	insertLogo(info.i.l);
+	initMap(info.i.g);
+	initPrice(info.i.o);
+	(info.c.length!=0) ? fillComments(info.c) : (document.getElementById("no-comments").style.display="block");
 
 	if (document.getElementById("c_replyto").value) {
 		fillReplyTo(document.getElementById("c_replyto").value);
@@ -281,86 +285,67 @@ function processData(info) {
 		if (this.value == "http://")
 			this.value = "";
 	});
-	if (total_points!=0) {
-		var points = total_points/n_comments;
-		document.getElementById("points").innerHTML = points.toFixed(1) + " (" + n_comments + " valoraciones)";
-	}
 
     /* Amchart */
     amChart(info.h);
-	// this method is called when chart is inited as we listen for "dataUpdated" event
-	function zoomChart() {
-		// different zoom methods can be used - zoomToIndexes, zoomToDates, zoomToCategoryValues
-		amchart.zoomToIndexes(chartData.length - 40, chartData.length - 1);
-	}
-
-
     /* Puntuaciones (estrellas) */
     initPoints();
 }
 
 function amChart(chartData) {
+	console.log(chartData);
 	var chart;
 	for (var i in chartData) chartData[i].d = new Date(chartData[i].d);
-	AmCharts.ready(function() {
-	    // SERIAL CHART
-	    chart = new AmCharts.AmSerialChart();
-	    chart.pathToImages = "http://www.amcharts.com/lib/images/";
-	    chart.zoomOutButton = {
-	        backgroundColor: '#000000',
-	        backgroundAlpha: 0.15
-    	};
-	    chart.dataProvider = chartData;
-	    chart.marginTop = 10;
-	    chart.autoMarginOffset = 3;
-	    chart.marginRight = 0;        
-	    chart.categoryField = "d";
-	    chart.addListener("dataUpdated", zoomChart);
-	    // AXES
-	    // Category
-	    var categoryAxis = chart.categoryAxis;
-	    categoryAxis.parseDates = true;
-	    categoryAxis.gridAlpha = 0.07;
-	    categoryAxis.axisColor = "#DADADA";
-	    categoryAxis.startOnAxis = true;
-	    categoryAxis.showLastLabel = false;
-	    // Value
-	    var valueAxis = new AmCharts.ValueAxis();
-	    valueAxis.gridAlpha = 0.07;
-	    valueAxis.title = "Precio (€/l)";
-	    chart.addValueAxis(valueAxis);
-	    for (var o=0; o<CHART_OPTIONS.length; o++) {
-	    	var t = CHART_OPTIONS[o].id;
-	    	if (!chartData[chartData.length-1].hasOwnProperty(t)) continue;
-	    	var graph = new AmCharts.AmGraph();
-		    graph.type = "line";
-		    graph.title = CHART_OPTIONS[o].name;
-		    graph.valueField = t;
-		    graph.lineAlpha = 1;
-		    graph.lineThickness = 1;
-		    graph.fillAlphas = 0.8;
-		    graph.lineColor = CHART_OPTIONS[o].color;
-		    chart.addGraph(graph);
-	    }
-	    // LEGEND
-	    var legend = new AmCharts.AmLegend();
-	    legend.position = "top";
-	    chart.addLegend(legend);
-	    // SCROLLBAR
-	    var chartScrollbar = new AmCharts.ChartScrollbar();
-	    chart.addChartScrollbar(chartScrollbar);
-	    // CURSOR
-	    var chartCursor = new AmCharts.ChartCursor();
-	    chartCursor.zoomable = false; // as the chart displayes not too many values, we disabled zooming
-	    chartCursor.cursorAlpha = 0;
-	    chart.addChartCursor(chartCursor);
-	    // WRITE
-	    chart.write("chart");
-	    function zoomChart() {
-		    // different zoom methods can be used - zoomToIndexes, zoomToDates, zoomToCategoryValues
-		    chart.zoomToIndexes(chartData.length - 40, chartData.length - 1);
-		}
-	});
+    // SERIAL CHART
+    chart = new AmCharts.AmSerialChart();
+    chart.pathToImages = "/img/";
+    chart.zoomOutButton = {
+        backgroundColor: '#000000',
+        backgroundAlpha: 0.15
+	};
+    chart.dataProvider = chartData;
+    chart.marginTop = 20;
+    chart.autoMarginOffset = 3;
+    chart.marginRight = 0;        
+    chart.categoryField = "d";
+    chart.addTitle("Evolución histórica de los precios", 15);
+    // AXES
+    // Category
+    var categoryAxis = chart.categoryAxis;
+    categoryAxis.parseDates = true;
+    categoryAxis.gridAlpha = 0.07;
+    categoryAxis.axisColor = "#DADADA";
+    categoryAxis.startOnAxis = true;
+    categoryAxis.showLastLabel = false;
+    categoryAxis.title = "Fecha";
+    // Value
+    var valueAxis = new AmCharts.ValueAxis();
+    valueAxis.gridAlpha = 0.07;
+    valueAxis.title = "Precio (€/l)";
+    chart.addValueAxis(valueAxis);
+    for (var o=0; o<CHART_OPTIONS.length; o++) {
+    	var t = CHART_OPTIONS[o].id;
+    	if (!chartData[chartData.length-1].hasOwnProperty(t)) continue;
+    	var graph = new AmCharts.AmGraph();
+	    graph.type = "line";
+	    graph.title = CHART_OPTIONS[o].name;
+	    graph.valueField = t;
+	    graph.lineAlpha = 1;
+	    graph.lineThickness = 1;
+	    graph.fillAlphas = 0.6;
+	    graph.lineColor = CHART_OPTIONS[o].color;
+	    chart.addGraph(graph);
+    }
+    // LEGEND
+    chart.addLegend(new AmCharts.AmLegend());
+    // SCROLLBAR
+    chart.addChartScrollbar(new AmCharts.ChartScrollbar());
+    // CURSOR
+    var cursor = new AmCharts.ChartCursor();
+    cursor.valueBalloonsEnabled = false;
+    chart.addChartCursor(cursor);
+    // WRITE
+    chart.write("chart");
 }
 
 window.addEventListener("load", function() {

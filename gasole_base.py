@@ -85,7 +85,7 @@ class BaseAuthHandler(BaseHandler, SimpleAuthHandler):
 		'google'   : {
 			'picture': 'avatar_url',
 			'name'   : 'name',
-			'link'   : 'link',
+			'profile'   : 'link',
 			'family_name': 'lastName',
 			'given_name' : 'firstName'
 			},

@@ -61,6 +61,6 @@ MEDIA_JS = {
 
 def get_js(target, debug=False):
 	if debug:
-		return [a for a in MEDIA_JS[target]['api']]+[JS_PATH+s for s in MEDIA_JS[target]['src']]+[JS_PATH_LIBS+s for s in MEDIA_JS[target]['libs']]
+		return [JS_PATH_LIBS+s for s in MEDIA_JS[target]['libs']]+[a for a in MEDIA_JS[target]['api']]+[JS_PATH+s for s in MEDIA_JS[target]['src']]
 	else:
 		return [a for a in MEDIA_JS[target]['api']]+[JS_PATH_MIN+target]
