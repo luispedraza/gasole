@@ -337,12 +337,8 @@ function initControl() {
 		})
 	}
 	// Para que no haga scroll el documento cuando se hace scroll en cities-list
-	document.getElementById("cities-list").addEventListener("mouseover", function() {
-		document.body.style.overflow = "hidden";
-	})
-	document.getElementById("cities-list").addEventListener("mouseout", function() {
-		document.body.style.overflow = "auto";
-	})
+	lockScroll("cities-list");
+
 }
 function showDetail(marker) {
 	map.panTo(marker.position);

@@ -127,65 +127,7 @@ fjs.parentNode.insertBefore(js, fjs);
 <div class="footer_section" style="width: 730px;float: right;">
 	<h2>Todas las provincias</h2>
 	<ul id="allprovs">
-		<li><a>Álava</a></li>
-		<li><a>Albacete</a></li>
-		<li><a>Alicante</a></li>
-		<li><a>Almería</a></li>
-		<li><a>Asturias</a></li>
-		<li><a>Ávila</a></li>
-		<li><a>Badajoz</a></li>
-		<li><a>Balears (Illes)</a></li>
-		<li><a>Barcelona</a></li>
-		<li><a>Burgos</a></li>
-		<li><a>Cáceres</a></li>
-		<li><a>Cádiz</a></li>
-		<li><a>Cantabria</a></li>
-		<li><a>Castellón / Castelló</a></li>
-		<li><a>Ceuta</a></li>
-		<li><a>Ciudad Real</a></li>
-		<li><a>Córdoba</a></li>
-		<li><a>Coruña (A)</a></li>
-		<li><a>Cuenca</a></li>
-		<li><a>Girona</a></li>
-		<li><a>Granada</a></li>
-		<li><a>Guadalajara</a></li>
-		<li><a>Guipúzcoa</a></li>
-		<li><a>Huelva</a></li>
-		<li><a>Huesca</a></li>
-		<li><a>Jaén</a></li>
-		<li><a>León</a></li>
-		<li><a>Lleida</a></li>
-		<li><a>Lugo</a></li>
-		<li><a>Madrid</a></li>
-		<li><a>Málaga</a></li>
-		<li><a>Melilla</a></li>
-		<li><a>Murcia</a></li>
-		<li><a>Navarra</a></li>
-		<li><a>Ourense</a></li>
-		<li><a>Palencia</a></li>
-		<li><a>Palmas (Las)</a></li>
-		<li><a>Pontevedra</a></li>
-		<li><a>Rioja (La)</a></li>
-		<li><a>Salamanca</a></li>
-		<li><a>Santa Cruz de Tenerife</a></li>
-		<li><a>Segovia</a></li>
-		<li><a>Sevilla</a></li>
-		<li><a>Soria</a></li>
-		<li><a>Tarragona</a></li>
-		<li><a>Teruel</a></li>
-		<li><a>Toledo</a></li>
-		<li><a>Valencia / València</a></li>
-		<li><a>Valladolid</a></li>
-		<li><a>Vizcaya</a></li>
-		<li><a>Zamora</a></li>
-		<li><a>Zaragoza</a></li>
-		<script>
-			var links = document.getElementById("allprovs").getElementsByTagName("a");
-			for (var i=0,N=links.length; i<N; i++) {
-				links[i].title = "Todas las gasolineras de "+links[i].textContent;
-				links[i].href = "/gasolineras/"+encodeName(links[i].textContent);
-			}
-		</script>
+		<script>initProvLinks("allprovs");</script>
 	</ul>
 </div>
 

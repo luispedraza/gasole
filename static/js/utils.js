@@ -89,6 +89,29 @@ var APIS = 	{ 	"gasolineras": "api",
 				"ficha": "api"
 			};
 
+
+/* Bloqueo de scroll en el body cuando se hace scroll en un elemento */
+function lockScroll(id) {
+	document.getElementById(id).addEventListener("mouseover", function() {
+		document.body.style.overflow = "hidden";
+	})
+	document.getElementById(id).addEventListener("mouseout", function() {
+		document.body.style.overflow = "auto";
+	})
+}
+/* Enlaces a páginas de provincias a partir de lista */
+function initProvLinks(id) {
+	var place = document.getElementById(id);
+	for (var p in PROVS) {
+		var li = document.createElement("li");
+		var a = document.createElement("a");
+		a.title = "Todas las gasolineras de "+p;
+		a.textContent = p;
+		a.href = "/gasolineras/"+encodeName(p);
+		li.appendChild(a);
+		place.appendChild(li);
+	}
+}
 /* Obtener nombre de provincia a partir de id */
 function getProvName(id) {
 	for (k in PROVS) if (PROVS[k] == id) return k;
