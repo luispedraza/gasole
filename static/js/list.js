@@ -279,10 +279,11 @@ function filterText() {
 			.replace(/[úùü]/g, "u");
 	}
 	var filtervalue = document.getElementById("contains").value;
+	var rows = document.getElementById("table-data").getElementsByTagName("tr");
+	var rlen = rows.length;
 	if (filtervalue.length) {
 		var terms = filtervalue.split(/ +/);
-		var rows = document.getElementById("table-data").getElementsByTagName("tr");
-		for (var f=0, rlen=rows.length; f<rlen; f++) {
+		for (var f=0; f<rlen; f++) {
 			var row = rows[f];
 			if (row.className=="r_off") continue;
 			for (var t=0, tlen=terms.length; t<tlen; t++) {
@@ -297,8 +298,7 @@ function filterText() {
 			}
 		}
 	} else {
-		var rows = document.getElementById("table-data").getElementsByClassName("f_off");
-		for (var f=0, rlen=rows.length; f<rlen; f++) rows[f].className="r_on";
+		for (var f=0; f<rlen; f++) rows[f].className="r_on";
 	}
 }
 
