@@ -22,7 +22,7 @@ h2 {
 	margin-right: auto;
 }
 #price-board {
-	width: 350px;
+	width: 340px;
 	height: 850px;
 	float: left;
 	position: relative;
@@ -127,7 +127,6 @@ h2 {
 #detail {
 	width: 730px;
 	float: right;
-	margin-bottom: 50px;
 }
 
 #detail-content {
@@ -147,11 +146,11 @@ h2 {
 }
 #chart {
 	width: 100%;
-	height: 350px;
+	height: 400px;
 	clear: both;
 }
 #edit, #comments {
-	width: 780px;
+	width: 100%;
 	float: right;
 }
 #comments form {
@@ -159,7 +158,7 @@ h2 {
 }
 #comments textarea {
 	margin-top: 5px;
-	width: 308px;
+	width: 328px;
 	padding: 5px;
 	font-size: 1em;
 	height: 150px;
@@ -298,11 +297,11 @@ div.error {
 }
 
 #comments-new {
-	width: 320px;
+	width: 340px;
 	float: left;
 }
 #comments-old {
-	width: 430px;
+	width: 730px;
 	float: right;
 }
 .button {
@@ -339,7 +338,7 @@ div.error {
 	padding-top: 30px;
 }
 #old_comments .c_block .c_block {
-	padding: 15px 0px 0px 30px;
+	padding: 15px 0px 0px 50px;
 	margin-left: 0;
 	border-bottom: 1px dotted #d3d3d3;
 	height: 50px;
@@ -354,7 +353,7 @@ div.error {
 	clear: both;
 	background-color: #fff;
 	border: 1px solid #d3d3d3;
-	padding: 10px 10px 35px 10px;
+	padding: 10px 10px 30px 10px;
 	min-height: 100px;
 	position: relative;
 }
@@ -364,7 +363,7 @@ div.error {
 	float: right;
 }
 #old_comments .c_avatar {
-	width: 30px;
+	width: 50px;
 	height: auto;
 	float: left;
 	margin-right: 5px;
@@ -382,16 +381,13 @@ div.error {
 
 #old_comments .c_points{
 	height: 20px;
-	position: absolute;
-	right: 5px;
-	top: 20px;
 	font-size: .8em;
 }
 #old_comments .c_content {
-	padding-top: 10px;
+	padding: 0px 15px;
 	clear: both;
 	margin-top: 5px;
-	border-top: 1px dotted #d3d3d3;
+	margin-left: 120px;
 }
 #old_comments .reply {
 	font-size: .8em;

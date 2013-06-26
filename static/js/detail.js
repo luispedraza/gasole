@@ -305,7 +305,7 @@ function amChart(chartData) {
 	};
     chart.dataProvider = chartData;
     chart.marginTop = 20;
-    chart.autoMarginOffset = 3;
+    chart.autoMarginOffset = 40;
     chart.marginRight = 0;        
     chart.categoryField = "d";
     chart.addTitle("Evolución histórica de los precios", 15);
@@ -317,7 +317,7 @@ function amChart(chartData) {
     categoryAxis.axisColor = "#DADADA";
     categoryAxis.startOnAxis = true;
     categoryAxis.showLastLabel = false;
-    categoryAxis.title = "Fecha";
+    // categoryAxis.title = "Fecha";
     // Value
     var valueAxis = new AmCharts.ValueAxis();
     valueAxis.gridAlpha = 0.07;
