@@ -436,6 +436,14 @@ td.T_ADDR a {
 	display: block;
 }
 
+td.T_1, td.T_3, td.T_4, td.T_5, td.T_6, td.T_7, td.T_8 {
+	font-family: 'digital-7';
+	font-size: 1.3em;
+	background-color: #333;
+	color: #fff;
+	text-align: center;
+}
+
 li.T_1.on, th.T_1, #d-prices li.T_1 {
 	background-color: #006633;
 }

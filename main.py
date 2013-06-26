@@ -314,13 +314,7 @@ class Stats(BaseAuthHandler):
             the_scripts = [GOOGLE_MAPS_VIS_API, MAPBOX_API]+get_js('cantidad.js',DEBUG)
             the_styles=["/css/g_cantidad.css", MAPBOX_CSS]
         elif (g_type=="variedad"):
-            the_scripts = [GOOGLE_MAPS_VIS_API, 
-                '/js/stats.js', 
-                '/js/libs/polymaps.min.js', 
-                '/js/libs/jquery.min.js', 
-                '/js/libs/raphael.min.js', 
-                '/js/libs/kartograph.min.js',
-                'http://d3js.org/d3.v3.min.js']
+            the_scripts = [GOOGLE_MAPS_VIS_API]+get_js('variedad.js',DEBUG)
             the_styles=["/css/g_variedad.css"]
         self.render("base.html",
             title=u"Gráficos: "+title,

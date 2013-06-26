@@ -51,6 +51,12 @@ MEDIA_JS = {
 		'extern':	['google_maps_api_v3.js'],
 		'api':		[D3_API, OPENLAYERS_API, GOOGLE_MAPS_API]
 		},
+	'variedad.js': {
+		'src':		['stats.js','search.js', 'utils.js'],
+		'libs': 	['polymaps.min.js','jquery.min.js','raphael.min.js','kartograph.min.js'],
+		'extern':	['google_maps_api_v3.js'],
+		'api':		[D3_API, OPENLAYERS_API, GOOGLE_MAPS_API]
+		},
 	'noticias.js': {
 		'src':		['tumblr.js','noticias.js','search.js', 'utils.js'],
 		'libs': 	[],

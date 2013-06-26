@@ -103,27 +103,17 @@ function initD3() {
 }
 
 window.addEventListener("load", function(){
-	initialize();
-	var req = new XMLHttpRequest();
-	req.onload = function(r) {
-		data = JSON.parse(r.target.responseText);
-		console.log(data);
-		drawData(data);
-		initD3();
-	}
-	var url = document.URL;
-	req.open("GET", document.URL.replace("stats", "api"), true)
-	req.send();
+	//initialize();
 
 
 	/* polymaps */
 	var po = org.polymaps;
 	var pomap = po.map()
-	.container(document.getElementById("polymap").appendChild(po.svg("svg")))
-	.center({lat: 39, lon: -96})
-	.zoom(4)
-	.zoomRange([3, 7])
-	.add(po.interact());
+		.container(document.getElementById("polymap").appendChild(po.svg("svg")))
+		.center({lat: 39, lon: -96})
+		.zoom(4)
+		.zoomRange([3, 7])
+		.add(po.interact());
 
 	pomap.add(po.image()
 		.url(po.url("http://{S}tile.cloudmade.com"
@@ -149,5 +139,21 @@ window.addEventListener("load", function(){
 			feature.element.setAttribute("id", feature.data.id);
 		}
 	}
+
+	new Gasole(function() {
+		drawData(this.info);
+		initD3();
+	});
+
+	// var req = new XMLHttpRequest();
+	// req.onload = function(r) {
+	// 	data = JSON.parse(r.target.responseText);
+	// 	console.log(data);
+	// 	drawData(data);
+	// 	initD3();
+	// }
+	// var url = document.URL;
+	// req.open("GET", document.URL.replace("stats", "api"), true)
+	// req.send();
 
 })
