@@ -418,7 +418,7 @@ function Gasole(callback) {
 							var dist = distance(geo,l,r);
 							if (dist) {
 								var price = st.o[type];	// el precio en la estación
-								result.push({a:station,r:st.r,g:geo,p:price,t:town,l:st.l,d:dist});
+								result.push({a:station,prov:prov,g:geo,p:price,t:town,l:st.l,d:dist});
 								this.stats.add(price);
 							}
 						}

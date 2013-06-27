@@ -65,6 +65,7 @@
 	display: none;
 	padding: 5px;
 	clear: both;
+	overflow: hidden;
 }
 #price-board .name {
 	width: 120px;
@@ -102,6 +103,7 @@
 	overflow: scroll;
 }
 #price-board .rel-list {
+	padding: 5px;
 	margin-top: 5px;
 	border: 1px solid #fff;
 	height: 100px;

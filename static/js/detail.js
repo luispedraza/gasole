@@ -7,6 +7,9 @@ var POINTS = [
 			]
 var gasole = null;	// todo gasole
 var sdata = null;	// esta estación
+var map = null;				// el mapa
+var candidateMark = null; 	// marcador de gasolinera propuesta por el recomendador
+
 function initMap(latlon) {
 	if (!latlon) return;
 	var position = new google.maps.LatLng(latlon[0], latlon[1]);
@@ -197,6 +200,34 @@ function initPrice(price) {
 							td = document.createElement("td");
 							td.textContent = result[i].p +" €/l";
 							tr.appendChild(td);
+							tr.setAttribute("data-g", result[i].g);
+							tr.setAttribute("data-p", result[i].prov);
+							tr.setAttribute("data-t", result[i].t);
+							tr.setAttribute("data-s", result[i].a);
+							tr.addEventListener("click", function() {
+								window.location = "/ficha/"+encodeName(this.getAttribute("data-p"))+"/"+encodeName(this.getAttribute("data-t"))+"/"+encodeName(this.getAttribute("data-s"));
+							});
+							tr.addEventListener("mouseover", function() {
+								var bounds = new google.maps.LatLngBounds();
+								var current = new google.maps.LatLng(sdata.i.g[0], sdata.i.g[1]);
+								bounds.extend(current);
+								var g = this.getAttribute("data-g").split(",");
+								var candidate = new google.maps.LatLng(parseFloat(g[0]), parseFloat(g[1]));
+								bounds.extend(candidate);
+								map.fitBounds(bounds);
+								if (candidateMark) {
+									candidateMark.setPosition(candidate);
+									candidateMark.setAnimation(google.maps.Animation.BOUNCE)
+								} else {
+									var image = new google.maps.MarkerImage("/img/sprt.png", new google.maps.Size(25, 25, "px", "px"), new google.maps.Point(2,473), null, null);
+									candidateMark = new google.maps.Marker({
+										map: map,
+										position: candidate,
+										icon: image,
+										animation: google.maps.Animation.BOUNCE
+									});
+								}
+							});
 							table.appendChild(tr);
 						}
 						lockScroll(list);
