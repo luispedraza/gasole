@@ -48,14 +48,16 @@
 #station-logo {
 	font-size: 25px;
 	height: 70px;
-	background-color: white;
+	padding: 5px;
+	border: 1px solid #333;
+	background-color: #fff;
 }
-#price-board .section > div {
+.name, .price {
 	height: 40px;
 	padding: 5px;
 	float: left;
 	border: 1px solid #fff;
-	margin-right: 5px;
+	margin-right: 10px;
 }
 #price-board .section {
 	height: 55px;
@@ -65,7 +67,7 @@
 	padding: 5px;
 }
 #price-board .name {
-	width: 120px;
+	width: 130px;
 	font-size: 1.1em;
 }
 #price-board .price {
@@ -74,7 +76,17 @@
 	width: 120px;
 	background-color: #000;
 }
-
+#price-board .more {
+	padding: 3px;
+	color: #fff;
+	font-size: 1.2em;
+	cursor: pointer;
+	float: right;
+}
+#price-board .more:hover {
+	color: #333;
+	background-color: #fff;
+}
 .G95 .name {
 	background-color: #006633;
 }

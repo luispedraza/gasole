@@ -5,7 +5,7 @@ var POINTS = [
 				"Muy recomendable",				// 8
 				"¡Excelente!"					// 10
 			]
-
+var gasole = null;
 function initMap(latlon) {
 	if (!latlon) return;
 	var position = new google.maps.LatLng(latlon[0], latlon[1]);
@@ -368,7 +368,7 @@ window.addEventListener("load", function() {
 	}
 	var path = decodeArray(window.location.pathname.split("/"));
 	var sdata = {'p':path[2], 't': path[3], 's': path[4]};		// toda la información de la aestación
-	new Gasole(function() {
+	gasole = new Gasole(function() {
 		sdata.i = this.info[sdata.p][sdata.t][sdata.s];
 		getApiData(function(d) {
 			sdata.c = d._comments;
