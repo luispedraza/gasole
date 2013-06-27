@@ -144,19 +144,7 @@ function initPrice(price) {
 	for (var p in price) {
 		var type = FUEL_OPTIONS[p]["short"];
 		document.getElementById("sec-"+type).style.display = "block";
-		var priceDiv = document.getElementById(type);
-		var digits = price[p].toFixed(3);
-		for (var d=0; d<digits.length; d++){
-			var digitBack = document.createElement("div");
-			digitBack.className = "back";
-			if (digits[d]==".") digitBack.className += " point";
-			else digitBack.textContent = 8;
-			var digitDiv = document.createElement("div"); 
-			digitDiv.className = "digit"; 
-			digitDiv.textContent = digits[d];
-			digitBack.appendChild(digitDiv);
-			priceDiv.appendChild(digitBack);
-		}
+		fillPriceDigits(document.getElementById(type), price[p]);
 	}
 }
 function fillReplyTo(id) {
@@ -265,7 +253,6 @@ function fillComments(comments) {
 	}
 }
 function processData(info) {
-	console.log(info);
 	document.getElementById("address").textContent = toTitle(info.s) + " (" + info.t + ", " + info.p + ")";
 	document.getElementById("hours").textContent = info.i.h;
 	insertLogo(info.i.l);

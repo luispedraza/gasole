@@ -80,24 +80,7 @@ h2 {
 	border: 1px inset #fff;
 	background-color: #000;
 }
-.price .back {
-	position: relative;
-	width: .6em;
-	float: left;
-	margin: 2px;
-	text-align: right;
-	color: #292929;
-}
-.back .digit {
-	width: 100%;
-	position: absolute;
-	color: #fff;
-	top: 0;
-	left: 0;
-}
-.price .back.point {
-	width: 5px;
-}
+
 .G95 .name {
 	background-color: #006633;
 }

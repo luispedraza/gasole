@@ -98,32 +98,43 @@ ul.droplist li:hover {
 }
 
 /* Panel de precios */
+
+#price_board {
+	background-color: #333;
+	color: #fff;
+	border-radius: 3px;
+}
 .section {
-	clear: both;
-	margin-top: 12px;
+	border-top: 3px solid #fff;
 	height: 40px;
 }
 .price, .name {
 	float: left;
-	/*background-color: #000;*/
-	height: 40px;
 	padding: 5px;
 }
 .head.name, .head.price {
-	background-color: #fff;
 	font-family: 'Lato', sans-serif;
 	font-size: 12px;
-	height: 20px;
 	text-transform: uppercase;
+	border: 0;
 }
+
 .name {
 	width: 100px;
 }
 .price {
 	font-family: 'digital-7', sans-serif;
-	font-size: 40px;
+	font-size: 30px;
 	width: 90px;
-	margin-right: 2px;
+	border-left: 3px solid #fff;
+	text-align: center;
+}
+.price span {
+	display: block;
+	width: 90px;
+	height: 1em;
+	border: 1px inset #fff;
+	background-color: #000;
 }
 
 .T_G95 {
@@ -133,17 +144,17 @@ ul.droplist li:hover {
 	background-color: #339933;
 }
 .T_GOA {
-	background-color: #fff;
+	background-color: #333;
 }
 .T_NGO {
-	background-color: #aaa;
+	background-color: #222;
 }
 .T_GOB {
-	background-color: #CC3333;
+	background-color: #A52828;
 }
 .T_GOC {
-	background-color: #FF3300;
+	background-color: #CB2800;
 }
 .T_BIOD {
-	background-color: #FFCC33;
+	background-color: #F1AA41;
 }

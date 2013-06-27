@@ -497,3 +497,18 @@ function Gasole(callback) {
 		if (this.callback) this.callback();
 	}
 }
+
+/* Rellena dígitos de información numérica */
+function fillPriceDigits(div, price) {
+	var digits = price.toFixed(3);
+	for (var d=0; d<digits.length; d++){
+		var digitBack = document.createElement("div");
+		digitBack.className = "back";
+		(digits[d]==".") ? (digitBack.className += " point") : (digitBack.textContent = 8);
+		var digitDiv = document.createElement("div"); 
+		digitDiv.className = "digit"; 
+		digitDiv.textContent = digits[d];
+		digitBack.appendChild(digitDiv);
+		div.appendChild(digitBack);
+	}
+}

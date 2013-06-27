@@ -20,9 +20,9 @@ window.addEventListener("load", function() {
 		console.log(this);
 		var stats = this.stats.stats;
 		for (var o in stats) {
-			document.getElementById("p_"+FUEL_OPTIONS[o]["short"]).textContent = stats[o].mu.toFixed(3);
-			document.getElementById("min_"+FUEL_OPTIONS[o]["short"]).textContent = stats[o].min.toFixed(3);
-			document.getElementById("max_"+FUEL_OPTIONS[o]["short"]).textContent = stats[o].max.toFixed(3);
+			fillPriceDigits(document.getElementById("p_"+FUEL_OPTIONS[o]["short"]).children[0], stats[o].mu);
+			fillPriceDigits(document.getElementById("min_"+FUEL_OPTIONS[o]["short"]).children[0], stats[o].min);
+			fillPriceDigits(document.getElementById("max_"+FUEL_OPTIONS[o]["short"]).children[0], stats[o].max);
 		}
 	});
 })

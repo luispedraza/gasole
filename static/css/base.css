@@ -377,6 +377,25 @@ footer ul a:hover{
         height: 0;
 }
 
+/* PANELES DE PRECIOS */
+.price .back {
+	position: relative;
+	width: .6em;
+	float: left;
+	margin: 0;
+	text-align: right;
+	color: #333;
+}
+.back .digit {
+	width: 100%;
+	position: absolute;
+	color: #fff;
+	top: 0;
+	left: 0;
+}
+.price .back.point {
+	width: 5px;
+}
 /* sprites */
 .arrow {
 	position: absolute;
