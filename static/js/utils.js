@@ -500,6 +500,7 @@ function Gasole(callback) {
 
 /* Rellena dígitos de información numérica */
 function fillPriceDigits(div, price) {
+	div.innerHTML = "";
 	var digits = price.toFixed(3);
 	for (var d=0; d<digits.length; d++){
 		var digitBack = document.createElement("div");

@@ -24,6 +24,7 @@ function initMap(latlon) {
 	});
 }
 
+/* Eventos para valoración de una gasolinera */
 function initPoints() {
 	var timeOut=null;
 	function selStar(i){
@@ -164,8 +165,22 @@ function fillReplyTo(id) {
 	})
 }
 
+/* rellena una valoración basada en la puntuación */
+function fillStars(div, p) {
+	p--;
+	div.textContent = POINTS[p]+": ";
+	div.className = "c_points";
+	for (var s=0; s<5; s++) {
+		var star = document.createElement("div");
+		star.className = "sprt star_mini";
+		star.className += (s<=p) ? " son" : " soff";
+		div.appendChild(star);
+	}
+}
+
 /* Rellena los comentarios de la gasolinera */
 function fillComments(comments) {
+	console.log(comments);
 	var commentsDiv = document.getElementById("old_comments");
 	var total_points = 0;
 	var n_comments = 0;
@@ -179,19 +194,12 @@ function fillComments(comments) {
 		newComment.className = "c_comment";
 		newComment.id = "comment-"+comments[c].id;
 
-		if (comments[c].points!=null) {
-			var newCPoints = document.createElement("div");
-			var points = parseInt(comments[c].points);
+		var points = comments[c].points;
+		if (points) {
+			points = parseInt(points);
 			total_points+=points;
-			points-=1;
-			newCPoints.textContent = POINTS[points];
-			newCPoints.className = "c_points";
-			for (var p=0; p<5; p++) {
-				var star = document.createElement("div");
-				star.className = "sprt star_mini";
-				star.className += (p<=points) ? " son" : " soff";
-				newCPoints.appendChild(star);
-			}
+			var newCPoints = document.createElement("div");
+			fillStars(newCPoints,points);
 			newComment.appendChild(newCPoints);
 			n_comments++;
 		}
@@ -248,8 +256,9 @@ function fillComments(comments) {
 		}
 	}
 	if (total_points!=0) {
-		var points = total_points/n_comments;
-		document.getElementById("points").innerHTML = points.toFixed(1) + " (" + n_comments + " valoraciones)";
+		// var points = Math.round(total_points/n_comments);
+		// document.getElementById("points").innerHTML = points.toFixed(1) + " (" + n_comments + " valoraciones)";
+		fillStars(document.getElementById("points"), Math.round(total_points/n_comments));
 	}
 }
 function processData(info) {
