@@ -5,7 +5,8 @@ var POINTS = [
 				"Muy recomendable",				// 8
 				"¡Excelente!"					// 10
 			]
-var gasole = null;
+var gasole = null;	// todo gasole
+var sdata = null;	// esta estación
 function initMap(latlon) {
 	if (!latlon) return;
 	var position = new google.maps.LatLng(latlon[0], latlon[1]);
@@ -141,11 +142,81 @@ function insertLogo(label) {
 		document.getElementById("station-logo").textContent = label;
 	}
 }
+
+/* Inicializa tablón de precios y reomendador */
 function initPrice(price) {
 	for (var p in price) {
 		var type = FUEL_OPTIONS[p]["short"];
-		document.getElementById("sec-"+type).style.display = "block";
+		var dsec = document.getElementById("sec-"+type);
+		dsec.style.display = "block";
 		fillPriceDigits(document.getElementById(type), price[p]);
+		// Recomendador
+		var dmore = document.createElement("div");
+		dmore.className = "more";
+		dmore.id = "more-"+p;
+		dmore.textContent = "+";
+		dmore.addEventListener("click", function(e) {
+			var radius = 5;
+			var type = this.id.split("-")[1];
+			var div = document.getElementById("rel-"+type);
+			var price = sdata.i.o[type];
+			console.log(price);
+			if (this.textContent=="+") {
+				this.textContent="x";
+				div.className+=" on";
+				var g = sdata.i.g;
+				if (g) {
+					var where = new SearchLocations();
+					where.add("esta gasolinera", g);
+					where.radius = radius;
+					var result = gasole.nearDataArray(where, type, "p");
+					console.log(result);
+					var rlen=result.length;
+					if (rlen) {
+						for (var i=rlen-1; i>=0; i--) if (result[i].p>=price) result.splice(i,1);	// precios más caros
+						console.log(result);
+						rlen = result.length;
+						if (!rlen) {
+							div.innerHTML = "<p>La más barata para este combustible en un radio de "+radius+" km.</p>";
+							div.innerHTML += "<div class='sprt the_best'></div>";
+							return;
+						}
+						div.textContent = "Hay "+rlen+" gasolineras más baratas en un radio de "+radius+" km.";
+						// Lista de gasolineras más económicas:
+						var list = document.createElement("div");
+						list.className = "rel-list";
+						var table = document.createElement("table");
+						for (var i=0; i<rlen; i++) {
+							var tr = document.createElement("tr");
+							var td = document.createElement("td");
+							td.textContent = "A "+result[i].d.toFixed(1)+ "km.";
+							tr.appendChild(td);
+							td = document.createElement("td");
+							td.textContent = result[i].l;
+							tr.appendChild(td);
+							td = document.createElement("td");
+							td.textContent = result[i].p +" €/l";
+							tr.appendChild(td);
+							table.appendChild(tr);
+						}
+						lockScroll(list);
+						list.appendChild(table);
+						div.appendChild(list);
+						return;
+					}
+				} 
+				div.textContent = "No se pueden encontrar otras gasolineras próximas";
+			} else {
+				this.textContent="+";
+				div.innerHTML="";
+				div.className = div.className.replace(" on", "");
+			}
+		});
+		dsec.appendChild(dmore);
+		var drelated = document.createElement("div");
+		drelated.id = "rel-"+p;
+		drelated.className = "rel";
+		dsec.appendChild(drelated);
 	}
 }
 function fillReplyTo(id) {
@@ -180,7 +251,6 @@ function fillStars(div, p) {
 
 /* Rellena los comentarios de la gasolinera */
 function fillComments(comments) {
-	console.log(comments);
 	var commentsDiv = document.getElementById("old_comments");
 	var total_points = 0;
 	var n_comments = 0;
@@ -289,7 +359,6 @@ function processData(info) {
 }
 
 function amChart(chartData) {
-	console.log(chartData);
 	var chart;
 	for (var i in chartData) chartData[i].d = new Date(chartData[i].d);
     // SERIAL CHART
@@ -367,7 +436,7 @@ window.addEventListener("load", function() {
 		}
 	}
 	var path = decodeArray(window.location.pathname.split("/"));
-	var sdata = {'p':path[2], 't': path[3], 's': path[4]};		// toda la información de la aestación
+	sdata = {'p':path[2], 't': path[3], 's': path[4]};		// toda la información de la aestación
 	gasole = new Gasole(function() {
 		sdata.i = this.info[sdata.p][sdata.t][sdata.s];
 		getApiData(function(d) {

@@ -92,10 +92,11 @@ var APIS = 	{ 	"gasolineras": "api",
 
 /* Bloqueo de scroll en el body cuando se hace scroll en un elemento */
 function lockScroll(id) {
-	document.getElementById(id).addEventListener("mouseover", function() {
+	if (typeof id=="string") id = document.getElementById(id);
+	id.addEventListener("mouseover", function() {
 		document.body.style.overflow = "hidden";
 	})
-	document.getElementById(id).addEventListener("mouseout", function() {
+	id.addEventListener("mouseout", function() {
 		document.body.style.overflow = "auto";
 	})
 }
@@ -399,7 +400,8 @@ function Gasole(callback) {
 	// Obtiene array de gasolineras próximas a una ubicación
 	// @param loc: lugar y radio de búsqueda
 	// @param sort: criterio de ordenación
-	this.nearDataArray = function(loc, sort) {
+	this.nearDataArray = function(loc, type, sort) {
+		console.log(loc);
 		var l = loc.latlng(); if (!l) return;			// lugar de búsqueda
 		var r = loc.radius;								// radio de búsqueda
 		this.stats = new Stats();
@@ -410,12 +412,12 @@ function Gasole(callback) {
 				var infot = infop[town];				// info de la ciudad
 				for (var station in infot) {			// para todas las estaciones…
 					var st = infot[station];			// información de la estación
-					if (st.o.hasOwnProperty(this.type)) {
+					if (st.o.hasOwnProperty(type)) {
 						var geo = st.g;
 						if (geo) {
 							var dist = distance(geo,l,r);
 							if (dist) {
-								var price = st.o[this.type];	// el precio en la estación
+								var price = st.o[type];	// el precio en la estación
 								result.push({a:station,r:st.r,g:geo,p:price,t:town,l:st.l,d:dist});
 								this.stats.add(price);
 							}

@@ -60,32 +60,71 @@
 	margin-right: 10px;
 }
 #price-board .section {
-	height: 55px;
 	border-bottom: 3px solid white;
 	color: #fff;
 	display: none;
 	padding: 5px;
+	clear: both;
 }
 #price-board .name {
-	width: 130px;
+	width: 120px;
 	font-size: 1.1em;
 }
 #price-board .price {
 	font-family: 'digital-7', sans-serif;
 	font-size: 3.5em;
-	width: 120px;
+	width: 130px;
 	background-color: #000;
 }
 #price-board .more {
-	padding: 3px;
+	float: right;
+	text-align: center;
 	color: #fff;
 	font-size: 1.2em;
 	cursor: pointer;
-	float: right;
+	width: 1em;
+	height: 1em;
+}
+#price-board .rel {
+	width: 100%;
+	height: 0;
+	clear: both;
+	padding-top: 5px;
+	overflow: hidden;
+	-webkit-transition: all .5s ease;
+	-moz-transition: all .5s ease;
+	-ms-transition: all .5s ease;
+	-o-transition: all .5s ease;
+	transition: all .5s ease;
+}
+#price-board .rel.on {
+	height: 150px;
+	overflow: scroll;
+}
+#price-board .rel-list {
+	margin-top: 5px;
+	border: 1px solid #fff;
+	height: 100px;
+	overflow: scroll;
+}
+#price-board table {
+	width: 100%;
+}
+#price-board tr:hover {
+	background-color: #fff;
+	color: #333;
+	cursor: pointer;
 }
 #price-board .more:hover {
-	color: #333;
 	background-color: #fff;
+	color: #333;
+}
+#price-board .more div {
+	margin-left: 10px;
+	border: 1px dotted #000;
+	width: 200px;
+	background-color: #fff;
+	font-size: .8em;
 }
 .G95 .name {
 	background-color: #006633;
