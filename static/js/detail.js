@@ -195,6 +195,7 @@ function initPrice(price) {
 							td.textContent = "A "+result[i].d.toFixed(1)+ "km.";
 							tr.appendChild(td);
 							td = document.createElement("td");
+							td.className = "label";
 							td.textContent = result[i].l;
 							tr.appendChild(td);
 							td = document.createElement("td");

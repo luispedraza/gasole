@@ -144,7 +144,7 @@ function getLogo(label) {
 	if (label) {
 		/* Algunos errores del archivo del Ministerio */
 		label = label.replace(/camspa/i, "campsa");
-		logo = label.match(/\b(abycer|agla|alcampo|andamur|a\.?n\.? energeticos|avia|bonarea|b\.?p\.?|buquerin|campsa|carmoned|carrefour|cepsa|empresoil|eroski|esclatoil|galp|gasolben|iberdoex|leclerc|makro|meroil|norpetrol|petrem|petrocat|petromiralles|petronor|repostar|repsol|saras|shell|simply|staroil|tamoil|valcarce)\b/i);
+		logo = label.match(/\b(abycer|agla|alcampo|andamur|a\.?n\.? energeticos|avia|bonarea|b\.?p\.?|buquerin|campsa|carmoned|carrefour|cepsa|empresoil|eroski|esclatoil|galp|gasolben|iberdoex|leclerc|makro|meroil|norpetrol|petrem|petrocat|petromiralles|petronor|ramell|repostar|repsol|saras|shell|simply|staroil|tamoil|valcarce)\b/i);
 		if (logo) return logo[0].replace(/\./g, "").replace(/ /g, "_").toLowerCase();	
 	}
 	return null;

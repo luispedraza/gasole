@@ -64,7 +64,6 @@
 	display: none;
 	padding: 5px;
 	clear: both;
-	overflow: hidden;
 }
 #price-board .name {
 	width: 120px;
@@ -90,7 +89,6 @@
 	height: 0;
 	clear: both;
 	padding-top: 5px;
-	overflow: hidden;
 	-webkit-transition: all .5s ease;
 	-moz-transition: all .5s ease;
 	-ms-transition: all .5s ease;
@@ -99,14 +97,20 @@
 }
 #price-board .rel.on {
 	height: 150px;
-	overflow: scroll;
 }
 #price-board .rel-list {
 	padding: 5px;
 	margin-top: 5px;
 	border: 1px solid #fff;
 	height: 100px;
-	overflow: scroll;
+	overflow: auto;
+}
+
+#price-board table .label {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	max-width: 60px;
 }
 #price-board table {
 	width: 100%;
