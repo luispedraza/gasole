@@ -1,12 +1,12 @@
 /* El mapa */
-#map {
+/*#map {
   width: 600;
   height: 600px;
 }
 #map svg {
   width: 600px;
   height: 600px;
-}
+}*/
 .canarias {
   fill-rule:evenodd;
   clip-rule:evenodd;
@@ -193,4 +193,11 @@ label {
 #openmap-p, #openmap-n {
   width: 100%;
   height: 500px;
+}
+
+#raphael {
+  margin-left: auto;
+  margin-right: auto;
+  width: 800px;
+  height: 800px;
 }
