@@ -327,8 +327,11 @@ class StatsApi(BaseHandler):
     def get(self, prov, town):
         info = {}
         if not prov and not town:
-            info = compute_stats()
-            self.render_json(info)
+            # info = memcache.get("stats");
+            # if not info:
+            #     info = compute_stats()
+            #     memcache.set("stats", info)
+            self.render_json(compute_stats())
 
 # webapp2 config
 app_config = {

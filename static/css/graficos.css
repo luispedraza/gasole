@@ -16,17 +16,18 @@
   stroke-linejoin:round;
   stroke-miterlimit:3;
 }
+
 .prov {
-  fill:#ccc;
+  opacity: .5;
   cursor: pointer;
-  -webkit-transition: fill .5s;
-  -moz-transition: fill .5s;
-  -ms-transition: fill .5s;
-  -o-transition: fill .5s;
-  transition: fill .5s;
+  -webkit-transition: all .5s;
+  -moz-transition: all .5s;
+  -ms-transition: all .5s;
+  -o-transition: all .5s;
+  transition: all .5s;
 }
 .prov:hover {
-  opacity: 0.5;
+  opacity: 0;
 }
 
 /* Gráficos */
@@ -195,9 +196,29 @@ label {
   height: 500px;
 }
 
-#raphael {
-  margin-left: auto;
-  margin-right: auto;
-  width: 800px;
-  height: 800px;
+
+
+/*Los mapas*/
+#map-container {
+  width: 730px;
+  height: 730px;
+  position: relative;
+  float: left;
+  border: 1px solid #000;
+}
+
+
+#raphael, #openmap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 730px;
+  height: 730px;
+}
+
+#control-container {
+  width: 350px;
+  height: 730px;
+  float: right;
+  border: 1px solid #f00;
 }
