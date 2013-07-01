@@ -64,6 +64,7 @@
 	display: none;
 	padding: 5px;
 	clear: both;
+	overflow: hidden;
 }
 #price-board .name {
 	width: 120px;

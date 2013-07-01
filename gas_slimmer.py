@@ -47,9 +47,9 @@ MEDIA_JS = {
 		},
 	'precio.js': {
 		'src':		['g_precio.js','search.js', 'utils.js'],
-		'libs': 	['raphael.min.js'],
+		'libs': 	['raphael.min.js', 'd3.js','nv.d3.js','radar-chart-d3.js'],
 		'extern':	['google_maps_api_v3.js'],
-		'api':		[D3_API, OPENLAYERS_API, GOOGLE_MAPS_API]
+		'api':		[OPENLAYERS_API, GOOGLE_MAPS_API]
 		},
 	'variedad.js': {
 		'src':		['stats.js','search.js', 'utils.js'],

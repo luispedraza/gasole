@@ -18,16 +18,12 @@
 }
 
 .prov {
-  opacity: .5;
   cursor: pointer;
   -webkit-transition: all .5s;
   -moz-transition: all .5s;
   -ms-transition: all .5s;
   -o-transition: all .5s;
   transition: all .5s;
-}
-.prov:hover {
-  opacity: 0;
 }
 
 /* Gráficos */
@@ -47,29 +43,20 @@
   border-left: 1px solid #ccc;
 }
 
-#prov_h2, #prov_sel {
-  display: inline-block;
-}
-#prov_h2 {
-  height: 20px;
-  overflow: hidden;
-}
-#prov_h2:hover {
-  height: 100px;
-  overflow-y: scroll;
-  text-align: top;
-}
-input[type=radio] {
+
+input[type=radio], input[type=checkbox] {
   display: none;
 }
 label {
-  width: 120px;
+  display: block;
+  width: 100%;
   border: 1px dotted #383838;
   color: white;
   background-color: #999;
   padding: 3px;
   margin: 1px;
   cursor: pointer;
+  font-size: .8em;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   -ms-border-radius: 3px;
@@ -221,4 +208,9 @@ label {
   height: 730px;
   float: right;
   border: 1px solid #f00;
+}
+
+.chart {
+  height: 500px;
+  border: 1px solid black;
 }

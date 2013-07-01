@@ -7,9 +7,10 @@ body {
 
 
 <div id="content">
-	<div id="controls">
-		
-	</div>
+<div id="radar" width="400px" class="chart"></div>			<!-- cantidad-area-marca -->
+<div id="histogram" class="chart"><svg></svg></div>				<!-- precio-area-marca -->
+<div id="bolas" class="chart"></div>		<!-- area-marca-precio-cantidad -->
+
 	<div id="map-container">
 		<div id="openmap"></div>
 		<div id="raphael"></div>
@@ -21,13 +22,6 @@ body {
 			<ul id="province" class="droplist"></ul>
 		</div><!--prov-list-->
 
-		<div id="view-map">Mapa</div>
-		<div id="graph-map">Gráfico</div>
-	</div>
-
-	<div id="stats-price">
-	<h1>El precio de la gasolina en España</h1>
-	<p>A continuación se muestran los precios medios de los diferentes combustibles en cada una de las comunidades autónomas y a nivel nacional</p>
 		<div id="options">
 			<input type="radio" name="option" value="1" id="op1" checked="true"><label for="op1" class="T_G95">Gasolina 95</label>
 			<input type="radio" name="option" value="3" id="op3"><label for="op3" class="T_G98">Gasolina 98</label>
@@ -37,10 +31,28 @@ body {
 			<input type="radio" name="option" value="7" id="op7"><label for="op7" class="T_GOC">Gasóleo C</label>
 			<input type="radio" name="option" value="8" id="op8"><label for="op8" class="T_BIOD">Biodiésel</label>
 		</div>
+		<label for="hide">Excluir Ceuta, Melilla y Canarias</label><input id="hide" name="hide" type="checkbox" checked="true">
+
+
+		<div id="view-map">Mapa</div>
+		<div id="graph-map">Gráfico</div>
+	</div>
+
+
+
+
+
+
+
+
+	<div id="stats-price">
+	<h1>El precio de la gasolina en España</h1>
+	<p>A continuación se muestran los precios medios de los diferentes combustibles en cada una de las comunidades autónomas y a nivel nacional</p>
+		
 
 		<div class="l-pan">
 			<h2>Precios en toda España</h2>
-			<label for="hide">Excluir Ceuta, Melilla y Canarias</label><input id="hide" name="hide" type="checkbox" checked="true">
+			
 			<div id="spain_hist"></div>
 			<div>Rango de precios<sup>*</sup>: 
 				<div id="bar_price">
@@ -55,7 +67,7 @@ body {
 
 
 		<div class="r-pan">
-			<h2>Precios en la provincia de Madrid<div id="prov_h2"></div><div id="prov_sel">cambiar…</div></h2>
+			<h2>Precios en la provincia</h2>
 			<div id="prov_hist"></div>
 			<div id="openmap-p"></div>
 		</div>
