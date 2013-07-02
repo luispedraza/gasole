@@ -461,3 +461,43 @@ footer ul a:hover{
 .star_mini.soff {width:12px; height:12px; background-position: -2px -549px}
 .star_mini.son {width:12px; height:12px; background-position: -16px -549px}
 .the_best {width:35px; height:55px; background-position: -2px -563px}
+
+
+/* Sprites logos */
+.logo {width:30px; height:20px; position: absolute; left: 0; overflow:hidden; background-repeat: no-repeat;background-image:url(/img/logos/logos.png);}
+
+.abycer {background-position: -2px -2px}
+.agla {background-position: -34px -2px}
+.alcampo {background-position: -66px -2px}
+.an_energeticos {background-position: -98px -2px}
+.andamur {background-position: -130px -2px}
+.avia {background-position: -162px -2px}
+.bonarea {background-position: -194px -2px}
+.bp {background-position: -2px -24px}
+.buquerin {background-position: -34px -24px}
+.campsa {background-position: -66px -24px}
+.carmoned {background-position: -98px -24px}
+.carrefour {background-position: -130px -24px}
+.cepsa {background-position: -162px -24px}
+.empresoil {background-position: -194px -24px}
+.eroski {background-position: -2px -46px}
+.esclatoil {background-position: -34px -46px}
+.galp {background-position: -66px -46px}
+.gasolben {background-position: -98px -46px}
+.iberdoex {background-position: -130px -46px}
+.leclerc {background-position: -162px -46px}
+.makro {background-position: -194px -46px}
+.meroil {background-position: -2px -68px}
+.norpetrol {background-position: -34px -68px}
+.petrem {background-position: -66px -68px}
+.petrocat {background-position: -98px -68px}
+.petromiralles {background-position: -130px -68px}
+.petronor {background-position: -162px -68px}
+.repostar {background-position: -194px -68px}
+.repsol {background-position: -2px -90px}
+.saras {background-position: -34px -90px}
+.shell {background-position: -66px -90px}
+.simply {background-position: -98px -90px}
+.staroil {background-position: -130px -90px}
+.tamoil {background-position: -162px -90px}
+.valcarce {background-position: -194px -90px}

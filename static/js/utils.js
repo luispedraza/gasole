@@ -17,7 +17,7 @@ var CHART_OPTIONS = [
 	{id: "G95", color: "#006633", name: "Gasolina 95"},
 	{id: "NGO", color: "#aaa", name: "Nuevo Gasóleo A"},
 	{id: "BIOD", color: "#f1aa41", name: "Biodiésel"},
-	{id: "GOA", color: "#000", name: "Gasóleo A"},
+	{id: "GOA", color: "#000", name: "Gasóleo Automoción"},
 	{id: "GOC", color: "#FF3300", name: "Gasóleo C"},
 	{id: "GOB", color: "#CC3333", name: "Gasóleo B"}];
 
