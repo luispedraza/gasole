@@ -216,7 +216,7 @@ function raphInit(gasole) {
 	for (var i=0, n=htmlsvg.length; i<n; i++) {
 		var id = htmlsvg[i].id;
 		if (!id) continue;
-		var prov = paper.path(htmlsvg[i].path).attr({"stroke": "#000", "stroke-width": 0});
+		var prov = paper.path(htmlsvg[i].path).attr({"stroke": "#aaa", "stroke-width": 0});
 		prov.pname = getProvName(id);
 		prov.click(function(e) {
 			console.log(this);
@@ -255,8 +255,8 @@ function drawStations(pname) {
 	}
 	var markers = new OpenLayers.Layer.Markers("markers");
 	openMap.addLayer(markers);
-	var data = (pname=="all") ? gasole.info : {"province": gasole.info[pname]};
-	
+	var data = {};
+	data[pname] = gasole.info[pname];
 	for (var p in data) {
 		var prov = data[p];
 		for (var t in prov) {
@@ -268,7 +268,12 @@ function drawStations(pname) {
 					var logo = getLogo(station.l);
 					if (logo) icon.imageDiv.className = "logo "+logo;
 					var lonlat = reprojectLatLon(station.g);
-					markers.addMarker(new OpenLayers.Marker(lonlat, icon));
+					var marker = new OpenLayers.Marker(lonlat, icon);
+					marker.station = encodeName(p)+"/"+encodeName(t)+"/"+encodeName(s);
+					markers.addMarker(marker);
+					marker.events.register("click", marker, function() {
+						window.location = "/ficha/"+this.station;
+					});
 				}
 			}
 		}

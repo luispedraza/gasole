@@ -53,9 +53,15 @@ input[type=radio], input[type=checkbox] {
   height: 500px;
   border: 1px solid #000;
 }
-#exclude {
-  background-color: #000;
+#hide + label {
+  color: #ccc;
+  font-size: .8em;
+  padding: 2px;
+  cursor: pointer;
+}
+#hide:checked + label {
   color: #fff;
+  background-color: #000;
 }
 
 #raphael, #openmap {
@@ -67,6 +73,12 @@ input[type=radio], input[type=checkbox] {
 }
 #openmap {
   float: right;
+}
+#openmap .logo {
+  cursor: pointer;
+}
+#openmap .logo:hover {
+  outline: 5px solid #3AF2D4;
 }
 .chart {
   width: 1000px;
