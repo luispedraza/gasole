@@ -276,6 +276,7 @@ class Info(BaseAuthHandler):
     def get(self, section):
         content_html = ""
         scripts = ""
+        styles = ""
         if section=="combustibles":
             content_html="info_combustibles.html"
         elif section=="tarjetas":
@@ -283,9 +284,11 @@ class Info(BaseAuthHandler):
         elif section=="noticias":
             content_html="info_noticias.html"
             scripts=get_js('noticias.js',DEBUG)
+            styles = ["/css/noticias.css"]
         self.render("base.html",
             content=jinja_env.get_template(content_html).render(),
-            scripts=scripts)
+            scripts=scripts,
+            styles=styles)
 
 def handle_404(request, response, exception):
     #http://webapp-improved.appspot.com/guide/exceptions.html

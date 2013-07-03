@@ -212,12 +212,12 @@ footer ul a:hover{
 }
 #textcontent {
 	padding: 30px;
-	-moz-column-count:2; /* Firefox */
-	-webkit-column-count:2; /* Safari and Chrome */
+/*	-moz-column-count:2;
+	-webkit-column-count:2;
 	column-count:2;
-	-moz-column-gap:10px; /* Firefox */
-	-webkit-column-gap:10px; /* Safari and Chrome */
-	column-gap:10px;
+	-moz-column-gap:10px;
+	-webkit-column-gap:10px;
+	column-gap:10px;*/
 }
 #user {
 	width: 50px;

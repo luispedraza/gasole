@@ -1,0 +1,48 @@
+.tumblr_posts {
+	font-size: 16px;
+}
+
+.tumblr_post {
+	margin-top: 30px;
+	clear: both;
+}
+
+.tumblr_post:after {
+        visibility: hidden;
+        display: block;
+        font-size: 0;
+        content: " ";
+        clear: both;
+        height: 0;
+}
+
+.tumblr_link {
+	display: block;
+	font-size: 1.2em;
+	padding: 5px;
+	background-color: #3399CC;
+	color: #fff;
+	padding-left: 250px;
+	text-decoration: none;
+	border-bottom: 5px solid #006699;
+}
+
+.tumblr_description {
+	margin-top: 20px;
+}
+.tumblr_description p {
+	width: 730px;
+	float: right;
+}
+.tumblr_description p.image {
+	width: 250px;
+	float: left;
+}
+.tumblr_description p.image img {
+	max-width: 250px !important;
+	height: auto !important;
+}
+
+.tumblr_description a {
+	color: #006699;
+}

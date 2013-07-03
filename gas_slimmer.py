@@ -58,7 +58,7 @@ MEDIA_JS = {
 		'api':		[D3_API, OPENLAYERS_API, GOOGLE_MAPS_API]
 		},
 	'noticias.js': {
-		'src':		['tumblr.js','noticias.js','search.js', 'utils.js'],
+		'src':		['search.js', 'utils.js'],
 		'libs': 	[],
 		'extern':	['google_maps_api_v3.js'],
 		'api':		[]
