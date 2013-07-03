@@ -17,6 +17,7 @@
 }
 
 .tumblr_link {
+	text-align: right;
 	display: block;
 	font-size: 1.2em;
 	padding: 5px;
@@ -29,10 +30,15 @@
 
 .tumblr_description {
 	margin-top: 20px;
+	line-height: 1.2em;
 }
 .tumblr_description p {
 	width: 730px;
 	float: right;
+}
+.tumblr_description p:first-child:first-letter, .image + p:first-letter {
+	font-size: 2em;
+	padding-bottom: 5px;
 }
 .tumblr_description p.image {
 	width: 250px;
@@ -45,4 +51,22 @@
 
 .tumblr_description a {
 	color: #006699;
+}
+.tumblr_description .link {
+	text-align: right;
+}
+.tumblr_description .link a {
+	font-size: .8em;
+	text-decoration: none;
+	background-color: #ccc;
+	color: #fff;
+	padding: 3px;
+}
+.tumblr_description .link a:hover {
+	background-color: #006699;
+}
+
+/* Publicidad */
+.ads {
+	float: right;
 }
