@@ -2,8 +2,19 @@
 body {
   background-color: #7e2516;
 }
-</style>
 
+</style>
+<div id="textcontent">
+
+	<h1>Gráficos de precio y distribución de gasolineras, por provincias y por marcas</h1>
+	<p>Aquí encontrarás una serie de gráficos interactivos que te ayudarán a comprender mejor cómo se distribuyen las gasolineras geográficamente por españa, cuáles son los precios en las diferentes regiones, qué marcas son más caras, y cuáles más baratas… Puedes presonalizar los gráficos para obtener la perspectiva que te resulte más útil de la información.</p>
+
+	<p>Comienza seleccionando el tipo de combustible que quieras investigar.</p>
+	<div id="options" class="menubar"></div>
+
+
+	<h2>Mapas de distribución geográfica de gasolineras y precios</h2>
+	<p>Ayúdante de las opciones disponibles en los dos mapas inferiores para visualizar de qué manera se distribuyen las gasolineras por españa; dónde se alcanzan mayores concentraciones, así como qué ciudadanos pagan más dinero por llenar el depósito de gasolina.</p>
 
 	<div id="map-container">
 		<input id="hide" name="hide" type="checkbox" checked="true">
@@ -16,23 +27,26 @@ body {
 
 
 
-	<div id="control-container">
-	
-		<div id="regions">
-	
-		</div>
-		<div id="brands">
-	
-		</div>
-		<div id="options">
-	
-		</div>
+	<h2>Histograma de precios</h2>
+	<div id="regions" class="menubar"></div>
 
-	</div>
+	<canvas id="histogram" width="1100px" height="400px" class="chart"></canvas>
+	<svg id="histD3"></svg>
+
+
+	<div id="brands"></div>
 	
 
-<canvas id="radar"  width="500px" height="500px" class="chart"></canvas>			<!-- cantidad-area-marca -->
+	
+	<h2>Cuotas de mercado de las empresas</h2>
+	<p>Observa la cuota de mercado que alcanza cada marca de combustible en cada una de las provincias de España.</p>
+	<canvas id="radar"  width="500px" height="500px" class="chart"></canvas>			<!-- cantidad-area-marca -->
 
-	<canvas id="histogram" width="1000px" height="400px" class="chart"></canvas>				<!-- precio-area-marca -->
-	<canvas id="bolas" class="chart"></canvas>		<!-- area-marca-precio-cantidad -->
+					<!-- precio-area-marca -->
+	<canvas id="circles" class="chart"></canvas>		<!-- area-marca-precio-cantidad -->
+
+	
+	<svg id="ballsD3"></svg>
+
+</div><!-- textcontent -->
 		

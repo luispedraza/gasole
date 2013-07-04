@@ -47,7 +47,7 @@ MEDIA_JS = {
 		},
 	'precio.js': {
 		'src':		['utils.js','g_precio.js','search.js'],
-		'libs': 	['raphael.min.js', 'chart.js'],
+		'libs': 	['d3.js', 'nv.d3.js','raphael.min.js', 'chart.js'],
 		'extern':	['google_maps_api_v3.js'],
 		'api':		[OPENLAYERS_API, GOOGLE_MAPS_API]
 		},

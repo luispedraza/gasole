@@ -461,12 +461,9 @@ function populateTable(types) {
 				td_s.setAttribute("label", label);
 				var td_ref = document.createElement("div");
 				td_ref.className = "ref";
-				var logo = getLogo(label);
-				if (logo) {
-					var dl = document.createElement("div");
-					dl.className = "logo "+logo;
-					td_ref.appendChild(dl);
-				}
+				var dl = document.createElement("div");
+				dl.className = "logo " + (getLogo(label) || "otra");
+				td_ref.appendChild(dl);
 				td_ref.appendChild(a_s);
 				td_s.appendChild(td_ref);
 				tr.appendChild(td_s);

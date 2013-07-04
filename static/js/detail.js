@@ -135,14 +135,15 @@ function onBlurContent(d) {
 	}
 }
 function insertLogo(label) {
-	var logoid = getLogo(label);
-	if (logoid) {
-		var img = document.createElement("img");
-		img.src = "/img/logos/" + logoid + "_w.png";
-		document.getElementById("station-logo").appendChild(img);
+	var logoId = getLogo(label);
+	var logoDiv = document.getElementById("station-logo");
+	if (logoId) {
+		var imgUrl = "/img/logos/" + logoId + "_w.png";
+		logoDiv.style.backgroundImage = "url("+imgUrl+")";
 	}
 	else {
-		document.getElementById("station-logo").textContent = label;
+		logoDiv.style.backgroundImage = "url('/img/logos/otra_w.png')";
+		logoDiv.textContent = label;
 	}
 }
 

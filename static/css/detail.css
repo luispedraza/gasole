@@ -46,10 +46,16 @@
 	background-repeat: no-repeat;
 }
 #station-logo {
-	font-size: 25px;
+	color: #fff;
+	font-size: 30px;
 	padding: 10px;
 	border: 1px solid #333;
-	background-color: #fff;
+	height: 80px;
+	background-repeat: no-repeat;
+	background-position: 10px 10px;
+	border-bottom: 5px solid #fff;
+	text-align: center;
+	background-color: #000;
 }
 .name, .price {
 	height: 40px;

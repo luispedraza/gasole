@@ -1,57 +1,79 @@
+
+
+p {
+  width: 500px;
+  text-align: justify;
+  font-size: 1.1em;
+  line-height: 1.1em;
+}
+
 input[type=radio], input[type=checkbox] {
   display: none;
 }
+#options {
+  float: right;
+  font-size: 18px;
+}
+.menubar {
+  clear: both;
+  height: 30px;
+  padding: 2px;
+}
 
-#control-container {
-  border: 1px solid black;
-  height: 20px;
+.group-container {
+  display: inline-block;
   overflow: visible;
+  height: 1em;
 }
-#regions, #brands, #options {
-  float: left;
-  margin-right: 10px;
-  border: 1px solid red;
+.group-adder {
+  background-color: #ccc;
+  color: #fff;
+  display: inline-block;
+  height: 1.5em;
+  width: 20px;
+  cursor: pointer;
+  border-radius: 3px;
+  text-align: center;
 }
-/*selector de regiones*/
 .group {
-  width: 80px;
-  font-size: .8em;
+  width: 100px;
   float: left;
+  padding: 2px;
+    -webkit-transition: height .2s linear;
+     -moz-transition: height .2s linear;
+      -ms-transition: height .2s linear;
+       -o-transition: height .2s linear;
+          transition: height .2s linear;
 }
 .group label {
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: #fff;
   display: block;
   height: 0;
   overflow: hidden;
   cursor: pointer;
-  opacity: .8;
-  -webkit-transition: height .2s linear;
-     -moz-transition: height .2s linear;
-      -ms-transition: height .2s linear;
-       -o-transition: height .2s linear;
-          transition: height .2s linear;
+  opacity: .9;
 }
 .group:hover {
   height: 200px;
   overflow: scroll;
 }
 .group:hover label {
-  border: 1px solid #eee;
-  height: 1em;
-  margin-bottom: 3px;
+  height: 1.2em;
+  padding: 2px;
+  border-bottom: 1px solid #fff;
 }
 
-.group input:checked + label, .group input:checked + label {
-  height: 1em;
-  padding: 3px;
-  opacity: 1;
-  margin-bottom: 2px;
+.group input:checked + label {
+  font-weight: bold;
+  height: 1.2em;
+  padding: 2px;
 }
 
 /*Los mapas*/
 #map-container {
   height: 500px;
-  border: 1px solid #000;
 }
 #hide + label {
   color: #ccc;
@@ -83,6 +105,12 @@ input[type=radio], input[type=checkbox] {
 .chart {
   width: 1000px;
   height: 400px;
-  border: 1px solid black;
   float: left;
+}
+
+#histD3 {
+  height: 400px;
+}
+#ballsD3 {
+  height: 800px;
 }
