@@ -2,6 +2,7 @@ var TYPE = "1";			// Tipo de combustible estudiado
 var gasole = null;
 
 var openMap = null;
+var openMapOSM = null;
 var MARKERS = {};										// marcadores de cada una de las provincias
 var MAP_LIMITS = [27.5244, -18.4131, 43.3781, 3.8672];	// vista inicial de open maps (Todas España)
 var NBINS = 12;											// Para el histograma
@@ -242,12 +243,12 @@ function hideStations(pname) {
 function openMapinit() {
 	openMap = new OpenLayers.Map("openmap");
 	// var osm = new OpenLayers.Layer.Google("OSM");
-	var osm = new OpenLayers.Layer.OSM("OSM");
+	openMapOSM = new OpenLayers.Layer.OSM("OSM");
 	// override default epsg code
 	var aliasproj = new OpenLayers.Projection("EPSG:3857");
-	osm.projection = aliasproj;
+	openMapOSM.projection = aliasproj;
 	//add baselayers to map
-	openMap.addLayer(osm);
+	openMap.addLayer(openMapOSM);
 	openMap.setCenter(new OpenLayers.LonLat(0,40), 5);
 	var bl = reprojectLatLon(MAP_LIMITS.slice(0,2)); // bottom-left
 	var tr = reprojectLatLon(MAP_LIMITS.slice(2,4)); // top-right
@@ -297,6 +298,35 @@ function populateOptions(divID, optionsArray, defaultArray, colorArray, inputTyp
 		}	
 		container.appendChild(selector);
 	}
+}
+
+/* Histograma de concentración de gasolineras */
+function openHeatMap(g) {
+	var data = g.info;
+	var heatData = {max: 10, data: []};
+	var heatPoints = heatData.data;
+	for (var p in data) {
+		var datap = data[p];
+		for (var t in datap) {
+			var datat = datap[t];
+			for (var s in datat) {
+				var datas = datat[s];
+				if (datas.hasOwnProperty("g"))
+					heatPoints.push({
+						lonlat: new OpenLayers.LonLat(datas.g[1], datas.g[0]),
+						count: 1
+					});
+			}
+		}
+	}
+	console.log(heatData);
+	var heatmap = new OpenLayers.Layer.Heatmap(
+		"Heatmap Layer", 
+		openMap, openMapOSM, 
+		{visible: true, radius:10},
+		{isBaseLayer: false, opacity: 0.3, projection: new OpenLayers.Projection("EPSG:4326")});
+	openMap.addLayer(heatmap);
+	heatmap.setDataSet(heatData);
 }
 
 // Para agregar más selectores
@@ -581,6 +611,7 @@ window.addEventListener("load", function(){
 		openMapinit();
 		controlInit();
 		updateAll(this);
+		openHeatMap(this);
 	})
 
 })

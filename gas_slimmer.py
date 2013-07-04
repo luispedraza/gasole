@@ -12,7 +12,7 @@ JS_PATH_MIN = '/js/'
 JS_PATH_LIBS = '/js/my_js_libs/'
 
 D3_API = 'http://d3js.org/d3.v3.min.js'
-OPENLAYERS_API = 'http://openlayers.org/api/2.12/OpenLayers.js'
+OPENLAYERS_API = 'http://openlayers.org/api/OpenLayers.js'
 
 MEDIA_JS = {
 	'home.js': {
@@ -47,7 +47,7 @@ MEDIA_JS = {
 		},
 	'precio.js': {
 		'src':		['utils.js','g_precio.js','search.js'],
-		'libs': 	['d3.js', 'nv.d3.js','raphael.min.js', 'chart.js'],
+		'libs': 	['heatmap.js','heatmap-openlayers.js','d3.js', 'nv.d3.js','raphael.min.js', 'chart.js'],
 		'extern':	['google_maps_api_v3.js'],
 		'api':		[OPENLAYERS_API, GOOGLE_MAPS_API]
 		},
@@ -67,6 +67,6 @@ MEDIA_JS = {
 
 def get_js(target, debug=False):
 	if debug:
-		return [JS_PATH_LIBS+s for s in MEDIA_JS[target]['libs']]+[a for a in MEDIA_JS[target]['api']]+[JS_PATH+s for s in MEDIA_JS[target]['src']]
+		return [a for a in MEDIA_JS[target]['api']]+[JS_PATH_LIBS+s for s in MEDIA_JS[target]['libs']]+[JS_PATH+s for s in MEDIA_JS[target]['src']]
 	else:
 		return [a for a in MEDIA_JS[target]['api']]+[JS_PATH_MIN+target]
