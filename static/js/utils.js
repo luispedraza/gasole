@@ -522,3 +522,17 @@ function fillPriceDigits(div, price) {
 		div.appendChild(digitBack);
 	}
 }
+
+/* Función para procesar datos de gasole, que ejecuta
+el callback para cada estación encontrada */
+function gasoleProcess(ginfo, callback) {
+	for (var p in ginfo) {	// para todas las provincias
+		var datap = ginfo[p];
+		for (var t in datap) {	// para todas las ciudades
+			var datat = datap[t];
+			for (var s in datat) {	// para todas las estaciones
+				callback(datat[s]);		// llamamos a la función callback
+			}
+		}
+	}
+}

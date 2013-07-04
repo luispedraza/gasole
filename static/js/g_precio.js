@@ -158,7 +158,7 @@ function raphUpdate(gasole) {
 function raphSelectProvince(e) {
 	if (e.isSelected) {
 			hideStations(e.pname);
-			e.attr("stroke-width", 0);
+			e.attr("stroke-width", 1);
 			e.isSelected=false;
 
 	} else {
@@ -181,7 +181,7 @@ function raphInit(gasole) {
 	for (var i=0, n=htmlsvg.length; i<n; i++) {
 		var id = htmlsvg[i].id;
 		if (!id) continue;
-		var prov = paper.path(htmlsvg[i].path).attr({"stroke": "#17cccc", "stroke-width": 0});
+		var prov = paper.path(htmlsvg[i].path).attr({"stroke": "#17cccc", "stroke-width": 1});
 		htmlsvg[i].e = prov;	// guardo el path de la provincia, que usaré en rapSelectProvince
 		prov.pname = getProvName(id);
 		prov.click(function() {raphSelectProvince(this)});
@@ -301,29 +301,40 @@ function populateOptions(divID, optionsArray, defaultArray, colorArray, inputTyp
 }
 
 /* Histograma de concentración de gasolineras */
-function openHeatMap(g) {
+function openHeatMapNumber(g) {
 	var data = g.info;
 	var heatData = {max: 10, data: []};
 	var heatPoints = heatData.data;
-	for (var p in data) {
-		var datap = data[p];
-		for (var t in datap) {
-			var datat = datap[t];
-			for (var s in datat) {
-				var datas = datat[s];
-				if (datas.hasOwnProperty("g"))
-					heatPoints.push({
-						lonlat: new OpenLayers.LonLat(datas.g[1], datas.g[0]),
-						count: 1
-					});
-			}
-		}
-	}
-	console.log(heatData);
+	function addStation(s) {
+		if (s.hasOwnProperty("g")) 
+			heatPoints.push({lonlat: new OpenLayers.LonLat(s.g[1], s.g[0]), count: 1});
+	};
+	gasoleProcess(g.info, addStation);
+	console.log(heatPoints);
 	var heatmap = new OpenLayers.Layer.Heatmap(
 		"Heatmap Layer", 
 		openMap, openMapOSM, 
 		{visible: true, radius:10},
+		{isBaseLayer: false, opacity: 0.3, projection: new OpenLayers.Projection("EPSG:4326")});
+	openMap.addLayer(heatmap);
+	heatmap.setDataSet(heatData);
+}
+function openHeatMapPrice(g) {
+	var data = g.info;
+	var stats = g.stats.stats;
+	var max = stats[TYPE].max*1000;
+	var min = stats[TYPE].min*1000;
+	var heatData = {max: max-min, data: []};
+	var heatPoints = heatData.data;
+	function addStation(s) {
+		if (s.hasOwnProperty("g") && s.o.hasOwnProperty(TYPE)) 
+			heatPoints.push({lonlat: new OpenLayers.LonLat(s.g[1], s.g[0]), count: s.o[TYPE]*1000-min});
+	};
+	gasoleProcess(g.info, addStation);
+	var heatmap = new OpenLayers.Layer.Heatmap(
+		"Heatmap Layer", 
+		openMap, openMapOSM, 
+		{visible: true, radius:5},
 		{isBaseLayer: false, opacity: 0.3, projection: new OpenLayers.Projection("EPSG:4326")});
 	openMap.addLayer(heatmap);
 	heatmap.setDataSet(heatData);
@@ -611,7 +622,8 @@ window.addEventListener("load", function(){
 		openMapinit();
 		controlInit();
 		updateAll(this);
-		openHeatMap(this);
+		// openHeatMapNumber(this);
+		openHeatMapPrice(this);
 	})
 
 })
