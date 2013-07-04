@@ -7172,8 +7172,8 @@ nv.models.multiBarChart = function() {
 
       if (showControls) {
         var controlsData = [
-          { key: 'Grouped', disabled: multibar.stacked() },
-          { key: 'Stacked', disabled: !multibar.stacked() }
+          { key: 'Agrupadas', disabled: multibar.stacked() },
+          { key: 'Apiladas', disabled: !multibar.stacked() }
         ];
 
         controls.width(controlWidth()).color(['#444', '#444', '#444']);
@@ -7321,10 +7321,10 @@ nv.models.multiBarChart = function() {
         d.disabled = false;
 
         switch (d.key) {
-          case 'Grouped':
+          case 'Agrupadas':
             multibar.stacked(false);
             break;
-          case 'Stacked':
+          case 'Apiladas':
             multibar.stacked(true);
             break;
         }
@@ -8097,8 +8097,8 @@ nv.models.multiBarHorizontalChart = function() {
 
       if (showControls) {
         var controlsData = [
-          { key: 'Grouped', disabled: multibar.stacked() },
-          { key: 'Stacked', disabled: !multibar.stacked() }
+          { key: 'Agrupadas', disabled: multibar.stacked() },
+          { key: 'Apiladas', disabled: !multibar.stacked() }
         ];
 
         controls.width(controlWidth()).color(['#444', '#444', '#444']);
@@ -8208,10 +8208,10 @@ nv.models.multiBarHorizontalChart = function() {
         d.disabled = false;
 
         switch (d.key) {
-          case 'Grouped':
+          case 'Agrupadas':
             multibar.stacked(false);
             break;
-          case 'Stacked':
+          case 'Apiladas':
             multibar.stacked(true);
             break;
         }

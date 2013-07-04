@@ -101,17 +101,24 @@ function lockScroll(id) {
 	})
 }
 /* Enlaces a páginas de provincias a partir de lista */
-function initProvLinks(id) {
+function initProvLinks(id, callback) {
 	var place = document.getElementById(id);
 	for (var p in PROVS) {
 		var li = document.createElement("li");
-		var a = document.createElement("a");
-		a.title = "Todas las gasolineras de "+p;
-		a.textContent = p;
-		a.href = "/gasolineras/"+encodeName(p);
-		li.appendChild(a);
+		li.id = "plist-"+PROVS[p];
+		if (callback) {
+			li.textContent = p;
+			li.onclick = callback;
+		} else {
+			var a = document.createElement("a");
+			a.title = "Todas las gasolineras de "+p;
+			a.textContent = p;
+			a.href = "/gasolineras/"+encodeName(p);
+			li.appendChild(a);	
+		}
 		place.appendChild(li);
 	}
+	lockScroll(place);
 }
 /* Obtener nombre de provincia a partir de id */
 function getProvName(id) {

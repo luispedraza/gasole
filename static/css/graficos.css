@@ -1,18 +1,84 @@
+h1 {
+  background-color: #d24e33;
+  color: #fff;
+  padding: 5px;
+  border-bottom: 5px solid #7e2516;
+}
 
+.description {
+  color: #333;
+  padding-left: 20px;
+  width: 730px;
+  -moz-column-count:2; /* Firefox */
+  -webkit-column-count:2; /* Safari and Chrome */
+  column-count:2;
+  -moz-column-gap:30px; /* Firefox */
+  -webkit-column-gap:30px; /* Safari and Chrome */
+  column-gap:30px;
+}
 
 p {
-  width: 500px;
   text-align: justify;
   font-size: 1.1em;
-  line-height: 1.1em;
+  line-height: 1.2em;
+  margin-top: 1.8em;
 }
+p:first-child {
+  margin-top: 0;
+}
+
+/* Lista de provincias */
+#prov-list {
+  z-index: 50;
+  color: #fff;
+  position: absolute;
+  background: rgb(8,8,8);
+  background: rgba(8,8,8,0.8);
+  padding: 5px;
+  width: 160px;
+  cursor: pointer;
+  border-radius: 3px;
+}
+#prov-list h2 {
+  display: inline-block;
+  margin: 0;
+  padding-left: 5px;
+  font-size: 1em;
+}
+ul.droplist  {
+  font-size: .9em;
+  list-style: none;
+  height: 0;
+  overflow: hidden;
+  -webkit-transition: height .5s;
+}
+ul.droplist li {
+  border-bottom: 1px dotted #fff;
+  padding: 5px;
+}
+ul.droplist a {
+  text-decoration: none;
+  color: white;
+  display: block;
+}
+ul.droplist li:hover {
+  background-color: red;
+}
+#prov-list:hover ul.droplist {
+  height: 350px;
+  overflow-y: scroll;
+  border-top: 1px solid #fff;
+  margin-top: 10px;
+}
+/* fin lista provincias */
+
 
 input[type=radio], input[type=checkbox] {
   display: none;
 }
 #options {
   float: right;
-  font-size: 18px;
+  font-size: 24px;
 }
 .menubar {
   clear: both;
@@ -36,7 +102,7 @@ input[type=radio], input[type=checkbox] {
   text-align: center;
 }
 .group {
-  width: 100px;
+  width: 8em;
   float: left;
   padding: 2px;
     -webkit-transition: height .2s linear;
@@ -74,24 +140,37 @@ input[type=radio], input[type=checkbox] {
 /*Los mapas*/
 #map-container {
   height: 500px;
+  position: relative;
+  background-color: #b5d0d0;
+}
+#hide-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 100;
 }
 #hide + label {
   color: #ccc;
-  font-size: .8em;
-  padding: 2px;
+  font-size: .7em;
+  padding: 3px;
   cursor: pointer;
+  border-radius: 2px;
 }
 #hide:checked + label {
   color: #fff;
-  background-color: #000;
+  background-color: #333;
 }
 
 #raphael, #openmap {
-  width: 50%;
+  width: 49%;
   height: 500px;
 }
 #raphael {
   float: left;
+  border-right: 1px dotted #fff;
+}
+#raphael path {
+  cursor: pointer;
 }
 #openmap {
   float: right;
@@ -113,4 +192,21 @@ input[type=radio], input[type=checkbox] {
 }
 #ballsD3 {
   height: 800px;
+}
+
+
+
+
+/*nv.d3.js*/
+.nvd3 .nv-legend circle {
+  cursor: pointer;
+}
+.nvd3 .nv-legend .disabled circle {
+  fill-opacity: 0;
+}
+.nvd3 .nv-axis line {
+  fill: none;
+  stroke: #333;
+  stroke-opacity: .2;
+  shape-rendering: crispEdges;
 }

@@ -15,7 +15,6 @@ window.addEventListener("load", function() {
 		});
 	}
 	initProvLinks("province");
-	lockScroll("province");
 	var gasole = new Gasole(function () {
 		console.log(this);
 		var stats = this.stats.stats;

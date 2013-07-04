@@ -7,21 +7,30 @@ body {
 <div id="textcontent">
 
 	<h1>Gráficos de precio y distribución de gasolineras, por provincias y por marcas</h1>
-	<p>Aquí encontrarás una serie de gráficos interactivos que te ayudarán a comprender mejor cómo se distribuyen las gasolineras geográficamente por españa, cuáles son los precios en las diferentes regiones, qué marcas son más caras, y cuáles más baratas… Puedes presonalizar los gráficos para obtener la perspectiva que te resulte más útil de la información.</p>
-
-	<p>Comienza seleccionando el tipo de combustible que quieras investigar.</p>
 	<div id="options" class="menubar"></div>
+	<div class="description">
+		<p>Aquí encontrarás una serie de gráficos interactivos que te ayudarán a comprender mejor cómo se distribuyen geográficamente las gasolineras  en España, cuáles son los precios en las diferentes regiones, qué marcas son más caras y cuáles más baratas… Puedes presonalizar los gráficos para obtener la perspectiva de la información que te resulte más útil.</p>
+
+		<p>Comienza seleccionando a la derecha el tipo de combustible que quieras investigar.</p>
+	</div>
 
 
 	<h2>Mapas de distribución geográfica de gasolineras y precios</h2>
-	<p>Ayúdante de las opciones disponibles en los dos mapas inferiores para visualizar de qué manera se distribuyen las gasolineras por españa; dónde se alcanzan mayores concentraciones, así como qué ciudadanos pagan más dinero por llenar el depósito de gasolina.</p>
+	<div class="description">
+		<p>Ayúdante de las opciones disponibles en los dos mapas inferiores para visualizar de qué manera se distribuyen las gasolineras por españa; dónde se alcanzan mayores concentraciones, así como qué ciudadanos pagan más dinero por llenar el depósito de gasolina.</p>
+	</div>
 
 	<div id="map-container">
 		<input id="hide" name="hide" type="checkbox" checked="true">
-		<label for="hide">Excluir Ceuta, Melilla y Canarias</label>
+		<label id="hide-label" for="hide">Excluir Ceuta, Melilla y Canarias</label>
 
-		<div id="openmap"></div>
+		<div id="prov-list"><div class="sprt arrow_white"></div><h2 id="prov-current">lista de provincias</h2>
+				<ul id="province" class="droplist"></ul>
+		</div><!--prov-list-->
+
+		
 		<div id="raphael"></div>
+		<div id="openmap"></div>
 	</div>
 
 
@@ -30,7 +39,7 @@ body {
 	<h2>Histograma de precios</h2>
 	<div id="regions" class="menubar"></div>
 
-	<canvas id="histogram" width="1100px" height="400px" class="chart"></canvas>
+<!-- 	<canvas id="histogram" width="1100px" height="400px" class="chart"></canvas> -->
 	<svg id="histD3"></svg>
 
 

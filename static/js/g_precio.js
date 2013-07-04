@@ -46,7 +46,6 @@ var G_MIN = 0;
 var G_MAX = 0;
 var MOUSE_REF = null;
 
-
 function reprojectLatLon(latlon) {
 	var proj = new OpenLayers.Projection("EPSG:4326");
 	var point = new OpenLayers.LonLat(latlon[1], latlon[0]);
@@ -153,6 +152,27 @@ function raphUpdate(gasole) {
 
 }
 
+/* Cuando se selecciona una provincia del mapa Raphael */
+/* e: elemento */
+function raphSelectProvince(e) {
+	if (e.isSelected) {
+			hideStations(e.pname);
+			e.attr("stroke-width", 0);
+			e.isSelected=false;
+
+	} else {
+		// zoom en una provincia
+		// var box = this.getBBox();
+		// paper.setViewBox(box.x, box.y, box.width, box.height, true);
+		var a = gasole.stats.provinces[e.pname][TYPE].g;
+		var bl = reprojectLatLon([a[0],a[2]]); // bottom-left
+		var tr = reprojectLatLon([a[1],a[3]]); // top-right
+		openMap.zoomToExtent([bl.lon, bl.lat, tr.lon, tr.lat]);
+		drawStations(e.pname);
+		e.attr("stroke-width", 3);
+		e.isSelected=true;
+	}
+}
 
 function raphInit(gasole) {
 	var stats = gasole.stats;
@@ -160,30 +180,18 @@ function raphInit(gasole) {
 	for (var i=0, n=htmlsvg.length; i<n; i++) {
 		var id = htmlsvg[i].id;
 		if (!id) continue;
-		var prov = paper.path(htmlsvg[i].path).attr({"stroke": "#aaa", "stroke-width": 0});
+		var prov = paper.path(htmlsvg[i].path).attr({"stroke": "#17cccc", "stroke-width": 0});
+		htmlsvg[i].e = prov;	// guardo el path de la provincia, que usaré en rapSelectProvince
 		prov.pname = getProvName(id);
-		prov.click(function(e) {
-			console.log(this);
-			if (this.isSelected) {
-					hideStations(this.pname);
-					this.attr("stroke-width", 0);
-					this.isSelected=false;
-
-			} else {
-				// zoom en una provincia
-				// var box = this.getBBox();
-				// paper.setViewBox(box.x, box.y, box.width, box.height, true);
-				var a = gasole.stats.provinces[this.pname][TYPE].g;
-				var bl = reprojectLatLon([a[0],a[2]]); // bottom-left
-				var tr = reprojectLatLon([a[1],a[3]]); // top-right
-				openMap.zoomToExtent([bl.lon, bl.lat, tr.lon, tr.lat]);
-				drawStations(this.pname);
-				this.attr("stroke-width", 3);
-				this.isSelected=true;
-			}
-		});
-		var hoverIn = function() {this.attr({"opacity": .5})};
-		var hoverOut = function() {this.attr({"opacity": 1})};
+		prov.click(function() {raphSelectProvince(this)});
+		var hoverIn = function() {
+			this.attr({"opacity": .5});
+			document.getElementById("prov-current").textContent = this.pname;
+		};
+		var hoverOut = function() {
+			this.attr({"opacity": 1});
+			document.getElementById("prov-current").textContent = "lista de provincias";
+		};
 		prov.hover(hoverIn,hoverOut,prov,prov);
 		prov.node.setAttribute("class", "prov");
 	} 
@@ -210,7 +218,7 @@ function drawStations(pname) {
 				if (station.o.hasOwnProperty(TYPE) && station.g) {
 					var icon = new OpenLayers.Icon(null, new OpenLayers.Size(30,20));
 					var logo = getLogo(station.l);
-					if (logo) icon.imageDiv.className = "logo "+logo;
+					icon.imageDiv.className = "logo "+(logo || "otra");
 					var lonlat = reprojectLatLon(station.g);
 					var marker = new OpenLayers.Marker(lonlat, icon);
 					marker.station = encodeName(p)+"/"+encodeName(t)+"/"+encodeName(s);
@@ -321,7 +329,7 @@ function controlInit() {
 	function regionClick() {
 		var id = parseInt(this.name.split("-")[1]);
 		REGIONS_GRAPH[id] = this.value;
-		updateAll(gasole);
+		updateAll();
 	};
 	populateOptions("regions",REGIONS,REGIONS_GRAPH,REGIONS_COLORS, "radio", regionClick);
 	insertAdder("regions", function() {
@@ -331,7 +339,7 @@ function controlInit() {
 	function brandClick() {
 		var id = parseInt(this.name.split("-")[1]);
 		BRANDS_GRAPH[id] = this.value;
-		updateAll(gasole);	
+		updateAll();	
 	};
 	populateOptions("brands",BRANDS,BRANDS_GRAPH,BRANDS_COLORS,"radio", brandClick);
 	insertAdder("brands", function() {
@@ -407,52 +415,51 @@ function drawRadar(gasole) {
 }
 
 function drawCircles(g) {
-	nv.addGraph(function() {
-		var chart = nv.models.scatterChart()
-		.showDistX(true)
-		.showDistY(true)
-		.color(d3.scale.category10().range());
+	// nv.addGraph(function() {
+	// 	var chart = nv.models.scatterChart()
+	// 		.showDistX(true)
+	// 		.showDistY(true)
+	// 		.color(d3.scale.category10().range());
 
-	  // chart.xAxis.tickFormat(d3.format('.02f'))
-	  // chart.yAxis.tickFormat(d3.format('.02f'))
+	// 	// chart.xAxis.tickFormat(d3.format('.02f'))
+	// 	// chart.yAxis.tickFormat(d3.format('.02f'))
+		
+	// 	d3.select('#ballsD3')
+	// 		.datum(computeData(g))
+	// 		.transition().duration(200)
+	// 		.call(chart);
 
-	  d3.select('#ballsD3')
-	  .datum(computeData(g))
-	  .transition().duration(500)
-	  .call(chart);
-
-	  nv.utils.windowResize(chart.update);
-
-	  return chart;
-	});
-
-	/**************************************
-	 * Simple test data generator
-	 */
-
-	function computeData(g) { //# groups,# points per group
-		var data = [];
-		var random = d3.random.normal();
-		var g = g.stats.provinces;
-		for (var i in g) {
-			if (!g[i].hasOwnProperty(TYPE)) continue;
-			data.push({
-				key: i,
-				values: []
-			});
-			console.log(data);
-			for (j in g[i][TYPE].brands) {
-				data[data.length-1].values.push({
-					x: random()
-					, y: random()
-					, size: Math.random()
-					, shape: "circle"
-				});
-			}
-		}
-		console.log(data);
-		return data;
-	}
+	// 	nv.utils.windowResize(chart.update);
+	// 	return chart;
+	// });
+	// function computeData(g) {
+	// 	var data = [];
+	// 	var random = d3.random.normal();
+	// 	var g = g.stats.provinces;
+	// 	for (var i=0,il=REGIONS_GRAPH.length; i<il; i++) {
+	// 		var p = REGIONS_GRAPH[i];
+	// 		if (g[p].hasOwnProperty(TYPE)) {
+	// 			values = [];
+	// 			var brands = g[p][TYPE].brands;
+	// 			for (var j=0,jl=BRANDS_GRAPH; j<jl; j++) {
+	// 				var b = BRANDS_GRAPH[j];
+	// 				if (brands.hasOwnProperty(b)) {
+	// 					values.push({
+	// 						x: random(),
+	// 						y: random(),
+	// 						size: Math.random(),
+	// 						shape: "circle"
+	// 					});	
+	// 				}
+	// 			}
+	// 			data.push({
+	// 				key: p,
+	// 				values: values
+	// 			});	
+	// 		}
+	// 	}
+	// 	return data;
+	// }
 }
 
 function drawHistD3(gasole) {
@@ -475,11 +482,12 @@ function drawHistD3(gasole) {
 
 		d3.select('#histD3')
 			.datum(data)
-			.transition().duration(500).call(chart);
+			.transition().duration(200).call(chart);
 		nv.utils.windowResize(chart.update);
 		return chart;
 	});
 }
+
 // Histogramas, distribuciones…
 function computeChartData(gasole, nbins) {
 	// Inicializa un histograma a cero
@@ -553,14 +561,20 @@ function computeChartData(gasole, nbins) {
 }
 
 function updateAll(g) {
-	drawRadar(g);	
-	drawHist(g);
-	drawCircles(g);
+	if (!g) g = gasole;
+	// drawRadar(g);	
+	// drawHist(g);
+	// drawCircles(g);
 	drawHistD3(g);
 }
 
 window.addEventListener("load", function(){
-	// initProvLinks("province");
+	initProvLinks("province", function() {
+		var pID = this.id.split("-")[1];
+		for (var i=htmlsvg.length-1; i>=0; i--) {
+			if (htmlsvg[i].id == pID) raphSelectProvince(htmlsvg[i].e);
+		}
+	});
 	gasole = new Gasole(function() {
 		computeChartData(this, NBINS);
 		raphInit(this);
