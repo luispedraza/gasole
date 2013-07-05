@@ -74,7 +74,11 @@ var PROVS = {
 	"Vizcaya": "48",
 	"Zamora": "49",
 	"Zaragoza": "50"};
+
+// Meses del año
 var MONTHS = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+
+// Colores de precio mínimo, máximo y medio de un resultado
 var COLORS = {
 	stroke: "#fff",
 	min: "#36AE34",
@@ -82,8 +86,8 @@ var COLORS = {
 	mu: "#3399CC"
 }
 
-var info = null;
-var LS_EXPIRE = 3600000;				// 1 hora
+var LS_EXPIRE = 3600000;				// Expiración de localStorage, 1 hora
+
 var APIS = 	{ 	"gasolineras": "api",
 				"resultados": "geo",
 				"ficha": "api"
@@ -93,14 +97,12 @@ var APIS = 	{ 	"gasolineras": "api",
 /* Bloqueo de scroll en el body cuando se hace scroll en un elemento */
 function lockScroll(id) {
 	if (typeof id=="string") id = document.getElementById(id);
-	id.addEventListener("mouseover", function() {
-		document.body.style.overflow = "hidden";
-	})
-	id.addEventListener("mouseout", function() {
-		document.body.style.overflow = "auto";
-	})
+	id.addEventListener("mouseover", function() {document.body.style.overflow = "hidden";})
+	id.addEventListener("mouseout", function() {document.body.style.overflow = "auto";})
 }
-/* Enlaces a páginas de provincias a partir de lista */
+
+/* Lista de provincias para incluir en un div de ID dado, un acción a ejecutar en el click.
+Si el callback es null se agrega un enlace a la página de la provincia */
 function initProvLinks(id, callback) {
 	var place = document.getElementById(id);
 	for (var p in PROVS) {
@@ -118,16 +120,21 @@ function initProvLinks(id, callback) {
 		}
 		place.appendChild(li);
 	}
-	lockScroll(place);
+	lockScroll(place);		// Además se bloquea en scroll de la página
 }
+
 /* Obtener nombre de provincia a partir de id */
 function getProvName(id) {
 	for (k in PROVS) if (PROVS[k] == id) return k;
 }
 
+
+/* Elimina el etiquetado HTML de un texto para su envío al servidor */
 function clearHtmlTags(s) {
 	return s.replace(/(<([^>]+)>)/ig,"")
 }
+
+/* Elimina errores y uniformiza nombres de direcciones de gasolineras */
 function toTitle(s) {
 	return s.replace(" [N]", "")
 		.replace(/^CARRETERA ?|^CR\.? ?/i, "CTRA. ")
@@ -147,6 +154,8 @@ function toTitle(s) {
 		.replace(/\[I\]$/, "(m.i.)")
 		.replace(/ \[N\]$/, "")
 }
+
+/* Obtiene el identificador correspondiente a una etiqueta de gasolinera */
 function getLogo(label) {
 	if (label) {
 		/* Algunos errores del archivo del Ministerio */
@@ -156,9 +165,13 @@ function getLogo(label) {
 	}
 	return null;
 }
+
+/* Decodifica un nombre de url a representación humana */
 function decodeName(s) {
 	return decodeURI(s).replace(/_/g, " ").replace(/\|/g, "/");
 }
+
+/* Hace que un nombre sea más bonito para representación en pantalla */
 function prettyName(s) {
 	if (s.match("/")) {
 		 s = s.split("/")[1]; // dos idiomas
@@ -169,13 +182,18 @@ function prettyName(s) {
 	}
 	return s;
 }
+
+/* Decodifica un array de nombres url a nombre legible */
 function decodeArray(a) {
 	for (var n=0; n<a.length; n++) a[n]=decodeName(a[n]); return a;
 }
+
+/* Codifica un nombre para utilizar en una url */
 function encodeName(s) {
 	return s.replace(/\//g, "|").replace(/ /g, "_");
 }
 
+/* Comprueba si existe almacenamiento local en el navegador */
 function checkLocalStorage() {
 	try {
 		return 'localStorage' in window && window['localStorage'] !== null;
@@ -184,6 +202,7 @@ function checkLocalStorage() {
 	}
 }
 
+/* Clave de la página actual, para guardado o recuperación de LocalStorage */
 function getKey() {return window.location.pathname.split("/").slice(1).join("*");}
 
 /* Obtención de datos de la api a partir de la url de la página actual */
@@ -320,10 +339,18 @@ function Stats() {
 }
 
 /** @constructor **/
-function GasoleStats(gasoleData) {
-	// Estadisticas de todos los datos de gasole
-	var stats = this.stats = {};						// estadísticas nacionales
+function GasoleStats(gasoleData, types) {
+	// Estadisticas de todos los datos de un objeto gasole
+	// types indica sobre qué tipos de quiere calcular la aestadística
+	if (typeof types == "undefined") types = null;
+	var stats = this.stats = {};						// estadísticas globales
 	this.provinces = {};								// estadísticas provinciales
+	function addData(datas, statP, statGlobal, o) {
+		if (!statP.hasOwnProperty(o)) statP[o] = new Stats();
+		if (!statGlobal.hasOwnProperty(o)) statGlobal[o] = new Stats();
+		statP[o].add(datas.o[o],[p,t,s],datas.g);
+		statGlobal[o].add(datas.o[o],[p,t,s],datas.g);
+	}
 	for (var p in gasoleData) {
 		var datap = gasoleData[p];						// datos de la provincia
 		var statp = this.provinces[p] = {};				// estadisticas provinciales, optiones y límites geográficos
@@ -331,16 +358,19 @@ function GasoleStats(gasoleData) {
 			var datat = datap[t];						// datos de la ciudad
 			for (var s in datat) {
 				datas = datat[s];						// datos de la estación
-				var g = datas.g;						// posición de la estación
-				for (var o in datas.o) {				// tipos de combustible
-					if (!statp.hasOwnProperty(o)) statp[o] = new Stats();
-					if (!stats.hasOwnProperty(o)) stats[o] = new Stats();
-					statp[o].add(datas.o[o],[p,t,s],g);
-					stats[o].add(datas.o[o],[p,t,s],g);
+				if (types) {
+					for (var i=types.length-1; i>=0; i--) {
+						var o = types[i];
+						if (datas.o.hasOwnProperty(o))
+							addData(datas, statp, stats, o);
+					}
+				} else {
+					for (var o in datas.o) addData(datas, statp, stats, o);
 				}
 			}
 		}	
 	}
+	console.log(this);
 }
 
 /** @constructor */
@@ -507,7 +537,8 @@ function Gasole(callback) {
 	}
 }
 
-/* Rellena dígitos de información numérica */
+/* Rellena dígitos de información numérica 
+para conseguir el efecto de tablero de precios */
 function fillPriceDigits(div, price) {
 	div.innerHTML = "";
 	var digits = price.toFixed(3);

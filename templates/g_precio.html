@@ -4,14 +4,44 @@ body {
 }
 
 </style>
+
+<div id="toolbar">
+
+	<div class="toolbar-item">
+		<div id="options"></div>
+	</div>
+
+	<div class="toolbar-item">
+		<div id="prov-list">
+			<div id="prov-current">Provincias</div>
+			<ul id="province" class="droplist"></ul>
+		</div>
+	</div>
+
+	<div class="toolbar-item">
+		<div id="brand-list">
+			<div id="">Marcas</div>
+			<ul id="brand" class="droplist"></ul>
+		</div>
+	</div>
+
+	<div class="toolbar-item">
+		<input id="hidet" name="hidet" type="checkbox">
+		<label id="hidet-label" for="hidet">Ocultar explicaciones</label>
+	</div>
+
+</div>
+
+
 <div id="textcontent">
 
+
 	<h1>Gráficos de precio y distribución de gasolineras, por provincias y por marcas</h1>
-	<div id="options" class="menubar"></div>
+	
 	<div class="description">
 		<p>Aquí encontrarás una serie de gráficos interactivos que te ayudarán a comprender mejor cómo se distribuyen geográficamente las gasolineras  en España, cuáles son los precios en las diferentes regiones, qué marcas son más caras y cuáles más baratas… Puedes presonalizar los gráficos para obtener la perspectiva de la información que te resulte más útil.</p>
 
-		<p>Comienza seleccionando a la derecha el tipo de combustible que quieras investigar.</p>
+		<p>Comienza seleccionando en la barra superior el tipo de combustible que quieras investigar.</p>
 	</div>
 
 
@@ -21,14 +51,9 @@ body {
 	</div>
 
 	<div id="map-container">
-		<input id="hide" name="hide" type="checkbox" checked="true">
-		<label id="hide-label" for="hide">Excluir Ceuta, Melilla y Canarias</label>
+		<input id="hidep" name="hidep" type="checkbox" checked>
+		<label for="hidep">Excluir Ceuta, Melilla y Canarias</label>
 
-		<div id="prov-list"><div class="sprt arrow_white"></div><h2 id="prov-current">lista de provincias</h2>
-				<ul id="province" class="droplist"></ul>
-		</div><!--prov-list-->
-
-		
 		<div id="raphael"></div>
 		<div id="openmap"></div>
 	</div>
@@ -42,6 +67,9 @@ body {
 <!-- 	<canvas id="histogram" width="1100px" height="400px" class="chart"></canvas> -->
 	<svg id="histD3"></svg>
 
+	<div id="price-histogram"></div>
+
+
 
 	<div id="brands"></div>
 	
@@ -49,13 +77,17 @@ body {
 	
 	<h2>Cuotas de mercado de las empresas</h2>
 	<p>Observa la cuota de mercado que alcanza cada marca de combustible en cada una de las provincias de España.</p>
-	<canvas id="radar"  width="500px" height="500px" class="chart"></canvas>			<!-- cantidad-area-marca -->
-
-					<!-- precio-area-marca -->
-	<canvas id="circles" class="chart"></canvas>		<!-- area-marca-precio-cantidad -->
-
 	
-	<svg id="ballsD3"></svg>
+
+	<!-- <canvas id="radar"  width="500px" height="500px" class="chart"></canvas>
+ -->
+	
+	<div id="ballsD3"></div>
+	
+	
+	
+
+
 
 </div><!-- textcontent -->
 		
