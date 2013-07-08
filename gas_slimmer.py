@@ -47,7 +47,7 @@ MEDIA_JS = {
 		},
 	'precio.js': {
 		'src':		['utils.js','g_precio.js','search.js'],
-		'libs': 	['heatmap.js','heatmap-openlayers.js','d3.js', 'nv.d3.js','raphael.min.js', 'chart.js'],
+		'libs': 	['jscolor.js','heatmap.js','heatmap-openlayers.js','d3.js','raphael.min.js'],
 		'extern':	['google_maps_api_v3.js'],
 		'api':		[OPENLAYERS_API, GOOGLE_MAPS_API]
 		},

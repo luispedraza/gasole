@@ -370,7 +370,6 @@ function GasoleStats(gasoleData, types) {
 			}
 		}	
 	}
-	console.log(this);
 }
 
 /** @constructor */
@@ -567,3 +566,26 @@ function gasoleProcess(ginfo, callback) {
 		}
 	}
 }
+
+// Para propagación de evento
+// http://blog.patricktresp.de/2012/02/internet-explorer-8-and-all-the-fun-stuff-e-stoppropagation-e-preventdefault-mousedown/
+function stopEvent(e) {
+	//e.cancelBubble is supported by IE -
+    // this will kill the bubbling process.
+	e.cancelBubble = true;
+	e.returnValue = false;
+	//e.stopPropagation works only in Firefox.
+	if ( e.stopPropagation ) e.stopPropagation();
+	if ( e.preventDefault ) e.preventDefault();		
+    return false;
+}
+
+
+// Para agregar eventos 
+function addEvent(el, evnt, func) {
+		if(el.addEventListener) {
+			el.addEventListener(evnt, func, false);
+		} else if(el.attachEvent) {
+			el.attachEvent('on'+evnt, func);
+		}
+	}
