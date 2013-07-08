@@ -197,9 +197,10 @@ function showMarkers(pname, show) {
 
 /* Inicialización de open map */
 function openMapinit() {
-	openMap = new OpenLayers.Map("openmap", {
-		controls: [new OpenLayers.Control.LayerSwitcher({'ascending':true})]
-	});
+	openMap = new OpenLayers.Map("openmap")
+	// , {
+	// 	controls: [new OpenLayers.Control.LayerSwitcher({'ascending':true})]
+	// });
 	// var osm = new OpenLayers.Layer.Google("OSM");
 	openMapOSM = new OpenLayers.Layer.OSM("OSM");
 	var aliasproj = new OpenLayers.Projection("EPSG:3857");
@@ -398,14 +399,23 @@ function drawCircles() {
 		.selectAll("text")
 			.style("font-size", ".8em");
 
-	chart.selectAll("circle")
-		.data(data)
-		.enter()
+	var circles = chart.selectAll("circle")
+		.data(data);
+	circles.transition().duration(500)
+		.attr("cx", function(d){return x(d.n);})		// número en coordenada x
+		.attr("cy", function(d){return y(d.p);});		// precio en coordenada Y
+	circles.enter()
 		.append("circle")
+		.attr("class", "circle")
 		.attr("cx", function(d){return x(d.n);})		// número en coordenada x
 		.attr("cy", function(d){return y(d.p);})		// precio en coordenada Y
-		.attr("r", "20")
+		.attr("r", 0)
 		.attr("fill", function(d){return d.c;})
+		.transition().delay(500).duration(500).ease("bounce").attr("r", 70);
+	circles.exit()
+		.transition().duration(500)
+		.attr("r", 0)
+		.remove();
 }
 
 // Histogramas, distribuciones…

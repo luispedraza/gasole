@@ -311,6 +311,11 @@ input[type=radio], input[type=checkbox] {
 .bar:hover {
   opacity: 1;
 }
+.circle {
+  stroke-width: 1px;
+  stroke: #fff;
+  opacity: .8;
+}
 .axis path, .axis line {
   fill: none;
   stroke: #333;
