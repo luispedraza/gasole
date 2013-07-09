@@ -359,7 +359,7 @@ input[type=radio], input[type=checkbox] {
 }
 
 #circles {
-  height: 400px;
+  height: 500px;
 }
 .bar {
   opacity: .8;
@@ -371,6 +371,9 @@ input[type=radio], input[type=checkbox] {
   stroke-width: 1px;
   stroke: #fff;
   opacity: .8;
+}
+.circle:hover {
+  opacity: 1;
 }
 .axis path, .axis line {
   fill: none;

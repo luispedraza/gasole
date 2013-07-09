@@ -285,32 +285,30 @@ function drawCircles() {
 	// Número de gasolineras en el eje de las X
 	// Precio medio del combustible en el eje de las Y
 	var stats = theStats.stats[TYPE];
+	if (!stats) return;
 	var div = d3.select("#circles");
-	if (!stats) {
-		div.attr("class","chart off");
-		return;
-	}
-	else {
-		div.attr("class", "chart");
-	}
 	var provinces = theStats.provinces;
-	var yMin = 0;
-	var yMax = stats[TYPE].max;
+	var yMin = stats.min;
+	var yMax = stats.max;
 	var xMin = 0;
 	var xMax = 0;
 	var data = [];
-	for (var p in REGIONS) {
-		if (REGIONS[p].selected)
-		var current = provinces[p][TYPE];
-
-		var n = current.n;
-		data.push({p: current.mu, n: n, c: "#"+REGIONS[p].color});
-		if (n>xMax) xMax = n;
+	var radius = 40;						// radio de las pelotas
+	for (var p in REGIONS) {				// para todas las regiones
+		if (REGIONS[p].selected) {
+			var current = provinces[p][TYPE];
+			var n = current.n;
+			data.push({name: p, p: current.mu, n: n, c: "#"+REGIONS[p].color, r: radius});
+			if (n>xMax) xMax = n;	
+		} else {
+			data.push({p: 0, n: 0, c: "#ccc", r:0});
+		}
 	}
+	console.log(data);
 	divWidth = parseInt(div.style("width").split("px")[0]);
 	divHeight = parseInt(div.style("height").split("px")[0]);
 
-	var margin = {top: 5, right: 5, bottom: 50, left: 50},
+	var margin = {top: 5+radius, right: 5+radius, bottom: 50+radius, left: 50+radius},
 		width = divWidth - margin.left - margin.right,
 		height = divHeight - margin.top - margin.bottom;
 
@@ -357,17 +355,20 @@ function drawCircles() {
 
 	var circles = chart.selectAll("circle")
 		.data(data);
-	circles.transition().duration(500)
-		.attr("cx", function(d){return x(d.n);})		// número en coordenada x
-		.attr("cy", function(d){return y(d.p);});		// precio en coordenada Y
+	circles.transition().duration(300)
+			.attr("cx", function(d) {return d.n ? x(d.n) : d3.select(this).attr("cx")})		// número en coordenada x
+			.attr("cy", function(d) {return y(d.p)})		// precio en coordenada Y
+			.attr("fill", function(d) {return d.c})
+		.transition().duration(300).ease("bounce")
+			.attr("r", function(d) {return d.r});
 	circles.enter()
 		.append("circle")
 		.attr("class", "circle")
-		.attr("cx", function(d){return x(d.n);})		// número en coordenada x
-		.attr("cy", function(d){return y(d.p);})		// precio en coordenada Y
+		.attr("cx", function(d){return x(d.n)})		// número en coordenada x
+		.attr("cy", function(d){return y(d.p)})		// precio en coordenada Y
 		.attr("r", 0)
-		.attr("fill", function(d){return d.c;})
-		.transition().delay(500).duration(500).ease("bounce").attr("r", 70);
+		.attr("fill", function(d){return d.c})
+		.transition().delay(500).duration(500).ease("bounce").attr("r", function(d){return d.r});
 	circles.exit()
 		.transition().duration(500)
 		.attr("r", 0)
@@ -493,7 +494,6 @@ function Histogram() {
 			var hMax = d3.max(current.hist);
 			if (hMax>nMax) nMax = hMax;
 		}
-		console.log(data);
 		if (this.stacked) nMax = d3.max(stats[TYPE].hist);	// barras apiladas
 		var nSeries = data.length;
 		var margin = {top: 20, right: 20, bottom: 30, left: 50};
