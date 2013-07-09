@@ -1,18 +1,13 @@
 var theGasole = null;	// El objeto gasole, con toda la información
 var theStats = null;	// Estadísticas de la selección considerada
-var TYPE = "1";			// Tipo de combustible estudiado
+var TYPE = "1";			// Tipo de combustible seleccionado
 
+var histogram = new Histogram();
 
 var openMap = null;
 var openMapOSM = null;
 var MAP_LIMITS = [27.5244, -18.4131, 43.3781, 3.8672];	// vista inicial de open maps (Todas España)
 var NBINS = 12;											// Para el histograma
-
-var TYPES = [];
-for (var t in CHART_OPTIONS) TYPES.push(CHART_OPTIONS[t].name);
-var TYPES_GRAPH = ["Gasolina 95"];
-var TYPES_COLORS = [];
-for (var t in CHART_OPTIONS) TYPES_COLORS.push(CHART_OPTIONS[t].color);
 
 // Regiones a mostrar en las gráficas
 // var REGIONS = ["España"].concat(Object.keys(PROVS));
@@ -83,7 +78,7 @@ function circle2path(x , y, r) // x and y are center and r is the radius
 	return s;
 }
 
-function raphUpdate() {
+function raphaelUpdate() {
 	var stats = theGasole.stats;
 	// rango de precios
 	var prices = [];
@@ -155,7 +150,7 @@ function raphaelInit() {
 		prov.node.setAttribute("class", "prov");
 	} 
 	paper.setViewBox(-50,0,450,400, true);
-	raphUpdate(gasole);
+	raphaelUpdate(gasole);
 }
 
 
@@ -213,51 +208,6 @@ function openMapinit() {
 	openMap.zoomToExtent([bl.lon, bl.lat, tr.lon, tr.lat]);
 }
 
-// Opciones de menús desplegables de selección
-function populateOptions(divID, optionsArray, defaultArray, colorArray, inputType, callback) {
-	var div = document.getElementById(divID);
-	var container = div.getElementsByClassName("group-container");
-	if (container.length) container = container[0];
-	else {
-		container = document.createElement("div");
-		container.className = "group-container";
-		div.appendChild(container);	
-	}
-	var currentSelectors = container.childNodes.length;
-	// para todas las opciones seleccionadas
-	for (var i=0,li=defaultArray.length; i<li; i++) {
-		var iSel = currentSelectors+i;
-		var selector = document.createElement("div");
-		lockScroll(selector);
-		selector.className = "group";
-		selector.id =divID+"-"+iSel;
-		// todos los items
-		for (var r=0,lr=optionsArray.length; r<lr; r++) {
-			var color = colorArray[r];
-			if (!color) {
-				var color = Raphael.getColor();
-				colorArray[r] = color;	
-			} 
-			var thisOption = [divID,iSel,r].join("-");
-			var text = optionsArray[r];
-			var newI = document.createElement("input");
-			newI.type = inputType;
-			newI.value = text;
-			newI.name = divID+"-"+iSel;
-			newI.id = thisOption;
-			if (optionsArray[r]==defaultArray[i]) newI.checked=true;
-			newL = document.createElement("label");
-			newL.textContent = text;
-			newL.setAttribute("for", thisOption);
-			newL.style.backgroundColor = color;
-			selector.appendChild(newI);
-			selector.appendChild(newL);
-			newI.addEventListener("change", callback);
-		}	
-		container.appendChild(selector);
-	}
-}
-
 /* Histograma de concentración de gasolineras */
 function openHeatMapNumber(g) {
 	var data = g.info;
@@ -308,13 +258,14 @@ function insertAdder(divID, callback) {
 }
 
 function initControl() {
+	initOptions();			// Selector de tipo de combustible
 	initProvinces();		// Selector de provincias en la barra
 	initToolbar();
 	// Ocultar Ceuta, Melilla y Canarias
 	document.getElementById("hidep").addEventListener("change", function() {
 		// Ocultar Ceuta, Melilla, Canarias
 		skip = this.checked;
-		raphUpdate();
+		raphaelUpdate();
 	});
 	// Ocultar Textos 
 	document.getElementById("hidet").addEventListener("change", function() {
@@ -322,13 +273,10 @@ function initControl() {
 		d3.selectAll(".description")
 			.attr("class", hideText ? "no description" : "description");
 	});
-
-	// Selector de tipos de combustible
-	populateOptions("options",TYPES,TYPES_GRAPH,TYPES_COLORS,"radio", function() {
-		var name = this.value;
-		for (var t in FUEL_OPTIONS) if (FUEL_OPTIONS[t].name==name) TYPE=t;
-		raphUpdate();
-		updateAll();
+	// Apilar barras
+	addEvent(document.getElementById("stack"), "change", function() {
+		histogram.stacked = this.checked;
+		histogram.draw();
 	});
 }
 
@@ -336,21 +284,29 @@ function drawCircles() {
 	// Gráfico de bolas
 	// Número de gasolineras en el eje de las X
 	// Precio medio del combustible en el eje de las Y
-	var stats = theStats.stats;
-	if (!stats[TYPE]) return;
+	var stats = theStats.stats[TYPE];
+	var div = d3.select("#circles");
+	if (!stats) {
+		div.attr("class","chart off");
+		return;
+	}
+	else {
+		div.attr("class", "chart");
+	}
 	var provinces = theStats.provinces;
-	var yMin = 1.3;
+	var yMin = 0;
 	var yMax = stats[TYPE].max;
 	var xMin = 0;
 	var xMax = 0;
 	var data = [];
-	for (var p in provinces) {
+	for (var p in REGIONS) {
+		if (REGIONS[p].selected)
 		var current = provinces[p][TYPE];
+
 		var n = current.n;
-		data.push({p: current.mu, n: n, c: REGIONS[p].color});
+		data.push({p: current.mu, n: n, c: "#"+REGIONS[p].color});
 		if (n>xMax) xMax = n;
 	}
-	var div = d3.select("#circles");
 	divWidth = parseInt(div.style("width").split("px")[0]);
 	divHeight = parseInt(div.style("height").split("px")[0]);
 
@@ -496,145 +452,176 @@ function computeHistograms(gasoleData, stats, nbins) {
 	}
 }
 
-function updateAll() {
-	// Dalculamos la estadísticas para los datos seleccionados
-	var gasoleData = {}
-	for (p in REGIONS) {
-		// Selección de datos para construir estadísticas
-		if (REGIONS[p].selected) gasoleData[p] = theGasole.info[p];
+/* Función que actualiza todos los gráficos,
+y recalcula las estadísticas en caso necesario */
+function updateAll(recompute) {
+	if (typeof recompute == "undefined") recompute = true;
+	if (recompute) {
+		// Dalculamos la estadísticas para los datos seleccionados
+		var gasoleData = {}
+		for (p in REGIONS) {
+			// Selección de datos para construir estadísticas
+			if (REGIONS[p].selected) gasoleData[p] = theGasole.info[p];
+		}
+		theStats = new GasoleStats(gasoleData, [TYPE]);	
 	}
-	theStats = new GasoleStats(gasoleData, [TYPE]);
-	drawHistogram();
+	histogram.draw();
+	drawCircles();
+	raphaelUpdate
 	// Mapas de calor
 	// openHeatMapNumber(this);
 	// openHeatMapPrice();
-	drawCircles();
-	// drawRadar(g);	
-	// drawHist(g);
-	// drawCircles(g);
 }
 
+/** @constructor */
+function Histogram() {
+	this.stacked = false;
+	this.draw = function() {
+		/* Dibujo del histograma con la librería D3.js */
+		computeHistograms(theGasole.info, theStats, NBINS);
+		var stats = theStats.stats;
+		var provinces = theStats.provinces;
+		if (!stats[TYPE]) return;
+		var bins = stats[TYPE].bins;
+		var step = stats[TYPE].step;
+		var data = [];
+		var nMax = 0;						// Número máximo en una provincia, para escala de gráfico
+		for (var p in provinces) {
+			var current = provinces[p][TYPE];
+			var n = current.n;
+			data.push({name: p, hist: current.hist, color: "#"+REGIONS[p].color});
+			var hMax = d3.max(current.hist);
+			if (hMax>nMax) nMax = hMax;
+		}
+		console.log(data);
+		if (this.stacked) nMax = d3.max(stats[TYPE].hist);	// barras apiladas
+		var nSeries = data.length;
+		var margin = {top: 20, right: 20, bottom: 30, left: 50};
+		var binMargin = 4;	// Margen entre bins de histogramas, en píxeles
 
-/* Dibujo del histograma con la librería D3.js */
-function drawHistogram() {
-	computeHistograms(theGasole.info, theStats, NBINS);
-	var stats = theStats.stats;
-	var provinces = theStats.provinces;
-	if (!stats[TYPE]) return;
-	var bins = stats[TYPE].bins;
-	var step = stats[TYPE].step;
-	var data = [];
-	var nMax = 0;						// Número máximo en una provincia, para escala de gráfico
-	for (var p in provinces) {
-		var current = provinces[p][TYPE];
-		var n = current.n;
-		data.push({name: p, hist: current.hist, color: REGIONS[p].color});
-		var hMax = d3.max(current.hist);
-		if (hMax>nMax) nMax = hMax;
-	}
-	var nSeries = data.length;
-	var margin = {top: 20, right: 20, bottom: 30, left: 50};
-	var binMargin = 4;	// Margen entre bins de histogramas, en píxeles
+		var yMin = 0,
+			yMax = nMax;
 
-	var yMin = 0,
-		yMax = nMax;
+		var div = d3.select("#histogram"),
+			divWidth = parseInt(div.style("width").split("px")[0]),		// ancho del div en pixeles
+			divHeight = parseInt(div.style("height").split("px")[0]);	// alto del div en pixeles
+		var width = divWidth - margin.left - margin.right,
+			height = divHeight - margin.top - margin.bottom;
+		var x = d3.scale.linear()
+			.domain(d3.extent(bins))				// dominio de entrada x
+			.range([0,width]);						// rango de salida x
+		var y = d3.scale.linear()
+			.domain([yMin, yMax])					// dominio de entrada y
+			.range([height,0]);						// rango de salida y
+		var xAxis = d3.svg.axis()
+			.scale(x)
+			.tickFormat(d3.format(",.3f"))
+			.orient("bottom")
+			.tickValues(bins);
+		var yAxis = d3.svg.axis()
+			.scale(y)
+			.orient("left")
+			.ticks(5)
+			.tickFormat(d3.format(".0f"));
 
-	var div = d3.select("#histogram"),
-		divWidth = parseInt(div.style("width").split("px")[0]),		// ancho del div en pixeles
-		divHeight = parseInt(div.style("height").split("px")[0]);	// alto del div en pixeles
-	var width = divWidth - margin.left - margin.right,
-		height = divHeight - margin.top - margin.bottom;
-	var x = d3.scale.linear()
-		.domain(d3.extent(bins))				// dominio de entrada x
-		.range([0,width]);						// rango de salida x
-	var y = d3.scale.linear()
-		.domain([yMin, yMax])					// dominio de entrada y
-		.range([height,0]);						// rango de salida y
-	var xAxis = d3.svg.axis()
-		.scale(x)
-		.tickFormat(d3.format(",.3f"))
-		.orient("bottom")
-		.tickValues(bins);
-	var yAxis = d3.svg.axis()
-		.scale(y)
-		.orient("left")
-		.ticks(5)
-		.tickFormat(d3.format(".0f"));
-
-	var gridWidth = x(bins[1]);
-	var chart = div.select(".chart");
-	if (chart[0][0]==null) {
-		chart = div.append("svg")
-			.attr("width", "100%")
-			.attr("height", "100%")
-			.append("g")
-			.attr("class", "chart")
-			.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-		chart.append("g")
-			.attr("class", "x axis")
-			.attr("transform", "translate(0," + height + ")");
-		chart.append("g")
-			.attr("class", "y axis");
+		var gridWidth = x(bins[1]);
+		var chart = div.select(".chart");
+		if (chart[0][0]==null) {
+			chart = div.append("svg")
+				.attr("width", "100%")
+				.attr("height", "100%")
+				.append("g")
+				.attr("class", "chart")
+				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+			chart.append("g")
+				.attr("class", "x axis")
+				.attr("transform", "translate(0," + height + ")");
+			chart.append("g")
+				.attr("class", "y axis");
+			
+		} else if (nSeries>1) {
+			grid = chart.selectAll(".grid").data(bins);
+			grid.enter()
+				.insert("rect", ":first-child")
+				.attr("class", "grid")
+				.attr("x", function(d,i) {return x(bins[i])})
+				.attr("y", 0)
+				.attr("width", gridWidth)
+				.attr("height", height)
+				.attr("fill", function(d,i) { return (i%2) ? "#ccc" : "#eee"})
+				.transition().duration(1000).attr("opacity", .2);
+		}
+		chart.select(".x.axis")
+			.call(xAxis)
+			.selectAll("text")
+				.style("font-size", ".8em");
 		
-	} else if (nSeries>1) {
-		grid = chart.selectAll(".grid").data(bins);
-		grid.enter()
-			.insert("rect", ":first-child")
-			.attr("class", "grid")
-			.attr("x", function(d,i) {return x(bins[i])})
-			.attr("y", 0)
-			.attr("width", gridWidth)
-			.attr("height", height)
-			.attr("fill", function(d,i) { return (i%2) ? "#ccc" : "#eee"})
-			.transition().duration(1000).attr("opacity", .2);
-	}
-	chart.select(".x.axis")
-		.call(xAxis)
-		.selectAll("text")
-			.style("font-size", ".8em");
-	
-	chart.select(".y.axis")
-		.call(yAxis)
-		.selectAll("text")
-			.style("font-size", ".8em");
+		chart.select(".y.axis")
+			.call(yAxis)
+			.selectAll("text")
+				.style("font-size", ".8em");
 
-	var barWidth = (gridWidth-(2*binMargin))/nSeries;	// ancho de cada barra
-	var transX = 500,	// transición horizontal
-		transY = 500;	// transición vertical
+		var barWidth = (gridWidth-(2*binMargin));
+		if (!this.stacked) barWidth/=nSeries;	// ancho de cada barra
+		var transX = 500,	// transición horizontal
+			transY = 500;	// transición vertical
 
-	var series = chart.selectAll(".serie").data(data);
-	series.transition().duration(transX)
-		.attr("transform", function(sd,si) {return "translate(" + (binMargin+si*barWidth) + ",0)";});
-	series.enter().append("g")
-		.attr("class", "serie")
-		.attr("transform", function(sd,si) {return "translate(" + (binMargin+si*barWidth) + ",0)";});
-	series.exit().remove();
-	series.each(function(sd,si) {
-		var color = sd.color;
-		var bars = d3.select(this).selectAll("rect").data(sd.hist);
-		bars.attr("fill", color)
-			.transition().duration(transX)
+		var THAT = this;
+		var series = chart.selectAll(".serie").data(data);
+		series.transition().duration(transX)
+			.attr("transform", 
+				function(sd,si) {
+					return "translate(" + (binMargin+(THAT.stacked ? 0 : si*barWidth)) + ",0)";
+				});
+		series.enter().append("g")
+			.attr("class", "serie")
+			.attr("transform", 
+				function(sd,si) {
+					return "translate(" + (binMargin+(THAT.stacked ? 0 : si*barWidth)) + ",0)";
+				});
+		series.exit().remove();
+		series.each(function(sd,si) {
+			var color = sd.color;
+			var bars = d3.select(this).selectAll("rect").data(sd.hist);
+			bars.attr("fill", color)
+				.transition().duration(transX)
+					.attr("x", function(d,i){return x(bins[i]);})
+					.attr("width", barWidth)
+				.transition().delay(transX).duration(transY)
+					.attr("y", 
+						function(d,i){
+							var value = d;
+							if (THAT.stacked) {
+								for (var index=0; index<si; index++) value+=data[index].hist[i];
+							}
+							return y(value);
+						})
+					.attr("height", 
+						function(d,i){return height-y(d);});
+			bars.enter()
+				.append("rect")
+				.attr("class", "bar")
 				.attr("x", function(d,i){return x(bins[i]);})
+				.attr("y", height)
 				.attr("width", barWidth)
-			.transition().delay(transX).duration(transY)
-				.attr("y", function(d,i){return y(d);})
-				.attr("height", function(d,i){return height-y(d);});
-		bars.enter()
-			.append("rect")
-			.attr("class", "bar")
-			.attr("x", function(d,i){return x(bins[i]);})
-			.attr("y", height)
-			.attr("width", barWidth)
-			.attr("height", 0)
-			.attr("fill", color)
-			.transition().delay(transX).duration(transY)
-				.attr("y", function(d,i){return y(d);})
-				.attr("height", function(d,i){return height-y(d);})
-		bars.exit().remove();
-		bars.on("mouseover", function(d,i) {
-			console.log(d);
+				.attr("height", 0)
+				.attr("fill", color)
+				.transition().delay(transX).duration(transY)
+					.attr("y", 
+						function(d,i){
+							var value = d;
+							if (THAT.stacked) {
+								for (var index=0; index<si; index++) value+=data[index].hist[i];
+							}
+							return y(value);
+						})
+					.attr("height", function(d,i){return height-y(d);})
+			bars.exit().remove();
+			bars.on("mouseover", function(d,i) {
+				
+			})
 		})
-	})
+	}
 }
 
 
@@ -651,6 +638,12 @@ function initToolbar() {
 		}
 			
 	})
+}
+
+/* Despliega una lista de opciones */
+function dropList() {
+	var cname = this.getAttribute("class");
+	this.setAttribute("class", cname ? "" : "on");
 }
 
 /* Inicializa el selector de provincias y sus eventos */
@@ -672,13 +665,15 @@ function initProvinces() {
 					pickerPosition: 'right',
 					pickerClosable: true
 				}
-				region.color = Raphael.getColor();
 				var div = document.createElement("div");
 				div.setAttribute("class", "config");
 				var col = document.createElement("input");
-				col.value = region.color.slice(1);
-				col.setAttribute("class", "color");
-				region.picker = new jscolor.color(col, pickerOptions);
+				col.value = Raphael.getColor().slice(1);
+				col.className="color";
+				region.color = new jscolor.color(col, pickerOptions);
+				addEvent(col, "change", function() {
+					updateAll(false);
+				});
 				div.appendChild(col);
 				this.appendChild(div);
 			} else {
@@ -689,25 +684,41 @@ function initProvinces() {
 		updateAll();
 		return stopEvent(e);
 	});
-
 	// desplegar la lista de provincias
-	document.getElementById("prov-list").onclick = function() {
-		var cname = this.getAttribute("class");
-		this.setAttribute("class", cname ? "" : "on");
+	document.getElementById("prov-list").onclick = dropList;
+}
+/* Inicializa el selector de opcions de combustible y sus eventos */
+function initOptions() {
+	// Selección de un nuevo tipo 
+	function selectType(id) {
+		var options = document.getElementById("type").getElementsByTagName("li");
+		for (var o=options.length; o>0;) {
+			var current = options[--o];
+			current.className = current.className.replace(" on", "");
+			if (current.id.match(id)) current.className+=" on";
+		}
+		TYPE = id;
 	}
+	var div = document.getElementById("type");
+	for (var o in FUEL_OPTIONS) {
+		var li = document.createElement("li");
+		li.id = "o-"+o;
+		li.textContent = FUEL_OPTIONS[o].name;
+		li.className = "T_"+FUEL_OPTIONS[o].short;
+		div.appendChild(li);
+		li.onclick = function(e) {
+			stopEvent(e);
+			selectType(this.id.split("-")[1]);
+			updateAll();
+		};
+	}
+	// desplegar la lista de opciones
+	document.getElementById("type-list").onclick = dropList;
+	// Selección actual
+	selectType(TYPE);
 }
 
 function initBrands() {
-	// Selector de marcas
-	// function brandClick() {
-	// 	var id = parseInt(this.name.split("-")[1]);
-	// 	BRANDS_GRAPH[id] = this.value;
-	// 	updateAll();	
-	// };
-	// populateOptions("brands",BRANDS,BRANDS_GRAPH,BRANDS_COLORS,"radio", brandClick);
-	// insertAdder("brands", function() {
-	// 	populateOptions("brands",BRANDS,["repsol"],BRANDS_COLORS,"radio", brandClick);
-	// });
 }
 
 addEvent(window, "load", function(){
@@ -716,7 +727,6 @@ addEvent(window, "load", function(){
 		openMapinit();
 		// initMarkers();
 		raphaelInit();
-		
 		initControl();
 		updateAll();
 	})

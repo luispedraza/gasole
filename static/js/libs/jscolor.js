@@ -379,7 +379,6 @@ var jscolor = {
 				var vp = jscolor.getViewPos(); // view pos
 				var vs = jscolor.getViewSize(); // view size
 				var ps = getPickerDims(this); // picker size
-				console.log(tp, ts, vp)
 				var a, b, c;
 				switch(this.pickerPosition.toLowerCase()) {
 					case 'left': a=1; b=0; c=-1; break;
