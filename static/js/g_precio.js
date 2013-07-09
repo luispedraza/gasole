@@ -704,7 +704,7 @@ function initOptions() {
 		var li = document.createElement("li");
 		li.id = "o-"+o;
 		li.textContent = FUEL_OPTIONS[o].name;
-		li.className = "T_"+FUEL_OPTIONS[o].short;
+		li.className = "T_"+FUEL_OPTIONS[o]["short"];
 		div.appendChild(li);
 		li.onclick = function(e) {
 			stopEvent(e);
