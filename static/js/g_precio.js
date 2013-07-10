@@ -488,12 +488,13 @@ function Histogram() {
 	this.stacked = false;
 	this.draw = function() {
 		/* Dibujo del histograma con la librería D3.js */
+		var stats = theStats.stats[TYPE];
+		showChartContainer("histogram", stats!=null);
+		if (!stats) return;
 		computeHistograms(theGasole.info, theStats, NBINS);
-		var stats = theStats.stats;
 		var provinces = theStats.provinces;
-		if (!stats[TYPE]) return;
-		var bins = stats[TYPE].bins;
-		var step = stats[TYPE].step;
+		var bins = stats.bins;
+		var step = stats.step;
 		var data = [];
 		var nMax = 0;						// Número máximo en una provincia, para escala de gráfico
 		for (var p in provinces) {
@@ -503,7 +504,7 @@ function Histogram() {
 			var hMax = d3.max(current.hist);
 			if (hMax>nMax) nMax = hMax;
 		}
-		if (this.stacked) nMax = d3.max(stats[TYPE].hist);	// barras apiladas
+		if (this.stacked) nMax = d3.max(stats.hist);	// barras apiladas
 		var nSeries = data.length;
 		var margin = {top: 20, right: 20, bottom: 30, left: 50};
 		var binMargin = 4;	// Margen entre bins de histogramas, en píxeles
