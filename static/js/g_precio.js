@@ -106,7 +106,12 @@ function raphaelUpdate() {
 
 /* Cuando se selecciona una provincia del mapa Raphael */
 /* e: elemento */
-function raphSelectProvince(e) {
+function raphaelSelectProvince(e) {
+	console.log(e);
+	if (typeof e == "string") {
+		var i=htmlsvg.length;
+		while(i--) if (htmlsvg[i].id == e) e = htmlsvg[i].e;
+	}
 	if (e.isSelected) {
 			showMarkers(e.pname, false);
 			e.attr("stroke-width", 0);
@@ -137,7 +142,7 @@ function raphaelInit() {
 		var prov = paper.path(htmlsvg[i].path).attr({"stroke": "#fff", "stroke-width": 0});
 		htmlsvg[i].e = prov;	// guardo el path de la provincia, que usaré en rapSelectProvince
 		prov.pname = getProvName(id);
-		prov.click(function() {raphSelectProvince(this)});
+		prov.click(function() {raphaelSelectProvince(this)});
 		var hoverIn = function() {
 			this.attr({"opacity": .5});
 			document.getElementById("prov-current").textContent = this.pname;
@@ -285,6 +290,7 @@ function drawCircles() {
 	// Número de gasolineras en el eje de las X
 	// Precio medio del combustible en el eje de las Y
 	var stats = theStats.stats[TYPE];
+	showChartContainer("circles", stats!=null);
 	if (!stats) return;
 	var div = d3.select("#circles");
 	var provinces = theStats.provinces;
@@ -293,7 +299,7 @@ function drawCircles() {
 	var xMin = 0;
 	var xMax = 0;
 	var data = [];
-	var radius = 40;						// radio de las pelotas
+	var radius = 20;						// radio de las pelotas
 	for (var p in REGIONS) {				// para todas las regiones
 		if (REGIONS[p].selected) {
 			var current = provinces[p][TYPE];
@@ -304,7 +310,6 @@ function drawCircles() {
 			data.push({p: 0, n: 0, c: "#ccc", r:0});
 		}
 	}
-	console.log(data);
 	divWidth = parseInt(div.style("width").split("px")[0]);
 	divHeight = parseInt(div.style("height").split("px")[0]);
 
@@ -470,10 +475,14 @@ function updateAll(recompute) {
 	drawCircles();
 	raphaelUpdate
 	// Mapas de calor
-	// openHeatMapNumber(this);
 	// openHeatMapPrice();
 }
 
+// MUestra/oculta el contenedor de un gráfico y las indicaciones
+function showChartContainer(id, show) {
+	var container = document.getElementById(id+"-container");
+	container.className = show ? "chart": "chart off";
+}
 /** @constructor */
 function Histogram() {
 	this.stacked = false;
@@ -579,7 +588,10 @@ function Histogram() {
 				function(sd,si) {
 					return "translate(" + (binMargin+(THAT.stacked ? 0 : si*barWidth)) + ",0)";
 				});
-		series.exit().remove();
+		series.exit().selectAll("rect")
+			.transition().duration(transY)
+			.attr("height", 0);
+		series.exit().transition().delay(transY).remove();
 		series.each(function(sd,si) {
 			var color = sd.color;
 			var bars = d3.select(this).selectAll("rect").data(sd.hist);
@@ -648,45 +660,72 @@ function dropList() {
 
 /* Inicializa el selector de provincias y sus eventos */
 function initProvinces() {
+	function checkProvince(pDiv, check) {
+		if (typeof check === "undefined") check=(pDiv.className!="on");
+		// Marca/desmarca una provincia
+		pDiv.className = check ? "on" : "";
+		var pID = pDiv.id.split("-")[1];		// ID de la provincia
+		var region = REGIONS[pDiv.textContent];
+		var configDiv = pDiv.getElementsByClassName("config")[0];
+		if (check && !configDiv) {
+			var pickerOptions = {
+				pickerPosition: 'right',
+				pickerClosable: true
+			}
+			var div = document.createElement("div");
+			div.className="config";
+			var col = document.createElement("input");
+			col.value = Raphael.getColor().slice(1);	// nuevo color
+			col.className="color";
+			region.color = new jscolor.color(col, pickerOptions);
+			addEvent(col, "change", function() {
+				console.log("cambio de color");
+				updateAll(false);
+			});
+			div.appendChild(col);
+			pDiv.appendChild(div);
+		}
+		region.selected = check;
+	}
+	// Marcar/desmarcar todas
+	var div = document.getElementById("province");
+	var liAll = document.createElement("li");
+	liAll.id = "checkall";
+	liAll.textContent = "MARCAR TODAS";
+	liAll.onclick = function(e) {
+		var cname = this.className;
+		var check = (cname!="on");
+		this.textContent = (check ? "DESMARCAR" : "MARCAR") + " TODAS";
+		this.className = check ? "on" : "";
+		provs = document.getElementById("province").getElementsByTagName("li");
+		for (var i=1,il=provs.length; i<il; i++) {
+			checkProvince(provs[i], check);	// Marca/desmarca todas las provincias
+		}
+		updateAll();
+		return stopEvent(e);
+	};
+	div.appendChild(liAll);
 	// Selector de provincias en TOOL
 	initProvLinks("province", function(e) {
-		var currentClass=this.getAttribute("class");
-		this.setAttribute("class", currentClass ? "" : "on");
-		var pID = this.id.split("-")[1];
-		for (var i=htmlsvg.length-1; i>=0; i--) {
-			if (htmlsvg[i].id == pID) raphSelectProvince(htmlsvg[i].e);
-		};
-		var region = REGIONS[this.textContent];
-		if (region.selected) {
-			this.getElementsByClassName("config")[0].style.display = "none";
-		} else {
-			if (this.children.length==0) {
-				var pickerOptions = {
-					pickerPosition: 'right',
-					pickerClosable: true
-				}
-				var div = document.createElement("div");
-				div.setAttribute("class", "config");
-				var col = document.createElement("input");
-				col.value = Raphael.getColor().slice(1);
-				col.className="color";
-				region.color = new jscolor.color(col, pickerOptions);
-				addEvent(col, "change", function() {
-					updateAll(false);
-				});
-				div.appendChild(col);
-				this.appendChild(div);
-			} else {
-				this.getElementsByClassName("config")[0].style.display = "block";
-			}
-		}
-		region.selected = !region.selected;
+		checkProvince(this);
+		raphaelSelectProvince(this.id.split("-")[1]);
 		updateAll();
 		return stopEvent(e);
 	});
 	// desplegar la lista de provincias
 	document.getElementById("prov-list").onclick = dropList;
 }
+
+/* Elimina las provincias que no tienen el combustible seleccionado */
+function filterProvinces() {
+	var provinces = theGasole.provinces;
+	var lis = document.getElementById("province").getElementsByTagName("li");
+	for (var l=0, ll=lis.length; l<ll; l++) {
+
+	}
+}
+
+
 /* Inicializa el selector de opcions de combustible y sus eventos */
 function initOptions() {
 	// Selección de un nuevo tipo 
@@ -698,6 +737,7 @@ function initOptions() {
 			if (current.id.match(id)) current.className+=" on";
 		}
 		TYPE = id;
+		// Hay que actualizar la lista de provincias, omitiendo las que no tienen este combustible
 	}
 	var div = document.getElementById("type");
 	for (var o in FUEL_OPTIONS) {
@@ -725,6 +765,7 @@ addEvent(window, "load", function(){
 	new Gasole(function() {
 		theGasole = this;
 		openMapinit();
+		openHeatMapNumber(this);
 		// initMarkers();
 		raphaelInit();
 		initControl();

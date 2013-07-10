@@ -103,6 +103,12 @@ p:first-child {
   border-radius: 3px;
 }
 /* Lista de provincias */
+#checkall {
+  background-color: #d24e33;
+}
+#prov-list #checkall.on {
+  background-color: #7e2516;
+}
 #prov-list {
   color: #fff;
   background: rgb(8,8,8);
@@ -199,10 +205,14 @@ ul.droplist li.on:hover {
 
 /* configuraciones de provincias */
 #prov-list .config {
+  display: none;
   float: right;
   width: 20px;
   height: 15px;
   position: relative;
+}
+#prov-list li.on .config {
+  display: block;
 }
 #prov-list input.color {
   float: right;
@@ -343,23 +353,33 @@ input[type=radio], input[type=checkbox] {
 }
 
 /* Gráficos D3.js */
-.chart {
-  -webkit-transition: height .5s;
-     -moz-transition: height .5s;
-      -ms-transition: height .5s;
-       -o-transition: height .5s;
-          transition: height .5s;
-}
-.chart.off {
-  height: 0;
-}
-
 #histogram {
   height: 400px;
 }
-
 #circles {
   height: 500px;
+}
+.chart {
+  overflow: hidden;
+  max-height: 1000px;
+  -webkit-transition: max-height .3s;
+     -moz-transition: max-height .3s;
+      -ms-transition: max-height .3s;
+       -o-transition: max-height .3s;
+          transition: max-height .3s;
+}
+.chart.off {
+  max-height: 0;
+}
+.chart_msg {
+  padding: 10px;
+  background-color: #FAE1F7;
+  font-size: 20px;
+  text-align: center;
+  color: #333;
+}
+.chart.off .chart_msg {
+  display: none;
 }
 .bar {
   opacity: .8;
@@ -379,11 +399,4 @@ input[type=radio], input[type=checkbox] {
   fill: none;
   stroke: #333;
   shape-rendering: crispEdges;
-}
-
-.chart_msg {
-  background-color: #FAE1F7;
-  font-size: 20px;
-  text-align: center;
-  color: #333;
 }

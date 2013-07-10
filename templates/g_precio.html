@@ -60,23 +60,24 @@ body {
 		<div id="openmap"></div>
 	</div>
 
-
-
-
 	<h2>Histograma de precios</h2>
 	<div id="regions" class="menubar"></div>
 
 <!-- 	<canvas id="histogram" width="1100px" height="400px" class="chart"></canvas> -->
 
-	<div id="histogram" class="chart off"></div>
+	<div id="histogram-container" class="chart off">
+		<div id="histogram" class="off"></div>
+	</div>
 	<label for="stack">Apilar las barras</label>
 	<input id="stack" name="stack" type="checkbox">
 	
 	<h2>Cuotas de mercado de las empresas</h2>
 	<p>Observa la cuota de mercado que alcanza cada marca de combustible en cada una de las provincias de España.</p>
 	
-	<div class="chart_msg">Selecciona al menos una Provincia para visualizar los resultados</div>
-	<div id="circles" class="chart off"></div>
+	<div id="circles-container" class="chart off">
+		<div class="chart_msg">Selecciona al menos una Provincia para visualizar los resultados</div>
+		<div id="circles" class="off"></div>
+	</div>
 	
 	
 	
