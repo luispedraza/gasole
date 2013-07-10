@@ -377,28 +377,35 @@ input:checked + label:before {
 #circles {
   height: 500px;
 }
-.chart {
-  overflow: hidden;
-  max-height: 1000px;
-  -webkit-transition: max-height .3s;
-     -moz-transition: max-height .3s;
-      -ms-transition: max-height .3s;
-       -o-transition: max-height .3s;
-          transition: max-height .3s;
-}
-.chart.off {
-  max-height: 0;
+#chart-container {
+  position: relative;
 }
 .chart_msg {
-  padding: 10px;
-  background-color: #FAE1F7;
-  font-size: 20px;
+  position: absolute;
+  line-height: 300px;
+  left: 400px;
+  height: 300px;
+  width: 300px;
+  border-radius: 200px;
   text-align: center;
-  color: #333;
-  display: none;
+  background-color: #7e2516;
+  color: #fff;
+  opacity: 0;
+  overflow: visible;
+  white-space: nowrap;
 }
-.chart.off + .chart_msg {
-  display: block;
+.chart_msg, .d3 {
+  -webkit-transition: opacity .2s;
+     -moz-transition: opacity .2s;
+      -ms-transition: opacity .2s;
+       -o-transition: opacity .2s;
+          transition: opacity .2s;
+}
+.chart.off .d3 {
+  opacity: 0;
+}
+.chart.off .chart_msg {
+  opacity: 1;
 }
 .bar {
   opacity: .8;
@@ -409,6 +416,9 @@ input:checked + label:before {
 .circle {
   stroke-width: 1px;
   stroke: #fff;
+  opacity: .8;
+}
+.spread {
   opacity: .8;
 }
 .circle:hover {
