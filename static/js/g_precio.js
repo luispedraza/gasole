@@ -9,7 +9,7 @@ var infoDiv = null;
 var openMap = null;
 var openMapOSM = null;
 var MAP_LIMITS = [27.5244, -18.4131, 43.3781, 3.8672];	// vista inicial de open maps (Todas España)
-var NBINS = 12;											// Para el histograma
+var NBINS = 10;											// Para el histograma
 
 // Regiones a mostrar en las gráficas
 // var REGIONS = ["España"].concat(Object.keys(PROVS));
@@ -435,6 +435,31 @@ function Circles(spread) {
 			.transition().duration(500)
 			.attr("r", 0)
 			.remove();
+		// eventos
+		circles.on("mouseover", function(d,i) {
+			infoDiv.className="show";
+			infoDiv.textContent = "En " + d.name + " hay " + d.n + " puntos de venta de " + FUEL_OPTIONS[TYPE].name + " con un precio medio de " + d.p.toFixed(3) + " €/l";
+			var here = d3.select(this);
+			here.transition().duration(300).attr("r", 100)
+				.transition().duration(300).ease("bounce").attr("r", 10);
+			var xpos = here.attr("cx");
+			var ypos = parseInt(here.attr("cy"))+30;
+			var tooltip = chart.append("text").text("hola")
+				.attr("id", "tooltip")
+				.attr("x", xpos)
+				.attr("y", ypos)
+				.style("font-size", "20px")
+				.style("font-family", "sans-serif")
+				.style("text-anchor", "middle")
+				.style("fill", "#333");
+			console.log(here.attr("cy"), tooltip.attr("y"));
+
+		});
+		circles.on("mouseout", function(d,i) {
+			infoDiv.className="";
+			infoDiv.textContent = "";
+			chart.select("#tooltip").remove();
+		});
 	}
 	
 }

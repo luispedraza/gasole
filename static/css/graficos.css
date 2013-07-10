@@ -54,6 +54,7 @@
   font-size: .8em;
   padding: 2px 10px 2px 10px;
   opacity: 0;
+  background-color: #d24e33;
   -webkit-transition: opacity .1;
      -moz-transition: opacity .1;
       -ms-transition: opacity .1;
