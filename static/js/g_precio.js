@@ -285,7 +285,8 @@ function initControl() {
 	});
 }
 
-function drawCircles() {
+function drawCircles(spread) {
+	if (typeof spread=="unedefined") spread = false;
 	// Gráfico de bolas
 	// Número de gasolineras en el eje de las X
 	// Precio medio del combustible en el eje de las Y
@@ -294,10 +295,10 @@ function drawCircles() {
 	if (!stats) return;
 	var div = d3.select("#circles");
 	var provinces = theStats.provinces;
-	var yMin = stats.min;
-	var yMax = stats.max;
-	var xMin = 0;
-	var xMax = 0;
+	var xMin = stats.min;
+	var xMax = stats.max;
+	var yMin = 0;
+	var yMax = 0;
 	var data = [];
 	var radius = 20;						// radio de las pelotas
 	for (var p in REGIONS) {				// para todas las regiones
@@ -305,7 +306,7 @@ function drawCircles() {
 			var current = provinces[p][TYPE];
 			var n = current.n;
 			data.push({name: p, p: current.mu, n: n, c: "#"+REGIONS[p].color, r: radius});
-			if (n>xMax) xMax = n;	
+			if (n>yMax) yMax = n;	
 		} else {
 			data.push({p: 0, n: 0, c: "#ccc", r:0});
 		}
@@ -325,14 +326,15 @@ function drawCircles() {
 		.range([height,0]);
 	var xAxis = d3.svg.axis()
 		.scale(x)
-		.tickFormat(d3.format(".0f"))
 		.orient("bottom")
-		.ticks(10);
+		.ticks(5)
+		.tickFormat(d3.format(".3f"));
+		
 	var yAxis = d3.svg.axis()
 		.scale(y)
 		.orient("left")
-		.ticks(5)
-		.tickFormat(d3.format(".3f"));
+		.ticks(10)
+		.tickFormat(d3.format(".0f"));
 
 	var chart = div.select(".chart");
 	if (chart[0][0]==null) {
@@ -361,16 +363,16 @@ function drawCircles() {
 	var circles = chart.selectAll("circle")
 		.data(data);
 	circles.transition().duration(300)
-			.attr("cx", function(d) {return d.n ? x(d.n) : d3.select(this).attr("cx")})		// número en coordenada x
-			.attr("cy", function(d) {return y(d.p)})		// precio en coordenada Y
+			.attr("cx", function(d) {return x(d.p)})		// precio
+			.attr("cy", function(d) {return d.n ? y(d.n) : d3.select(this).attr("cx")})		// cantidad
 			.attr("fill", function(d) {return d.c})
 		.transition().duration(300).ease("bounce")
 			.attr("r", function(d) {return d.r});
 	circles.enter()
 		.append("circle")
 		.attr("class", "circle")
-		.attr("cx", function(d){return x(d.n)})		// número en coordenada x
-		.attr("cy", function(d){return y(d.p)})		// precio en coordenada Y
+		.attr("cx", function(d){return x(d.p)})		// precio en coordenada x
+		.attr("cy", function(d){return y(d.n)})		// cantidad en coordenada Y
 		.attr("r", 0)
 		.attr("fill", function(d){return d.c})
 		.transition().delay(500).duration(500).ease("bounce").attr("r", function(d){return d.r});
