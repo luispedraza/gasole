@@ -286,7 +286,8 @@ function initControl() {
 	});
 	// Mostrar dispersión
 	addEvent(document.getElementById("spread"), "change", function() {
-
+		circles.spread = this.checked;
+		circles.draw();
 	})
 }
 
@@ -302,22 +303,34 @@ function Circles(spread) {
 		if (!stats) return;
 		var div = d3.select("#circles");
 		var provinces = theStats.provinces;
+		var data = [];
+		var radius = 20;						// radio de las pelotas
+		var prices = [];
 		var xMin = stats.min;
 		var xMax = stats.max;
 		var yMin = 0;
 		var yMax = 0;
-		var data = [];
-		var radius = 20;						// radio de las pelotas
 		for (var p in REGIONS) {				// para todas las regiones
 			if (REGIONS[p].selected) {
 				var current = provinces[p][TYPE];
 				var n = current.n;
-				data.push({name: p, p: current.mu, n: n, c: "#"+REGIONS[p].color, r: radius});
-				if (n>yMax) yMax = n;	
+				var color = "#"+REGIONS[p].color;
+				var price = current.mu;
+				prices.push(price);	// todos los precios medios
+				if (this.spread) 
+					data.push({name: p, p: price, n: n, c: color, r: radius, min: current.min, max: current.max});
+				else 
+					data.push({name: p, p: price, n: n, c: color, r: radius, min: 0, max: 0});
+				if (n>yMax) yMax = n;
 			} else {
-				data.push({p: 0, n: 0, c: "#ccc", r:0});
+				data.push({name: p, p: 0, n: 0, c: "#ccc", r:0, min: 0, max:0});
 			}
 		}
+		if (!this.spread && (prices.length>1)) {
+			xMin = d3.min(prices);
+			xMax = d3.max(prices);
+		}
+		
 		divWidth = parseInt(div.style("width").split("px")[0]);
 		divHeight = parseInt(div.style("height").split("px")[0]);
 
@@ -366,12 +379,46 @@ function Circles(spread) {
 			.call(yAxis)
 			.selectAll("text")
 				.style("font-size", ".8em");
-
-		var circles = chart.selectAll("circle")
-			.data(data);
+		// dispersión de precios
+		var spreads_min = chart.selectAll(".spread.min").data(data);
+		spreads_min.transition().duration(300)
+			.attr("x1", function(d) {return d.min ? x(d.min) : x(d.p)})
+			.attr("y1", function(d) {return d.n ? y(d.n) : d3.select(this).attr("y1")})
+			.attr("x2", function(d) {return d.min ? (x(d.p)-radius) : x(d.p)})
+			.attr("y2", function(d) {return d.n ? y(d.n) : d3.select(this).attr("y2")})
+			.attr("stroke-width", function(d) {return d.n ? 10 : 0})
+			.attr("stroke", function(d) {return d.c});
+		spreads_min.enter()
+			.append("line")
+			.attr("class", "spread min")
+			.attr("x1", function(d) {return d.min ? x(d.min) : x(d.p)})
+			.attr("y1", function(d) {return d.n ? y(d.n) : d3.select(this).attr("y1")})
+			.attr("x2", function(d) {return d.min ? (x(d.p)-radius) : x(d.p)})
+			.attr("y2", function(d) {return d.n ? y(d.n) : d3.select(this).attr("y2")})
+			.attr("stroke-width", function(d) {return d.n ? 10 : 0})
+			.attr("stroke", function(d) {return d.c});
+		var spreads_max = chart.selectAll(".spread.max").data(data);
+		spreads_max.transition().duration(300)
+			.attr("x1", function(d) {return d.max ? x(d.max) : x(d.p)})
+			.attr("y1", function(d) {return d.n ? y(d.n) : d3.select(this).attr("y1")})
+			.attr("x2", function(d) {return d.max ? (x(d.p)+radius) : x(d.p)})
+			.attr("y2", function(d) {return d.n ? y(d.n) : d3.select(this).attr("y2")})
+			.attr("stroke-width", function(d) {return d.n ? 10 : 0})
+			.attr("stroke", function(d) {return d.c});
+		spreads_max.enter()
+			.append("line")
+			.attr("class", "spread max")
+			.attr("x1", function(d) {return d.max ? x(d.max) : d3.select(this).attr("x2")})
+			.attr("y1", function(d) {return d.n ? y(d.n) : d3.select(this).attr("y1")})
+			.attr("x2", function(d) {return d.max ? (x(d.p)+radius) : d3.select(this).attr("x2")})
+			.attr("y2", function(d) {return d.n ? y(d.n) : d3.select(this).attr("y2")})
+			.attr("stroke-width", function(d) {return d.n ? 10 : 0})
+			.attr("stroke", function(d) {return d.c});
+		// precios medios
+		var circles = chart.selectAll(".circle").data(data);
 		circles.transition().duration(300)
-				.attr("cx", function(d) {return x(d.p)})		// precio
-				.attr("cy", function(d) {return d.n ? y(d.n) : d3.select(this).attr("cx")})		// cantidad
+				.attr("cx", function(d) {return d.p ? x(d.p) : d3.select(this).attr("cx")})		// precio
+				.attr("cy", function(d) {return d.n ? y(d.n) : d3.select(this).attr("cy")})		// cantidad
 				.attr("fill", function(d) {return d.c})
 			.transition().duration(300).ease("bounce")
 				.attr("r", function(d) {return d.r});
