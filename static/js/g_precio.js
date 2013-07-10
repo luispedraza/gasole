@@ -3,6 +3,7 @@ var theStats = null;	// Estadísticas de la selección considerada
 var TYPE = "1";			// Tipo de combustible seleccionado
 
 var histogram = new Histogram();
+var circles = new Circles();
 
 var openMap = null;
 var openMapOSM = null;
@@ -283,103 +284,111 @@ function initControl() {
 		histogram.stacked = this.checked;
 		histogram.draw();
 	});
+	// Mostrar dispersión
+	addEvent(document.getElementById("spread"), "change", function() {
+
+	})
 }
 
-function drawCircles(spread) {
-	if (typeof spread=="unedefined") spread = false;
-	// Gráfico de bolas
-	// Número de gasolineras en el eje de las X
-	// Precio medio del combustible en el eje de las Y
-	var stats = theStats.stats[TYPE];
-	showChartContainer("circles", stats!=null);
-	if (!stats) return;
-	var div = d3.select("#circles");
-	var provinces = theStats.provinces;
-	var xMin = stats.min;
-	var xMax = stats.max;
-	var yMin = 0;
-	var yMax = 0;
-	var data = [];
-	var radius = 20;						// radio de las pelotas
-	for (var p in REGIONS) {				// para todas las regiones
-		if (REGIONS[p].selected) {
-			var current = provinces[p][TYPE];
-			var n = current.n;
-			data.push({name: p, p: current.mu, n: n, c: "#"+REGIONS[p].color, r: radius});
-			if (n>yMax) yMax = n;	
-		} else {
-			data.push({p: 0, n: 0, c: "#ccc", r:0});
+/** @constructor */
+function Circles(spread) {
+	this.spread = false;
+	this.draw = function() {
+		// Gráfico de bolas
+		// Número de gasolineras en el eje de las X
+		// Precio medio del combustible en el eje de las Y
+		var stats = theStats.stats[TYPE];
+		showChartContainer("circles", stats!=null);
+		if (!stats) return;
+		var div = d3.select("#circles");
+		var provinces = theStats.provinces;
+		var xMin = stats.min;
+		var xMax = stats.max;
+		var yMin = 0;
+		var yMax = 0;
+		var data = [];
+		var radius = 20;						// radio de las pelotas
+		for (var p in REGIONS) {				// para todas las regiones
+			if (REGIONS[p].selected) {
+				var current = provinces[p][TYPE];
+				var n = current.n;
+				data.push({name: p, p: current.mu, n: n, c: "#"+REGIONS[p].color, r: radius});
+				if (n>yMax) yMax = n;	
+			} else {
+				data.push({p: 0, n: 0, c: "#ccc", r:0});
+			}
 		}
-	}
-	divWidth = parseInt(div.style("width").split("px")[0]);
-	divHeight = parseInt(div.style("height").split("px")[0]);
+		divWidth = parseInt(div.style("width").split("px")[0]);
+		divHeight = parseInt(div.style("height").split("px")[0]);
 
-	var margin = {top: 5+radius, right: 5+radius, bottom: 50+radius, left: 50+radius},
-		width = divWidth - margin.left - margin.right,
-		height = divHeight - margin.top - margin.bottom;
+		var margin = {top: 5+radius, right: 5+radius, bottom: 50+radius, left: 50+radius},
+			width = divWidth - margin.left - margin.right,
+			height = divHeight - margin.top - margin.bottom;
 
-	var x = d3.scale.linear()
-		.domain([xMin, xMax])
-		.range([0,width]);
-	var y = d3.scale.linear()
-		.domain([yMin, yMax])
-		.range([height,0]);
-	var xAxis = d3.svg.axis()
-		.scale(x)
-		.orient("bottom")
-		.ticks(5)
-		.tickFormat(d3.format(".3f"));
+		var x = d3.scale.linear()
+			.domain([xMin, xMax])
+			.range([0,width]);
+		var y = d3.scale.linear()
+			.domain([yMin, yMax])
+			.range([height,0]);
+		var xAxis = d3.svg.axis()
+			.scale(x)
+			.orient("bottom")
+			.ticks(5)
+			.tickFormat(d3.format(".3f"));
+			
+		var yAxis = d3.svg.axis()
+			.scale(y)
+			.orient("left")
+			.ticks(10)
+			.tickFormat(d3.format(".0f"));
+
+		var chart = div.select(".chart");
+		if (chart[0][0]==null) {
+			chart = div.append("svg")
+				.attr("width", "100%")
+				.attr("height", "100%")
+				.append("g")
+				.attr("class", "chart")
+				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+			chart.append("g")
+				.attr("class", "x axis")
+				.attr("transform", "translate(0," + height + ")");
+			chart.append("g")
+				.attr("class", "y axis")
+		}
+		chart.select(".x.axis")
+			.call(xAxis)
+			.selectAll("text")
+				.style("font-size", ".8em")
 		
-	var yAxis = d3.svg.axis()
-		.scale(y)
-		.orient("left")
-		.ticks(10)
-		.tickFormat(d3.format(".0f"));
+		chart.select(".y.axis")
+			.call(yAxis)
+			.selectAll("text")
+				.style("font-size", ".8em");
 
-	var chart = div.select(".chart");
-	if (chart[0][0]==null) {
-		chart = div.append("svg")
-			.attr("width", "100%")
-			.attr("height", "100%")
-			.append("g")
-			.attr("class", "chart")
-			.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-		chart.append("g")
-			.attr("class", "x axis")
-			.attr("transform", "translate(0," + height + ")");
-		chart.append("g")
-			.attr("class", "y axis")
+		var circles = chart.selectAll("circle")
+			.data(data);
+		circles.transition().duration(300)
+				.attr("cx", function(d) {return x(d.p)})		// precio
+				.attr("cy", function(d) {return d.n ? y(d.n) : d3.select(this).attr("cx")})		// cantidad
+				.attr("fill", function(d) {return d.c})
+			.transition().duration(300).ease("bounce")
+				.attr("r", function(d) {return d.r});
+		circles.enter()
+			.append("circle")
+			.attr("class", "circle")
+			.attr("cx", function(d){return x(d.p)})		// precio en coordenada x
+			.attr("cy", function(d){return y(d.n)})		// cantidad en coordenada Y
+			.attr("r", 0)
+			.attr("fill", function(d){return d.c})
+			.transition().delay(500).duration(500).ease("bounce").attr("r", function(d){return d.r});
+		circles.exit()
+			.transition().duration(500)
+			.attr("r", 0)
+			.remove();
 	}
-	chart.select(".x.axis")
-		.call(xAxis)
-		.selectAll("text")
-			.style("font-size", ".8em")
 	
-	chart.select(".y.axis")
-		.call(yAxis)
-		.selectAll("text")
-			.style("font-size", ".8em");
-
-	var circles = chart.selectAll("circle")
-		.data(data);
-	circles.transition().duration(300)
-			.attr("cx", function(d) {return x(d.p)})		// precio
-			.attr("cy", function(d) {return d.n ? y(d.n) : d3.select(this).attr("cx")})		// cantidad
-			.attr("fill", function(d) {return d.c})
-		.transition().duration(300).ease("bounce")
-			.attr("r", function(d) {return d.r});
-	circles.enter()
-		.append("circle")
-		.attr("class", "circle")
-		.attr("cx", function(d){return x(d.p)})		// precio en coordenada x
-		.attr("cy", function(d){return y(d.n)})		// cantidad en coordenada Y
-		.attr("r", 0)
-		.attr("fill", function(d){return d.c})
-		.transition().delay(500).duration(500).ease("bounce").attr("r", function(d){return d.r});
-	circles.exit()
-		.transition().duration(500)
-		.attr("r", 0)
-		.remove();
 }
 
 // Histogramas, distribuciones…
@@ -474,7 +483,7 @@ function updateAll(recompute) {
 		theStats = new GasoleStats(gasoleData, [TYPE]);	
 	}
 	histogram.draw();
-	drawCircles();
+	circles.draw();
 	raphaelUpdate
 	// Mapas de calor
 	// openHeatMapPrice();
@@ -639,19 +648,18 @@ function Histogram() {
 	}
 }
 
-
-/* arrastre de la toolbar */
+/* Posición de la barra de herramientas */
+var toolbarPosition = 0;
 function initToolbar() {
-	window.addEventListener("scroll", function() {
-		var content = document.getElementById("content");
+	toolbarPosition = document.getElementById("toolbar").getBoundingClientRect().top;
+	addEvent(window, "scroll", function() {
 		var toolbar = document.getElementById("toolbar");
-		if (content.getBoundingClientRect().top<=0) {
+		if (window.scrollY>=toolbarPosition) {
 			toolbar.style.position = "fixed";
 			toolbar.style.top = 0;
 		} else {
 			toolbar.style.position = "relative";
-		}
-			
+		}	
 	})
 }
 

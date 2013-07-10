@@ -20,13 +20,21 @@
   background-color: #F1AA41;
 }
 
-#toolbar {
-  width: 1070px;
+#texcontent {
+  position: relative;
+}
+#toolbar-container {
+  width: 1030px;
   height: 80px;
+}
+#toolbar {
+  width: 1030px;
+  min-height: 80px;
   background-color: #333;
   z-index: 2000;
   font-size: 1.2em;
-  padding-left: 30px;
+  padding: 5px;
+  top: 0;
 }
 .toolbar-item {
   height: 20px;
@@ -38,10 +46,19 @@
   border-left: 1px solid #333;
   border-right: 1px solid #333;
 }
-#hidet-label, #hidep-label {
+#hidet-label {
+  float: right;
+  padding: 2px;
+  border: 1px solid #fff;
+  border-radius: 3px;
+}
+#hidet-label:hover {
+
+}
+#hidep-label {
   color: #ccc;
 }
-#hidet + label, #hidep + label {
+label {
   font-size: .8em;
 }
 label {
@@ -64,7 +81,7 @@ h1 {
   -moz-column-gap:30px; /* Firefox */
   -webkit-column-gap:30px; /* Safari and Chrome */
   column-gap:30px;
-  max-height: 500px;
+  max-height: 300px;
   overflow: hidden;
   -webkit-transition: max-height .5s;
      -moz-transition: max-height .5s;
@@ -313,16 +330,16 @@ input[type=radio], input[type=checkbox] {
   border: 1px dotted #333;
   border-top-right-radius: 5px;
 }
-#hidep + label:before {
+input + label:before {
   content: "\2610";
   font-size: 15px;
   margin-right: 5px;
 }
-#hidep:checked + label {
+input:checked + label {
   color: #fff;
   background-color: #333;
 }
-#hidep:checked + label:before {
+input:checked + label:before {
   content: "\2611";
 }
 

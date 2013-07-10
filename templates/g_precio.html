@@ -5,41 +5,11 @@ body {
 
 </style>
 
-<div id="toolbar">
-	<div class="toolbar-item">	<!-- tipo de combustible -->
-		<div id="type-list">
-			<div id="type-current" class="selector">Combustible: </div>
-			<ul id="type" class="droplist"></ul>
-		</div>
-	</div>
-
-	<div class="toolbar-item"> <!-- selector de provincias -->
-		<div id="prov-list">
-			<div id="prov-current" class="selector">Provincias</div>
-			<ul id="province" class="droplist"></ul>
-		</div>
-	</div>
-
-	<div class="toolbar-item">
-		<div id="brand-list">
-			<div id="">Marcas</div>
-			<ul id="brand" class="droplist"></ul>
-		</div>
-	</div>
-
-	<div class="toolbar-item">
-		<input id="hidet" name="hidet" type="checkbox">
-		<label id="hidet-label" for="hidet">Ocultar explicaciones</label>
-	</div>
-
-</div>
-
-
 <div id="textcontent">
 
-
 	<h1>Gráficos de precio y distribución de gasolineras, por provincias y por marcas</h1>
-	
+	<input id="hidet" name="hidet" type="checkbox">
+	<label id="hidet-label" for="hidet">Ocultar explicaciones</label>
 	<div class="description">
 		<p>Aquí encontrarás una serie de gráficos interactivos que te ayudarán a comprender mejor cómo se distribuyen geográficamente las gasolineras  en España, cuáles son los precios en las diferentes regiones, qué marcas son más caras y cuáles más baratas… Puedes presonalizar los gráficos para obtener la perspectiva de la información que te resulte más útil.</p>
 
@@ -51,6 +21,31 @@ body {
 	<div class="description">
 		<p>Ayúdante de las opciones disponibles en los dos mapas inferiores para visualizar de qué manera se distribuyen las gasolineras por españa; dónde se alcanzan mayores concentraciones, así como qué ciudadanos pagan más dinero por llenar el depósito de gasolina.</p>
 	</div>
+
+<div id="toolbar-container">
+	<div id="toolbar">
+		<div class="toolbar-item">	<!-- tipo de combustible -->
+			<div id="type-list">
+				<div id="type-current" class="selector">Combustible: </div>
+				<ul id="type" class="droplist"></ul>
+			</div>
+		</div>
+
+		<div class="toolbar-item"> <!-- selector de provincias -->
+			<div id="prov-list">
+				<div id="prov-current" class="selector">Provincias</div>
+				<ul id="province" class="droplist"></ul>
+			</div>
+		</div>
+
+		<div class="toolbar-item">
+			<div id="brand-list">
+				<div id="">Marcas</div>
+				<ul id="brand" class="droplist"></ul>
+			</div>
+		</div>
+	</div>
+</div> <!--toolbar-container-->
 
 	<div id="map-container">
 		<input id="hidep" name="hidep" type="checkbox" checked>
