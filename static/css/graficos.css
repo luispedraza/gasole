@@ -25,11 +25,11 @@
 }
 #toolbar-container {
   width: 1030px;
-  height: 80px;
+  height: 100px;
 }
 #toolbar {
   width: 1030px;
-  min-height: 80px;
+  min-height: 100px;
   background-color: #333;
   z-index: 2000;
   font-size: 1.2em;
@@ -46,6 +46,33 @@
   border-left: 1px solid #333;
   border-right: 1px solid #333;
 }
+
+#info {
+  margin-top: 5px;
+  height: 1em;
+  color: #fff;
+  font-size: .8em;
+  padding: 2px 10px 2px 10px;
+  opacity: 0;
+  -webkit-transition: opacity .1;
+     -moz-transition: opacity .1;
+      -ms-transition: opacity .1;
+       -o-transition: opacity .1;
+          transition: opacity .1;
+}
+#info.show {
+  opacity: 1;
+}
+#info:before {
+  background-color: #fff;
+  border-radius: 30px;
+  content: "\a0\a0\69\a0\a0";
+  width: 10px;
+  height: 10px;
+  color: #333;
+  margin-right: 10px;
+}
+
 #hidet-label {
   float: right;
   padding: 2px;
@@ -377,20 +404,21 @@ input:checked + label:before {
 #circles {
   height: 500px;
 }
-#chart-container {
+#histogram-container, #circles-container {
   position: relative;
 }
 .chart_msg {
   position: absolute;
   line-height: 300px;
   left: 400px;
+  top: 20px;
   height: 300px;
   width: 300px;
   border-radius: 200px;
   text-align: center;
   background-color: #7e2516;
   color: #fff;
-  opacity: 0;
+  display: none;
   overflow: visible;
   white-space: nowrap;
 }
@@ -405,7 +433,7 @@ input:checked + label:before {
   opacity: 0;
 }
 .chart.off .chart_msg {
-  opacity: 1;
+  display: block;
 }
 .bar {
   opacity: .8;

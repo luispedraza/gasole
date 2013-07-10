@@ -4,6 +4,7 @@ var TYPE = "1";			// Tipo de combustible seleccionado
 
 var histogram = new Histogram();
 var circles = new Circles();
+var infoDiv = null;
 
 var openMap = null;
 var openMapOSM = null;
@@ -304,7 +305,7 @@ function Circles(spread) {
 		var div = d3.select("#circles");
 		var provinces = theStats.provinces;
 		var data = [];
-		var radius = 20;						// radio de las pelotas
+		var radius = 10;						// radio de las pelotas
 		var prices = [];
 		var xMin = stats.min;
 		var xMax = stats.max;
@@ -386,7 +387,7 @@ function Circles(spread) {
 			.attr("y1", function(d) {return d.n ? y(d.n) : d3.select(this).attr("y1")})
 			.attr("x2", function(d) {return d.min ? (x(d.p)-radius) : x(d.p)})
 			.attr("y2", function(d) {return d.n ? y(d.n) : d3.select(this).attr("y2")})
-			.attr("stroke-width", function(d) {return d.n ? 10 : 0})
+			.attr("stroke-width", function(d) {return d.n ? 5 : 0})
 			.attr("stroke", function(d) {return d.c});
 		spreads_min.enter()
 			.append("line")
@@ -395,7 +396,7 @@ function Circles(spread) {
 			.attr("y1", function(d) {return d.n ? y(d.n) : d3.select(this).attr("y1")})
 			.attr("x2", function(d) {return d.min ? (x(d.p)-radius) : x(d.p)})
 			.attr("y2", function(d) {return d.n ? y(d.n) : d3.select(this).attr("y2")})
-			.attr("stroke-width", function(d) {return d.n ? 10 : 0})
+			.attr("stroke-width", function(d) {return d.n ? 5 : 0})
 			.attr("stroke", function(d) {return d.c});
 		var spreads_max = chart.selectAll(".spread.max").data(data);
 		spreads_max.transition().duration(300)
@@ -403,7 +404,7 @@ function Circles(spread) {
 			.attr("y1", function(d) {return d.n ? y(d.n) : d3.select(this).attr("y1")})
 			.attr("x2", function(d) {return d.max ? (x(d.p)+radius) : x(d.p)})
 			.attr("y2", function(d) {return d.n ? y(d.n) : d3.select(this).attr("y2")})
-			.attr("stroke-width", function(d) {return d.n ? 10 : 0})
+			.attr("stroke-width", function(d) {return d.n ? 5 : 0})
 			.attr("stroke", function(d) {return d.c});
 		spreads_max.enter()
 			.append("line")
@@ -412,7 +413,7 @@ function Circles(spread) {
 			.attr("y1", function(d) {return d.n ? y(d.n) : d3.select(this).attr("y1")})
 			.attr("x2", function(d) {return d.max ? (x(d.p)+radius) : d3.select(this).attr("x2")})
 			.attr("y2", function(d) {return d.n ? y(d.n) : d3.select(this).attr("y2")})
-			.attr("stroke-width", function(d) {return d.n ? 10 : 0})
+			.attr("stroke-width", function(d) {return d.n ? 5 : 0})
 			.attr("stroke", function(d) {return d.c});
 		// precios medios
 		var circles = chart.selectAll(".circle").data(data);
@@ -689,8 +690,15 @@ function Histogram() {
 					.attr("height", function(d,i){return height-y(d);})
 			bars.exit().remove();
 			bars.on("mouseover", function(d,i) {
-				
-			})
+				infoDiv.className="show";
+				var pmin = bins[i].toFixed(3);
+				var pmax = bins[i+1].toFixed(3);
+				infoDiv.textContent = "En " + data[si].name + " hay " + d + " puntos de venta de " + FUEL_OPTIONS[TYPE].name + " entre " + pmin + " y " + pmax + " €/l";
+			});
+			bars.on("mouseout", function(d,i) {
+				infoDiv.className="";
+				infoDiv.textContent = "";
+			});
 		})
 	}
 }
@@ -821,6 +829,7 @@ function initBrands() {
 
 addEvent(window, "load", function(){
 	new Gasole(function() {
+		infoDiv = document.getElementById("info");
 		theGasole = this;
 		openMapinit();
 		openHeatMapNumber(this);
