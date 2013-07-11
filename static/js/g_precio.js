@@ -200,16 +200,12 @@ function showMarkers(pname, show) {
 /* Inicialización de open map */
 function openMapinit() {
 	openMap = new OpenLayers.Map("openmap")
-	// , {
-	// 	controls: [new OpenLayers.Control.LayerSwitcher({'ascending':true})]
-	// });
-	// var osm = new OpenLayers.Layer.Google("OSM");
 	openMapOSM = new OpenLayers.Layer.OSM("OSM");
 	var aliasproj = new OpenLayers.Projection("EPSG:3857");
 	openMapOSM.projection = aliasproj;
 	//add baselayers to map
 	openMap.addLayer(openMapOSM);
-	openMap.setCenter(new OpenLayers.LonLat(0,40), 5);
+	// openMap.setCenter(new OpenLayers.LonLat(0,40), 5);
 	var bl = reprojectLatLon(MAP_LIMITS.slice(0,2)); // bottom-left
 	var tr = reprojectLatLon(MAP_LIMITS.slice(2,4)); // top-right
 	openMap.zoomToExtent([bl.lon, bl.lat, tr.lon, tr.lat]);
@@ -218,7 +214,7 @@ function openMapinit() {
 /* Histograma de concentración de gasolineras */
 function openHeatMapNumber(g) {
 	var data = g.info;
-	var heatData = {max: 10, data: []};
+	var heatData = {max: 1, data: []};
 	var heatPoints = heatData.data;
 	function addStation(s) {
 		if (s.hasOwnProperty("g")) 
@@ -254,28 +250,18 @@ function openHeatMapPrice() {
 	heatmap.setDataSet(heatData);
 }
 
-// Para agregar más selectores
-function insertAdder(divID, callback) {
-	var div = document.getElementById(divID);
-	var divMore = document.createElement("div");
-	divMore.className = "group-adder";
-	divMore.textContent="+";
-	div.appendChild(divMore);
-	divMore.addEventListener("click", callback);
-}
-
 function initControl() {
 	initOptions();			// Selector de tipo de combustible
 	initProvinces();		// Selector de provincias en la barra
 	initToolbar();
 	// Ocultar Ceuta, Melilla y Canarias
-	document.getElementById("hidep").addEventListener("change", function() {
+	addEvent(document.getElementById("hidep"),"change", function() {
 		// Ocultar Ceuta, Melilla, Canarias
 		skip = this.checked;
 		raphaelUpdate();
 	});
 	// Ocultar Textos 
-	document.getElementById("hidet").addEventListener("change", function() {
+	addEvent(document.getElementById("hidet"),"change", function() {
 		var hideText=this.checked;
 		d3.selectAll(".description")
 			.attr("class", hideText ? "no description" : "description");
@@ -443,27 +429,12 @@ function Circles(spread) {
 			.remove();
 		// eventos
 		circles.on("mouseover", function(d,i) {
-			infoDiv.className="show";
-			infoDiv.textContent = "En " + d.name + " hay " + d.n + " puntos de venta de " + FUEL_OPTIONS[TYPE].name + " con un precio medio de " + d.p.toFixed(3) + " €/l";
-			var here = d3.select(this);
-			here.transition().duration(300).attr("r", 100)
-				.transition().duration(300).ease("bounce").attr("r", 10);
-			var xpos = here.attr("cx");
-			var ypos = parseInt(here.attr("cy"))+30;
-			var tooltip = chart.append("text").text("hola")
-				.attr("id", "tooltip")
-				.attr("x", xpos)
-				.attr("y", ypos)
-				.style("font-size", "20px")
-				.style("font-family", "sans-serif")
-				.style("text-anchor", "middle")
-				.style("fill", "#333");
-			console.log(here.attr("cy"), tooltip.attr("y"));
-
+			var infoText = [d.name];
+			infoText.push(d.n + " puntos de venta");
+			infoText.push("Precio medio: " + d.p.toFixed(3) + " €/l");
+			showTooltip(chart, infoText, 100);
 		});
 		circles.on("mouseout", function(d,i) {
-			infoDiv.className="";
-			infoDiv.textContent = "";
 			chart.select("#tooltip").remove();
 		});
 	}
@@ -720,18 +691,39 @@ function Histogram() {
 						})
 					.attr("height", function(d,i){return height-y(d);})
 			bars.exit().remove();
+			// los eventos
 			bars.on("mouseover", function(d,i) {
-				infoDiv.className="show";
 				var pmin = bins[i].toFixed(3);
 				var pmax = bins[i+1].toFixed(3);
-				infoDiv.textContent = "En " + data[si].name + " hay " + d + " puntos de venta de " + FUEL_OPTIONS[TYPE].name + " entre " + pmin + " y " + pmax + " €/l";
+				var infoText = ["En " + data[si].name];
+				infoText.push("hay " + d + " puntos de venta");
+				infoText.push("de " + FUEL_OPTIONS[TYPE].name);
+				infoText.push("entre " + pmin + " y " + pmax + " €/l");
+				showTooltip(chart, infoText, 100);
 			});
 			bars.on("mouseout", function(d,i) {
-				infoDiv.className="";
-				infoDiv.textContent = "";
+				chart.select("#tooltip").remove();
 			});
 		})
 	}
+}
+
+/* Muestra la pelota informativa del elemento seleccionado */
+function showTooltip(where, infoText, R) {
+	var node = where.node();
+	var mousePos = d3.mouse(node);
+	var x = mousePos[0], y = mousePos[1];
+	var width = node.getBoundingClientRect().width;
+	var height = node.getBoundingClientRect().height;
+	var posX = x + ((x<(width/2)) ? 100 : -100);
+	var posY = y + ((y<(height/2)) ? 100 : -100);
+	var lineIni = -Math.floor(infoText.length/2);
+	var tooltip = where.append("g").attr("id", "tooltip");
+	tooltip.append("circle").attr("cx", posX).attr("cy", posY).attr("r",0).attr("fill", "#d24e33").attr("stroke", "#ccc").attr("stroke-width", 5)
+		.transition().duration(100).ease("bounce").attr("r", R);
+	var text = tooltip.append("text").attr("x", posX).attr("y", posY).attr("text-anchor", "middle").attr("fill", "#fff");
+	text.selectAll("tspan").data(infoText)
+	.enter().append("tspan").attr("x", posX).attr("y", function(d,i) {return posY+(i+lineIni)*20}).text(function(d){return d});
 }
 
 /* Posición de la barra de herramientas */
