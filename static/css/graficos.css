@@ -29,7 +29,7 @@
 }
 #toolbar {
   width: 1030px;
-  min-height: 100px;
+  min-height: 90px;
   background-color: #333;
   z-index: 2000;
   font-size: 1.2em;
@@ -101,6 +101,7 @@ h1 {
 
 .description {
   color: #333;
+  margin-bottom: 5px;
   padding-left: 20px;
   width: 730px;
   -moz-column-count:2; /* Firefox */
@@ -456,8 +457,12 @@ input:checked + label:before {
 .circle:hover {
   opacity: 1;
 }
+
 .axis path, .axis line {
   fill: none;
   stroke: #333;
   shape-rendering: crispEdges;
+}
+#brands .axis path, #brands .axis line {
+  display: none;
 }

@@ -4,6 +4,7 @@ var TYPE = "1";			// Tipo de combustible seleccionado
 
 var histogram = new Histogram();
 var circles = new Circles();
+var brands = new Brands();
 var infoDiv = null;
 
 var openMap = null;
@@ -34,16 +35,10 @@ var htmlsvg=[{id:"15",path:'M 17.5 20.7 L 20.7 21.6 L 15 32.2 C 14.9 32.3 14.9 3
 var SKIP = ["Ceuta", "Melilla", "Santa Cruz De Tenerife", "Palmas (Las)"];
 var skip = true;
 // Colores y precios máximo y mínimo para representación gráfica
-var C_MIN = [255, 240, 50];
-var C_MAX = [255, 0, 0];
-var CG_MIN = [140, 230, 240];
-var CG_MAX = [35, 40, 255];
-var C_NA = "#ccc";			// color de provincias no mostradas
-var X_MIN = 0;
-var X_MAX = 0;
-var G_MIN = 0;
-var G_MAX = 0;
-var MOUSE_REF = null;
+var CMIN = [0,255,0];	// verde para las baratas
+var CMU = [255,255,0]	// amarillo para las intermedias
+var CMAX = [255,0,0];	// rojo para las caras
+var CNA = "#ccc";		// color de provincias no mostradas
 
 function reprojectLatLon(latlon) {
 	var proj = new OpenLayers.Projection("EPSG:4326");
@@ -58,8 +53,12 @@ function array2color(a) {
 }
 
 // Obtiene un color para un precio, interpolado entre dos colores extremos
-function pickColor(x, xmin, xmax, cmin, cmax) {
-	if ((x>xmax)||(x<xmin)) return "#ccc";
+function pickColor(x, xmin, xmax, xmu) {
+	if ((x>xmax)||(x<xmin)) return "#000";
+	if (typeof xmu == "undefined") xmu = (xmin+xmax)/2;	// media aritmética
+	var cmin=CMIN,cmax=CMAX;
+	if (x<xmu) {xmax=xmu;cmax=CMU}
+	else {xmin=xmu;cmin=CMU};
 	var rgb = [];
 	for (var c=0; c<3; c++) {
 		var val = cmin[c] + (x-xmin) * (cmax[c]-cmin[c]) / (xmax-xmin);
@@ -96,7 +95,7 @@ function raphaelUpdate() {
 			e.show();			// Mostramos el elemento
 			var currentProvince = stats.provinces[e.pname];
 			var price = currentProvince.hasOwnProperty(TYPE) ? currentProvince[TYPE].mu : null;
-			var fill =  price ? pickColor(price, min, max, C_MIN, C_MAX) : C_NA;
+			var fill =  price ? pickColor(price, min, max) : CNA;
 			var box = e.getBBox();
 			var radius = price ? Math.sqrt(currentProvince[TYPE].n) : 0;
 			// var circle = paper.circle(box.cx, box.cy, radius).attr({"stroke":"#fff", "fill": "#0f0"});
@@ -304,15 +303,17 @@ function Circles(spread) {
 		for (var p in REGIONS) {				// para todas las regiones
 			if (REGIONS[p].selected) {
 				var current = provinces[p][TYPE];
-				var n = current.n;
-				var color = "#"+REGIONS[p].color;
-				var price = current.mu;
-				prices.push(price);	// todos los precios medios
-				if (this.spread) 
-					data.push({name: p, p: price, n: n, c: color, r: radius, min: current.min, max: current.max});
-				else 
-					data.push({name: p, p: price, n: n, c: color, r: radius, min: 0, max: 0});
-				if (n>yMax) yMax = n;
+				if (current) {
+					var n = current.n;
+					var color = "#"+REGIONS[p].color;
+					var price = current.mu;
+					prices.push(price);	// todos los precios medios
+					if (this.spread) 
+						data.push({name: p, p: price, n: n, c: color, r: radius, min: current.min, max: current.max});
+					else 
+						data.push({name: p, p: price, n: n, c: color, r: radius, min: 0, max: 0});
+					if (n>yMax) yMax = n;					
+				}
 			} else {
 				data.push({name: p, p: 0, n: 0, c: "#ccc", r:0, min: 0, max:0});
 			}
@@ -438,6 +439,109 @@ function Circles(spread) {
 	}
 }
 
+/** @constructor */
+function Brands(spread) {
+	this.draw = function() {
+		// Gráfico de bolas
+		// Provincias en eje de las X
+		// Marcas en eje de las Y
+		var stats = theStats.stats[TYPE];
+		showChartContainer("brands", stats!=null);
+		if (!stats) return;
+		var div = d3.select("#brands");
+		var provinces = theStats.provinces;
+		var brands = stats.brands;
+		var data = [];
+		var pMin = 1000, pMax = 0;		//
+		for (var p in provinces) {
+			var current = provinces[p][TYPE];
+			if (current) {
+				var brands = current.brands;
+				for (var b in brands) {
+					var info = brands[b];
+					var price = info.mu;
+					if (price<pMin) pMin=price;
+					if (price>pMax) pMax=price;
+					data.push({prov: p, brand: b, n: info.n, price: info.mu});
+				}
+			}
+		}
+		
+		divWidth = parseInt(div.style("width").split("px")[0]);
+		divHeight = parseInt(div.style("height").split("px")[0]);
+
+		var provincesDomain = Object.keys(provinces);
+		var brandsDomain = Object.keys(brands);
+		var margin = {top: 20, right: 20, bottom: 90, left: 70},
+			width = divWidth - margin.left - margin.right,
+			height = divHeight - margin.top - margin.bottom;
+
+		var x = d3.scale.ordinal()
+			.domain(provincesDomain)
+			.rangePoints([0,width]);
+		var y = d3.scale.ordinal()
+			.domain(brandsDomain)
+			.rangePoints([height,0]);
+		var xAxis = d3.svg.axis()
+			.scale(x)
+			.orient("bottom");
+			
+		var yAxis = d3.svg.axis()
+			.scale(y)
+			.orient("left");
+
+		var chart = div.select(".chart");
+		if (chart[0][0]==null) {
+			chart = div.append("svg")
+				.attr("width", "100%")
+				.attr("height", "100%")
+				.append("g")
+				.attr("class", "chart")
+				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+			chart.append("g")
+				.attr("class", "x axis")
+				.attr("transform", "translate(0," + height + ")");
+			chart.append("g")
+				.attr("class", "y axis")
+		}
+		chart.select(".x.axis")
+			.call(xAxis)
+			.selectAll("text")
+				.style("font-size", ".7em")
+	            .style("text-anchor", "end")
+	            .attr("dx", "-.7em")
+	            .attr("dy", ".1em")
+	            .attr("transform", function(d) {
+	                return "rotate(-45)" 
+	                });
+		
+		chart.select(".y.axis")
+			.call(yAxis)
+			.selectAll("text")
+				.style("font-size", ".7em");
+
+
+		var balls = chart.selectAll("circle").data(data);
+		balls.attr().transition().duration(200)
+			.attr("cx", function(d){return x(d.prov)})
+			.attr("cy", function(d) {return y(d.brand)})
+			.attr("r", function(d) {return (d.n) ? 2+Math.sqrt(d.n) : 0})
+			.attr("fill", function(d) {return pickColor(d.price, pMin, pMax)});
+		balls.enter()
+			.append("circle")
+			.attr("cx", function(d){return x(d.prov)})
+			.attr("cy", function(d) {return y(d.brand)})
+			.attr("r", 0)
+			.attr("fill", function(d) {return pickColor(d.price, pMin, pMax)})
+			.attr("stroke", "#fff")
+			.transition().duration(200).ease("bounce")
+				.attr("r", function(d) {return (d.n) ? 2+Math.sqrt(d.n) : 0});
+		balls.exit()
+			.transition().duration(200)
+				.attr("r",0).remove();
+	}
+}
+
 // Histogramas, distribuciones…
 // gasoleData son los datos de la API de gasole
 // stats son las estadísticas del resultado
@@ -531,6 +635,7 @@ function updateAll(recompute) {
 	}
 	histogram.draw();
 	circles.draw();
+	brands.draw();
 	raphaelUpdate
 	// Mapas de calor
 	// openHeatMapPrice();
@@ -557,10 +662,12 @@ function Histogram() {
 		var nMax = 0;						// Número máximo en una provincia, para escala de gráfico
 		for (var p in provinces) {
 			var current = provinces[p][TYPE];
-			var n = current.n;
-			data.push({name: p, hist: current.hist, color: "#"+REGIONS[p].color});
-			var hMax = d3.max(current.hist);
-			if (hMax>nMax) nMax = hMax;
+			if (current) {
+				var n = current.n;
+				data.push({name: p, hist: current.hist, color: "#"+REGIONS[p].color});
+				var hMax = d3.max(current.hist);
+				if (hMax>nMax) nMax = hMax;	
+			}
 		}
 		if (this.stacked) nMax = d3.max(stats.hist);	// barras apiladas
 		var nSeries = data.length;
