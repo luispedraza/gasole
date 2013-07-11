@@ -54,7 +54,7 @@ function array2color(a) {
 
 // Obtiene un color para un precio, interpolado entre dos colores extremos
 function pickColor(x, xmin, xmax, xmu) {
-	if ((x>xmax)||(x<xmin)) return "#000";
+	if ((x>xmax)||(x<xmin)) {return "#000";};
 	if (typeof xmu == "undefined") xmu = (xmin+xmax)/2;	// media aritmética
 	var cmin=CMIN,cmax=CMAX;
 	if (x<xmu) {xmax=xmu;cmax=CMU}
@@ -520,7 +520,6 @@ function Brands(spread) {
 			.selectAll("text")
 				.style("font-size", ".7em");
 
-
 		var balls = chart.selectAll("circle").data(data);
 		balls.attr().transition().duration(200)
 			.attr("cx", function(d){return x(d.prov)})
@@ -549,18 +548,7 @@ function Brands(spread) {
 function computeHistograms(gasoleData, stats, nbins) {
 	// Inicializa un histograma a cero
 	function initHist() {
-		var hist = [];
-		var n = nbins;
-		while (n--) hist[n]=0;
-		return hist;
-	}
-	// Inicializa todas las marcas en un lugar
-	function initBrands() {
-		var r = {};
-		for (var i=0, l=BRANDS.length; i<l; i++) {
-			r[BRANDS[i]] = {n: 0, hist: initHist()};
-		}
-		return r;
+		var hist=[];var n = nbins;while (n--) hist[n]=0;return hist;
 	}
 	// Nuevo precio (price) en estadístico de marca (brand) y aumento del # pricebin
 	function addData(where, price, pricebin) {
@@ -572,10 +560,10 @@ function computeHistograms(gasoleData, stats, nbins) {
 			else if (price<where.min) where.min=price;
 			where.mu = (where.mu*(where.n-1)+price)/where.n;
 		}
-		where.hist[pricebin]++;
+		if (pricebin) where.hist[pricebin]++;
 	}
 	var sGlobal = stats.stats;			// Estadísticas del resultado
-	var sProvs = stats.provinces;				// estadísticas de las provincias consideradas
+	var sProvs = stats.provinces;		// estadísticas de las provincias consideradas
 	// Cálculo de histogramas
 	for (var o in sGlobal) {
 		var sGlobalO = sGlobal[o],
@@ -587,13 +575,13 @@ function computeHistograms(gasoleData, stats, nbins) {
 			bins[n] = gMin + n*step;
 		bins.push(gMax);
 		sGlobalO.bins = bins;
-		sGlobalO.brands = initBrands();
+		sGlobalO.brands = {};
 		sGlobalO.hist = initHist();
 		sGlobalO.step = step;
 		for (var p in sProvs) {
 			if (sProvs[p].hasOwnProperty(o)) {
 				var sProvO = sProvs[p][o];
-				sProvO.brands = initBrands();
+				sProvO.brands = {};
 				sProvO.hist = initHist();
 				// Y ahora los datos
 				var pdata = gasoleData[p];
@@ -610,8 +598,10 @@ function computeHistograms(gasoleData, stats, nbins) {
 							}
 							addData(sProvO, price, b);
 							addData(sGlobalO, price, b);
-							addData(sProvO.brands[brand], price, b);
-							addData(sGlobalO.brands[brand],price, b);
+							if (!sProvO.brands[brand]) sProvO.brands[brand]={n:0};
+							addData(sProvO.brands[brand], price);
+							if (!sGlobalO.brands[brand]) sGlobalO.brands[brand]={n:0};
+							addData(sGlobalO.brands[brand],price);
 						}
 					}
 				}
@@ -949,9 +939,6 @@ function initOptions() {
 	document.getElementById("type-list").onclick = dropList;
 	// Selección actual
 	selectType(TYPE);
-}
-
-function initBrands() {
 }
 
 addEvent(window, "load", function(){
