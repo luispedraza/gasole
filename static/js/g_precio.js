@@ -461,13 +461,14 @@ function Brands(spread) {
 				}
 			}
 		}
-		divWidth = parseInt(div.style("width").split("px")[0]);
-		divHeight = parseInt(div.style("height").split("px")[0]);
-
-		console.log(Object.keys(brands));
 		var provincesDomain = Object.keys(provinces);
 		var brandsDomain = Object.keys(brands);
-		var margin = {top: 20, right: 20, bottom: 50, left: 180},
+		// ajuste del alto del gráfico:
+		var divHeight = Math.max(400,provincesDomain.length*30+70);
+		div.style("height", divHeight+"px");
+		divWidth = parseInt(div.style("width").split("px")[0]);
+		
+		var margin = {top: 40, right: 30, bottom: 30, left: 170},
 			width = divWidth - margin.left - margin.right,
 			height = divHeight - margin.top - margin.bottom;
 
@@ -479,7 +480,7 @@ function Brands(spread) {
 			.rangePoints([0,width]);
 		var xAxis = d3.svg.axis()
 			.scale(x)
-			.orient("bottom");
+			.orient("top");
 			
 		var yAxis = d3.svg.axis()
 			.scale(y)
@@ -494,8 +495,7 @@ function Brands(spread) {
 				.attr("class", "chart")
 				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 			chart.append("g")
-				.attr("class", "x axis")
-				.attr("transform", "translate(0," + height + ")");
+				.attr("class", "x axis");
 			chart.append("g")
 				.attr("class", "y axis")
 		}
@@ -504,13 +504,7 @@ function Brands(spread) {
 			.selectAll("text")
 				.style("font-size", ".7em")
 				.style("text-anchor", "center")
-				.attr("dy", "15px");
-	            // .style("text-anchor", "end")
-	            // .attr("dx", "-.7em")
-	            // .attr("dy", ".1em")
-	            // .attr("transform", function(d) {
-	            //     return "rotate(-45)" 
-	            //     });
+				.attr("dy", "-15px");
 		
 		chart.select(".y.axis")
 			.call(yAxis)
@@ -524,7 +518,7 @@ function Brands(spread) {
 		balls.attr().transition().duration(500)
 			.attr("cx", function(d){return x(d.brand)})
 			.attr("cy", function(d) {return y(d.prov)})
-			.attr("r", function(d) {return 2+Math.sqrt(d.n)})
+			.attr("r", function(d) {return 4+Math.sqrt(d.n)})
 			.attr("fill", function(d) {return pickColor(d.price, pMin, pMax)});
 		balls.enter()
 			.append("circle")
@@ -534,12 +528,13 @@ function Brands(spread) {
 			.attr("fill", function(d) {return pickColor(d.price, pMin, pMax)})
 			.attr("stroke", "#fff")
 			.transition().duration(500).ease("bounce")
-				.attr("r", function(d) {return 2+Math.sqrt(d.n)});
+				.attr("r", function(d) {return 4+Math.sqrt(d.n)});
 		balls.exit().remove();
 		// los eventos
 		balls.on("mouseover", function(d,i) {
-			var infoText = [d.brand + " en " + d.prov];
-			infoText.push("tiene " + d.n + " puntos de venta");
+			var otras = d.brand=="otras";
+			var infoText = [d.brand +(otras ? " marcas en " : " en ")+ d.prov];
+			infoText.push((otras ? "tienen " : "tiene ") + d.n + " puntos de venta");
 			infoText.push("con un precio medio de:");
 			infoText.push(d.price.toFixed(3) + " €/l");
 			showTooltip(chart, infoText, 100);
@@ -644,6 +639,7 @@ function updateAll(recompute) {
 function showChartContainer(id, show) {
 	var container = document.getElementById(id+"-container");
 	container.className = show ? "chart": "chart off";
+	if(!show) document.getElementById(id).style.height = "";
 }
 /** @constructor */
 function Histogram() {

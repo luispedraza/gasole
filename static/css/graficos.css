@@ -407,7 +407,12 @@ input:checked + label:before {
   height: 500px;
 }
 #brands {
-  height: 800px;
+  height: 400px;
+  -webkit-transition: height .5s;
+     -moz-transition: height .5s;
+      -ms-transition: height .5s;
+       -o-transition: height .5s;
+          transition: height .5s;
 }
 #histogram-container, #circles-container, #brands-container {
   position: relative;
