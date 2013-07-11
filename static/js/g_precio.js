@@ -17,16 +17,11 @@ var NBINS = 10;											// Para el histograma
 REGIONS = {}		// Guardará las regiones a mostrar y sus colores
 for (var p in PROVS) { REGIONS[p] = {id: PROVS[p], color: null, picker: null, selected: false, layer: null};}
 
-var BRANDS = ["alcampo","avia", "bp", "campsa","carrefour","cepsa","eroski","galp","leclerc", "makro","petronor","repsol","saras", "shell", "otras"];
-var BRANDS_GRAPH = ["campsa", "cepsa", "repsol", "bp"];
-var BRANDS_COLORS = [];
+var BRANDS = {"alcampo":1,"avia":1, "bp":1, "campsa":1,"carrefour":1,"cepsa":1,"eroski":1,"galp":1,"leclerc":1, "makro":1,"petronor":1,"repsol":1,"saras":1, "shell":1, "otras":1};
 // ¿Es la marca una de las principales ?
 function checkBrand(b) {
 	var brand = getLogo(b);
-	for (var i=0, l=BRANDS.length; i<l; i++) {
-		if (brand==BRANDS[i]) return brand;
-	}
-	return "otras";
+	return ((brand in BRANDS) ? brand : "otras");
 }
 
 // Obtenido de: http://www.irunmywebsite.com/raphael/SVGTOHTML_LIVE90.php
@@ -452,13 +447,13 @@ function Brands(spread) {
 		var provinces = theStats.provinces;
 		var brands = stats.brands;
 		var data = [];
-		var pMin = 1000, pMax = 0;		//
+		var pMin = 1000, pMax = 0;		// Precios máximo y mínimo
 		for (var p in provinces) {
 			var current = provinces[p][TYPE];
 			if (current) {
-				var brands = current.brands;
-				for (var b in brands) {
-					var info = brands[b];
+				var current_brands = current.brands;
+				for (var b in current_brands) {
+					var info = current_brands[b];
 					var price = info.mu;
 					if (price<pMin) pMin=price;
 					if (price>pMax) pMax=price;
@@ -466,22 +461,22 @@ function Brands(spread) {
 				}
 			}
 		}
-		
 		divWidth = parseInt(div.style("width").split("px")[0]);
 		divHeight = parseInt(div.style("height").split("px")[0]);
 
+		console.log(Object.keys(brands));
 		var provincesDomain = Object.keys(provinces);
 		var brandsDomain = Object.keys(brands);
-		var margin = {top: 20, right: 20, bottom: 90, left: 70},
+		var margin = {top: 20, right: 20, bottom: 50, left: 180},
 			width = divWidth - margin.left - margin.right,
 			height = divHeight - margin.top - margin.bottom;
 
-		var x = d3.scale.ordinal()
-			.domain(provincesDomain)
-			.rangePoints([0,width]);
 		var y = d3.scale.ordinal()
+			.domain(provincesDomain)
+			.rangePoints([0,height]);
+		var x = d3.scale.ordinal()
 			.domain(brandsDomain)
-			.rangePoints([height,0]);
+			.rangePoints([0,width]);
 		var xAxis = d3.svg.axis()
 			.scale(x)
 			.orient("bottom");
@@ -508,36 +503,50 @@ function Brands(spread) {
 			.call(xAxis)
 			.selectAll("text")
 				.style("font-size", ".7em")
-	            .style("text-anchor", "end")
-	            .attr("dx", "-.7em")
-	            .attr("dy", ".1em")
-	            .attr("transform", function(d) {
-	                return "rotate(-45)" 
-	                });
+				.style("text-anchor", "center")
+				.attr("dy", "15px");
+	            // .style("text-anchor", "end")
+	            // .attr("dx", "-.7em")
+	            // .attr("dy", ".1em")
+	            // .attr("transform", function(d) {
+	            //     return "rotate(-45)" 
+	            //     });
 		
 		chart.select(".y.axis")
 			.call(yAxis)
 			.selectAll("text")
-				.style("font-size", ".7em");
+				.style("font-size", ".7em")
+				.style("text-anchor", "end")
+				.attr("dx", "-15px");
+
 
 		var balls = chart.selectAll("circle").data(data);
-		balls.attr().transition().duration(200)
-			.attr("cx", function(d){return x(d.prov)})
-			.attr("cy", function(d) {return y(d.brand)})
-			.attr("r", function(d) {return (d.n) ? 2+Math.sqrt(d.n) : 0})
+		balls.attr().transition().duration(500)
+			.attr("cx", function(d){return x(d.brand)})
+			.attr("cy", function(d) {return y(d.prov)})
+			.attr("r", function(d) {return 2+Math.sqrt(d.n)})
 			.attr("fill", function(d) {return pickColor(d.price, pMin, pMax)});
 		balls.enter()
 			.append("circle")
-			.attr("cx", function(d){return x(d.prov)})
-			.attr("cy", function(d) {return y(d.brand)})
+			.attr("cx", function(d){return x(d.brand)})
+			.attr("cy", function(d) {return y(d.prov)})
 			.attr("r", 0)
 			.attr("fill", function(d) {return pickColor(d.price, pMin, pMax)})
 			.attr("stroke", "#fff")
-			.transition().duration(200).ease("bounce")
-				.attr("r", function(d) {return (d.n) ? 2+Math.sqrt(d.n) : 0});
-		balls.exit()
-			.transition().duration(200)
-				.attr("r",0).remove();
+			.transition().duration(500).ease("bounce")
+				.attr("r", function(d) {return 2+Math.sqrt(d.n)});
+		balls.exit().remove();
+		// los eventos
+		balls.on("mouseover", function(d,i) {
+			var infoText = [d.brand + " en " + d.prov];
+			infoText.push("tiene " + d.n + " puntos de venta");
+			infoText.push("con un precio medio de:");
+			infoText.push(d.price.toFixed(3) + " €/l");
+			showTooltip(chart, infoText, 100);
+		});
+		balls.on("mouseout", function(d,i) {
+			chart.select("#tooltip").remove();
+		});
 	}
 }
 

@@ -407,7 +407,7 @@ input:checked + label:before {
   height: 500px;
 }
 #brands {
-  height: 500px;
+  height: 800px;
 }
 #histogram-container, #circles-container, #brands-container {
   position: relative;
