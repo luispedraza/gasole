@@ -290,6 +290,12 @@ function initControl() {
 		circles.spread = this.checked;
 		circles.draw();
 	})
+	// Ocultar todos los desplegables
+	addEvent(document, "click", function() {
+		console.log("document");
+		document.getElementById("prov-list").className =
+		document.getElementById("type-list").className = "";
+	})
 }
 
 /** @constructor */
@@ -744,7 +750,9 @@ function initToolbar() {
 }
 
 /* Despliega una lista de opciones */
-function dropList() {
+function dropList(e) {
+	console.log("click");
+	stopEvent(e);
 	var cname = this.getAttribute("class");
 	this.setAttribute("class", cname ? "" : "on");
 }
