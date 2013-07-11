@@ -109,7 +109,6 @@ function raphaelUpdate() {
 /* Cuando se selecciona una provincia del mapa Raphael */
 /* e: elemento */
 function raphaelSelectProvince(e) {
-	console.log(e);
 	if (typeof e == "string") {
 		var i=htmlsvg.length;
 		while(i--) if (htmlsvg[i].id == e) e = htmlsvg[i].e;
@@ -278,7 +277,6 @@ function initControl() {
 	})
 	// Ocultar todos los desplegables
 	addEvent(document, "click", function() {
-		console.log("document");
 		document.getElementById("prov-list").className =
 		document.getElementById("type-list").className = "";
 	})
@@ -438,7 +436,6 @@ function Circles(spread) {
 			chart.select("#tooltip").remove();
 		});
 	}
-	
 }
 
 // Histogramas, distribuciones…
@@ -743,7 +740,6 @@ function initToolbar() {
 
 /* Despliega una lista de opciones */
 function dropList(e) {
-	console.log("click");
 	stopEvent(e);
 	var cname = this.getAttribute("class");
 	this.setAttribute("class", cname ? "" : "on");
@@ -770,7 +766,6 @@ function initProvinces() {
 			col.className="color";
 			region.color = new jscolor.color(col, pickerOptions);
 			addEvent(col, "change", function() {
-				console.log("cambio de color");
 				updateAll(false);
 			});
 			div.appendChild(col);

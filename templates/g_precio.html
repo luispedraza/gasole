@@ -59,10 +59,20 @@ body {
 		<div id="openmap"></div>
 	</div>
 
-	<h2>Histograma de precios</h2>
-	<div id="regions" class="menubar"></div>
 
-<!-- 	<canvas id="histogram" width="1100px" height="400px" class="chart"></canvas> -->
+	<h2>Cuotas de mercado de las empresas</h2>
+	<p>Observa la cuota de mercado que alcanza cada marca de combustible en cada una de las provincias de España, así como el precio medio del combustible que ofrece a sus clientes.</p>
+
+	<div id="brands-container" class="chart off">
+			<div class="chart_msg">Selecciona al menos una Provincia</div>
+		<div id="brands" class="d3"></div>
+	</div>
+
+	
+	<h2>Histograma de precios</h2>
+	<div class="description">
+		<p>Se muestra el histograma de precios para la selección de provincias considerada. El rango horizontal se divide en 10 tramos de precios, desde el precio mínimo de todas las gasolineras de la selección de provincias, hasta el precio máximo.</p>
+	</div>
 
 	<div id="histogram-container" class="chart off">
 				<div class="chart_msg">Selecciona al menos una Provincia</div>
@@ -71,11 +81,11 @@ body {
 		<input id="stack" name="stack" type="checkbox">
 
 	</div>
-	
-	
-	
-	<h2>Cuotas de mercado de las empresas</h2>
-	<p>Observa la cuota de mercado que alcanza cada marca de combustible en cada una de las provincias de España.</p>
+
+	<h2>Precio y puntos de venta por provincia</h2>
+	<div class="description">
+		<p>Se muestra el número de puntos de venta y precio medio de oferta por provincia y tipo de combustible seleccionado.</p>
+	</div>
 	
 	<div id="circles-container" class="chart off">
 			<div class="chart_msg">Selecciona al menos una Provincia</div>
@@ -84,6 +94,8 @@ body {
 		<input id="spread" name="spread" type="checkbox">
 	
 	</div>
+
+
 	
 
 </div><!-- textcontent -->

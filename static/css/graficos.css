@@ -405,7 +405,10 @@ input:checked + label:before {
 #circles {
   height: 500px;
 }
-#histogram-container, #circles-container {
+#brands {
+  height: 500px;
+}
+#histogram-container, #circles-container, #brands-container {
   position: relative;
 }
 .chart_msg {
