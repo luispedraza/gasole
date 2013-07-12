@@ -10,10 +10,9 @@ var infoDiv = null;
 var openMap = null;
 var openMapOSM = null;
 var MAP_LIMITS = [27.5244, -18.4131, 43.3781, 3.8672];	// vista inicial de open maps (Todas España)
-var NBINS = 10;											// Para el histograma
+var NBINS = 10; // Para el histograma
 
 // Regiones a mostrar en las gráficas
-// var REGIONS = ["España"].concat(Object.keys(PROVS));
 REGIONS = {}		// Guardará las regiones a mostrar y sus colores
 for (var p in PROVS) { REGIONS[p] = {id: PROVS[p], color: null, picker: null, selected: false, layer: null};}
 
@@ -29,6 +28,8 @@ var htmlsvg=[{id:"15",path:'M 17.5 20.7 L 20.7 21.6 L 15 32.2 C 14.9 32.3 14.9 3
 // Provincias a saltar (régimen tributarioe specífico)
 var SKIP = ["Ceuta", "Melilla", "Santa Cruz De Tenerife", "Palmas (Las)"];
 var skip = true;
+/* Hay que omitir una provincia ? */
+function skipProv(p) {return (skip && (SKIP.indexOf(p)>=0));}
 // Colores y precios máximo y mínimo para representación gráfica
 var CMIN = [0,255,0];	// verde para las baratas
 var CMU = [255,255,0]	// amarillo para las intermedias
@@ -62,9 +63,6 @@ function pickColor(x, xmin, xmax, xmu) {
 	return array2color(rgb);
 }
 
-/* Hay que omitir una provincia ? */
-function skipProv(p) {return (skip && (SKIP.indexOf(p)>=0));}
-
 /* Función que confierte un círculo en un path, para transformaciones de raphael */
 function circle2path(x , y, r) // x and y are center and r is the radius
 {
@@ -97,7 +95,6 @@ function raphaelUpdate() {
 			e.attr({fill:fill});
 		}
 	});
-
 }
 
 /* Cuando se selecciona una provincia del mapa Raphael */
@@ -222,27 +219,8 @@ function openHeatMapNumber(g) {
 	openMap.addLayer(heatmap);
 	heatmap.setDataSet(heatData);
 }
-function openHeatMapPrice() {
-	var data = theGasole.info;
-	var stats = theGasole.stats.stats;
-	var max = stats[TYPE].max*1000;				// Máximo global del precio
-	var min = stats[TYPE].min*1000;				// Mínimo global del precio
-	var heatData = {max: max-min, data: []};
-	var heatPoints = heatData.data;
-	function addStation(s) {
-		if (s.hasOwnProperty("g") && s.o.hasOwnProperty(TYPE)) 
-			heatPoints.push({lonlat: new OpenLayers.LonLat(s.g[1], s.g[0]), count: s.o[TYPE]*1000-min});
-	};
-	gasoleProcess(data, addStation);
-	var heatmap = new OpenLayers.Layer.Heatmap(
-		"Heatmap Layer", 
-		openMap, openMapOSM, 
-		{visible: true, radius:5},
-		{isBaseLayer: false, opacity: 0.3, projection: new OpenLayers.Projection("EPSG:4326")});
-	openMap.addLayer(heatmap);
-	heatmap.setDataSet(heatData);
-}
 
+/* Todas las funciones de control de los gráficos */
 function initControl() {
 	initOptions();			// Selector de tipo de combustible
 	initProvinces();		// Selector de provincias en la barra
@@ -350,7 +328,8 @@ function Circles(spread) {
 				.attr("height", "100%")
 				.append("g")
 				.attr("class", "chart")
-				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+				.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+				.attr("width",width+"px").attr("height",height+"px");
 			chart.append("g")
 				.attr("class", "x axis")
 				.attr("transform", "translate(0," + height + ")");
@@ -493,7 +472,8 @@ function Brands(spread) {
 				.attr("height", "100%")
 				.append("g")
 				.attr("class", "chart")
-				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+				.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+				.attr("width",width+"px").attr("height",height+"px");
 			chart.append("g")
 				.attr("class", "x axis");
 			chart.append("g")
@@ -702,7 +682,8 @@ function Histogram() {
 				.attr("height", "100%")
 				.append("g")
 				.attr("class", "chart")
-				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+				.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+				.attr("width",width+"px").attr("height",height+"px");
 			chart.append("g")
 				.attr("class", "x axis")
 				.attr("transform", "translate(0," + height + ")");
@@ -812,8 +793,8 @@ function showTooltip(where, infoText, R, options) {
 	var node = where.node();
 	var mousePos = d3.mouse(node);
 	var x = mousePos[0], y = mousePos[1];
-	var width = node.getBoundingClientRect().width;
-	var height = node.getBoundingClientRect().height;
+	var width = parseInt(where.attr("width").split("px")[0]);
+	var height = parseInt(where.attr("height").split("px")[0]);
 	var posX = x + ((x<(width/2)) ? 100 : -100);
 	var posY = y + ((y<(height/2)) ? 100 : -100);
 	var lineIni = -Math.floor(infoText.length/2);
