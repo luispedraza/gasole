@@ -73,7 +73,8 @@ OpenLayers.Layer.Heatmap = OpenLayers.Class(OpenLayers.Layer, {
         set.data = [];
         while(dlen--){  // get the pixels for all the lonlat entries
             entry = dataset[dlen],
-            lonlat = entry.lonlat.clone().transform(this.projection, this.map.getProjectionObject()),
+            // lonlat = entry.lonlat.clone().transform(this.projection, this.map.getProjectionObject()),
+            lonlat = entry.lonlat,
             pixel = this.roundPixels(this.getViewPortPxFromLonLat(lonlat));
                 
             if(pixel){

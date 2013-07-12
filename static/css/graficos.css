@@ -442,9 +442,6 @@ input:checked + label:before {
 #openmap .logo {
   cursor: pointer;
 }
-#openmap .logo:hover {
-  outline: 5px solid #3AF2D4;
-}
 
 /* Gráficos D3.js */
 #histogram {

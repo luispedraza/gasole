@@ -194,7 +194,7 @@ function openMapinit() {
 	var bl = reprojectLatLon(MAP_LIMITS.slice(0,2)); // bottom-left
 	var tr = reprojectLatLon(MAP_LIMITS.slice(2,4)); // top-right
 	openMap.zoomToExtent([bl.lon, bl.lat, tr.lon, tr.lat]);
-	// Inicializa todas las capas de marcadores de provincias
+	// Capa de marcadores de gasolineras
 	function initMarkers() {
 		var markers = new OpenLayers.Layer.Markers("Marcadores de gasolineras");
 		openMap.addLayer(markers);
@@ -206,7 +206,7 @@ function openMapinit() {
         openMap.events.register("moveend", markers, updateMarkers);
 		return markers;
 	}
-	/* Histograma de concentración de gasolineras */
+	/* Concentración de gasolineras */
 	function initHeatMap() {
 		var options = {//visible: true, 
 			radius:5,
@@ -218,14 +218,15 @@ function openMapinit() {
 		openMap.addLayer(heatlayer);
 		return heatlayer;
 	}
+	/* Retícula de precios de combustible */
 	function initPriceGrid() {
 		var retLayer = new OpenLayers.Layer.Vector("Precio: Retícula coloreada");
 		openMap.addLayer(retLayer);
 		return retLayer;
 	}
-	markersLayer = initMarkers();
-	heatLayer = initHeatMap();
 	priceLayer = initPriceGrid();
+	heatLayer = initHeatMap();
+	markersLayer = initMarkers();
 }
 
 
@@ -233,8 +234,7 @@ function updateHeatMap() {
 	var heatData = {max: 1, data: []};
 	var heatPoints = heatData.data;
 	function addStation(s) {
-		if (s.hasOwnProperty("g")) 
-			heatPoints.push({lonlat: new OpenLayers.LonLat(s.g[1], s.g[0]), count: 1});
+		if (s.hasOwnProperty("g")) heatPoints.push({lonlat: s.g, count: 1});
 	};
 	var gasoleData = {}
 	for (var p in REGIONS) if (REGIONS[p].selected) gasoleData[p] = theGasole.info[p];
