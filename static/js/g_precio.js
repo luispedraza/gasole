@@ -1,5 +1,7 @@
-var theGasole = null;	// El objeto gasole, con toda la información
-var theStats = null;	// Estadísticas de la selección considerada
+var theGasole = null;	// El objeto gasole obtenido de la API, con toda la información
+var theInfo = null;		// La información de la selección actual
+var theStats = null;	// Estadísticas de la selección actual
+var theGrid = null;		// La rejilla para el mapa
 var TYPE = "1";			// Tipo de combustible seleccionado
 
 var histogram = new Histogram();
@@ -14,7 +16,7 @@ var markersLayer = null,	// marcadores de gasolineras
 	priceLayer = null;		// retícula de precio de gasolineras
 var MAP_LIMITS = [27.5244, -18.4131, 43.3781, 3.8672];	// vista inicial de open maps (Todas España)
 var NBINS = 10; 			// Para el histograma
-var RET_SIZE = 10000;		// TAMAÑO DE LA RETÍCULA EN km
+var GRID_SIZE = 20000;		// TAMAÑO DE LA RETÍCULA EN km (50 km)
 
 // Regiones a mostrar en las gráficas
 REGIONS = {}		// Guardará las regiones a mostrar y sus colores
@@ -165,8 +167,8 @@ function updateMarkers() {
 			var town = prov[t];
 			for (var s in town) {
 				var station = town[s];
-				if (station.o.hasOwnProperty(TYPE) && station.g) {
-					var lonlat = station.g;
+				if (station.o.hasOwnProperty(TYPE) && station.ll) {
+					var lonlat = station.ll;
 					if (bounds.containsLonLat(lonlat)) {
 						var icon = new OpenLayers.Icon(null, new OpenLayers.Size(30,20));
 						var logo = getLogo(station.l);
@@ -200,7 +202,7 @@ function openMapinit() {
 		openMap.addLayer(markers);
 		// Aprovechamos para calcular los objetos lonlat
 		gasoleProcess(theGasole.info, function(s) {
-			if (s.g) s.g = reprojectLatLon(s.g);
+			if (s.g) s.ll = reprojectLatLon(s.g);	// LonLat en metros
 		})
 		openMap.events.register("zoomend", markers, updateMarkers);
         openMap.events.register("moveend", markers, updateMarkers);
@@ -229,12 +231,37 @@ function openMapinit() {
 	markersLayer = initMarkers();
 }
 
+/* Actualización de la rejilla de precios */
+function updatePriceGrid() {
+	if (!theGrid) return;
+	var ox = theGrid.ox;
+	var oy = theGrid.oy;
+	var pmin = theGrid.pmin;
+	var pmax = theGrid.pmax;
+	var grid = theGrid.grid;
+	var features = [];
+	for (var x in grid)
+		for (var y in grid[x]) {
+			var data = grid[x][y];
+			var bx = ox+x*GRID_SIZE;
+			var by = oy+y*GRID_SIZE;
+			var color = pickColor(data.p, pmin, pmax);
+			var poly = new OpenLayers.Bounds(bx,by,bx+GRID_SIZE,by+GRID_SIZE).toGeometry();
+			var polygonFeature = new OpenLayers.Feature.Vector(poly);
+			polygonFeature.style = {fillColor: color, strokeColor: "none", fillOpacity: .8};
+			features.push(polygonFeature);
+			
+		}
+	priceLayer.addFeatures(features);
+}
+
+
 /* Acatualización del mapa de concentración */
 function updateHeatMap() {
 	var heatData = {max: 1, data: []};
 	var heatPoints = heatData.data;
 	function addStation(s) {
-		if (s.hasOwnProperty("g") && s.o.hasOwnProperty(TYPE)) heatPoints.push({lonlat: s.g, count: 1});
+		if (s.ll && s.o[TYPE]) heatPoints.push({lonlat: s.ll, count: 1});
 	};
 	var gasoleData = {}
 	for (var p in REGIONS) if (REGIONS[p].selected) gasoleData[p] = theGasole.info[p];
@@ -315,19 +342,18 @@ function Circles(spread) {
 		var yMin = 0;
 		var yMax = 0;
 		for (var p in REGIONS) {				// para todas las regiones
-			if (REGIONS[p].selected) {
-				var current = provinces[p][TYPE];
-				if (current) {
-					var n = current.n;
-					var color = "#"+REGIONS[p].color;
-					var price = current.mu;
-					prices.push(price);	// todos los precios medios
-					if (this.spread) 
-						data.push({name: p, p: price, n: n, c: color, r: radius, min: current.min, max: current.max});
-					else 
-						data.push({name: p, p: price, n: n, c: color, r: radius, min: 0, max: 0});
-					if (n>yMax) yMax = n;					
-				}
+			var current = provinces[p];
+			if (current && current[TYPE]) {
+				current = current[TYPE];
+				var n = current.n;
+				var color = "#"+REGIONS[p].color;
+				var price = current.mu;
+				prices.push(price);	// todos los precios medios
+				if (this.spread) 
+					data.push({name: p, p: price, n: n, c: color, r: radius, min: current.min, max: current.max});
+				else 
+					data.push({name: p, p: price, n: n, c: color, r: radius, min: 0, max: 0});
+				if (n>yMax) yMax = n;					
 			} else {
 				data.push({name: p, p: 0, n: 0, c: "#ccc", r:0, min: 0, max:0});
 			}
@@ -566,11 +592,51 @@ function Brands(spread) {
 	}
 }
 
+/* Rejilla de precios, según tamaño GRID_SIZE */
+function computePriceGrid() {
+	if (!theStats.stats[TYPE]) return;
+	var bounds = theStats.stats[TYPE].g;
+	var bl = reprojectLatLon([bounds[0],bounds[2]]); // bottom-left
+	var tr = reprojectLatLon([bounds[1],bounds[3]]); // top-right
+	var width = tr.lon-bl.lon;
+	var height = tr.lat-bl.lat;
+	console.log(width, height);
+	var xBins = Math.ceil(width/GRID_SIZE);		// Número de bins horizontales
+	var offsetX = (xBins*GRID_SIZE-width)/2;
+	var yBins = Math.ceil(height/GRID_SIZE);	// Número de bins verticales
+	var offsetY = (xBins*GRID_SIZE-width)/2;
+	bl = bl.add(-offsetX,-offsetY);
+	var blx = bl.lon;
+	var bly = bl.lat;
+	tr = tr.add(offsetX,offsetY);
+
+	var result = {};
+	var pmin = 100, pmax = 0;
+	gasoleProcess(theInfo, function(s) {
+		if (s.ll && s.o[TYPE]) {
+			var price = s.o[TYPE];
+			if (price<pmin) pmin=price;
+			if (price>pmax) pmax=price;
+			var x = Math.floor((s.ll.lon-blx)/GRID_SIZE);
+			if (!result[x]) result[x]={};
+			var resultx = result[x];
+			var y = Math.floor((s.ll.lat-bly)/GRID_SIZE);
+			if (!resultx[y]) {
+				resultx[y] = {p: price, n: 1};
+			} 
+			else {
+				resultx[y].p = ((resultx[y].p*resultx[y].n)+price)/(++resultx[y].n);
+			}
+
+		}
+	});
+	theGrid = {pmin:pmin, pmax:pmax, ox: blx, oy: bly, grid: result};
+}
+
+
 // Histogramas, distribuciones…
-// gasoleData son los datos de la API de gasole
-// stats son las estadísticas del resultado
 // nbins es el número de bins del histograma de precios
-function computeHistograms(gasoleData, stats, nbins) {
+function computeHistograms(nbins) {
 	// Inicializa un histograma a cero
 	function initHist() {
 		var hist=[];var n = nbins;while (n--) hist[n]=0;return hist;
@@ -587,8 +653,8 @@ function computeHistograms(gasoleData, stats, nbins) {
 		}
 		if (pricebin) where.hist[pricebin]++;
 	}
-	var sGlobal = stats.stats;			// Estadísticas del resultado
-	var sProvs = stats.provinces;		// estadísticas de las provincias consideradas
+	var sGlobal = theStats.stats;			// Estadísticas globales del resultado
+	var sProvs = theStats.provinces;			// Estadísticas de las provincias consideradas
 	// Cálculo de histogramas
 	for (var o in sGlobal) {
 		var sGlobalO = sGlobal[o],
@@ -596,8 +662,7 @@ function computeHistograms(gasoleData, stats, nbins) {
 			gMin = sGlobalO.min,
 			gMax = sGlobalO.max;
 		var step = (gMax-gMin)/nbins;
-		for (var n=0; n<nbins; n++) 
-			bins[n] = gMin + n*step;
+		for (var n=0; n<nbins; n++) bins[n] = gMin + n*step;
 		bins.push(gMax);
 		sGlobalO.bins = bins;
 		sGlobalO.brands = {};
@@ -609,7 +674,7 @@ function computeHistograms(gasoleData, stats, nbins) {
 				sProvO.brands = {};
 				sProvO.hist = initHist();
 				// Y ahora los datos
-				var pdata = gasoleData[p];
+				var pdata = theInfo[p];
 				for (var t in pdata) {							// para todas las ciudades
 					var tdata = pdata[t];						
 					for (var s in tdata) {						// para todas las estaciones
@@ -641,20 +706,22 @@ function updateAll(recompute) {
 	if (typeof recompute == "undefined") recompute = true;
 	if (recompute) {
 		// Dalculamos la estadísticas para los datos seleccionados
-		var gasoleData = {}
+		theInfo = {}
 		for (p in REGIONS) {
 			// Selección de datos para construir estadísticas
-			if (REGIONS[p].selected) gasoleData[p] = theGasole.info[p];
+			if (REGIONS[p].selected && !skipProv(p)) theInfo[p] = theGasole.info[p];
 		}
-		theStats = new GasoleStats(gasoleData, [TYPE]);
-		computeHistograms(theGasole.info, theStats, NBINS);
+		theStats = new GasoleStats(theInfo, [TYPE]);
+		computeHistograms(NBINS);
+		computePriceGrid();
 	}
 	histogram.draw();
 	circles.draw();
 	brands.draw();
 	raphaelUpdate();
 	updateHeatMap();	// Mapa de concentración
-	updateMarkers();
+	updateMarkers();	// Marcadores de gasolineras
+	updatePriceGrid();	// Rejilla de precios
 }
 
 // MUestra/oculta el contenedor de un gráfico y las indicaciones
