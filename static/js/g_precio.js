@@ -9,6 +9,7 @@ var infoDiv = null;
 
 var openMap = null;
 var openMapOSM = null;
+var heatmap = null;
 var MAP_LIMITS = [27.5244, -18.4131, 43.3781, 3.8672];	// vista inicial de open maps (Todas España)
 var NBINS = 10; // Para el histograma
 
@@ -202,21 +203,24 @@ function openMapinit() {
 }
 
 /* Histograma de concentración de gasolineras */
-function openHeatMapNumber(g) {
-	var data = g.info;
+function initHeatMap() {
+	heatmap = new OpenLayers.Layer.Heatmap(
+		"Concentración de gasolineras", 
+		openMap, openMapOSM, 
+		{visible: true, radius:6},
+		{isBaseLayer: false, opacity: 0.25, projection: new OpenLayers.Projection("EPSG:4326")});
+	openMap.addLayer(heatmap);
+}
+function updateHeatMap() {
 	var heatData = {max: 1, data: []};
 	var heatPoints = heatData.data;
 	function addStation(s) {
 		if (s.hasOwnProperty("g")) 
 			heatPoints.push({lonlat: new OpenLayers.LonLat(s.g[1], s.g[0]), count: 1});
 	};
-	gasoleProcess(g.info, addStation);
-	var heatmap = new OpenLayers.Layer.Heatmap(
-		"Heatmap Layer", 
-		openMap, openMapOSM, 
-		{visible: true, radius:6},
-		{isBaseLayer: false, opacity: 0.3, projection: new OpenLayers.Projection("EPSG:4326")});
-	openMap.addLayer(heatmap);
+	var gasoleData = {}
+	for (var p in REGIONS) if (REGIONS[p].selected) gasoleData[p] = theGasole.info[p];
+	gasoleProcess(gasoleData, addStation);
 	heatmap.setDataSet(heatData);
 }
 
@@ -610,9 +614,8 @@ function updateAll(recompute) {
 	histogram.draw();
 	circles.draw();
 	brands.draw();
-	raphaelUpdate
-	// Mapas de calor
-	// openHeatMapPrice();
+	raphaelUpdate();
+	updateHeatMap();	// Mapa de concentración
 }
 
 // MUestra/oculta el contenedor de un gráfico y las indicaciones
@@ -953,7 +956,7 @@ addEvent(window, "load", function(){
 		infoDiv = document.getElementById("info");
 		theGasole = this;
 		openMapinit();
-		openHeatMapNumber(this);
+		initHeatMap();
 		// initMarkers();
 		raphaelInit();
 		initControl();
