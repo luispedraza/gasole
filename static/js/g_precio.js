@@ -407,7 +407,7 @@ function Circles(spread) {
 			.remove();
 		// eventos
 		circles.on("mouseover", function(d,i) {
-			var infoText = [d.name];
+			var infoText = [prettyName(d.name)];
 			infoText.push(d.n + " puntos de venta");
 			infoText.push("Precio medio: " + d.p.toFixed(3) + " €/l");
 			showTooltip(chart, infoText, 100, {cx:x(d.p), cy:y(d.n), r:d.r+2});
@@ -518,7 +518,7 @@ function Brands(spread) {
 		// los eventos
 		balls.on("mouseover", function(d,i) {
 			var otras = d.brand=="otras";
-			var infoText = [d.brand +(otras ? " marcas en " : " en ")+ d.prov];
+			var infoText = [d.brand +(otras ? " marcas en " : " en ")+ prettyName(d.prov)];
 			infoText.push((otras ? "tienen " : "tiene ") + d.n + " puntos de venta");
 			infoText.push("con un precio medio de:");
 			infoText.push(d.price.toFixed(3) + " €/l");
@@ -779,7 +779,7 @@ function Histogram() {
 			bars.on("mouseover", function(d,i) {
 				var pmin = bins[i].toFixed(3);
 				var pmax = bins[i+1].toFixed(3);
-				var infoText = ["En " + data[si].name];
+				var infoText = ["En " + prettyName(data[si].name)];
 				infoText.push("hay " + d + " puntos de venta");
 				infoText.push("de " + FUEL_OPTIONS[TYPE].name);
 				infoText.push("entre " + pmin + " y " + pmax + " €/l");
