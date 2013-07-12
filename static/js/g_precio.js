@@ -229,12 +229,12 @@ function openMapinit() {
 	markersLayer = initMarkers();
 }
 
-
+/* Acatualización del mapa de concentración */
 function updateHeatMap() {
 	var heatData = {max: 1, data: []};
 	var heatPoints = heatData.data;
 	function addStation(s) {
-		if (s.hasOwnProperty("g")) heatPoints.push({lonlat: s.g, count: 1});
+		if (s.hasOwnProperty("g") && s.o.hasOwnProperty(TYPE)) heatPoints.push({lonlat: s.g, count: 1});
 	};
 	var gasoleData = {}
 	for (var p in REGIONS) if (REGIONS[p].selected) gasoleData[p] = theGasole.info[p];
@@ -646,13 +646,15 @@ function updateAll(recompute) {
 			// Selección de datos para construir estadísticas
 			if (REGIONS[p].selected) gasoleData[p] = theGasole.info[p];
 		}
-		theStats = new GasoleStats(gasoleData, [TYPE]);	
+		theStats = new GasoleStats(gasoleData, [TYPE]);
+		computeHistograms(theGasole.info, theStats, NBINS);
 	}
 	histogram.draw();
 	circles.draw();
 	brands.draw();
 	raphaelUpdate();
 	updateHeatMap();	// Mapa de concentración
+	updateMarkers();
 }
 
 // MUestra/oculta el contenedor de un gráfico y las indicaciones
@@ -669,7 +671,6 @@ function Histogram() {
 		var stats = theStats.stats[TYPE];
 		showChartContainer("histogram", stats!=null);
 		if (!stats) return;
-		computeHistograms(theGasole.info, theStats, NBINS);
 		var provinces = theStats.provinces;
 		var bins = stats.bins;
 		var step = stats.step;
