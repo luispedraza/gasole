@@ -217,7 +217,7 @@ function openHeatMapNumber(g) {
 	var heatmap = new OpenLayers.Layer.Heatmap(
 		"Heatmap Layer", 
 		openMap, openMapOSM, 
-		{visible: true, radius:10},
+		{visible: true, radius:6},
 		{isBaseLayer: false, opacity: 0.3, projection: new OpenLayers.Projection("EPSG:4326")});
 	openMap.addLayer(heatmap);
 	heatmap.setDataSet(heatData);
@@ -426,7 +426,7 @@ function Circles(spread) {
 			var infoText = [d.name];
 			infoText.push(d.n + " puntos de venta");
 			infoText.push("Precio medio: " + d.p.toFixed(3) + " €/l");
-			showTooltip(chart, infoText, 100);
+			showTooltip(chart, infoText, 100, {cx:x(d.p), cy:y(d.n), r:d.r+2});
 		});
 		circles.on("mouseout", function(d,i) {
 			chart.select("#tooltip").remove();
@@ -537,7 +537,7 @@ function Brands(spread) {
 			infoText.push((otras ? "tienen " : "tiene ") + d.n + " puntos de venta");
 			infoText.push("con un precio medio de:");
 			infoText.push(d.price.toFixed(3) + " €/l");
-			showTooltip(chart, infoText, 100);
+			showTooltip(chart, infoText, 100, {cx:x(d.brand),cy:y(d.prov),r:8+Math.sqrt(d.n)});
 		});
 		balls.on("mouseout", function(d,i) {
 			chart.select("#tooltip").remove();
@@ -808,7 +808,7 @@ function Histogram() {
 }
 
 /* Muestra la pelota informativa del elemento seleccionado */
-function showTooltip(where, infoText, R) {
+function showTooltip(where, infoText, R, options) {
 	var node = where.node();
 	var mousePos = d3.mouse(node);
 	var x = mousePos[0], y = mousePos[1];
@@ -818,11 +818,32 @@ function showTooltip(where, infoText, R) {
 	var posY = y + ((y<(height/2)) ? 100 : -100);
 	var lineIni = -Math.floor(infoText.length/2);
 	var tooltip = where.append("g").attr("id", "tooltip");
-	tooltip.append("circle").attr("cx", posX).attr("cy", posY).attr("r",0).attr("fill", "#d24e33").attr("stroke", "#ccc").attr("stroke-width", 5)
-		.transition().duration(100).ease("bounce").attr("r", R);
-	var text = tooltip.append("text").attr("x", posX).attr("y", posY).attr("text-anchor", "middle").attr("fill", "#fff");
+	if (options && options.hasOwnProperty("r")) {
+		var Dy = posY-options.cy;
+		var Dx = posX-options.cx;
+		var D = Math.sqrt(Math.pow(Dy,2)+Math.pow(Dx,2));
+		var d = options.r+4;
+		var dy = (Dy/D)*d;
+		var dx = (Dx/D)*d;
+		tooltip.append("circle")
+			.attr("cx", options.cx)
+			.attr("cy", options.cy)
+			.attr("r", options.r)
+			.attr("stroke", "#ccc").attr("stroke-width",2).attr("fill", "none");
+		tooltip.append("line")
+			.attr("stroke", "#ccc").attr("stroke-width",2)
+			.attr("x1", options.cx+dx).attr("y1", options.cy+dy)
+			.attr("x2", options.cx+dx).attr("y2", options.cy+dy)
+			.transition().duration(200)
+				.attr("x2", posX).attr("y2", posY);
+	}
+	tooltip.append("circle").attr("cx", posX).attr("cy", posY).attr("r",0).attr("fill", "#7e2516").attr("stroke", "#ccc").attr("stroke-width", 5)
+		.transition().delay(200).duration(200).ease("bounce").attr("r", R);
+	var text = tooltip.append("text");
+	text.attr("x", posX).attr("y", posY).attr("text-anchor", "middle").attr("fill", "#fff")
+		.attr("font-size","0em").transition().delay(200).attr("font-size",".9em");
 	text.selectAll("tspan").data(infoText)
-	.enter().append("tspan").attr("x", posX).attr("y", function(d,i) {return posY+(i+lineIni)*20}).text(function(d){return d});
+		.enter().append("tspan").attr("x", posX).attr("y", function(d,i) {return posY+(i+lineIni)*20}).text(function(d){return d});
 }
 
 /* Posición de la barra de herramientas */
