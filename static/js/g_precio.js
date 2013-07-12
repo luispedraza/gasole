@@ -9,8 +9,8 @@ var infoDiv = null;
 
 var openMap = null;
 var openMapOSM = null;
-var heatmap = null;
-var heatPriceMap = null;
+var markersLayer = null,
+	heatmapLayer = null;
 var MAP_LIMITS = [27.5244, -18.4131, 43.3781, 3.8672];	// vista inicial de open maps (Todas España)
 var NBINS = 10; // Para el histograma
 
@@ -153,35 +153,30 @@ function raphaelInit() {
 	raphaelUpdate(gasole);
 }
 
-
-// Inicializa todas las capas de marcadores de provincias
-function initMarkers() {
-	var data = theGasole.info;
-	for (var p in data) {
-		var markers = new OpenLayers.Layer.Markers(p);
-		openMap.addLayer(markers);
-		markers.display(false);
-		var prov = data[p];
-		for (var t in prov) {
-			var town = prov[t];
-			for (var s in town) {
-				var station = town[s];
-				if (station.o.hasOwnProperty(TYPE) && station.g) {
-					var icon = new OpenLayers.Icon(null, new OpenLayers.Size(30,20));
-					var logo = getLogo(station.l);
-					icon.imageDiv.className = "logo "+(logo || "otra");
-					var lonlat = reprojectLatLon(station.g);
-					var marker = new OpenLayers.Marker(lonlat, icon);
-					marker.station = encodeName(p)+"/"+encodeName(t)+"/"+encodeName(s);
-					marker.events.register("click", marker, function() {
-						window.location = "/ficha/"+this.station;
-					});
-					markers.addMarker(marker);
-				}
-			}
-		}
-		REGIONS[p].layer = markers;
-	}
+function updateMarkers() {
+	// var data = theGasole.info;
+	// for (var p in data) {
+	// 	var prov = data[p];
+	// 	for (var t in prov) {
+	// 		var town = prov[t];
+	// 		for (var s in town) {
+	// 			var station = town[s];
+	// 			if (station.o.hasOwnProperty(TYPE) && station.g) {
+	// 				var icon = new OpenLayers.Icon(null, new OpenLayers.Size(30,20));
+	// 				var logo = getLogo(station.l);
+	// 				icon.imageDiv.className = "logo "+(logo || "otra");
+	// 				var lonlat = reprojectLatLon(station.g);
+	// 				var marker = new OpenLayers.Marker(lonlat, icon);
+	// 				marker.station = encodeName(p)+"/"+encodeName(t)+"/"+encodeName(s);
+	// 				marker.events.register("click", marker, function() {
+	// 					window.location = "/ficha/"+this.station;
+	// 				});
+	// 				markers.addMarker(marker);
+	// 			}
+	// 		}
+	// 	}
+	// 	REGIONS[p].layer = markers;
+	// }
 }
 
 // Muestra/Oculta marcadores de una provincia
@@ -193,58 +188,46 @@ function showMarkers(pname, show) {
 /* Inicialización de open map */
 function openMapinit() {
 	openMap = new OpenLayers.Map("openmap")
-	openMapOSM = new OpenLayers.Layer.OSM("OSM");
+	openMapOSM = new OpenLayers.Layer.OSM("Open Street Map");
 	var aliasproj = new OpenLayers.Projection("EPSG:3857");
 	openMapOSM.projection = aliasproj;
-	//add baselayers to map
 	openMap.addLayer(openMapOSM);
-	// openMap.setCenter(new OpenLayers.LonLat(0,40), 5);
 	var bl = reprojectLatLon(MAP_LIMITS.slice(0,2)); // bottom-left
 	var tr = reprojectLatLon(MAP_LIMITS.slice(2,4)); // top-right
 	openMap.zoomToExtent([bl.lon, bl.lat, tr.lon, tr.lat]);
+	// Inicializa todas las capas de marcadores de provincias
+	function initMarkers() {
+		var markers = new OpenLayers.Layer.Markers("Marcadores de gasolineras");
+		openMap.addLayer(markers);
+	}
+	/* Histograma de concentración de gasolineras */
+	function initHeatMap() {
+		var options = {//visible: true, 
+			radius:5,
+			gradient: {0.5: "cyan", 0.7: "blue", 1.0: "magenta"}};
+		var heatlayer = new OpenLayers.Layer.Heatmap(
+			"Mapa de calor de concentración", 
+			openMap, openMapOSM, options,
+			{isBaseLayer: false, opacity: 0.2, projection: new OpenLayers.Projection("EPSG:4326")});
+		openMap.addLayer(heatlayer);
+		return heatlayer;
+	}
+	markersLayer = initMarkers();
+	heatLayer = initHeatMap();
 }
 
-/* Histograma de concentración de gasolineras */
-function initHeatMap() {
-	var options = {visible: true, 
-		radius:6,
-		gradient: { 0.5: "cyan", 0.75: "blue", 1.0: "magenta"}};
-	heatmap = new OpenLayers.Layer.Heatmap(
-		"Mapa de calor de concentración", 
-		openMap, openMapOSM, options,
-		{isBaseLayer: false, opacity: 0.25, projection: new OpenLayers.Projection("EPSG:4326")});
-	options = {visible: true, 
-		radius:1,
-		gradient: { 0.5: "green", 0.75: "yellow", 1.0: "red"}};
-	heatPriceMap = new OpenLayers.Layer.Heatmap(
-		"Mapa de calor de precios", 
-		openMap, openMapOSM, options,
-		{isBaseLayer: false, opacity: 0.25, projection: new OpenLayers.Projection("EPSG:4326")});
-	openMap.addLayer(heatPriceMap);
-}
+
 function updateHeatMap() {
-	// var heatData = {max: 1, data: []};
-	// var heatPoints = heatData.data;
-	// function addStation(s) {
-	// 	if (s.hasOwnProperty("g")) 
-	// 		heatPoints.push({lonlat: new OpenLayers.LonLat(s.g[1], s.g[0]), count: 1});
-	// };
-	// var gasoleData = {}
-	// for (var p in REGIONS) if (REGIONS[p].selected) gasoleData[p] = theGasole.info[p];
-	// gasoleProcess(gasoleData, addStation);
-	// heatmap.setDataSet(heatData);
-
-	if (!theStats.stats[TYPE]) return;
-	var heatData = {max: theStats.stats[TYPE].max, data: []};
+	var heatData = {max: 1, data: []};
 	var heatPoints = heatData.data;
 	function addStation(s) {
-		if (s.hasOwnProperty("g") && s.o.hasOwnProperty(TYPE)) 
-			heatPoints.push({lonlat: new OpenLayers.LonLat(s.g[1], s.g[0]), count: s.o[TYPE]});
+		if (s.hasOwnProperty("g")) 
+			heatPoints.push({lonlat: new OpenLayers.LonLat(s.g[1], s.g[0]), count: 1});
 	};
 	var gasoleData = {}
 	for (var p in REGIONS) if (REGIONS[p].selected) gasoleData[p] = theGasole.info[p];
 	gasoleProcess(gasoleData, addStation);
-	heatPriceMap.setDataSet(heatData);
+	heatLayer.setDataSet(heatData);
 }
 
 /* Todas las funciones de control de los gráficos */
@@ -280,6 +263,24 @@ function initControl() {
 		document.getElementById("prov-list").className =
 		document.getElementById("type-list").className = "";
 	})
+	// Control de capas del mapa
+	var layers = document.getElementById("layers-list");
+	for (var l=0,ll=openMap.layers.length; l<ll; l++) {
+		var layer = openMap.layers[l];
+		var li = document.createElement("li");
+		if (layer.getVisibility()) li.className="on";
+		li.textContent = layer.name;
+		layers.appendChild(li);
+		addEvent(li, "click", function() {
+			var layers = openMap.layers;
+			for (var l=0,ll=layers.length; l<ll; l++) 
+				if (this.textContent==layers[l].name) {
+					var visible = !(this.className=="on");
+					layers[l].setVisibility(visible);
+					this.className = (visible) ? "on" : "";
+				} 
+		});
+	}
 }
 
 /** @constructor */
@@ -980,8 +981,6 @@ addEvent(window, "load", function(){
 		infoDiv = document.getElementById("info");
 		theGasole = this;
 		openMapinit();
-		initHeatMap();
-		// initMarkers();
 		raphaelInit();
 		initControl();
 		updateAll();

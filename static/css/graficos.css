@@ -350,6 +350,53 @@ input[type=radio], input[type=checkbox] {
   position: relative;
   background-color: #b5d0d0;
 }
+#layers {
+  cursor: pointer;
+  z-index: 1200;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  max-height: 30px;
+  width: 30px;
+  overflow: hidden;
+  padding: 5px;
+  -webkit-transition: all .4s;
+     -moz-transition: all .4s;
+      -ms-transition: all .4s;
+       -o-transition: all .4s;
+          transition: all .4s;
+}
+#layers:hover {
+  max-height: 300px;
+  width: 300px;
+  background-color: #fff;
+}
+#layers div, #layers ul {
+  float: right;
+  overflow: hidden;
+}
+#layers ul {
+  width: 100%;
+  margin-top: 10px;
+}
+#layers li {
+  padding: 10px;
+  overflow: hidden;
+  white-space: nowrap;
+  border: 0;
+}
+#layers li:hover {
+  background-color: #333;
+  color: #fff;
+}
+#layers li:before {
+  font-size: 1.5em;
+  content: "\2610";
+}
+#layers li.on:before {
+  font-size: 1.5em;
+  content: "\2611"; 
+}
 #hidep + label {
   z-index: 200;
   position: absolute;

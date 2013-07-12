@@ -22,13 +22,21 @@ OpenLayers.Layer.Heatmap = OpenLayers.Class(OpenLayers.Layer, {
             var heatdiv = document.createElement("div"),
                 handler;
             OpenLayers.Layer.prototype.initialize.apply(this, [name, options]);
+
         heatdiv.style.cssText = "position:absolute;width:"+map.size.w+"px;height:"+map.size.h+"px;";
-        this.div.appendChild(heatdiv);  // this will be the heatmaps element
-        hmoptions.element = heatdiv;    // add to our heatmap.js config
+        // this will be the heatmaps element
+        this.div.appendChild(heatdiv);
+        // add to our heatmap.js config
+        hmoptions.element = heatdiv;
         this.mapLayer = mLayer;
         this.map = map;
-        this.heatmap = h337.create(hmoptions);  // create the heatmap with passed heatmap-options
-        handler = function(){if(this.tmpData.max){this.updateLayer();}};
+            // create the heatmap with passed heatmap-options
+        this.heatmap = h337.create(hmoptions);
+        handler = function(){ 
+            if(this.tmpData.max){
+                this.updateLayer(); 
+            }
+        };
         // on zoomend and moveend we have to move the canvas element and redraw the datapoints with new positions
         map.events.register("zoomend", this, handler);
         map.events.register("moveend", this, handler);
@@ -40,23 +48,21 @@ OpenLayers.Layer.Heatmap = OpenLayers.Class(OpenLayers.Layer, {
                 // otherwise move it the right by setting it a positive value. same for top
                 el.style.top = ((pixelOffset.y > 0)?('-'+pixelOffset.y):(Math.abs(pixelOffset.y)))+'px';
                 el.style.left = ((pixelOffset.x > 0)?('-'+pixelOffset.x):(Math.abs(pixelOffset.x)))+'px';
-
                 this.setDataSet(this.tmpData);
     },
-        getPixelOffset: function () {
-            var o = this.mapLayer.map.layerContainerOrigin,
-                o_lonlat = new OpenLayers.LonLat(o.lon, o.lat),
-                o_pixel = this.mapLayer.getViewPortPxFromLonLat(o_lonlat),
-                c = this.mapLayer.map.center,
-                c_lonlat = new OpenLayers.LonLat(c.lon, c.lat),
-                c_pixel = this.mapLayer.getViewPortPxFromLonLat(c_lonlat);
+    getPixelOffset: function () {
+        var o = this.mapLayer.map.layerContainerOrigin,
+            o_lonlat = new OpenLayers.LonLat(o.lon, o.lat),
+            o_pixel = this.mapLayer.getViewPortPxFromLonLat(o_lonlat),
+            c = this.mapLayer.map.center,
+            c_lonlat = new OpenLayers.LonLat(c.lon, c.lat),
+            c_pixel = this.mapLayer.getViewPortPxFromLonLat(c_lonlat);
 
-            return { 
-                x: o_pixel.x - c_pixel.x,
-                y: o_pixel.y - c_pixel.y 
-            };
-
-        },
+        return { 
+            x: o_pixel.x - c_pixel.x,
+            y: o_pixel.y - c_pixel.y 
+        };
+    },
     setDataSet: function(obj){
         var set = {},
         dataset = obj.data,
@@ -65,29 +71,24 @@ OpenLayers.Layer.Heatmap = OpenLayers.Class(OpenLayers.Layer, {
 
         set.max = obj.max;
         set.data = [];
-        // get the pixels for all the lonlat entries
-            while(dlen--){
-                entry = dataset[dlen],
-                lonlat = entry.lonlat.clone().transform(this.projection, this.map.getProjectionObject()),
-                pixel = this.roundPixels(this.getViewPortPxFromLonLat(lonlat));
-                    
-                if(pixel){
-                    set.data.push({x: pixel.x, y: pixel.y, count: entry.count});
-                }
+        while(dlen--){  // get the pixels for all the lonlat entries
+            entry = dataset[dlen],
+            lonlat = entry.lonlat.clone().transform(this.projection, this.map.getProjectionObject()),
+            pixel = this.roundPixels(this.getViewPortPxFromLonLat(lonlat));
+                
+            if(pixel){
+                set.data.push({x: pixel.x, y: pixel.y, count: entry.count});
             }
+        }
         this.tmpData = obj;
         this.heatmap.store.setDataSet(set);
     },
     // we don't want to have decimal numbers such as xxx.9813212 since they slow canvas performance down + don't look nice
     roundPixels: function(p){
-        if(p.x < 0 || p.y < 0){
-            return false;
-            }
-
-            p.x = (p.x >> 0);
+        if(p.x < 0 || p.y < 0){return false;}
+        p.x = (p.x >> 0);
         p.y = (p.y >> 0);
-
-            return p;
+        return p;
     },
     // same procedure as setDataSet
     addDataPoint: function(lonlat){
@@ -95,21 +96,20 @@ OpenLayers.Layer.Heatmap = OpenLayers.Class(OpenLayers.Layer, {
                 entry = {lonlat: lonlat},
                 args;
 
-            if(arguments.length == 2){
-                entry.count = arguments[1];
-            }
-
-            this.tmpData.data.push(entry);
-            
-            if(pixel){
-                args = [pixel.x, pixel.y];
-
         if(arguments.length == 2){
-            args.push(arguments[1]);
-        }
-        this.heatmap.store.addDataPoint.apply(this.heatmap.store, args);
+            entry.count = arguments[1];
         }
 
+        this.tmpData.data.push(entry);
+        
+        if(pixel){
+            args = [pixel.x, pixel.y];
+
+            if(arguments.length == 2){
+                args.push(arguments[1]);
+            }
+            this.heatmap.store.addDataPoint.apply(this.heatmap.store, args);
+        }
     },
     toggle: function(){
         this.heatmap.toggleDisplay();
@@ -117,6 +117,9 @@ OpenLayers.Layer.Heatmap = OpenLayers.Class(OpenLayers.Layer, {
     destroy: function() {
         // for now, nothing special to do here. 
         OpenLayers.Layer.Grid.prototype.destroy.apply(this, arguments);  
+    },
+    setVisibility: function(v) {
+        this.heatmap.setVisibility(v);
     },
     CLASS_NAME: "OpenLayers.Layer.Heatmap"
 });

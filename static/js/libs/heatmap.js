@@ -9,10 +9,12 @@
 (function(w){
     // the heatmapFactory creates heatmap instances
     var heatmapFactory = (function(){
+
     // store object constructor
     // a heatmap contains a store
     // the store has to know about the heatmap in order to trigger heatmap updates when datapoints get added
     var store = function store(hmap){
+
         var _ = {
             // data is a two dimensional array
             // a datapoint gets saved as data[point-x-value][point-y-value]
@@ -23,22 +25,35 @@
         };
         // the max occurrence - the heatmaps radial gradient alpha transition is based on it
         this.max = 1;
-        this.get = function(key){return _[key];};
-        this.set = function(key, value){_[key] = value;};
+
+        this.get = function(key){
+            return _[key];
+        };
+        this.set = function(key, value){
+            _[key] = value;
+        };
     }
 
     store.prototype = {
         // function for adding datapoints to the store
         // datapoints are usually defined by x and y but could also contain a third parameter which represents the occurrence
-        addDataPoint: function(x, y) {
-            if(x < 0 || y < 0) return;
+        addDataPoint: function(x, y){
+            if(x < 0 || y < 0)
+                return;
+
             var me = this,
                 heatmap = me.get("heatmap"),
                 data = me.get("data");
-            if(!data[x]) data[x] = [];
-            if(!data[x][y]) data[x][y] = 0;
+
+            if(!data[x])
+                data[x] = [];
+
+            if(!data[x][y])
+                data[x][y] = 0;
+
             // if count parameter is set increment by count otherwise by 1
             data[x][y]+=(arguments.length<3)?1:arguments[2];
+            
             me.set("data", data);
             // do we have a new maximum?
             if(me.max < data[x][y]){
@@ -55,27 +70,34 @@
                 data = [],
                 d = obj.data,
                 dlen = d.length;
-            heatmap.clear();    // clear the heatmap before the data set gets drawn
+            // clear the heatmap before the data set gets drawn
+            heatmap.clear();
             this.max = obj.max;
             // if a legend is set, update it
             heatmap.get("legend") && heatmap.get("legend").update(obj.max);
+            
             if(internal != null && internal){
                 for(var one in d){
                     // jump over undefined indexes
-                    if(one === undefined) continue;
+                    if(one === undefined)
+                        continue;
                     for(var two in d[one]){
                         if(two === undefined)
                             continue;
                         // if both indexes are defined, push the values into the array
-                        heatmap.drawAlpha(one, two, d[one][two], false);
+                        heatmap.drawAlpha(one, two, d[one][two], false);   
                     }
                 }
-            } else {
+            }else{
                 while(dlen--){
                     var point = d[dlen];
                     heatmap.drawAlpha(point.x, point.y, point.count, false);
-                    if(!data[point.x]) data[point.x] = [];
-                    if(!data[point.x][point.y]) data[point.x][point.y] = 0;
+                    if(!data[point.x])
+                        data[point.x] = [];
+
+                    if(!data[point.x][point.y])
+                        data[point.x][point.y] = 0;
+
                     data[point.x][point.y] = point.count;
                 }
             }
@@ -86,6 +108,7 @@
             var me = this,
                 data = me.get("data"),
                 exportData = [];
+
             for(var one in data){
                 // jump over undefined indexes
                 if(one === undefined)
@@ -97,20 +120,40 @@
                     exportData.push({x: parseInt(one, 10), y: parseInt(two, 10), count: data[one][two]});
                 }
             }
+
             return { max: me.max, data: exportData };
+        },
+        generateRandomDataSet: function(points){
+            var heatmap = this.get("heatmap"),
+            w = heatmap.get("width"),
+            h = heatmap.get("height");
+            var randomset = {},
+            max = Math.floor(Math.random()*1000+1);
+            randomset.max = max;
+            var data = [];
+            while(points--){
+                data.push({x: Math.floor(Math.random()*w+1), y: Math.floor(Math.random()*h+1), count: Math.floor(Math.random()*max+1)});
+            }
+            randomset.data = data;
+            this.setDataSet(randomset);
         }
     };
 
     var legend = function legend(config){
         this.config = config;
+
         var _ = {
             element: null,
             labelsEl: null,
             gradientCfg: null,
             ctx: null
         };
-        this.get = function(key){return _[key];};
-        this.set = function(key, value){_[key] = value;};
+        this.get = function(key){
+            return _[key];
+        };
+        this.set = function(key, value){
+            _[key] = value;
+        };
         this.init();
     };
     legend.prototype = {
@@ -124,14 +167,18 @@
                 labelsEl = document.createElement("ul"),
                 labelsHtml = "",
                 grad, element, gradient, positionCss = "";
+ 
             me.processGradientObject();
+            
             // Positioning
+
             // top or bottom
             if(position.indexOf('t') > -1){
                 positionCss += 'top:'+offset+'px;';
             }else{
                 positionCss += 'bottom:'+offset+'px;';
             }
+
             // left or right
             if(position.indexOf('l') > -1){
                 positionCss += 'left:'+offset+'px;';
@@ -510,14 +557,17 @@
                     xc = x + (1.5 * radius) >> 0, yc = y + (1.5 * radius) >> 0;
 
                 ctx.shadowColor = ('rgba(0,0,0,'+((count)?(count/me.store.max):'0.1')+')');
+
                 ctx.shadowOffsetX = 15000; 
                 ctx.shadowOffsetY = 15000; 
                 ctx.shadowBlur = 15; 
+
                 ctx.beginPath();
                 ctx.arc(x - 15000, y - 15000, radius, 0, Math.PI * 2, true);
                 ctx.closePath();
                 ctx.fill();
-                if(colorize){ // finally colorize the area
+                if(colorize){
+                    // finally colorize the area
                     me.colorize(xb,yb);
                 }else{
                     // or update the boundaries for the area that then should be colorized
@@ -535,17 +585,12 @@
                     }
                 }
         },
-        toggleDisplay: function(){
-                var me = this,
-                    visible = me.get("visible"),
-                canvas = me.get("canvas");
-
-                if(!visible)
-                    canvas.style.display = "block";
-                else
-                    canvas.style.display = "none";
-
-                me.set("visible", !visible);
+        setVisibility: function(v) {
+            this.set("visible", v);
+            this.get("canvas").style.display = ((v) ? "block" : "none");
+        },
+        toggleDisplay: function() {
+            this.setVisibility(!this.get("visible"));
         },
         // dataURL export
         getImageData: function(){
