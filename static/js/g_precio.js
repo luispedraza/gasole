@@ -10,6 +10,7 @@ var infoDiv = null;
 var openMap = null;
 var openMapOSM = null;
 var heatmap = null;
+var heatPriceMap = null;
 var MAP_LIMITS = [27.5244, -18.4131, 43.3781, 3.8672];	// vista inicial de open maps (Todas España)
 var NBINS = 10; // Para el histograma
 
@@ -73,6 +74,7 @@ function circle2path(x , y, r) // x and y are center and r is the radius
 	return s;
 }
 
+/* Actualización del mapa de Raphael */
 function raphaelUpdate() {
 	var stats = theGasole.stats;
 	// rango de precios
@@ -204,24 +206,45 @@ function openMapinit() {
 
 /* Histograma de concentración de gasolineras */
 function initHeatMap() {
+	var options = {visible: true, 
+		radius:6,
+		gradient: { 0.5: "cyan", 0.75: "blue", 1.0: "magenta"}};
 	heatmap = new OpenLayers.Layer.Heatmap(
-		"Concentración de gasolineras", 
-		openMap, openMapOSM, 
-		{visible: true, radius:6},
+		"Mapa de calor de concentración", 
+		openMap, openMapOSM, options,
 		{isBaseLayer: false, opacity: 0.25, projection: new OpenLayers.Projection("EPSG:4326")});
-	openMap.addLayer(heatmap);
+	options = {visible: true, 
+		radius:1,
+		gradient: { 0.5: "green", 0.75: "yellow", 1.0: "red"}};
+	heatPriceMap = new OpenLayers.Layer.Heatmap(
+		"Mapa de calor de precios", 
+		openMap, openMapOSM, options,
+		{isBaseLayer: false, opacity: 0.25, projection: new OpenLayers.Projection("EPSG:4326")});
+	openMap.addLayer(heatPriceMap);
 }
 function updateHeatMap() {
-	var heatData = {max: 1, data: []};
+	// var heatData = {max: 1, data: []};
+	// var heatPoints = heatData.data;
+	// function addStation(s) {
+	// 	if (s.hasOwnProperty("g")) 
+	// 		heatPoints.push({lonlat: new OpenLayers.LonLat(s.g[1], s.g[0]), count: 1});
+	// };
+	// var gasoleData = {}
+	// for (var p in REGIONS) if (REGIONS[p].selected) gasoleData[p] = theGasole.info[p];
+	// gasoleProcess(gasoleData, addStation);
+	// heatmap.setDataSet(heatData);
+
+	if (!theStats.stats[TYPE]) return;
+	var heatData = {max: theStats.stats[TYPE].max, data: []};
 	var heatPoints = heatData.data;
 	function addStation(s) {
-		if (s.hasOwnProperty("g")) 
-			heatPoints.push({lonlat: new OpenLayers.LonLat(s.g[1], s.g[0]), count: 1});
+		if (s.hasOwnProperty("g") && s.o.hasOwnProperty(TYPE)) 
+			heatPoints.push({lonlat: new OpenLayers.LonLat(s.g[1], s.g[0]), count: s.o[TYPE]});
 	};
 	var gasoleData = {}
 	for (var p in REGIONS) if (REGIONS[p].selected) gasoleData[p] = theGasole.info[p];
 	gasoleProcess(gasoleData, addStation);
-	heatmap.setDataSet(heatData);
+	heatPriceMap.setDataSet(heatData);
 }
 
 /* Todas las funciones de control de los gráficos */

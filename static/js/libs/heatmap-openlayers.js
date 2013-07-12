@@ -21,24 +21,14 @@ OpenLayers.Layer.Heatmap = OpenLayers.Class(OpenLayers.Layer, {
         initialize: function(name, map, mLayer, hmoptions, options){
             var heatdiv = document.createElement("div"),
                 handler;
-
             OpenLayers.Layer.prototype.initialize.apply(this, [name, options]);
-
         heatdiv.style.cssText = "position:absolute;width:"+map.size.w+"px;height:"+map.size.h+"px;";
-        // this will be the heatmaps element
-        this.div.appendChild(heatdiv);
-        // add to our heatmap.js config
-        hmoptions.element = heatdiv;
+        this.div.appendChild(heatdiv);  // this will be the heatmaps element
+        hmoptions.element = heatdiv;    // add to our heatmap.js config
         this.mapLayer = mLayer;
         this.map = map;
-            // create the heatmap with passed heatmap-options
-        this.heatmap = h337.create(hmoptions);
-
-            handler = function(){ 
-                if(this.tmpData.max){
-                    this.updateLayer(); 
-                }
-            };
+        this.heatmap = h337.create(hmoptions);  // create the heatmap with passed heatmap-options
+        handler = function(){if(this.tmpData.max){this.updateLayer();}};
         // on zoomend and moveend we have to move the canvas element and redraw the datapoints with new positions
         map.events.register("zoomend", this, handler);
         map.events.register("moveend", this, handler);
