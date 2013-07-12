@@ -253,6 +253,7 @@ function initControl() {
 	})
 	// Ocultar todos los desplegables
 	addEvent(document, "click", function() {
+		if (document.getElementsByClassName("picker").length) return;
 		document.getElementById("prov-list").className =
 		document.getElementById("type-list").className = "";
 	})
