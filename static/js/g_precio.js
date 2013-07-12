@@ -9,14 +9,16 @@ var infoDiv = null;
 
 var openMap = null;
 var openMapOSM = null;
-var markersLayer = null,
-	heatmapLayer = null;
+var markersLayer = null,	// marcadores de gasolineras
+	heatmapLayer = null,	// concentración de gasolineras
+	priceLayer = null;		// retícula de precio de gasolineras
 var MAP_LIMITS = [27.5244, -18.4131, 43.3781, 3.8672];	// vista inicial de open maps (Todas España)
-var NBINS = 10; // Para el histograma
+var NBINS = 10; 			// Para el histograma
+var RET_SIZE = 10000;		// TAMAÑO DE LA RETÍCULA EN km
 
 // Regiones a mostrar en las gráficas
 REGIONS = {}		// Guardará las regiones a mostrar y sus colores
-for (var p in PROVS) { REGIONS[p] = {id: PROVS[p], color: null, picker: null, selected: false, layer: null};}
+for (var p in PROVS) { REGIONS[p] = {id: PROVS[p], color: null, picker: null, selected: false};}
 
 var BRANDS = {"alcampo":1,"avia":1, "bp":1, "campsa":1,"carrefour":1,"cepsa":1,"eroski":1,"galp":1,"leclerc":1, "makro":1,"petronor":1,"repsol":1,"saras":1, "shell":1, "otras":1};
 // ¿Es la marca una de las principales ?
@@ -108,7 +110,6 @@ function raphaelSelectProvince(e) {
 		while(i--) if (htmlsvg[i].id == e) e = htmlsvg[i].e;
 	}
 	if (e.isSelected) {
-			showMarkers(e.pname, false);
 			e.attr("stroke-width", 0);
 			e.isSelected=false;
 
@@ -120,7 +121,6 @@ function raphaelSelectProvince(e) {
 		var bl = reprojectLatLon([a[0],a[2]]); // bottom-left
 		var tr = reprojectLatLon([a[1],a[3]]); // top-right
 		openMap.zoomToExtent([bl.lon, bl.lat, tr.lon, tr.lat]);
-		showMarkers(e.pname, true);
 		e.attr("stroke-width", 3);
 		e.isSelected=true;
 	}
@@ -154,35 +154,34 @@ function raphaelInit() {
 }
 
 function updateMarkers() {
-	// var data = theGasole.info;
-	// for (var p in data) {
-	// 	var prov = data[p];
-	// 	for (var t in prov) {
-	// 		var town = prov[t];
-	// 		for (var s in town) {
-	// 			var station = town[s];
-	// 			if (station.o.hasOwnProperty(TYPE) && station.g) {
-	// 				var icon = new OpenLayers.Icon(null, new OpenLayers.Size(30,20));
-	// 				var logo = getLogo(station.l);
-	// 				icon.imageDiv.className = "logo "+(logo || "otra");
-	// 				var lonlat = reprojectLatLon(station.g);
-	// 				var marker = new OpenLayers.Marker(lonlat, icon);
-	// 				marker.station = encodeName(p)+"/"+encodeName(t)+"/"+encodeName(s);
-	// 				marker.events.register("click", marker, function() {
-	// 					window.location = "/ficha/"+this.station;
-	// 				});
-	// 				markers.addMarker(marker);
-	// 			}
-	// 		}
-	// 	}
-	// 	REGIONS[p].layer = markers;
-	// }
-}
-
-// Muestra/Oculta marcadores de una provincia
-function showMarkers(pname, show) {
-	var markers = REGIONS[pname].layer;
-	if (markers) markers.display(show);
+	markersLayer.clearMarkers();
+	if (openMap.getZoom()<10) return;
+	var bounds = markersLayer.getExtent();
+	var data = theGasole.info;
+	for (var p in REGIONS) {
+		if (!REGIONS[p].selected) continue;
+		var prov = data[p];
+		for (var t in prov) {
+			var town = prov[t];
+			for (var s in town) {
+				var station = town[s];
+				if (station.o.hasOwnProperty(TYPE) && station.g) {
+					var lonlat = station.g;
+					if (bounds.containsLonLat(lonlat)) {
+						var icon = new OpenLayers.Icon(null, new OpenLayers.Size(30,20));
+						var logo = getLogo(station.l);
+						icon.imageDiv.className = "logo "+(logo || "otra");
+						var marker = new OpenLayers.Marker(lonlat, icon);
+						marker.station = encodeName(p)+"/"+encodeName(t)+"/"+encodeName(s);
+						marker.events.register("click", marker, function() {
+							window.location = "/ficha/"+this.station;
+						});
+						markersLayer.addMarker(marker);
+					}
+				}
+			}
+		}
+	}
 }
 
 /* Inicialización de open map */
@@ -199,6 +198,13 @@ function openMapinit() {
 	function initMarkers() {
 		var markers = new OpenLayers.Layer.Markers("Marcadores de gasolineras");
 		openMap.addLayer(markers);
+		// Aprovechamos para calcular los objetos lonlat
+		gasoleProcess(theGasole.info, function(s) {
+			if (s.g) s.g = reprojectLatLon(s.g);
+		})
+		openMap.events.register("zoomend", markers, updateMarkers);
+        openMap.events.register("moveend", markers, updateMarkers);
+		return markers;
 	}
 	/* Histograma de concentración de gasolineras */
 	function initHeatMap() {
@@ -206,14 +212,20 @@ function openMapinit() {
 			radius:5,
 			gradient: {0.5: "cyan", 0.7: "blue", 1.0: "magenta"}};
 		var heatlayer = new OpenLayers.Layer.Heatmap(
-			"Mapa de calor de concentración", 
+			"Concentración: Mapa de calor", 
 			openMap, openMapOSM, options,
 			{isBaseLayer: false, opacity: 0.2, projection: new OpenLayers.Projection("EPSG:4326")});
 		openMap.addLayer(heatlayer);
 		return heatlayer;
 	}
+	function initPriceGrid() {
+		var retLayer = new OpenLayers.Layer.Vector("Precio: Retícula coloreada");
+		openMap.addLayer(retLayer);
+		return retLayer;
+	}
 	markersLayer = initMarkers();
 	heatLayer = initHeatMap();
+	priceLayer = initPriceGrid();
 }
 
 
