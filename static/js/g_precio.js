@@ -16,7 +16,7 @@ var markersLayer = null,	// marcadores de gasolineras
 	priceLayer = null;		// retícula de precio de gasolineras
 var MAP_LIMITS = [27.5244, -18.4131, 43.3781, 3.8672];	// vista inicial de open maps (Todas España)
 var NBINS = 10; 			// Para el histograma
-var GRID_RESOLUTION = 20000;		// TAMAÑO DE LA RETÍCULA EN km (50 km)
+var GRID_RESOLUTION = 40000;		// TAMAÑO DE LA RETÍCULA EN km (50 km)
 
 // Regiones a mostrar en las gráficas
 REGIONS = {}		// Guardará las regiones a mostrar y sus colores
@@ -189,7 +189,7 @@ function updateMarkers() {
 /* Inicialización de open map */
 function openMapinit() {
 	openMap = new OpenLayers.Map("openmap")
-	openMapOSM = new OpenLayers.Layer.OSM("Open Street Map");
+	openMapOSM = new OpenLayers.Layer.OSM("OpenStreet Map");
 	var aliasproj = new OpenLayers.Projection("EPSG:3857");
 	openMapOSM.projection = aliasproj;
 	openMap.addLayer(openMapOSM);
@@ -319,8 +319,10 @@ function initControl() {
 		spinner.appendChild(value);
 		div.appendChild(spinner);
 		function valueChange(m) {
-			GRID_RESOLUTION+=(m*20000);
-			value.textContent = "Resolución: " + GRID_RESOLUTION/1000 + " km.";
+			var newValue = GRID_RESOLUTION+m*20000;
+			if ((newValue<=0) || (newValue>300000)) return;
+			GRID_RESOLUTION=newValue;
+			value.textContent = "Resolución: " + newValue/1000 + " km.";
 			computePriceGrid();
 			updatePriceGrid();
 		}
