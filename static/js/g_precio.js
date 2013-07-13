@@ -248,7 +248,7 @@ function updatePriceGrid() {
 				color = pickColor(data.p, pmin, pmax);
 			var poly = new OpenLayers.Bounds(xo,yo,xo+GRID_RESOLUTION,yo+GRID_RESOLUTION).toGeometry();
 			var polygonFeature = new OpenLayers.Feature.Vector(poly);
-			polygonFeature.style = {fillColor: color, strokeColor: "none", fillOpacity: .8};
+			polygonFeature.style = {fillColor: color, strokeColor: "#fff", strokeWidth: 1, fillOpacity: .5};
 			features.push(polygonFeature);
 		}
 	}
@@ -303,48 +303,49 @@ function initControl() {
 		document.getElementById("type-list").className = "";
 	})
 	// Control de capas del mapa
-	function insertSpinner(div) {
+	/** @constructor */
+	function Spinner(div) {
+		if (div.querySelector(".spinner")) return;
 		var spinner = document.createElement("div");
 			spinner.className = "spinner";
-			spinner.textContent = "Resolución: " + GRID_RESOLUTION + "km.";
+		var value = document.createElement("div");
+		value.textContent = "Resolución: " + GRID_RESOLUTION/1000 + " km.";
 		var bUp = document.createElement("div");
 			bUp.className = "button up";
 			spinner.appendChild(bUp);
 		var bDown = document.createElement("div");
 			bDown.className = "button down";
 			spinner.appendChild(bDown);
+		spinner.appendChild(value);
 		div.appendChild(spinner);
-		bUp.onclick = function(e) {
-			// stopEvent(e);
-			GRID_RESOLUTION+=20000;
-			this.parentNode.textContent = "Resolución: " + GRID_RESOLUTION + "km.";
+		function valueChange(m) {
+			GRID_RESOLUTION+=(m*20000);
+			value.textContent = "Resolución: " + GRID_RESOLUTION/1000 + " km.";
+			computePriceGrid();
 			updatePriceGrid();
 		}
-		bDown.onclick = function(e) {
-			// stopEvent(e);
-			GRID_RESOLUTION-=20000;
-			this.parentNode.textContent = "Resolución: " + GRID_RESOLUTION + "km.";
-			updatePriceGrid();
-		}
+		bUp.onclick = function(e) {stopEvent(e);valueChange(1)};
+		bDown.onclick = function(e) {stopEvent(e);valueChange(-1)};
 	}
 	var layers = document.getElementById("layers-list");
 	for (var l=0,ll=openMap.layers.length; l<ll; l++) {
 		var layer = openMap.layers[l];
 		var li = document.createElement("li");
 		if (layer.getVisibility()) li.className="on";
-		li.textContent = layer.name;
+		var name = document.createElement("div");
+		name.className = "layer-name";
+		name.textContent = layer.name;
+		li.appendChild(name);
 		layers.appendChild(li);
-		console.log(layer.hasResolution);
-		if (layer.hasResolution) insertSpinner(li);		// Control de resolución de rejilla
+		if (layer.hasResolution) new Spinner(li);
 		addEvent(li, "click", function() {
-			console.log("tetas");
-			var layers = openMap.layers;
-			for (var l=0,ll=layers.length; l<ll; l++) 
-				if (this.textContent==layers[l].name) {
-					var visible = !(this.className=="on");
-					layers[l].setVisibility(visible);
-					this.className = (visible) ? "on" : "";
-				} 
+			var name = this.getElementsByClassName("layer-name")[0].textContent;
+			var layer = openMap.getLayersByName(name)[0];
+			if (layer) {
+				var visible = !(this.className=="on");
+				layer.setVisibility(visible);
+				this.className = (visible) ? "on" : "";
+			}
 		});
 	}
 }
@@ -732,6 +733,7 @@ function computePriceGrid() {
 		}
 	});
 	theGrid = {pmin:pmin, pmax:pmax, ox: blx, oy: bly, grid: result};
+	console.log(theGrid);
 }
 
 
