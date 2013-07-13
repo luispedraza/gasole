@@ -360,11 +360,16 @@ input[type=radio], input[type=checkbox] {
   width: 30px;
   overflow: hidden;
   padding: 5px;
-  -webkit-transition: max-height .2s;
-     -moz-transition: max-height .2s;
-      -ms-transition: max-height .2s;
-       -o-transition: max-height .2s;
-          transition: max-height .2s;
+  -webkit-transition: max-height .7s;
+     -moz-transition: max-height .7s;
+      -ms-transition: max-height .7s;
+       -o-transition: max-height .7s;
+          transition: max-height .7s;
+  -webkit-transition: background-color .7s;
+     -moz-transition: background-color .7s;
+      -ms-transition: background-color .7s;
+       -o-transition: background-color .7s;
+          transition: background-color .7s;
 }
 #layers:hover {
   max-height: 300px;

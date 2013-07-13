@@ -236,24 +236,22 @@ function openMapinit() {
 function updatePriceGrid() {
 	if (!theGrid) return;
 	priceLayer.removeAllFeatures();	// limpieza
-	var ox = theGrid.ox;
-	var oy = theGrid.oy;
 	var pmin = theGrid.pmin;
 	var pmax = theGrid.pmax;
 	var grid = theGrid.grid;
 	var features = [];
-	for (var x in grid)
+	for (var x in grid) {
+		var xo = grid[x].x;
 		for (var y in grid[x]) {
 			var data = grid[x][y];
-			var bx = ox+x*GRID_RESOLUTION;
-			var by = oy+y*GRID_RESOLUTION;
-			var color = pickColor(data.p, pmin, pmax);
-			var poly = new OpenLayers.Bounds(bx,by,bx+GRID_RESOLUTION,by+GRID_RESOLUTION).toGeometry();
+			var yo = data.y,
+				color = pickColor(data.p, pmin, pmax);
+			var poly = new OpenLayers.Bounds(xo,yo,xo+GRID_RESOLUTION,yo+GRID_RESOLUTION).toGeometry();
 			var polygonFeature = new OpenLayers.Feature.Vector(poly);
 			polygonFeature.style = {fillColor: color, strokeColor: "none", fillOpacity: .8};
 			features.push(polygonFeature);
-			
 		}
+	}
 	priceLayer.addFeatures(features);
 }
 
@@ -308,6 +306,7 @@ function initControl() {
 	function insertSpinner(div) {
 		var spinner = document.createElement("div");
 			spinner.className = "spinner";
+			spinner.textContent = "Resolución: " + GRID_RESOLUTION + "km.";
 		var bUp = document.createElement("div");
 			bUp.className = "button up";
 			spinner.appendChild(bUp);
@@ -315,6 +314,18 @@ function initControl() {
 			bDown.className = "button down";
 			spinner.appendChild(bDown);
 		div.appendChild(spinner);
+		bUp.onclick = function(e) {
+			// stopEvent(e);
+			GRID_RESOLUTION+=20000;
+			this.parentNode.textContent = "Resolución: " + GRID_RESOLUTION + "km.";
+			updatePriceGrid();
+		}
+		bDown.onclick = function(e) {
+			// stopEvent(e);
+			GRID_RESOLUTION-=20000;
+			this.parentNode.textContent = "Resolución: " + GRID_RESOLUTION + "km.";
+			updatePriceGrid();
+		}
 	}
 	var layers = document.getElementById("layers-list");
 	for (var l=0,ll=openMap.layers.length; l<ll; l++) {
@@ -326,6 +337,7 @@ function initControl() {
 		console.log(layer.hasResolution);
 		if (layer.hasResolution) insertSpinner(li);		// Control de resolución de rejilla
 		addEvent(li, "click", function() {
+			console.log("tetas");
 			var layers = openMap.layers;
 			for (var l=0,ll=layers.length; l<ll; l++) 
 				if (this.textContent==layers[l].name) {
@@ -690,39 +702,33 @@ function Brands(spread) {
 /* Rejilla de precios, según tamaño GRID_RESOLUTION */
 function computePriceGrid() {
 	if (!theStats.stats[TYPE]) return;
-	var bounds = theStats.stats[TYPE].g;
-	var bl = reprojectLatLon([bounds[0],bounds[2]]); // bottom-left
-	var tr = reprojectLatLon([bounds[1],bounds[3]]); // top-right
-	var width = tr.lon-bl.lon;
-	var height = tr.lat-bl.lat;
-	console.log(width, height);
-	var xBins = Math.ceil(width/GRID_RESOLUTION);		// Número de bins horizontales
-	var offsetX = (xBins*GRID_RESOLUTION-width)/2;
-	var yBins = Math.ceil(height/GRID_RESOLUTION);	// Número de bins verticales
-	var offsetY = (xBins*GRID_RESOLUTION-width)/2;
-	bl = bl.add(-offsetX,-offsetY);
-	var blx = bl.lon;
-	var bly = bl.lat;
-	tr = tr.add(offsetX,offsetY);
-
-	var result = {};
-	var pmin = 100, pmax = 0;
+	var bounds = theStats.stats[TYPE].g;				// límites del resultado
+	var bl = reprojectLatLon([bounds[0],bounds[2]]), 	// bottom-left
+		tr = reprojectLatLon([bounds[1],bounds[3]]), 	// top-right
+		width = tr.lon-bl.lon,
+		height = tr.lat-bl.lat;
+	var xBins = Math.ceil(width/GRID_RESOLUTION),		// Número de bins horizontales
+		yBins = Math.ceil(height/GRID_RESOLUTION);		// Número de bins verticales
+	var offsetX = (xBins*GRID_RESOLUTION - width)/2,
+		offsetY = (xBins*GRID_RESOLUTION - height)/2;
+	var blx = bl.lon-offsetX,
+		bly = bl.lat-offsetY;							// Orígenes de la cuadrícula
+	var result = {},
+		pmin = 100, 
+		pmax = 0;
+		var floor = Math.floor;
 	gasoleProcess(theInfo, function(s) {
 		if (s.ll && s.o[TYPE]) {
 			var price = s.o[TYPE];
 			if (price<pmin) pmin=price;
-			if (price>pmax) pmax=price;
-			var x = Math.floor((s.ll.lon-blx)/GRID_RESOLUTION);
-			if (!result[x]) result[x]={};
-			var resultx = result[x];
-			var y = Math.floor((s.ll.lat-bly)/GRID_RESOLUTION);
-			if (!resultx[y]) {
-				resultx[y] = {p: price, n: 1};
-			} 
-			else {
-				resultx[y].p = ((resultx[y].p*resultx[y].n)+price)/(++resultx[y].n);
-			}
-
+			else if (price>pmax) pmax=price;
+			var xindex = floor((s.ll.lon-blx)/GRID_RESOLUTION);
+			if (!result[xindex]) result[xindex] = {x: blx + xindex*GRID_RESOLUTION};
+			var resultx = result[xindex];
+			var yindex = floor((s.ll.lat-bly)/GRID_RESOLUTION);
+			if (!resultx[yindex]) resultx[yindex] = {y: bly + yindex*GRID_RESOLUTION, p: price, n: 1};
+			var resulty = resultx[yindex];
+			resulty.p = (resulty.p*resulty.n+price)/(++resulty.n);
 		}
 	});
 	theGrid = {pmin:pmin, pmax:pmax, ox: blx, oy: bly, grid: result};
