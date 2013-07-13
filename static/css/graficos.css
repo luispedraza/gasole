@@ -498,7 +498,6 @@ input:checked + label:before {
 .circle {
   stroke-width: 1px;
   stroke: #fff;
-  opacity: .8;
 }
 .spread {
   opacity: .8;
@@ -506,7 +505,6 @@ input:checked + label:before {
 .circle:hover {
   opacity: 1;
 }
-
 .axis path, .axis line {
   fill: none;
   stroke: #333;

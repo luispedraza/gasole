@@ -342,12 +342,12 @@ function Stats() {
 function GasoleStats(gasoleData, types) {
 	// Estadisticas de todos los datos de un objeto gasole
 	// types indica sobre qué tipos de quiere calcular la aestadística
-	if (typeof types == "undefined") types = null;
+	// if (typeof types == "undefined") types = null;
 	var stats = this.stats = {};						// estadísticas globales
 	this.provinces = {};								// estadísticas provinciales
 	function addData(datas, statP, statGlobal, o) {
-		if (!statP.hasOwnProperty(o)) statP[o] = new Stats();
-		if (!statGlobal.hasOwnProperty(o)) statGlobal[o] = new Stats();
+		if (!statP[o]) statP[o] = new Stats();
+		if (!statGlobal[o]) statGlobal[o] = new Stats();
 		statP[o].add(datas.o[o],[p,t,s],datas.g);
 		statGlobal[o].add(datas.o[o],[p,t,s],datas.g);
 	}
@@ -361,8 +361,7 @@ function GasoleStats(gasoleData, types) {
 				if (types) {
 					for (var i=types.length-1; i>=0; i--) {
 						var o = types[i];
-						if (datas.o.hasOwnProperty(o))
-							addData(datas, statp, stats, o);
+						if (datas.o[o]) addData(datas, statp, stats, o);
 					}
 				} else {
 					for (var o in datas.o) addData(datas, statp, stats, o);
@@ -556,12 +555,12 @@ function fillPriceDigits(div, price) {
 /* Función para procesar datos de gasole, que ejecuta
 el callback para cada estación encontrada */
 function gasoleProcess(ginfo, callback) {
-	for (var p in ginfo) {	// para todas las provincias
+	for (var p in ginfo) {						// para todas las provincias
 		var datap = ginfo[p];
-		for (var t in datap) {	// para todas las ciudades
+		for (var t in datap) {					// para todas las ciudades
 			var datat = datap[t];
-			for (var s in datat) {	// para todas las estaciones
-				callback(datat[s]);		// llamamos a la función callback
+			for (var s in datat) {				// para todas las estaciones
+				callback(datat[s],p,t,s);		// llamamos a la función callback
 			}
 		}
 	}

@@ -329,6 +329,7 @@ function Circles(spread) {
 		// Gráfico de bolas
 		// Número de gasolineras en el eje de las X
 		// Precio medio del combustible en el eje de las Y
+		var RZOOM = 3000;		// radio de zoom en una provincia
 		var stats = theStats.stats[TYPE];
 		showChartContainer("circles", stats!=null);
 		if (!stats) return;
@@ -463,35 +464,64 @@ function Circles(spread) {
 			.attr("cy", function(d){return y(d.n)})		// cantidad en coordenada Y
 			.attr("r", 0)
 			.attr("fill", function(d){return d.c})
+			.attr("opacity", .7)
 			.transition().delay(500).duration(500).ease("bounce").attr("r", function(d){return d.r});
 		circles.exit()
 			.transition().duration(500)
 			.attr("r", 0)
 			.remove();
 		// eventos
-		function provinceTooltip(d) {
-			var infoText = [prettyName(d.name)];
+		function provinceInfo(d) {
+			var name = d.name,
+				info = {},
+				cities = {};
+			info[name] = theInfo[name];
+			gasoleProcess(info, function(station,p,t,s) {
+				if (!station.o[TYPE]) return;
+				(cities[t] ? (cities[t]++) : (cities[t]=1));
+			});
+			var infoText = [prettyName(name)];
 			infoText.push(d.n + " puntos de venta");
+			infoText.push(" en " + Object.keys(cities).length +  " ciudades");
 			infoText.push("Precio medio: " + d.p.toFixed(3) + " €/l");
-			showTooltip(chart, infoText, 100, {cx:x(d.p), cy:y(d.n), r:d.r+2});
+			return infoText;
 		}
-		function provinceClick(pData) { /* Ciudades de una provincia */
-			var RZOOM = 3000;
+		function provinceHoverIn(d) {
+			var circle = d3.select(this);
+			if (circle.attr("r")!=RZOOM) {
+				circle.attr("opacity",1);
+				showTooltip(chart, provinceInfo(d), 100, {cx:x(d.p), cy:y(d.n), r:d.r+2});	
+			}
+		}
+		function provinceHoverOut(d) {
+			var circle = d3.select(this);
+			if (circle.attr("r")!=RZOOM) {
+				circle.attr("opacity", .7);
+				hideTooltip();	
+			} 
+		}
+		function hideTooltip() {
+			chart.select("#tooltip").remove();
+		}
+		function provinceClick(d) { /* Ciudades de una provincia */
 			if (d3.select(this).attr("r")==RZOOM) {
 				x.domain([xMin,xMax]);
 				y.domain([yMin,yMax]);
 				updateAxes();
 				chart.selectAll(".city").remove();	// Borrar todas las ciudades
 				circles.transition().duration(500).ease("bounce").attr("r",function(d) {return d.r});
+				hideTooltip();
 				return;
 			}
-			var pname = pData.name;
+			hideTooltip();
+			showTooltip(chart, provinceInfo(d), 100, {corner:true});
+			var pname = d.name;
 			// Primero redibujar provincias
 			circles.transition().duration(500)
 				.attr("r",function(d) {return ((d.name==pname) ? RZOOM : 0)});
 			var pdata = theInfo[pname];					// province data
 			var pstats = theStats.provinces[pname][TYPE];	// province stats
-			var color = pData.c;
+			var color = d.c;
 			var cdata = [];			// cities data
 			var nMax = 0;
 			for (var t in pdata) {
@@ -517,12 +547,15 @@ function Circles(spread) {
 				.attr("width", 0).attr("height", 0)
 				.attr("fill", "#fff")
 				.transition().delay(500).duration(500).ease("bounce")
-					.attr("x", function(d){return x(d.d.mu)-10})	
-					.attr("y", function(d){return y(d.d.n)-10})	
-					.attr("width", 20).attr("height", 20);
+					.attr("x", function(d){return x(d.d.mu)-5})	
+					.attr("y", function(d){return y(d.d.n)-5})	
+					.attr("width", 10).attr("height", 10);
+			cities.on("mouseover", function(d) {
+				console.log(d);
+			})
 		}
-		circles.on("mouseover", provinceTooltip);
-		circles.on("mouseout", function() {chart.select("#tooltip").remove()});
+		circles.on("mouseover", provinceHoverIn);
+		circles.on("mouseout", provinceHoverOut);
 		circles.on("mousedown", provinceClick);
 	}
 }
@@ -943,15 +976,20 @@ function Histogram() {
 
 /* Muestra la pelota informativa del elemento seleccionado */
 function showTooltip(where, infoText, R, options) {
-	var node = where.node();
-	var mousePos = d3.mouse(node);
-	var x = mousePos[0], y = mousePos[1];
-	var width = parseInt(where.attr("width").split("px")[0]);
-	var height = parseInt(where.attr("height").split("px")[0]);
-	var posX = x + ((x<(width/2)) ? 100 : -100);
-	var posY = y + ((y<(height/2)) ? 100 : -100);
-	var lineIni = -Math.floor(infoText.length/2);
 	var tooltip = where.append("g").attr("id", "tooltip");
+	var lineIni = -Math.floor(infoText.length/2);
+	var posX, posY;
+	if (options && options.corner) {
+		posX = 100; posY = 100;
+	} else {
+		var node = where.node();
+		var mousePos = d3.mouse(node);
+		var x = mousePos[0], y = mousePos[1];
+		var width = parseInt(where.attr("width").split("px")[0]);
+		var height = parseInt(where.attr("height").split("px")[0]);
+		var posX = x + ((x<(width/2)) ? 100 : -100);
+		var posY = y + ((y<(height/2)) ? 100 : -100);	
+	}
 	if (options && options.hasOwnProperty("r")) {
 		var Dy = posY-options.cy;
 		var Dx = posX-options.cx;
