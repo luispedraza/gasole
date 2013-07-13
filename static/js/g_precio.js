@@ -16,7 +16,7 @@ var markersLayer = null,	// marcadores de gasolineras
 	priceLayer = null;		// retícula de precio de gasolineras
 var MAP_LIMITS = [27.5244, -18.4131, 43.3781, 3.8672];	// vista inicial de open maps (Todas España)
 var NBINS = 10; 			// Para el histograma
-var GRID_SIZE = 20000;		// TAMAÑO DE LA RETÍCULA EN km (50 km)
+var GRID_RESOLUTION = 20000;		// TAMAÑO DE LA RETÍCULA EN km (50 km)
 
 // Regiones a mostrar en las gráficas
 REGIONS = {}		// Guardará las regiones a mostrar y sus colores
@@ -223,6 +223,7 @@ function openMapinit() {
 	/* Retícula de precios de combustible */
 	function initPriceGrid() {
 		var retLayer = new OpenLayers.Layer.Vector("Precio: Retícula coloreada");
+		retLayer.hasResolution = true;
 		openMap.addLayer(retLayer);
 		return retLayer;
 	}
@@ -234,6 +235,7 @@ function openMapinit() {
 /* Actualización de la rejilla de precios */
 function updatePriceGrid() {
 	if (!theGrid) return;
+	priceLayer.removeAllFeatures();	// limpieza
 	var ox = theGrid.ox;
 	var oy = theGrid.oy;
 	var pmin = theGrid.pmin;
@@ -243,10 +245,10 @@ function updatePriceGrid() {
 	for (var x in grid)
 		for (var y in grid[x]) {
 			var data = grid[x][y];
-			var bx = ox+x*GRID_SIZE;
-			var by = oy+y*GRID_SIZE;
+			var bx = ox+x*GRID_RESOLUTION;
+			var by = oy+y*GRID_RESOLUTION;
 			var color = pickColor(data.p, pmin, pmax);
-			var poly = new OpenLayers.Bounds(bx,by,bx+GRID_SIZE,by+GRID_SIZE).toGeometry();
+			var poly = new OpenLayers.Bounds(bx,by,bx+GRID_RESOLUTION,by+GRID_RESOLUTION).toGeometry();
 			var polygonFeature = new OpenLayers.Feature.Vector(poly);
 			polygonFeature.style = {fillColor: color, strokeColor: "none", fillOpacity: .8};
 			features.push(polygonFeature);
@@ -303,6 +305,17 @@ function initControl() {
 		document.getElementById("type-list").className = "";
 	})
 	// Control de capas del mapa
+	function insertSpinner(div) {
+		var spinner = document.createElement("div");
+			spinner.className = "spinner";
+		var bUp = document.createElement("div");
+			bUp.className = "button up";
+			spinner.appendChild(bUp);
+		var bDown = document.createElement("div");
+			bDown.className = "button down";
+			spinner.appendChild(bDown);
+		div.appendChild(spinner);
+	}
 	var layers = document.getElementById("layers-list");
 	for (var l=0,ll=openMap.layers.length; l<ll; l++) {
 		var layer = openMap.layers[l];
@@ -310,6 +323,8 @@ function initControl() {
 		if (layer.getVisibility()) li.className="on";
 		li.textContent = layer.name;
 		layers.appendChild(li);
+		console.log(layer.hasResolution);
+		if (layer.hasResolution) insertSpinner(li);		// Control de resolución de rejilla
 		addEvent(li, "click", function() {
 			var layers = openMap.layers;
 			for (var l=0,ll=layers.length; l<ll; l++) 
@@ -336,7 +351,7 @@ function Circles(spread) {
 		var div = d3.select("#circles");
 		var provinces = theStats.provinces;
 		var data = [];
-		var radius = 10;						// radio de las pelotas
+		var radius = 12;						// radio de las pelotas
 		var prices = [];
 		var xMin = stats.min;
 		var xMax = stats.max;
@@ -672,7 +687,7 @@ function Brands(spread) {
 	}
 }
 
-/* Rejilla de precios, según tamaño GRID_SIZE */
+/* Rejilla de precios, según tamaño GRID_RESOLUTION */
 function computePriceGrid() {
 	if (!theStats.stats[TYPE]) return;
 	var bounds = theStats.stats[TYPE].g;
@@ -681,10 +696,10 @@ function computePriceGrid() {
 	var width = tr.lon-bl.lon;
 	var height = tr.lat-bl.lat;
 	console.log(width, height);
-	var xBins = Math.ceil(width/GRID_SIZE);		// Número de bins horizontales
-	var offsetX = (xBins*GRID_SIZE-width)/2;
-	var yBins = Math.ceil(height/GRID_SIZE);	// Número de bins verticales
-	var offsetY = (xBins*GRID_SIZE-width)/2;
+	var xBins = Math.ceil(width/GRID_RESOLUTION);		// Número de bins horizontales
+	var offsetX = (xBins*GRID_RESOLUTION-width)/2;
+	var yBins = Math.ceil(height/GRID_RESOLUTION);	// Número de bins verticales
+	var offsetY = (xBins*GRID_RESOLUTION-width)/2;
 	bl = bl.add(-offsetX,-offsetY);
 	var blx = bl.lon;
 	var bly = bl.lat;
@@ -697,10 +712,10 @@ function computePriceGrid() {
 			var price = s.o[TYPE];
 			if (price<pmin) pmin=price;
 			if (price>pmax) pmax=price;
-			var x = Math.floor((s.ll.lon-blx)/GRID_SIZE);
+			var x = Math.floor((s.ll.lon-blx)/GRID_RESOLUTION);
 			if (!result[x]) result[x]={};
 			var resultx = result[x];
-			var y = Math.floor((s.ll.lat-bly)/GRID_SIZE);
+			var y = Math.floor((s.ll.lat-bly)/GRID_RESOLUTION);
 			if (!resultx[y]) {
 				resultx[y] = {p: price, n: 1};
 			} 

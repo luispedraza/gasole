@@ -360,15 +360,15 @@ input[type=radio], input[type=checkbox] {
   width: 30px;
   overflow: hidden;
   padding: 5px;
-  -webkit-transition: all .4s;
-     -moz-transition: all .4s;
-      -ms-transition: all .4s;
-       -o-transition: all .4s;
-          transition: all .4s;
+  -webkit-transition: max-height .2s;
+     -moz-transition: max-height .2s;
+      -ms-transition: max-height .2s;
+       -o-transition: max-height .2s;
+          transition: max-height .2s;
 }
 #layers:hover {
   max-height: 300px;
-  width: 300px;
+  width: 500px;
   background-color: #fff;
 }
 #layers div, #layers ul {
@@ -396,6 +396,39 @@ input[type=radio], input[type=checkbox] {
 #layers li.on:before {
   font-size: 1.5em;
   content: "\2611"; 
+}
+.spinner {
+  width: 200px;
+  height: 20px;
+  padding: 2px;
+  border: 1px solid #fff;
+  border-radius: 5px;
+  float: right;
+}
+.spinner .button {
+  background-color: #333;
+  color: #fff;
+  width: 16px;
+  height: 16px;
+  font-size: 15px;
+  text-align: center;
+  cursor: pointer;
+  border: 1px solid #fff;
+  border-radius: 5px;
+  display: none;
+}
+.spinner:hover {
+  background-color: #fff;
+  color: #333;
+}
+.spinner:hover .button {
+  display: block;
+}
+.spinner .button.up:before {
+  content: "+";
+}
+.spinner .button.down:before {
+  content: "-";
 }
 #hidep + label {
   z-index: 200;
@@ -505,10 +538,16 @@ input:checked + label:before {
 .circle:hover {
   opacity: 1;
 }
+.tick text {
+  fill: #333;
+}
 .axis path, .axis line {
   fill: none;
-  stroke: #333;
+  stroke: #aaa;
   shape-rendering: crispEdges;
+}
+#circles .axis line {
+  stroke: none;
 }
 #brands .axis path, #brands .axis line {
   display: none;
