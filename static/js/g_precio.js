@@ -403,18 +403,19 @@ function Circles(spread) {
 			chart.append("g")
 				.attr("class", "y axis")
 		}
-		chart.select(".x.axis")
-			.call(xAxis)
-			.selectAll("text")
-				.style("font-size", ".8em")
-		
-		chart.select(".y.axis")
-			.call(yAxis)
-			.selectAll("text")
-				.style("font-size", ".8em");
+		function updateAxes() {
+			var x_axis = chart.select(".x.axis");
+				x_axis.transition().duration(500).call(xAxis);
+				x_axis.selectAll("text").style("font-size", ".8em")
+			
+			var y_axis = chart.select(".y.axis");
+				y_axis.transition().duration(500).call(yAxis);
+				y_axis.selectAll("text").style("font-size", ".8em");
+		}
+		updateAxes();
 		// dispersión de precios
 		var spreads_min = chart.selectAll(".spread.min").data(data);
-		spreads_min.transition().duration(300)
+		spreads_min.transition().duration(500)
 			.attr("x1", function(d) {return d.min ? x(d.min) : x(d.p)})
 			.attr("y1", function(d) {return d.n ? y(d.n) : d3.select(this).attr("y1")})
 			.attr("x2", function(d) {return d.min ? (x(d.p)-radius) : x(d.p)})
@@ -449,11 +450,11 @@ function Circles(spread) {
 			.attr("stroke", function(d) {return d.c});
 		// precios medios
 		var circles = chart.selectAll(".circle").data(data);
-		circles.transition().duration(300)
+		circles.transition().duration(500)
 				.attr("cx", function(d) {return d.p ? x(d.p) : d3.select(this).attr("cx")})		// precio
 				.attr("cy", function(d) {return d.n ? y(d.n) : d3.select(this).attr("cy")})		// cantidad
 				.attr("fill", function(d) {return d.c})
-			.transition().duration(300).ease("bounce")
+			.transition().duration(500).ease("bounce")
 				.attr("r", function(d) {return d.r});
 		circles.enter()
 			.append("circle")
@@ -468,15 +469,61 @@ function Circles(spread) {
 			.attr("r", 0)
 			.remove();
 		// eventos
-		circles.on("mouseover", function(d,i) {
+		function provinceTooltip(d) {
 			var infoText = [prettyName(d.name)];
 			infoText.push(d.n + " puntos de venta");
 			infoText.push("Precio medio: " + d.p.toFixed(3) + " €/l");
 			showTooltip(chart, infoText, 100, {cx:x(d.p), cy:y(d.n), r:d.r+2});
-		});
-		circles.on("mouseout", function(d,i) {
-			chart.select("#tooltip").remove();
-		});
+		}
+		function provinceClick(pData) { /* Ciudades de una provincia */
+			var RZOOM = 3000;
+			if (d3.select(this).attr("r")==RZOOM) {
+				x.domain([xMin,xMax]);
+				y.domain([yMin,yMax]);
+				updateAxes();
+				chart.selectAll(".city").remove();	// Borrar todas las ciudades
+				circles.transition().duration(500).ease("bounce").attr("r",function(d) {return d.r});
+				return;
+			}
+			var pname = pData.name;
+			// Primero redibujar provincias
+			circles.transition().duration(500)
+				.attr("r",function(d) {return ((d.name==pname) ? RZOOM : 0)});
+			var pdata = theInfo[pname];					// province data
+			var pstats = theStats.provinces[pname][TYPE];	// province stats
+			var color = pData.c;
+			var cdata = [];			// cities data
+			var nMax = 0;
+			for (var t in pdata) {
+				var tdata = pdata[t];
+				var tstats = new Stats();
+				for (var s in tdata) {
+					var price = tdata[s].o[TYPE];
+					if (price) tstats.add(price, [p,t,s]);
+				}
+				if (tstats.n>nMax) nMax = tstats.n;
+				cdata.push({t: t, d: tstats});
+			}
+			x.domain([pstats.min, pstats.max]);
+			y.domain([0,nMax]);
+			updateAxes();
+			// precios medios de ciudades
+			var cities = chart.selectAll(".city").data(cdata);
+			cities.enter()
+				.append("rect")
+				.attr("class", "city")
+				.attr("x", function(d){return x(d.d.mu)})
+				.attr("y", function(d){return y(d.d.n)})	
+				.attr("width", 0).attr("height", 0)
+				.attr("fill", "#fff")
+				.transition().delay(500).duration(500).ease("bounce")
+					.attr("x", function(d){return x(d.d.mu)-10})	
+					.attr("y", function(d){return y(d.d.n)-10})	
+					.attr("width", 20).attr("height", 20);
+		}
+		circles.on("mouseover", provinceTooltip);
+		circles.on("mouseout", function() {chart.select("#tooltip").remove()});
+		circles.on("mousedown", provinceClick);
 	}
 }
 
@@ -547,15 +594,15 @@ function Brands(spread) {
 				.attr("class", "y axis")
 		}
 		chart.select(".x.axis")
-			.call(xAxis)
-			.selectAll("text")
+			.transition().duration(500).call(xAxis);
+		chart.select(".x.axis").selectAll("text")
 				.style("font-size", ".7em")
 				.style("text-anchor", "center")
 				.attr("dy", "-15px");
 		
 		chart.select(".y.axis")
-			.call(yAxis)
-			.selectAll("text")
+			.transition().duration(500).call(yAxis);
+		chart.select(".y.axis").selectAll("text")
 				.style("font-size", ".7em")
 				.style("text-anchor", "end")
 				.attr("dx", "-15px");
@@ -810,15 +857,13 @@ function Histogram() {
 				.attr("fill", function(d,i) { return (i%2) ? "#ccc" : "#eee"})
 				.transition().duration(1000).attr("opacity", .2);
 		}
-		chart.select(".x.axis")
-			.call(xAxis)
-			.selectAll("text")
-				.style("font-size", ".8em");
+		var x_axis = chart.select(".x.axis");
+			x_axis.transition().duration(500).call(xAxis);
+			x_axis.selectAll("text").style("font-size", ".8em");
 		
-		chart.select(".y.axis")
-			.call(yAxis)
-			.selectAll("text")
-				.style("font-size", ".8em");
+		var y_axis = chart.select(".y.axis");
+			y_axis.transition().duration(500).call(yAxis);
+			y_axis.selectAll("text").style("font-size", ".8em");
 
 		var barWidth = (gridWidth-(2*binMargin));
 		if (!this.stacked) barWidth/=nSeries;	// ancho de cada barra
