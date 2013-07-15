@@ -469,7 +469,9 @@ function Circles(spread) {
 				.attr("class", "x axis")
 				.attr("transform", "translate(0," + height + ")");
 			chart.append("g")
-				.attr("class", "y axis")
+				.attr("class", "y axis");
+			chart.append("g").attr("class", "legend")
+				.attr("transform", "translate(0," + (height+40) + ")");
 		}
 		var shapes = chart.select(".shapes");
 		function updateAxes() {
@@ -480,7 +482,7 @@ function Circles(spread) {
 			var y_axis = chart.select(".y.axis");
 				y_axis.transition().duration(500).call(yAxis);
 				y_axis.selectAll("text").style("font-size", ".8em")
-					.attr("transform", "translate(-15,0)");;
+					.attr("transform", "translate(-15,0)");
 		}
 		updateAxes();
 		// dispersión de precios
@@ -501,7 +503,7 @@ function Circles(spread) {
 			.attr("y2", function(d) {return d.n ? y(d.n) : d3.select(this).attr("y2")})
 			.attr("stroke-width", function(d) {return d.n ? 5 : 0})
 			.attr("stroke", function(d) {return d.c});
-		var spreads_max = chart.selectAll(".spread.max").data(data);
+		var spreads_max = shapes.selectAll(".spread.max").data(data);
 		spreads_max.transition().duration(300)
 			.attr("x1", function(d) {return d.max ? x(d.max) : x(d.p)})
 			.attr("y1", function(d) {return d.n ? y(d.n) : d3.select(this).attr("y1")})
@@ -533,7 +535,7 @@ function Circles(spread) {
 			.attr("cy", function(d){return d.n ? y(d.n) : 0})		// cantidad en coordenada Y
 			.attr("r", 0)
 			.attr("fill", function(d){return d.c})
-			.attr("opacity", .7)
+			.attr("opacity", .8)
 			.transition().delay(500).duration(500).ease("bounce").attr("r", function(d){return d.r});
 		circles.exit()
 			.transition().duration(500)
@@ -558,13 +560,18 @@ function Circles(spread) {
 		function provinceHoverIn(d) {
 			var circle = d3.select(this);
 			if (circle.attr("r")!=RZOOM) {
-				showTooltip("pinfo", chart, provinceInfo(d), 100, {cx:x(d.p), cy:y(d.n), r:d.r+2});	
+				circle.attr("opacity", 1);
+				var options = {	"r": 100,
+								"fill": "#7e2516",
+								"stroke": "#ccc",
+								"stroke-width": 5};
+				showTooltip("pinfo", chart, provinceInfo(d), options, {cx:x(d.p), cy:y(d.n), r:d.r+2});	
 			}
 		}
 		function provinceHoverOut(d) {
 			var circle = d3.select(this);
 			if (circle.attr("r")!=RZOOM) {
-				circle.attr("opacity", "");
+				circle.attr("opacity", .8);
 				hideTooltip("pinfo");
 			} 
 		}
@@ -578,21 +585,29 @@ function Circles(spread) {
 				x.domain([xMin,xMax]);
 				y.domain([yMin,yMax]);
 				updateAxes();
-				shapes.selectAll(".city").remove();	// Borrar todas las ciudades
+				shapes.selectAll(".city").remove();				// Borrar todas las ciudades
 				circles.transition().duration(500).ease("bounce").attr("r",function(d) {return d.r});
 				hideTooltip("pinfo");
+				chart.select(".legend").selectAll(".item").remove();
 				return;
 			}
 			chart.attr("class", "chart white");
+			var color = d.c;
+			var colorDark = d3.rgb(color).darker().toString();
+			var colorBright = d3.rgb(color).brighter([.4]).toString();
 			hideTooltip("pinfo");
-			showTooltip("pinfo", chart, provinceInfo(d), 100, {corner:true});
+			var options = {	"r": 100,
+							// "fill": color,
+							"fill": colorDark,
+							"stroke": "#fff",
+							"stroke-width": 5};
+			showTooltip("pinfo", chart, provinceInfo(d), options, {corner:true});
 			var pname = d.name;
 			// Primero redibujar provincias
 			circles.transition().duration(500)
 				.attr("r",function(d) {return ((d.name==pname) ? RZOOM : 0)});
 			var pdata = theInfo[pname];					// province data
 			var pstats = theStats.provinces[pname][TYPE];	// province stats
-			var color = d.c;
 			var cdata = [];			// cities data
 			var nMax = 0;
 			for (var t in pdata) {
@@ -602,33 +617,77 @@ function Circles(spread) {
 					var price = tdata[s].o[TYPE];
 					if (price) tstats.add(price, [p,t,s]);
 				}
-				if (tstats.n>nMax) nMax = tstats.n;
-				cdata.push({t: t, d: tstats});
+				if (tstats.n) {
+					if (tstats.n>nMax) nMax = tstats.n;
+					tstats.name = t;
+					cdata.push(tstats);
+				}
 			}
+			// Ordenación alfabética
+			cdata.sort(function(a,b) {return (a.name<b.name) ?  -1 : 1});
 			x.domain([pstats.min, pstats.max]);
 			y.domain([1, nMax]);
 			updateAxes();
+			// Leyenda de ciudadas
+			function itemSize(i,current) {
+				var factor = .9;
+				var maxW = 10;
+				return Math.max(2,max)
+			}
+			var legend = chart.select(".legend");
+			var items = legend.selectAll(".item").data(cdata)
+				.enter()
+				.append("g").attr("class", "item")
+				.attr("transform", function(d,i) {return "translate("+i*2+",0)"});
+			items.append("rect").attr("x",0).attr("y",2).attr("width",3).attr("height",15)
+				.attr("fill", function(d,i) { return (i%2) ? colorDark : colorBright})
+				.on("mouseover" , function(d,i) {
+					d3.select(this).attr("fill", "#fff");
+					legend.selectAll("text")[0][i].style.display = "block";
+					showCity(shapes.selectAll(".city")[0][i]);
+				})
+				.on("mouseout", function(d,i) {
+					d3.select(this).attr("fill", (i%2) ? colorDark : colorBright);
+					legend.selectAll("text")[0][i].style.display = "none";
+					hideCity(shapes.selectAll(".city")[0][i]);	
+				});
+			items.append("text").data(cdata)
+				.text(function(d,i) {return d.name})
+				.style("display", "none");
 			// precios medios de ciudades
 			var cities = shapes.selectAll(".city").data(cdata);
+			function showCity(node) {
+				var node = d3.select(node);
+				console.log(node);
+				var d = node[0][0].__data__;
+				console.log(d);
+				var infoText = [d.name];
+				var newColor = colorBright;
+				node.attr("fill", newColor).attr("stroke-width", 2);
+				infoText.push(d.n + " puntos de venta");
+				infoText.push("Precio medio: "+d.mu.toFixed(3) + " €/l");
+				var options = {	"r": 100,
+								"fill": newColor,
+								"stroke": "#fff",
+								"stroke-width": 3};
+				showTooltip("tinfo", chart, infoText, options, {cx:x(d.mu), cy:y(d.n), r:0, stroke: "#fff"});
+			}
+			function hideCity(node) {
+				d3.select(node).attr("fill", color).attr("stroke-width", 1);
+				hideTooltip("tinfo");
+			}
 			cities.enter()
 				.append("rect")
 				.attr("class", "city")
-				.attr("x", function(d){return x(d.d.mu)})
-				.attr("y", function(d){y(d.d.n)})	
+				.attr("x", function(d){return x(d.mu)-5})	
+				.attr("y", function(d){return y(d.n)-5})	
 				.attr("width", 0).attr("height", 0)
 				.attr("stroke", "#fff")
 				.attr("fill", color)
-				.transition().delay(500).duration(500).ease("bounce")
-					.attr("x", function(d){return x(d.d.mu)-5})	
-					.attr("y", function(d){return y(d.d.n)-5})	
+				.transition().duration(200).ease("bounce")
 					.attr("width", 10).attr("height", 10);
-			cities.on("mouseover", function(d) {
-				var infoText = [d.t];
-				infoText.push(d.d.n + " puntos de venta");
-				infoText.push("Precio medio: "+d.d.mu.toFixed(3) + " €/l");
-				showTooltip("tinfo", chart, infoText, 100, {cx:x(d.d.mu), cy:y(d.d.n), r:0});	
-			})
-			cities.on("mouseout", function() {hideTooltip("tinfo")});
+			cities.on("mouseover", function(d) {showCity(this);})
+			cities.on("mouseout", function() {hideCity(this)});
 		}
 		circles.on("mouseover", provinceHoverIn);
 		circles.on("mouseout", provinceHoverOut);
@@ -740,7 +799,11 @@ function Brands(spread) {
 			infoText.push((otras ? "tienen " : "tiene ") + d.n + " puntos de venta");
 			infoText.push("con un precio medio de:");
 			infoText.push(d.price.toFixed(3) + " €/l");
-			showTooltip("pinfo", chart, infoText, 100, {cx:x(d.brand),cy:y(d.prov),r:8+Math.sqrt(d.n)});
+			var options = {	"r": 100,
+							"fill": "#7e2516",
+							"stroke": "#ccc",
+							"stroke-width": 5};
+			showTooltip("pinfo", chart, infoText, options, {cx:x(d.brand),cy:y(d.prov),r:8+Math.sqrt(d.n)});
 		});
 		balls.on("mouseout", function(d,i) {
 			chart.select("#pinfo").remove();
@@ -1036,7 +1099,11 @@ function Histogram() {
 				infoText.push("hay " + d + " puntos de venta");
 				infoText.push("de " + FUEL_OPTIONS[TYPE].name);
 				infoText.push("entre " + pmin + " y " + pmax + " €/l");
-				showTooltip("tooltip", chart, infoText, 100);
+				var options = {	"r": 100,
+								"fill": "#7e2516",
+								"stroke": "#ccc",
+								"stroke-width": 5};
+				showTooltip("tooltip", chart, infoText, options);
 			});
 			bars.on("mouseout", function(d,i) {
 				chart.select("#tooltip").remove();
@@ -1046,42 +1113,46 @@ function Histogram() {
 }
 
 /* Muestra la pelota informativa del elemento seleccionado */
-function showTooltip(id, where, infoText, R, options) {
-	var tooltip = where.append("g").attr("id", id);
+function showTooltip(id, where, infoText, options, anchor) {
+	var tooltip = where.append("g").attr("id", id);		// El grupo del tooltip
 	var lineIni = -Math.floor(infoText.length/2);
 	var posX, posY;
-	if (options && options.corner) {
-		posX = 100; posY = 100;
+	if (anchor && anchor.corner) {
+		posX = 100; posY = 100;	// Esquina superior derecha
 	} else {
-		var node = where.node();
-		var mousePos = d3.mouse(node);
-		var x = mousePos[0], y = mousePos[1];
+		var mousePos = d3.mouse(where.node());
+		var x = (anchor.cx || mousePos[0]), 
+			y = (anchor.y || mousePos[1]);
 		var width = parseInt(where.attr("width").split("px")[0]);
 		var height = parseInt(where.attr("height").split("px")[0]);
 		var posX = x + ((x<(width/2)) ? 100 : -100);
 		var posY = y + ((y<(height/2)) ? 100 : -100);	
 	}
-	if (options && options.hasOwnProperty("r")) {
-		var Dy = posY-options.cy;
-		var Dx = posX-options.cx;
+	if (anchor && anchor.hasOwnProperty("r")) {
+		var Dy = posY-anchor.cy;
+		var Dx = posX-anchor.cx;
 		var D = Math.sqrt(Math.pow(Dy,2)+Math.pow(Dx,2));
-		var d = options.r+4;
+		var d = anchor.r+4;
 		var dy = (Dy/D)*d;
 		var dx = (Dx/D)*d;
 		tooltip.append("circle")
-			.attr("cx", options.cx)
-			.attr("cy", options.cy)
-			.attr("r", options.r)
-			.attr("stroke", "#ccc").attr("stroke-width",2).attr("fill", "none");
+			.attr("cx", anchor.cx)
+			.attr("cy", anchor.cy)
+			.attr("r", anchor.r)
+			.attr("stroke",anchor.stroke  || "#ccc").attr("stroke-width",2).attr("fill", "none");
 		tooltip.append("line")
-			.attr("stroke", "#ccc").attr("stroke-width",2)
-			.attr("x1", options.cx+dx).attr("y1", options.cy+dy)
-			.attr("x2", options.cx+dx).attr("y2", options.cy+dy)
+			.attr("x1", anchor.cx+dx).attr("y1", anchor.cy+dy)
+			.attr("x2", anchor.cx+dx).attr("y2", anchor.cy+dy)
+			.attr("stroke", anchor.stroke || "#ccc").attr("stroke-width",2)
 			.transition().duration(200)
 				.attr("x2", posX).attr("y2", posY);
 	}
-	tooltip.append("circle").attr("cx", posX).attr("cy", posY).attr("r",0).attr("fill", "#7e2516").attr("stroke", "#ccc").attr("stroke-width", 5)
-		.transition().delay(200).duration(200).ease("bounce").attr("r", R);
+	// La tooltip propiamente dicha
+	tooltip.append("circle").call(function(e) {
+			for (var o in options) e.attr(o, options[o]);
+			e.attr("cx", posX).attr("cy", posY).attr("r",0)
+				.transition().delay(200).duration(200).ease("bounce").attr("r", options.r);
+		})
 	var text = tooltip.append("text");
 	text.attr("x", posX).attr("y", posY).attr("text-anchor", "middle").attr("fill", "#fff")
 		.attr("font-size","0em").transition().delay(200).attr("font-size",".9em");

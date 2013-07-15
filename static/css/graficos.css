@@ -556,6 +556,13 @@ input:checked + label:before {
 .chart.white text {
   fill: #fff;
 }
+.legend rect {
+  opacity: .7;
+  cursor: pointer;
+}
+.legend rect:hover {
+  opacity: 1;
+}
 #histogram .axis.x text, #circles .axis.x text {
   font-family: "digital-7";
   font-size: 14px;
