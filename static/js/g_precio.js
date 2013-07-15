@@ -188,11 +188,46 @@ function updateMarkers() {
 
 /* Inicialización de open map */
 function openMapinit() {
-	openMap = new OpenLayers.Map("openmap")
-	openMapOSM = new OpenLayers.Layer.OSM("OpenStreet Map");
+	var openMapOSM = new OpenLayers.Layer.XYZ(
+	    "MapBox Streets",
+	    [
+	        "http://a.tiles.mapbox.com/v3/luispedraza.map-prx7qlbc/${z}/${x}/${y}.png",
+	        "http://b.tiles.mapbox.com/v3/luispedraza.map-prx7qlbc/${z}/${x}/${y}.png",
+	        "http://c.tiles.mapbox.com/v3/luispedraza.map-prx7qlbc/${z}/${x}/${y}.png",
+	        "http://d.tiles.mapbox.com/v3/luispedraza.map-prx7qlbc/${z}/${x}/${y}.png"
+	    ], {
+	        attribution: "Tiles &copy; <a href='http://mapbox.com/'>MapBox</a> | " + 
+	            "Data &copy; <a href='http://www.openstreetmap.org/'>OpenStreetMap</a> " +
+	            "and contributors, CC-BY-SA",
+	        sphericalMercator: true,
+	        wrapDateLine: true,
+	        transitionEffect: "resize",
+	        buffer: 1,
+	        numZoomLevels: 17
+	    }
+	);
+
+	openMap = new OpenLayers.Map({
+	    div: "openmap",
+	    layers: [openMapOSM],
+	    controls: [
+	        new OpenLayers.Control.Attribution(),
+	        new OpenLayers.Control.Navigation({
+	            dragPanOptions: {
+	                enableKinetic: true
+	            }
+	        }),
+	        new OpenLayers.Control.Zoom(),
+	        new OpenLayers.Control.Permalink({anchor: true})
+	    ]
+	});
+
 	var aliasproj = new OpenLayers.Projection("EPSG:3857");
-	openMapOSM.projection = aliasproj;
-	openMap.addLayer(openMapOSM);
+	// openMap = new OpenLayers.Map("openmap")
+	// openMapOSM = new OpenLayers.Layer.OSM("OpenStreet Map");
+	
+	// openMapOSM.projection = aliasproj;
+	// openMap.addLayer(openMapOSM);
 	var bl = reprojectLatLon(MAP_LIMITS.slice(0,2)); // bottom-left
 	var tr = reprojectLatLon(MAP_LIMITS.slice(2,4)); // top-right
 	openMap.zoomToExtent([bl.lon, bl.lat, tr.lon, tr.lat]);
@@ -366,11 +401,11 @@ function Circles(spread) {
 		var div = d3.select("#circles");
 		var provinces = theStats.provinces;
 		var data = [];
-		var radius = 12;						// radio de las pelotas
+		var radius = 20;						// radio de las pelotas
 		var prices = [];
 		var xMin = stats.min;
 		var xMax = stats.max;
-		var yMin = 0;
+		var yMin = 10000;
 		var yMax = 0;
 		for (var p in REGIONS) {				// para todas las regiones
 			var current = provinces[p];
@@ -384,7 +419,8 @@ function Circles(spread) {
 					data.push({name: p, p: price, n: n, c: color, r: radius, min: current.min, max: current.max});
 				else 
 					data.push({name: p, p: price, n: n, c: color, r: radius, min: 0, max: 0});
-				if (n>yMax) yMax = n;					
+				if (n>yMax) yMax = n;
+				if (n && (n<yMin)) yMin = n;					
 			} else {
 				data.push({name: p, p: 0, n: 0, c: "#ccc", r:0, min: 0, max:0});
 			}
@@ -404,9 +440,9 @@ function Circles(spread) {
 		var x = d3.scale.linear()
 			.domain([xMin, xMax])
 			.range([0,width]);
-		var y = d3.scale.linear()
+		var y = d3.scale.log()
 			.domain([yMin, yMax])
-			.range([height,0]);
+			.range([height,radius]);
 		var xAxis = d3.svg.axis()
 			.scale(x)
 			.orient("bottom")
@@ -428,24 +464,27 @@ function Circles(spread) {
 				.attr("class", "chart")
 				.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 				.attr("width",width+"px").attr("height",height+"px");
+			chart.append("g").attr("class", "shapes");
 			chart.append("g")
 				.attr("class", "x axis")
 				.attr("transform", "translate(0," + height + ")");
 			chart.append("g")
 				.attr("class", "y axis")
 		}
+		var shapes = chart.select(".shapes");
 		function updateAxes() {
 			var x_axis = chart.select(".x.axis");
 				x_axis.transition().duration(500).call(xAxis);
-				x_axis.selectAll("text").style("font-size", ".8em")
+				// x_axis.selectAll("text").style("font-size", ".8em")
 			
 			var y_axis = chart.select(".y.axis");
 				y_axis.transition().duration(500).call(yAxis);
-				y_axis.selectAll("text").style("font-size", ".8em");
+				y_axis.selectAll("text").style("font-size", ".8em")
+					.attr("transform", "translate(-15,0)");;
 		}
 		updateAxes();
 		// dispersión de precios
-		var spreads_min = chart.selectAll(".spread.min").data(data);
+		var spreads_min = shapes.selectAll(".spread.min").data(data);
 		spreads_min.transition().duration(500)
 			.attr("x1", function(d) {return d.min ? x(d.min) : x(d.p)})
 			.attr("y1", function(d) {return d.n ? y(d.n) : d3.select(this).attr("y1")})
@@ -480,7 +519,7 @@ function Circles(spread) {
 			.attr("stroke-width", function(d) {return d.n ? 5 : 0})
 			.attr("stroke", function(d) {return d.c});
 		// precios medios
-		var circles = chart.selectAll(".circle").data(data);
+		var circles = shapes.selectAll(".circle").data(data);
 		circles.transition().duration(500)
 				.attr("cx", function(d) {return d.p ? x(d.p) : d3.select(this).attr("cx")})		// precio
 				.attr("cy", function(d) {return d.n ? y(d.n) : d3.select(this).attr("cy")})		// cantidad
@@ -491,7 +530,7 @@ function Circles(spread) {
 			.append("circle")
 			.attr("class", "circle")
 			.attr("cx", function(d){return x(d.p)})		// precio en coordenada x
-			.attr("cy", function(d){return y(d.n)})		// cantidad en coordenada Y
+			.attr("cy", function(d){return d.n ? y(d.n) : 0})		// cantidad en coordenada Y
 			.attr("r", 0)
 			.attr("fill", function(d){return d.c})
 			.attr("opacity", .7)
@@ -519,32 +558,34 @@ function Circles(spread) {
 		function provinceHoverIn(d) {
 			var circle = d3.select(this);
 			if (circle.attr("r")!=RZOOM) {
-				circle.attr("opacity",1);
-				showTooltip(chart, provinceInfo(d), 100, {cx:x(d.p), cy:y(d.n), r:d.r+2});	
+				showTooltip("pinfo", chart, provinceInfo(d), 100, {cx:x(d.p), cy:y(d.n), r:d.r+2});	
 			}
 		}
 		function provinceHoverOut(d) {
 			var circle = d3.select(this);
 			if (circle.attr("r")!=RZOOM) {
-				circle.attr("opacity", .7);
-				hideTooltip();	
+				circle.attr("opacity", "");
+				hideTooltip("pinfo");
 			} 
 		}
-		function hideTooltip() {
-			chart.select("#tooltip").remove();
+		function hideTooltip(id) {
+			chart.select("#"+id).remove();
 		}
 		function provinceClick(d) { /* Ciudades de una provincia */
-			if (d3.select(this).attr("r")==RZOOM) {
+			var circle = d3.select(this);
+			if (circle.attr("r")==RZOOM) {
+				chart.attr("class", "chart");
 				x.domain([xMin,xMax]);
 				y.domain([yMin,yMax]);
 				updateAxes();
-				chart.selectAll(".city").remove();	// Borrar todas las ciudades
+				shapes.selectAll(".city").remove();	// Borrar todas las ciudades
 				circles.transition().duration(500).ease("bounce").attr("r",function(d) {return d.r});
-				hideTooltip();
+				hideTooltip("pinfo");
 				return;
 			}
-			hideTooltip();
-			showTooltip(chart, provinceInfo(d), 100, {corner:true});
+			chart.attr("class", "chart white");
+			hideTooltip("pinfo");
+			showTooltip("pinfo", chart, provinceInfo(d), 100, {corner:true});
 			var pname = d.name;
 			// Primero redibujar provincias
 			circles.transition().duration(500)
@@ -565,24 +606,29 @@ function Circles(spread) {
 				cdata.push({t: t, d: tstats});
 			}
 			x.domain([pstats.min, pstats.max]);
-			y.domain([0,nMax]);
+			y.domain([1, nMax]);
 			updateAxes();
 			// precios medios de ciudades
-			var cities = chart.selectAll(".city").data(cdata);
+			var cities = shapes.selectAll(".city").data(cdata);
 			cities.enter()
 				.append("rect")
 				.attr("class", "city")
 				.attr("x", function(d){return x(d.d.mu)})
-				.attr("y", function(d){return y(d.d.n)})	
+				.attr("y", function(d){y(d.d.n)})	
 				.attr("width", 0).attr("height", 0)
-				.attr("fill", "#fff")
+				.attr("stroke", "#fff")
+				.attr("fill", color)
 				.transition().delay(500).duration(500).ease("bounce")
 					.attr("x", function(d){return x(d.d.mu)-5})	
 					.attr("y", function(d){return y(d.d.n)-5})	
 					.attr("width", 10).attr("height", 10);
 			cities.on("mouseover", function(d) {
-				console.log(d);
+				var infoText = [d.t];
+				infoText.push(d.d.n + " puntos de venta");
+				infoText.push("Precio medio: "+d.d.mu.toFixed(3) + " €/l");
+				showTooltip("tinfo", chart, infoText, 100, {cx:x(d.d.mu), cy:y(d.d.n), r:0});	
 			})
+			cities.on("mouseout", function() {hideTooltip("tinfo")});
 		}
 		circles.on("mouseover", provinceHoverIn);
 		circles.on("mouseout", provinceHoverOut);
@@ -694,10 +740,10 @@ function Brands(spread) {
 			infoText.push((otras ? "tienen " : "tiene ") + d.n + " puntos de venta");
 			infoText.push("con un precio medio de:");
 			infoText.push(d.price.toFixed(3) + " €/l");
-			showTooltip(chart, infoText, 100, {cx:x(d.brand),cy:y(d.prov),r:8+Math.sqrt(d.n)});
+			showTooltip("pinfo", chart, infoText, 100, {cx:x(d.brand),cy:y(d.prov),r:8+Math.sqrt(d.n)});
 		});
 		balls.on("mouseout", function(d,i) {
-			chart.select("#tooltip").remove();
+			chart.select("#pinfo").remove();
 		});
 	}
 }
@@ -735,7 +781,6 @@ function computePriceGrid() {
 		}
 	});
 	theGrid = {pmin:pmin, pmax:pmax, ox: blx, oy: bly, grid: result};
-	console.log(theGrid);
 }
 
 
@@ -903,7 +948,8 @@ function Histogram() {
 			chart.append("g")
 				.attr("class", "y axis");
 			
-		} else if (nSeries>1) {
+		}
+		if (nSeries>1) {
 			grid = chart.selectAll(".grid").data(bins);
 			grid.enter()
 				.insert("rect", ":first-child")
@@ -917,7 +963,7 @@ function Histogram() {
 		}
 		var x_axis = chart.select(".x.axis");
 			x_axis.transition().duration(500).call(xAxis);
-			x_axis.selectAll("text").style("font-size", ".8em");
+			// x_axis.selectAll("text").style("font-size", ".8em");
 		
 		var y_axis = chart.select(".y.axis");
 			y_axis.transition().duration(500).call(yAxis);
@@ -990,7 +1036,7 @@ function Histogram() {
 				infoText.push("hay " + d + " puntos de venta");
 				infoText.push("de " + FUEL_OPTIONS[TYPE].name);
 				infoText.push("entre " + pmin + " y " + pmax + " €/l");
-				showTooltip(chart, infoText, 100);
+				showTooltip("tooltip", chart, infoText, 100);
 			});
 			bars.on("mouseout", function(d,i) {
 				chart.select("#tooltip").remove();
@@ -1000,8 +1046,8 @@ function Histogram() {
 }
 
 /* Muestra la pelota informativa del elemento seleccionado */
-function showTooltip(where, infoText, R, options) {
-	var tooltip = where.append("g").attr("id", "tooltip");
+function showTooltip(id, where, infoText, R, options) {
+	var tooltip = where.append("g").attr("id", id);
 	var lineIni = -Math.floor(infoText.length/2);
 	var posX, posY;
 	if (options && options.corner) {

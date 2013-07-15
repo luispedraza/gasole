@@ -1,3 +1,8 @@
+@font-face {
+  font-family: 'digital-7';
+  src: url('/font/digital-7.ttf');
+}
+
 .T_G95 {
   background-color: #006633;
 }
@@ -360,24 +365,19 @@ input[type=radio], input[type=checkbox] {
   width: 30px;
   overflow: hidden;
   padding: 5px;
-  -webkit-transition: max-height .7s;
-     -moz-transition: max-height .7s;
-      -ms-transition: max-height .7s;
-       -o-transition: max-height .7s;
-          transition: max-height .7s;
-  -webkit-transition: background-color .7s;
-     -moz-transition: background-color .7s;
-      -ms-transition: background-color .7s;
-       -o-transition: background-color .7s;
-          transition: background-color .7s;
+  background-color: #fff;
+  -webkit-transition: all .7s;
+     -moz-transition: all .7s;
+      -ms-transition: all .7s;
+       -o-transition: all .7s;
+          transition: all .7s;
 }
 .sprt.layers {
   float: right;
 }
 #layers:hover {
-  max-height: 300px;
+  max-height: 200px;
   width: 500px;
-  background-color: #fff;
 }
 #layers ul {
   clear: both;
@@ -538,14 +538,12 @@ input:checked + label:before {
   opacity: 1;
 }
 .circle {
-  stroke-width: 1px;
+  stroke-width: 2px;
   stroke: #fff;
+  cursor: pointer;
 }
 .spread {
   opacity: .8;
-}
-.circle:hover {
-  opacity: 1;
 }
 .tick text {
   fill: #333;
@@ -555,8 +553,15 @@ input:checked + label:before {
   stroke: #aaa;
   shape-rendering: crispEdges;
 }
-#circles .axis line {
-  stroke: none;
+.chart.white text {
+  fill: #fff;
+}
+#histogram .axis.x text, #circles .axis.x text {
+  font-family: "digital-7";
+  font-size: 14px;
+}
+#circles .axis path, #circles .axis line {
+  display: none;
 }
 #brands .axis path, #brands .axis line {
   display: none;
