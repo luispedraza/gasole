@@ -457,6 +457,12 @@ li.on .layer-name:before {
   display: none;
   float: right;
 }
+.spinner .button:hover {
+  background-color: #aaa;
+}
+.spinner .button:active {
+  background-color: #000;
+}
 .spinner:hover {
   background-color: #fff;
   color: #333;

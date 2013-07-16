@@ -40,6 +40,8 @@ var CMIN = [0,255,0];	// verde para las baratas
 var CMU = [255,255,0]	// amarillo para las intermedias
 var CMAX = [255,0,0];	// rojo para las caras
 var CNA = "#ccc";		// color de provincias no mostradas
+/* Posición de la barra de herramientas */
+var toolbarPosition = 0;
 
 function reprojectLatLon(latlon) {
 	var proj = new OpenLayers.Projection("EPSG:4326");
@@ -282,6 +284,126 @@ function drawPriceGrid() {
 
 /* Todas las funciones de control de los gráficos */
 function initControl() {
+	/* Despliega una lista de opciones */
+	function dropList(e) {
+		stopEvent(e);
+		var cname = this.className;
+		this.className = cname ? "" : "on";
+	}
+	/* Inicializa el selector de opcions de combustible y sus eventos */
+	function initOptions() {
+		function selectType() {
+			var options = document.getElementById("type").getElementsByTagName("li");
+			for (var o=options.length; o>0;) {
+				var current = options[--o];
+				current.className = current.className.replace(" on", "");
+				if (current.id.match(TYPE)) current.className+=" on";
+			}
+		}
+		var div = document.getElementById("type");
+		for (var o in FUEL_OPTIONS) {
+			var li = document.createElement("li");
+			li.id = "o-"+o;
+			li.textContent = FUEL_OPTIONS[o].name;
+			li.className = "T_"+FUEL_OPTIONS[o]["short"];
+			div.appendChild(li);
+			li.onclick = function(e) {
+				TYPE = this.id.split("-")[1];
+				selectType();
+				updateAll();
+				return stopEvent(e);
+			};
+		}
+		document.getElementById("type-list").onclick = dropList;
+		selectType(TYPE);
+	}
+	/* Inicializa el selector de provincias y sus eventos */
+	function initProvinces() {
+		function checkProvince(pDiv, check) {
+			if (typeof check === "undefined") check=(pDiv.className!="on");
+			// Marca/desmarca una provincia
+			pDiv.className = check ? "on" : "";
+			var pID = pDiv.id.split("-")[1];		// ID de la provincia
+			var region = REGIONS[pDiv.textContent];
+			if (check && !region.color) {		// creación del selector de color
+				var pickerOptions = {
+					pickerPosition: 'right',
+					pickerClosable: true
+				}
+				var div = document.createElement("div");
+				div.className="config";
+				var col = document.createElement("input");
+				col.value = Raphael.getColor().slice(1);	// nuevo color
+				col.className = "color";
+				region.color = new jscolor.color(col, pickerOptions);
+				addEvent(col, "change", function() {updateAll(false);});
+				div.appendChild(col);
+				pDiv.appendChild(div);
+			}
+			region.selected = check;
+		}
+		// Marcar/desmarcar todas
+		document.getElementById("checkall").onclick = function(e) {
+			var cname = this.className;
+			var check = (cname!="on");
+			this.textContent = (check ? "Desmarcar" : "Marcar") + " Todas";
+			this.className = check ? "on" : "";
+			provs = document.getElementById("province").getElementsByTagName("li");
+			for (var i=2,il=provs.length; i<il; i++) {
+				checkProvince(provs[i], check);	// Marca/desmarca todas las provincias
+			}
+			updateAll();
+			return stopEvent(e);
+		};
+		// Excluir Ceuta, Melilla, Canarias
+		document.getElementById("hide").onclick = function(e) {
+			var cname = this.className;
+			var check = (cname!="on"); 
+			this.className = check ? "on" : "";
+			skip = check;
+			var lis = document.getElementById("province").getElementsByTagName("li");
+			for (var l=0, ll=lis.length; l<ll; l++) {
+				var li = lis[l];
+				li.style.display = skipProv(li.textContent) ? "none" : "block";
+			}
+			updateAll();
+			return stopEvent(e);
+		}
+		// Explicación 
+		var why = document.getElementById("whyhide");
+		why.onmouseover = function(e) {
+			var whymsg = document.createElement("div");
+			whymsg.innerHTML = "<p>Estas regiones disfrutan de un rémien tributario específico que hace que en ellas los precios del combustible sean sensiblemente inferiores a la media</p>";
+			whymsg.innerHTML += "<p>Por este motivo puede ser conveniente su exclusión de los gráficos para que los colore…</p>";
+			whymsg.id = "explainhide";
+			whymsg.style.left = e.clientX-document.body.scrollLeft+"px";
+			whymsg.style.top = e.clientY+document.body.scrollTop+"px";
+			document.body.appendChild(whymsg);
+		}
+		why.onmouseout = function() {
+			document.body.removeChild(document.getElementById("explainhide"));
+		}
+		// Selector de provincias en TOOL
+		initProvLinks("province", function(e) {
+			checkProvince(this);
+			raphaelSelectProvince(this.id.split("-")[1]);
+			updateAll();
+			return stopEvent(e);
+		});
+		// desplegar la lista de provincias
+		document.getElementById("prov-list").onclick = dropList;
+	}
+	/* La barra de controles */
+	function initToolbar() {
+		toolbarPosition = document.getElementById("toolbar").getBoundingClientRect().top;
+		addEvent(window, "scroll", function() {
+			var toolbar = document.getElementById("toolbar");
+			if (window.scrollY>=toolbarPosition) {
+				toolbar.style.position = "fixed"; toolbar.style.top = 0;
+			} else 
+				toolbar.style.position = "relative";	
+		})
+	}
 	initOptions();			// Selector de tipo de combustible
 	initProvinces();		// Selector de provincias en la barra
 	initToolbar();
@@ -293,68 +415,69 @@ function initControl() {
 	});
 	// Apilar barras
 	addEvent(document.getElementById("stack"), "change", function() {
-		histogram.stacked = this.checked;
-		histogram.draw();
+		histogram.stacked = this.checked; histogram.draw();
 	});
 	// Mostrar dispersión
 	addEvent(document.getElementById("spread"), "change", function() {
-		circles.spread = this.checked;
-		circles.draw();
+		circles.spread = this.checked; circles.draw();
 	})
 	// Ocultar todos los desplegables
 	addEvent(document, "click", function() {
-		if (document.getElementsByClassName("picker").length) return;
-		document.getElementById("prov-list").className =
-		document.getElementById("type-list").className = "";
-	})
-	// Control de capas del mapa
-	/** @constructor */
-	function Spinner(div) {
-		if (div.querySelector(".spinner")) return;
-		var spinner = document.createElement("div");
-			spinner.className = "spinner";
-		var value = document.createElement("div");
-		value.textContent = "Resolución: " + GRID_RESOLUTION/1000 + " km.";
-		var bUp = document.createElement("div");
-			bUp.className = "button up";
-			spinner.appendChild(bUp);
-		var bDown = document.createElement("div");
-			bDown.className = "button down";
-			spinner.appendChild(bDown);
-		spinner.appendChild(value);
-		div.appendChild(spinner);
-		function valueChange(m) {
-			var newValue = GRID_RESOLUTION+m*20000;
-			if ((newValue<=0) || (newValue>300000)) return;
-			GRID_RESOLUTION=newValue;
-			value.textContent = "Resolución: " + newValue/1000 + " km.";
-			computePriceGrid();
-			drawPriceGrid();
+		if (document.getElementsByClassName("picker").length==0) {
+			document.getElementById("prov-list").className =
+			document.getElementById("type-list").className = "";	
 		}
-		bUp.onclick = function(e) {stopEvent(e);valueChange(1)};
-		bDown.onclick = function(e) {stopEvent(e);valueChange(-1)};
-	}
-	var layers = document.getElementById("layers-list");
-	for (var l=0,ll=openMap.layers.length; l<ll; l++) {
-		var layer = openMap.layers[l];
-		var li = document.createElement("li");
-		if (layer.getVisibility()) li.className="on";
-		var name = document.createElement("div");
-		name.className = "layer-name";
-		name.textContent = layer.name;
-		li.appendChild(name);
-		layers.appendChild(li);
-		if (layer.hasResolution) new Spinner(li);
-		addEvent(li, "click", function() {
-			var name = this.getElementsByClassName("layer-name")[0].textContent;
-			var layer = openMap.getLayersByName(name)[0];
-			if (layer) {
-				var visible = !(this.className=="on");
-				layer.setVisibility(visible);
-				this.className = (visible) ? "on" : "";
+	})
+	function initLayers() {
+		/** @constructor */
+		function Spinner(div) {
+			if (div.querySelector(".spinner")) return;
+			var spinner = document.createElement("div");
+				spinner.className = "spinner";
+			var value = document.createElement("div");
+			value.textContent = "Resolución: " + GRID_RESOLUTION/1000 + " km.";
+			var bUp = document.createElement("div");
+				bUp.className = "button up";
+				spinner.appendChild(bUp);
+			var bDown = document.createElement("div");
+				bDown.className = "button down";
+				spinner.appendChild(bDown);
+			spinner.appendChild(value);
+			div.appendChild(spinner);
+			function valueChange(m) {
+				var newValue = GRID_RESOLUTION+m*20000;
+				if ((newValue<=0) || (newValue>300000)) return;
+				GRID_RESOLUTION=newValue;
+				value.textContent = "Resolución: " + newValue/1000 + " km.";
+				computePriceGrid();
+				drawPriceGrid();
 			}
-		});
+			bUp.onclick = function(e) {stopEvent(e);valueChange(1)};
+			bDown.onclick = function(e) {stopEvent(e);valueChange(-1)};
+		}
+		var layers = document.getElementById("layers-list");
+		for (var l=0,ll=openMap.layers.length; l<ll; l++) {
+			var layer = openMap.layers[l];
+			var li = document.createElement("li");
+			if (layer.getVisibility()) li.className="on";
+			var name = document.createElement("div");
+			name.className = "layer-name";
+			name.textContent = layer.name;
+			li.appendChild(name);
+			layers.appendChild(li);
+			if (layer.hasResolution) new Spinner(li);
+			addEvent(li, "click", function() {
+				var name = this.getElementsByClassName("layer-name")[0].textContent;
+				var layer = openMap.getLayersByName(name)[0];
+				if (layer) {
+					var visible = !(this.className=="on");
+					layer.setVisibility(visible);
+					this.className = (visible) ? "on" : "";
+				}
+			});
+		}
 	}
+	initLayers();
 }
 
 /** @constructor */
@@ -1166,138 +1289,6 @@ function showTooltip(id, where, infoText, options, anchor) {
 		.attr("font-size","0em").transition().delay(200).attr("font-size",".9em");
 	text.selectAll("tspan").data(infoText)
 		.enter().append("tspan").attr("x", posX).attr("y", function(d,i) {return posY+(i+lineIni)*20}).text(function(d){return d});
-}
-
-/* Posición de la barra de herramientas */
-var toolbarPosition = 0;
-function initToolbar() {
-	toolbarPosition = document.getElementById("toolbar").getBoundingClientRect().top;
-	addEvent(window, "scroll", function() {
-		var toolbar = document.getElementById("toolbar");
-		if (window.scrollY>=toolbarPosition) {
-			toolbar.style.position = "fixed";
-			toolbar.style.top = 0;
-		} else {
-			toolbar.style.position = "relative";
-		}	
-	})
-}
-
-/* Despliega una lista de opciones */
-function dropList(e) {
-	stopEvent(e);
-	var cname = this.getAttribute("class");
-	this.setAttribute("class", cname ? "" : "on");
-}
-
-/* Inicializa el selector de provincias y sus eventos */
-function initProvinces() {
-	function checkProvince(pDiv, check) {
-		if (typeof check === "undefined") check=(pDiv.className!="on");
-		// Marca/desmarca una provincia
-		pDiv.className = check ? "on" : "";
-		var pID = pDiv.id.split("-")[1];		// ID de la provincia
-		var region = REGIONS[pDiv.textContent];
-		if (check && !region.color) {		// creación del selector de color
-			var pickerOptions = {
-				pickerPosition: 'right',
-				pickerClosable: true
-			}
-			var div = document.createElement("div");
-			div.className="config";
-			var col = document.createElement("input");
-			col.value = Raphael.getColor().slice(1);	// nuevo color
-			col.className = "color";
-			region.color = new jscolor.color(col, pickerOptions);
-			addEvent(col, "change", function() {updateAll(false);});
-			div.appendChild(col);
-			pDiv.appendChild(div);
-		}
-		region.selected = check;
-	}
-	// Marcar/desmarcar todas
-	document.getElementById("checkall").onclick = function(e) {
-		var cname = this.className;
-		var check = (cname!="on");
-		this.textContent = (check ? "Desmarcar" : "Marcar") + " Todas";
-		this.className = check ? "on" : "";
-		provs = document.getElementById("province").getElementsByTagName("li");
-		for (var i=2,il=provs.length; i<il; i++) {
-			checkProvince(provs[i], check);	// Marca/desmarca todas las provincias
-		}
-		updateAll();
-		return stopEvent(e);
-	};
-
-	// Excluir Ceuta, Melilla, Canarias
-	document.getElementById("hide").onclick = function(e) {
-		var cname = this.className;
-		var check = (cname!="on"); 
-		this.className = check ? "on" : "";
-		skip = check;
-		var lis = document.getElementById("province").getElementsByTagName("li");
-		for (var l=0, ll=lis.length; l<ll; l++) {
-			var li = lis[l];
-			li.style.display = skipProv(li.textContent) ? "none" : "block";
-		}
-		updateAll();
-		return stopEvent(e);
-	}
-	// Explicación 
-	var why = document.getElementById("whyhide");
-	why.onmouseover = function(e) {
-		var whymsg = document.createElement("div");
-		whymsg.innerHTML = "<p>Estas regiones disfrutan de un rémien tributario específico que hace que en ellas los precios del combustible sean sensiblemente inferiores a la media</p>";
-		whymsg.innerHTML += "<p>Por este motivo puede ser conveniente su exclusión de los gráficos para que los colore…</p>";
-		whymsg.id = "explainhide";
-		whymsg.style.left = e.clientX-document.body.scrollLeft+"px";
-		whymsg.style.top = e.clientY+document.body.scrollTop+"px";
-		document.body.appendChild(whymsg);
-	}
-	why.onmouseout = function() {
-		document.body.removeChild(document.getElementById("explainhide"));
-	}
-	// Selector de provincias en TOOL
-	initProvLinks("province", function(e) {
-		checkProvince(this);
-		raphaelSelectProvince(this.id.split("-")[1]);
-		updateAll();
-		return stopEvent(e);
-	});
-	// desplegar la lista de provincias
-	document.getElementById("prov-list").onclick = dropList;
-}
-
-/* Inicializa el selector de opcions de combustible y sus eventos */
-function initOptions() {
-	// Selección de un nuevo tipo 
-	function selectType(id) {
-		var options = document.getElementById("type").getElementsByTagName("li");
-		for (var o=options.length; o>0;) {
-			var current = options[--o];
-			current.className = current.className.replace(" on", "");
-			if (current.id.match(id)) current.className+=" on";
-		}
-		TYPE = id;
-		// Hay que actualizar la lista de provincias, omitiendo las que no tienen este combustible
-	}
-	var div = document.getElementById("type");
-	for (var o in FUEL_OPTIONS) {
-		var li = document.createElement("li");
-		li.id = "o-"+o;
-		li.textContent = FUEL_OPTIONS[o].name;
-		li.className = "T_"+FUEL_OPTIONS[o]["short"];
-		div.appendChild(li);
-		li.onclick = function(e) {
-			stopEvent(e);
-			selectType(this.id.split("-")[1]);
-			updateAll();
-		};
-	}
-	// desplegar la lista de opciones
-	document.getElementById("type-list").onclick = dropList;
-	// Selección actual
-	selectType(TYPE);
 }
 
 addEvent(window, "load", function(){
