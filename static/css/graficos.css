@@ -37,7 +37,7 @@
   min-height: 90px;
   background-color: #333;
   z-index: 2000;
-  font-size: 1.2em;
+  font-size: 1.1em;
   padding: 5px;
   top: 0;
 }
@@ -87,9 +87,6 @@
 }
 #hidet-label:hover {
 
-}
-#hidep-label {
-  color: #ccc;
 }
 label {
   font-size: .8em;
@@ -149,23 +146,45 @@ p:first-child {
   background: rgb(8,8,8);
   background: rgba(8,8,8,0.8);
   padding: 5px;
-  width: 220px;
+  width: 150px;
   cursor: pointer;
   border-radius: 3px;
 }
 /* Lista de provincias */
-#checkall {
-  background-color: #d24e33;
+/*Marcar/desmarcar todas*/
+#checkall , #hide { 
+  background-color: #fff;
+  color: #333;
 }
-#prov-list #checkall.on {
+/*Ocultar ceuta, melilla, canarias*/
+#hide {
+  border-bottom: 3px solid #333;
+}
+#whyhide {
+  cursor: pointer;
+}
+#explainhide {
+  font-size: .8em;
+  position: absolute;
+  background-color: #333;
+  color: #fff;
+  border-radius: 10px;
+  width: 300px;
+  height: 200px;
+  padding: 10px;
+  z-index: 2500;
+  border: 1px solid #fff;
+}
+#prov-list #checkall.on, #prov-list #hide.on {
   background-color: #7e2516;
+  color: #fff;
 }
 #prov-list {
   color: #fff;
   background: rgb(8,8,8);
   background: rgba(8,8,8,0.8);
   padding: 5px;
-  width: 220px;
+  width: 230px;
   cursor: pointer;
   border-radius: 3px;
 }
@@ -196,7 +215,7 @@ p:first-child {
 }
 ul.droplist  {
   margin-top: 10px;
-  font-size: 14px;
+  font-size: 12px;
   list-style: none;
   overflow: hidden;
   /*padding-right: 15px;*/
@@ -221,7 +240,7 @@ ul.droplist li {
 }
 .on ul.droplist li, #type-list ul.droplist li.on {
   border-bottom: 1px dotted #fff;
-  padding: 5px;
+  padding: 4px;
   height: 1.5em;
   opacity: 1;
   padding-right: 15px;
@@ -353,7 +372,7 @@ input[type=radio], input[type=checkbox] {
 #map-container {
   height: 500px;
   position: relative;
-  background-color: #b5d0d0;
+  /*background-color: #b5d0d0;*/
 }
 #layers {
   cursor: pointer;
@@ -366,11 +385,11 @@ input[type=radio], input[type=checkbox] {
   overflow: hidden;
   padding: 5px;
   background-color: #fff;
-  -webkit-transition: all .7s;
-     -moz-transition: all .7s;
-      -ms-transition: all .7s;
-       -o-transition: all .7s;
-          transition: all .7s;
+  -webkit-transition: max-height .7s;
+     -moz-transition: max-height .7s;
+      -ms-transition: max-height .7s;
+       -o-transition: max-height .7s;
+          transition: max-height .7s;
 }
 .sprt.layers {
   float: right;
@@ -438,15 +457,6 @@ li.on .layer-name:before {
 }
 .spinner .button.down:before {
   content: "-";
-}
-#hidep + label {
-  z-index: 200;
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  padding: 2px;
-  border: 1px dotted #333;
-  border-top-right-radius: 5px;
 }
 input + label:before {
   content: "\2610";

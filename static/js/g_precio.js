@@ -188,46 +188,51 @@ function updateMarkers() {
 
 /* Inicialización de open map */
 function openMapinit() {
-	var openMapOSM = new OpenLayers.Layer.XYZ(
-	    "MapBox Streets",
-	    [
-	        "http://a.tiles.mapbox.com/v3/luispedraza.map-prx7qlbc/${z}/${x}/${y}.png",
-	        "http://b.tiles.mapbox.com/v3/luispedraza.map-prx7qlbc/${z}/${x}/${y}.png",
-	        "http://c.tiles.mapbox.com/v3/luispedraza.map-prx7qlbc/${z}/${x}/${y}.png",
-	        "http://d.tiles.mapbox.com/v3/luispedraza.map-prx7qlbc/${z}/${x}/${y}.png"
-	    ], {
-	        attribution: "Tiles &copy; <a href='http://mapbox.com/'>MapBox</a> | " + 
-	            "Data &copy; <a href='http://www.openstreetmap.org/'>OpenStreetMap</a> " +
-	            "and contributors, CC-BY-SA",
-	        sphericalMercator: true,
-	        wrapDateLine: true,
-	        transitionEffect: "resize",
-	        buffer: 1,
-	        numZoomLevels: 17
-	    }
-	);
+	function initMapbox() {
+		var openMapOSM = new OpenLayers.Layer.XYZ(
+		    "MapBox Streets",
+		    [
+		        "http://a.tiles.mapbox.com/v3/luispedraza.map-prx7qlbc/${z}/${x}/${y}.png",
+		        "http://b.tiles.mapbox.com/v3/luispedraza.map-prx7qlbc/${z}/${x}/${y}.png",
+		        "http://c.tiles.mapbox.com/v3/luispedraza.map-prx7qlbc/${z}/${x}/${y}.png",
+		        "http://d.tiles.mapbox.com/v3/luispedraza.map-prx7qlbc/${z}/${x}/${y}.png"
+		    ], {
+		        attribution: "Tiles &copy; <a href='http://mapbox.com/'>MapBox</a> | " + 
+		            "Data &copy; <a href='http://www.openstreetmap.org/'>OpenStreetMap</a> " +
+		            "and contributors, CC-BY-SA",
+		        sphericalMercator: true,
+		        wrapDateLine: true,
+		        transitionEffect: "resize",
+		        buffer: 1,
+		        numZoomLevels: 17
+		    }
+		);
 
-	openMap = new OpenLayers.Map({
-	    div: "openmap",
-	    layers: [openMapOSM],
-	    controls: [
-	        new OpenLayers.Control.Attribution(),
-	        new OpenLayers.Control.Navigation({
-	            dragPanOptions: {
-	                enableKinetic: true
-	            }
-	        }),
-	        new OpenLayers.Control.Zoom(),
-	        new OpenLayers.Control.Permalink({anchor: true})
-	    ]
-	});
+		return new OpenLayers.Map({
+		    div: "openmap",
+		    layers: [openMapOSM],
+		    controls: [
+		        new OpenLayers.Control.Attribution(),
+		        new OpenLayers.Control.Navigation({
+		            dragPanOptions: {
+		                enableKinetic: true
+		            }
+		        }),
+		        new OpenLayers.Control.Zoom(),
+		        new OpenLayers.Control.Permalink({anchor: true})
+		    ]
+		});
+	}
+	function initOpenstreet() {
+		var aliasproj = new OpenLayers.Projection("EPSG:3857");
+		map = new OpenLayers.Map("openmap")
+		openMapOSM = new OpenLayers.Layer.OSM("OpenStreet Map");
+		openMapOSM.projection = aliasproj;
+		map.addLayer(openMapOSM);
+		return map;
+	}
 
-	var aliasproj = new OpenLayers.Projection("EPSG:3857");
-	// openMap = new OpenLayers.Map("openmap")
-	// openMapOSM = new OpenLayers.Layer.OSM("OpenStreet Map");
-	
-	// openMapOSM.projection = aliasproj;
-	// openMap.addLayer(openMapOSM);
+	openMap = initOpenstreet();
 	var bl = reprojectLatLon(MAP_LIMITS.slice(0,2)); // bottom-left
 	var tr = reprojectLatLon(MAP_LIMITS.slice(2,4)); // top-right
 	openMap.zoomToExtent([bl.lon, bl.lat, tr.lon, tr.lat]);
@@ -309,12 +314,6 @@ function initControl() {
 	initOptions();			// Selector de tipo de combustible
 	initProvinces();		// Selector de provincias en la barra
 	initToolbar();
-	// Ocultar Ceuta, Melilla y Canarias
-	addEvent(document.getElementById("hidep"),"change", function() {
-		// Ocultar Ceuta, Melilla, Canarias
-		skip = this.checked;
-		raphaelUpdate();
-	});
 	// Ocultar Textos 
 	addEvent(document.getElementById("hidet"),"change", function() {
 		var hideText=this.checked;
@@ -1242,23 +1241,41 @@ function initProvinces() {
 		region.selected = check;
 	}
 	// Marcar/desmarcar todas
-	var div = document.getElementById("province");
-	var liAll = document.createElement("li");
-	liAll.id = "checkall";
-	liAll.textContent = "MARCAR TODAS";
-	liAll.onclick = function(e) {
+	document.getElementById("checkall").onclick = function(e) {
 		var cname = this.className;
 		var check = (cname!="on");
-		this.textContent = (check ? "DESMARCAR" : "MARCAR") + " TODAS";
+		this.textContent = (check ? "Desmarcar" : "Marcar") + " Todas";
 		this.className = check ? "on" : "";
 		provs = document.getElementById("province").getElementsByTagName("li");
-		for (var i=1,il=provs.length; i<il; i++) {
+		for (var i=2,il=provs.length; i<il; i++) {
 			checkProvince(provs[i], check);	// Marca/desmarca todas las provincias
 		}
 		updateAll();
 		return stopEvent(e);
 	};
-	div.appendChild(liAll);
+	// Excluir Ceuta, Melilla, Canarias
+	document.getElementById("hide").onclick = function(e) {
+		var cname = this.className;
+		var check = (cname!="on"); 
+		this.className = check ? "on" : "";
+		skip = check;
+		raphaelUpdate();
+		return stopEvent(e);
+	}
+	// Explicación 
+	var why = document.getElementById("whyhide");
+	why.onmouseover = function(e) {
+		var whymsg = document.createElement("div");
+		whymsg.innerHTML = "<p>Estas regiones disfrutan de un rémien tributario específico que hace que en ellas los precios del combustible sean sensiblemente inferiores a la media</p>";
+		whymsg.innerHTML += "<p>Por este motivo puede ser conveniente su exclusión de los gráficos para que los colore…</p>";
+		whymsg.id = "explainhide";
+		whymsg.style.left = e.clientX-document.body.scrollLeft+"px";
+		whymsg.style.top = e.clientY+document.body.scrollTop+"px";
+		document.body.appendChild(whymsg);
+	}
+	why.onmouseout = function() {
+		document.body.removeChild(document.getElementById("explainhide"));
+	}
 	// Selector de provincias en TOOL
 	initProvLinks("province", function(e) {
 		checkProvince(this);

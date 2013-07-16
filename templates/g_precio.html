@@ -35,7 +35,10 @@ body {
 		<div class="toolbar-item"> <!-- selector de provincias -->
 			<div id="prov-list">
 				<div id="prov-current" class="selector">Provincias</div>
-				<ul id="province" class="droplist"></ul>
+				<ul id="province" class="droplist">
+					<li id="checkall">Marcar Todas</li>
+					<li id="hide" class="on">Excluir Ceuta, Melilla y Canarias <span id="whyhide">[?]</span></li>
+				</ul>
 			</div>
 		</div>
 
@@ -52,9 +55,6 @@ body {
 </div> <!--toolbar-container-->
 
 	<div id="map-container">
-		<input id="hidep" name="hidep" type="checkbox" checked>
-		<label for="hidep">Excluir Ceuta, Melilla y Canarias</label>
-
 		<div id="raphael"></div>
 		<div id="openmap"></div>
 		<div id="layers">
