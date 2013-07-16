@@ -7,7 +7,6 @@ var TYPE = "1";			// Tipo de combustible seleccionado
 var histogram = new Histogram();
 var circles = new Circles();
 var brands = new Brands();
-var infoDiv = null;
 
 var openMap = null;
 var openMapOSM = null;
@@ -50,10 +49,7 @@ function reprojectLatLon(latlon) {
 }
 
 /* Confierte tres componentes de color en rgb */
-function array2color(a) {
-	return "rgb(" + a.join(",") + ")";
-}
-
+function array2color(a) {return "rgb(" + a.join(",") + ")";}
 // Obtiene un color para un precio, interpolado entre dos colores extremos
 function pickColor(x, xmin, xmax, xmu) {
 	if ((x>xmax)||(x<xmin)) {return "#000";};
@@ -70,13 +66,14 @@ function pickColor(x, xmin, xmax, xmu) {
 }
 
 /* Función que confierte un círculo en un path, para transformaciones de raphael */
-function circle2path(x , y, r) // x and y are center and r is the radius
-{
-	// https://groups.google.com/forum/#!topic/raphaeljs/6gH8TiOWlAw
-	var s = "M";
-	s = s + "" + (x) + "," + (y-r) + "A"+r+","+r+",0,1,1,"+(x-0.1)+","+(y-r)+"z";
-	return s;
-}
+// NO BORRAR, PUEDE SER ÚTIL
+// function circle2path(x , y, r) // x and y are center and r is the radius
+// {
+// 	// https://groups.google.com/forum/#!topic/raphaeljs/6gH8TiOWlAw
+// 	var s = "M";
+// 	s = s + "" + (x) + "," + (y-r) + "A"+r+","+r+",0,1,1,"+(x-0.1)+","+(y-r)+"z";
+// 	return s;
+// }
 
 /* Actualización del mapa de Raphael */
 function raphaelUpdate() {
@@ -155,74 +152,64 @@ function raphaelInit() {
 	raphaelUpdate(gasole);
 }
 
-function updateMarkers() {
+/* Dibujo de los marcadores visibles en el mapa */
+function drawMarkers() {
 	markersLayer.clearMarkers();
 	if (openMap.getZoom()<10) return;
 	var bounds = markersLayer.getExtent();
-	var data = theGasole.info;
-	for (var p in REGIONS) {
-		if (!REGIONS[p].selected) continue;
-		var prov = data[p];
-		for (var t in prov) {
-			var town = prov[t];
-			for (var s in town) {
-				var station = town[s];
-				if (station.o.hasOwnProperty(TYPE) && station.ll) {
-					var lonlat = station.ll;
-					if (bounds.containsLonLat(lonlat)) {
-						var icon = new OpenLayers.Icon(null, new OpenLayers.Size(30,20));
-						var logo = getLogo(station.l);
-						icon.imageDiv.className = "logo "+(logo || "otra");
-						var marker = new OpenLayers.Marker(lonlat, icon);
-						marker.station = encodeName(p)+"/"+encodeName(t)+"/"+encodeName(s);
-						marker.events.register("click", marker, function() {
-							window.location = "/ficha/"+this.station;
-						});
-						markersLayer.addMarker(marker);
-					}
-				}
+	gasoleProcess(theInfo, function(station, p, t, s) {
+		if (station.o[TYPE] && station.ll) {
+			var lonlat = station.ll;
+			if (bounds.containsLonLat(lonlat)) {
+				var icon = new OpenLayers.Icon(null, new OpenLayers.Size(30,20));
+				var logo = getLogo(station.l);
+				icon.imageDiv.className = "logo "+(logo || "otra");
+				var marker = new OpenLayers.Marker(lonlat, icon);
+				marker.url = encodeName(p)+"/"+encodeName(t)+"/"+encodeName(s);
+				marker.events.register("click", marker, function() {window.location = "/ficha/"+this.url;});
+				markersLayer.addMarker(marker);
 			}
 		}
-	}
+	})
 }
 
 /* Inicialización de open map */
 function openMapinit() {
-	function initMapbox() {
-		var openMapOSM = new OpenLayers.Layer.XYZ(
-		    "MapBox Streets",
-		    [
-		        "http://a.tiles.mapbox.com/v3/luispedraza.map-prx7qlbc/${z}/${x}/${y}.png",
-		        "http://b.tiles.mapbox.com/v3/luispedraza.map-prx7qlbc/${z}/${x}/${y}.png",
-		        "http://c.tiles.mapbox.com/v3/luispedraza.map-prx7qlbc/${z}/${x}/${y}.png",
-		        "http://d.tiles.mapbox.com/v3/luispedraza.map-prx7qlbc/${z}/${x}/${y}.png"
-		    ], {
-		        attribution: "Tiles &copy; <a href='http://mapbox.com/'>MapBox</a> | " + 
-		            "Data &copy; <a href='http://www.openstreetmap.org/'>OpenStreetMap</a> " +
-		            "and contributors, CC-BY-SA",
-		        sphericalMercator: true,
-		        wrapDateLine: true,
-		        transitionEffect: "resize",
-		        buffer: 1,
-		        numZoomLevels: 17
-		    }
-		);
-
-		return new OpenLayers.Map({
-		    div: "openmap",
-		    layers: [openMapOSM],
-		    controls: [
-		        new OpenLayers.Control.Attribution(),
-		        new OpenLayers.Control.Navigation({
-		            dragPanOptions: {
-		                enableKinetic: true
-		            }
-		        }),
-		        new OpenLayers.Control.Zoom(),
-		        new OpenLayers.Control.Permalink({anchor: true})
-		    ]
-		});
-	}
+	// NO BORRAR ESTA FUNCIÓN, ES PARA USAR EL MAPA DE MAPBOX
+	// function initMapbox() {
+	// 	var openMapOSM = new OpenLayers.Layer.XYZ(
+	// 	    "MapBox Streets",
+	// 	    [
+	// 	        "http://a.tiles.mapbox.com/v3/luispedraza.map-prx7qlbc/${z}/${x}/${y}.png",
+	// 	        "http://b.tiles.mapbox.com/v3/luispedraza.map-prx7qlbc/${z}/${x}/${y}.png",
+	// 	        "http://c.tiles.mapbox.com/v3/luispedraza.map-prx7qlbc/${z}/${x}/${y}.png",
+	// 	        "http://d.tiles.mapbox.com/v3/luispedraza.map-prx7qlbc/${z}/${x}/${y}.png"
+	// 	    ], {
+	// 	        attribution: "Tiles &copy; <a href='http://mapbox.com/'>MapBox</a> | " + 
+	// 	            "Data &copy; <a href='http://www.openstreetmap.org/'>OpenStreetMap</a> " +
+	// 	            "and contributors, CC-BY-SA",
+	// 	        sphericalMercator: true,
+	// 	        wrapDateLine: true,
+	// 	        transitionEffect: "resize",
+	// 	        buffer: 1,
+	// 	        numZoomLevels: 17
+	// 	    }
+	// 	);
+	// 	return new OpenLayers.Map({
+	// 	    div: "openmap",
+	// 	    layers: [openMapOSM],
+	// 	    controls: [
+	// 	        new OpenLayers.Control.Attribution(),
+	// 	        new OpenLayers.Control.Navigation({
+	// 	            dragPanOptions: {
+	// 	                enableKinetic: true
+	// 	            }
+	// 	        }),
+	// 	        new OpenLayers.Control.Zoom(),
+	// 	        new OpenLayers.Control.Permalink({anchor: true})
+	// 	    ]
+	// 	});
+	// }
 	function initOpenstreet() {
 		var aliasproj = new OpenLayers.Projection("EPSG:3857");
 		map = new OpenLayers.Map("openmap")
@@ -231,7 +218,6 @@ function openMapinit() {
 		map.addLayer(openMapOSM);
 		return map;
 	}
-
 	openMap = initOpenstreet();
 	var bl = reprojectLatLon(MAP_LIMITS.slice(0,2)); // bottom-left
 	var tr = reprojectLatLon(MAP_LIMITS.slice(2,4)); // top-right
@@ -244,15 +230,14 @@ function openMapinit() {
 		gasoleProcess(theGasole.info, function(s) {
 			if (s.g) s.ll = reprojectLatLon(s.g);	// LonLat en metros
 		})
-		openMap.events.register("zoomend", markers, updateMarkers);
-        openMap.events.register("moveend", markers, updateMarkers);
+		openMap.events.register("zoomend", markers, drawMarkers);
+        openMap.events.register("moveend", markers, drawMarkers);
 		return markers;
 	}
 	/* Concentración de gasolineras */
 	function initHeatMap() {
-		var options = {//visible: true, 
-			radius:5,
-			gradient: {0.5: "cyan", 0.7: "blue", 1.0: "magenta"}};
+		var options = { radius:5,
+						gradient: {0.5: "cyan", 0.7: "blue", 1.0: "magenta"}};
 		var heatlayer = new OpenLayers.Layer.Heatmap(
 			"Concentración: Mapa de calor", 
 			openMap, openMapOSM, options,
@@ -263,7 +248,7 @@ function openMapinit() {
 	/* Retícula de precios de combustible */
 	function initPriceGrid() {
 		var retLayer = new OpenLayers.Layer.Vector("Precio: Retícula coloreada");
-		retLayer.hasResolution = true;
+		retLayer.hasResolution = true;	// opción para mostrar spinner en control de capas
 		openMap.addLayer(retLayer);
 		return retLayer;
 	}
@@ -273,7 +258,7 @@ function openMapinit() {
 }
 
 /* Actualización de la rejilla de precios */
-function updatePriceGrid() {
+function drawPriceGrid() {
 	if (!theGrid) return;
 	priceLayer.removeAllFeatures();	// limpieza
 	var pmin = theGrid.pmin;
@@ -293,20 +278,6 @@ function updatePriceGrid() {
 		}
 	}
 	priceLayer.addFeatures(features);
-}
-
-
-/* Acatualización del mapa de concentración */
-function updateHeatMap() {
-	var heatData = {max: 1, data: []};
-	var heatPoints = heatData.data;
-	function addStation(s) {
-		if (s.ll && s.o[TYPE]) heatPoints.push({lonlat: s.ll, count: 1});
-	};
-	var gasoleData = {}
-	for (var p in REGIONS) if (REGIONS[p].selected) gasoleData[p] = theGasole.info[p];
-	gasoleProcess(gasoleData, addStation);
-	heatLayer.setDataSet(heatData);
 }
 
 /* Todas las funciones de control de los gráficos */
@@ -358,7 +329,7 @@ function initControl() {
 			GRID_RESOLUTION=newValue;
 			value.textContent = "Resolución: " + newValue/1000 + " km.";
 			computePriceGrid();
-			updatePriceGrid();
+			drawPriceGrid();
 		}
 		bUp.onclick = function(e) {stopEvent(e);valueChange(1)};
 		bDown.onclick = function(e) {stopEvent(e);valueChange(-1)};
@@ -523,8 +494,7 @@ function Circles(spread) {
 		updateAxes();
 		// Leyenda principal de provincias
 		function mainLegend() {
-			var ldata = data.filter(function(i) {console.log(i); return REGIONS[i.name].selected});
-			console.log(ldata);
+			var ldata = data.filter(function(i) {return REGIONS[i.name].selected});
 			Legend(ldata, null,
 				function(i){
 					provinceHoverIn(shapes.selectAll(".circle")[0][i]);
@@ -607,7 +577,7 @@ function Circles(spread) {
 			infoText.push("Precio medio: " + d.p.toFixed(3) + " €/l");
 			return infoText;
 		}
-		function provinceHoverIn(circle) {
+		function provinceHoverIn(circle,i) {
 			circle = d3.select(circle);
 			if (circle.attr("r")==radius) {
 				var d = circle.data()[0];
@@ -616,14 +586,16 @@ function Circles(spread) {
 								"fill": "#7e2516",
 								"stroke": "#333",
 								"stroke-width": 5};
-				showTooltip("pinfo", chart, provinceInfo(d), options, {cx:x(d.p), cy:y(d.n), r:d.r+2});	
+				showTooltip("pinfo", chart, provinceInfo(d), options, {cx:x(d.p), cy:y(d.n), r:d.r+2});
+				if (i>=0) showLegendItem(i,true);
 			}
 		}
-		function provinceHoverOut(circle) {
+		function provinceHoverOut(circle,i) {
 			circle = d3.select(circle);
-			if (parseInt(circle.attr("r"))!=RZOOM) {
+			if (parseInt(circle.attr("r"))==radius) {
 				circle.attr("opacity", .8);
 				hideTooltip("pinfo");
+				if (i>=0) showLegendItem(i,false);
 			}
 		}
 		function hideTooltip(id) {
@@ -721,8 +693,8 @@ function Circles(spread) {
 			cities.on("mouseover", function(d,i) {showCity(this); showLegendItem(i,true);})
 			cities.on("mouseout", function(d,i) {hideCity(this); showLegendItem(i,false);});
 		}
-		circles.on("mouseover",function(d,i) {provinceHoverIn(this)});
-		circles.on("mouseout", function(d,i) {provinceHoverOut(this)});
+		circles.on("mouseover",function(d,i) {provinceHoverIn(this,i)});
+		circles.on("mouseout", function(d,i) {provinceHoverOut(this,i)});
 		circles.on("mousedown", function(d,i) {provinceClick(this)});
 	}
 }
@@ -878,95 +850,99 @@ function computePriceGrid() {
 	theGrid = {pmin:pmin, pmax:pmax, ox: blx, oy: bly, grid: result};
 }
 
-
-// Histogramas, distribuciones…
-// nbins es el número de bins del histograma de precios
-function computeHistograms(nbins) {
-	// Inicializa un histograma a cero
-	function initHist() {
-		var hist=[];var n = nbins;while (n--) hist[n]=0;return hist;
-	}
-	// Nuevo precio (price) en estadístico de marca (brand) y aumento del # pricebin
-	function addData(where, price, pricebin) {
-		where.n++;				// nueva estación
-		if (where.n==1) {		// es la primera
-			where.max = where.min = where.mu = price;
-		} else {
-			if (price>where.max) where.max=price;
-			else if (price<where.min) where.min=price;
-			where.mu = (where.mu*(where.n-1)+price)/where.n;
-		}
-		if (pricebin) where.hist[pricebin]++;
-	}
-	var sGlobal = theStats.stats;			// Estadísticas globales del resultado
-	var sProvs = theStats.provinces;			// Estadísticas de las provincias consideradas
-	// Cálculo de histogramas
-	for (var o in sGlobal) {
-		var sGlobalO = sGlobal[o],
-			bins = [],
-			gMin = sGlobalO.min,
-			gMax = sGlobalO.max;
-		var step = (gMax-gMin)/nbins;
-		for (var n=0; n<nbins; n++) bins[n] = gMin + n*step;
-		bins.push(gMax);
-		sGlobalO.bins = bins;
-		sGlobalO.brands = {};
-		sGlobalO.hist = initHist();
-		sGlobalO.step = step;
-		for (var p in sProvs) {
-			if (sProvs[p].hasOwnProperty(o)) {
-				var sProvO = sProvs[p][o];
-				sProvO.brands = {};
-				sProvO.hist = initHist();
-				// Y ahora los datos
-				var pdata = theInfo[p];
-				for (var t in pdata) {							// para todas las ciudades
-					var tdata = pdata[t];						
-					for (var s in tdata) {						// para todas las estaciones
-						var sdata = tdata[s];					// información de la estación
-						if (sdata.o.hasOwnProperty(o)) {
-							var brand = checkBrand(sdata.l);
-							var price = sdata.o[o];
-							var b = bins.length-1;
-							while (b--) {
-								if (bins[b]<price) break;
-							}
-							addData(sProvO, price, b);
-							addData(sGlobalO, price, b);
-							if (!sProvO.brands[brand]) sProvO.brands[brand]={n:0};
-							addData(sProvO.brands[brand], price);
-							if (!sGlobalO.brands[brand]) sGlobalO.brands[brand]={n:0};
-							addData(sGlobalO.brands[brand],price);
-						}
-					}
-				}
-			} 
-		}
-	}
-}
-
 /* Función que actualiza todos los gráficos,
 y recalcula las estadísticas en caso necesario */
 function updateAll(recompute) {
+	/* Acatualización del mapa de concentración */
+	function updateHeatMap() {
+		var heatPoints = [];
+		function addStation(s) {if (s.ll && s.o[TYPE]) heatPoints.push({lonlat: s.ll, count: 1});};
+		gasoleProcess(theInfo, addStation);
+		heatLayer.setDataSet({max: 1, data: heatPoints});
+	}
+	// Histogramas, distribuciones…
+	// nbins es el número de bins del histograma de precios
+	function computeHistograms(nbins) {
+		// Inicializa un histograma a cero
+		function initHist() {
+			var hist=[];var n = nbins;while (n--) hist[n]=0;return hist;
+		}
+		// Nuevo precio (price) en estadístico de marca (brand) y aumento del # pricebin
+		function addData(where, price, pricebin) {
+			where.n++;				// nueva estación
+			if (where.n==1) {		// es la primera
+				where.max = where.min = where.mu = price;
+			} else {
+				if (price>where.max) where.max=price;
+				else if (price<where.min) where.min=price;
+				where.mu = (where.mu*(where.n-1)+price)/where.n;
+			}
+			if (pricebin) where.hist[pricebin]++;
+		}
+		var sGlobal = theStats.stats;			// Estadísticas globales del resultado
+		var sProvs = theStats.provinces;			// Estadísticas de las provincias consideradas
+		// Cálculo de histogramas
+		for (var o in sGlobal) {
+			var sGlobalO = sGlobal[o],
+				bins = [],
+				gMin = sGlobalO.min,
+				gMax = sGlobalO.max;
+			var step = (gMax-gMin)/nbins;
+			for (var n=0; n<nbins; n++) bins[n] = gMin + n*step;
+			bins.push(gMax);
+			sGlobalO.bins = bins;
+			sGlobalO.brands = {};
+			sGlobalO.hist = initHist();
+			sGlobalO.step = step;
+			for (var p in sProvs) {
+				if (sProvs[p].hasOwnProperty(o)) {
+					var sProvO = sProvs[p][o];
+					sProvO.brands = {};
+					sProvO.hist = initHist();
+					// Y ahora los datos
+					var pdata = theInfo[p];
+					for (var t in pdata) {							// para todas las ciudades
+						var tdata = pdata[t];						
+						for (var s in tdata) {						// para todas las estaciones
+							var sdata = tdata[s];					// información de la estación
+							if (sdata.o.hasOwnProperty(o)) {
+								var brand = checkBrand(sdata.l);
+								var price = sdata.o[o];
+								var b = bins.length-1;
+								while (b--) {
+									if (bins[b]<price) break;
+								}
+								addData(sProvO, price, b);
+								addData(sGlobalO, price, b);
+								if (!sProvO.brands[brand]) sProvO.brands[brand]={n:0};
+								addData(sProvO.brands[brand], price);
+								if (!sGlobalO.brands[brand]) sGlobalO.brands[brand]={n:0};
+								addData(sGlobalO.brands[brand],price);
+							}
+						}
+					}
+				} 
+			}
+		}
+	}
 	if (typeof recompute == "undefined") recompute = true;
 	if (recompute) {
 		// Dalculamos la estadísticas para los datos seleccionados
-		theInfo = {}
-		for (p in REGIONS) {
-			// Selección de datos para construir estadísticas
+		theInfo = {};
+		for (p in REGIONS) { // Selección de datos para construir estadísticas
 			if (REGIONS[p].selected && !skipProv(p)) theInfo[p] = theGasole.info[p];
 		}
-		theStats = new GasoleStats(theInfo, [TYPE]);
-		computeHistograms(NBINS);
-		computePriceGrid();
+		theStats = new GasoleStats(theInfo, [TYPE]);	// Estadística de la selección
+		computeHistograms(NBINS);						// Cálculo de los datos del histograma
+		computePriceGrid();								// Cálculo de la rejilla de precios
 	}
-	histogram.draw();
-	circles.draw();
-	brands.draw();
-	raphaelUpdate();
+	histogram.draw();	// Dibujo del gráfico histograma
+	circles.draw();		// Dibujo del gráfico de círculos
+	brands.draw();		// Dibujo del gráfico de marcas
+	raphaelUpdate();	// Dibujo del mapa Raphael
 	updateHeatMap();	// Mapa de concentración
-	updateMarkers();	// Marcadores de gasolineras
-	updatePriceGrid();	// Rejilla de precios
+	drawMarkers();		// Mapa de marcadores
+	drawPriceGrid();	// Mapa de retícula de precios
 }
 
 // MUestra/oculta el contenedor de un gráfico y las indicaciones
@@ -1222,8 +1198,7 @@ function initProvinces() {
 		pDiv.className = check ? "on" : "";
 		var pID = pDiv.id.split("-")[1];		// ID de la provincia
 		var region = REGIONS[pDiv.textContent];
-		var configDiv = pDiv.getElementsByClassName("config")[0];
-		if (check && !configDiv) {
+		if (check && !region.color) {		// creación del selector de color
 			var pickerOptions = {
 				pickerPosition: 'right',
 				pickerClosable: true
@@ -1232,11 +1207,9 @@ function initProvinces() {
 			div.className="config";
 			var col = document.createElement("input");
 			col.value = Raphael.getColor().slice(1);	// nuevo color
-			col.className="color";
+			col.className = "color";
 			region.color = new jscolor.color(col, pickerOptions);
-			addEvent(col, "change", function() {
-				updateAll(false);
-			});
+			addEvent(col, "change", function() {updateAll(false);});
 			div.appendChild(col);
 			pDiv.appendChild(div);
 		}
@@ -1267,7 +1240,7 @@ function initProvinces() {
 			var li = lis[l];
 			li.style.display = skipProv(li.textContent) ? "none" : "block";
 		}
-		raphaelUpdate();
+		updateAll();
 		return stopEvent(e);
 	}
 	// Explicación 
@@ -1329,7 +1302,6 @@ function initOptions() {
 
 addEvent(window, "load", function(){
 	new Gasole(function() {
-		infoDiv = document.getElementById("info");
 		theGasole = this;
 		openMapinit();
 		raphaelInit();
