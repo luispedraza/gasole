@@ -146,7 +146,7 @@ p:first-child {
   background: rgb(8,8,8);
   background: rgba(8,8,8,0.8);
   padding: 5px;
-  width: 150px;
+  width: 140px;
   cursor: pointer;
   border-radius: 3px;
 }
@@ -162,6 +162,14 @@ p:first-child {
 }
 #whyhide {
   cursor: pointer;
+  background-color: #d24e33;
+  color: #fff;
+  width: 16px;
+  height: 16px;
+  padding: 2px;
+  border-radius: 5px;
+  display: inline-block;
+  text-align: center;
 }
 #explainhide {
   font-size: .8em;
@@ -169,8 +177,7 @@ p:first-child {
   background-color: #333;
   color: #fff;
   border-radius: 10px;
-  width: 300px;
-  height: 200px;
+  width: 250px;
   padding: 10px;
   z-index: 2500;
   border: 1px solid #fff;
@@ -184,7 +191,7 @@ p:first-child {
   background: rgb(8,8,8);
   background: rgba(8,8,8,0.8);
   padding: 5px;
-  width: 230px;
+  width: 250px;
   cursor: pointer;
   border-radius: 3px;
 }
@@ -372,9 +379,10 @@ input[type=radio], input[type=checkbox] {
 #map-container {
   height: 500px;
   position: relative;
-  /*background-color: #b5d0d0;*/
+  background-color: #b5d0d0;
 }
 #layers {
+  border: 1px solid #333;
   cursor: pointer;
   z-index: 1200;
   position: absolute;
@@ -402,6 +410,10 @@ input[type=radio], input[type=checkbox] {
   clear: both;
   width: 100%;
   margin-top: 20px;
+  opacity: 0;
+}
+#layers:hover ul {
+  opacity: 1;
 }
 #layers li {
   padding: 5px;
