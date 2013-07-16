@@ -629,41 +629,38 @@ function Circles(spread) {
 			y.domain([1, nMax]);
 			updateAxes();
 			// Leyenda de ciudadas
-			function itemSize(i,current) {
-				var factor = .9;
-				var maxW = 10;
-				return Math.max(2,max)
+			function showLegendItem(i, show, node) {
+				if (!node) node = d3.select(legend.selectAll("rect")[0][i]);
+				if (show) {
+					node.attr("fill", "#fff").transition().duration(50).attr("y",5).attr("height",15);
+					legend.selectAll("text")[0][i].style.display = "block";
+					
+				} else {
+					node.attr("fill", (i%2) ? colorDark : colorBright).transition().duration(50).attr("y",10).attr("height",10);
+					legend.selectAll("text")[0][i].style.display = "none";
+				}
 			}
 			var legend = chart.select(".legend");
 			var items = legend.selectAll(".item").data(cdata)
 				.enter()
-				.append("g").attr("class", "item")
-				.attr("transform", function(d,i) {return "translate("+i*2+",0)"});
-			items.append("rect").attr("x",0).attr("y",2).attr("width",3).attr("height",15)
+					.append("g").attr("class", "item")
+					.attr("transform", function(d,i) {return "translate("+i*3+",0)"});
+			items.append("rect").attr("x",0).attr("y",10).attr("width",3).attr("height",10)
 				.attr("fill", function(d,i) { return (i%2) ? colorDark : colorBright})
-				.on("mouseover" , function(d,i) {
-					d3.select(this).attr("fill", "#fff");
-					legend.selectAll("text")[0][i].style.display = "block";
-					showCity(shapes.selectAll(".city")[0][i]);
-				})
-				.on("mouseout", function(d,i) {
-					d3.select(this).attr("fill", (i%2) ? colorDark : colorBright);
-					legend.selectAll("text")[0][i].style.display = "none";
-					hideCity(shapes.selectAll(".city")[0][i]);	
-				});
+				.on("mouseover" , function(d,i) {showLegendItem(i,true,d3.select(this)); showCity(shapes.selectAll(".city")[0][i]);})
+				.on("mouseout", function(d,i) {showLegendItem(i,false,d3.select(this)); hideCity(shapes.selectAll(".city")[0][i]);});
 			items.append("text").data(cdata)
 				.text(function(d,i) {return d.name})
+				.attr("text-anchor", "middle")
 				.style("display", "none");
-			// precios medios de ciudades
+			// la información de las ciudades
 			var cities = shapes.selectAll(".city").data(cdata);
 			function showCity(node) {
 				var node = d3.select(node);
-				console.log(node);
 				var d = node[0][0].__data__;
-				console.log(d);
 				var infoText = [d.name];
 				var newColor = colorBright;
-				node.attr("fill", newColor).attr("stroke-width", 2);
+				node.attr("fill", newColor).attr("stroke-width", 4);
 				infoText.push(d.n + " puntos de venta");
 				infoText.push("Precio medio: "+d.mu.toFixed(3) + " €/l");
 				var options = {	"r": 100,
@@ -686,8 +683,8 @@ function Circles(spread) {
 				.attr("fill", color)
 				.transition().duration(200).ease("bounce")
 					.attr("width", 10).attr("height", 10);
-			cities.on("mouseover", function(d) {showCity(this);})
-			cities.on("mouseout", function() {hideCity(this)});
+			cities.on("mouseover", function(d,i) {showCity(this); showLegendItem(i,true);})
+			cities.on("mouseout", function(d,i) {hideCity(this); showLegendItem(i,false);});
 		}
 		circles.on("mouseover", provinceHoverIn);
 		circles.on("mouseout", provinceHoverOut);
@@ -1122,7 +1119,7 @@ function showTooltip(id, where, infoText, options, anchor) {
 	} else {
 		var mousePos = d3.mouse(where.node());
 		var x = (anchor.cx || mousePos[0]), 
-			y = (anchor.y || mousePos[1]);
+			y = (anchor.cy || mousePos[1]);
 		var width = parseInt(where.attr("width").split("px")[0]);
 		var height = parseInt(where.attr("height").split("px")[0]);
 		var posX = x + ((x<(width/2)) ? 100 : -100);
