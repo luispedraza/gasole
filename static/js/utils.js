@@ -579,6 +579,21 @@ function stopEvent(e) {
     return false;
 }
 
+// Para ordenar dos nombres alfabéticamente
+// http://stackoverflow.com/questions/990904/javascript-remove-accents-in-strings
+function sortName(a,b) {
+	function accentsTidy(s) {
+		var r=s.toLowerCase();
+        r = r.replace(new RegExp(/\s/g),"");	// borrar espacios
+        r = r.replace(new RegExp(/[àá]/g),"a");
+        r = r.replace(new RegExp(/[èé]/g),"e");
+        r = r.replace(new RegExp(/[ìí]/g),"i");
+        r = r.replace(new RegExp(/[òó]/g),"o");
+        r = r.replace(new RegExp(/[ùú]/g),"u");
+		return r;
+	}
+	return (accentsTidy(a)<accentsTidy(b)) ?  -1 : 1;
+}
 
 // Para agregar eventos 
 function addEvent(el, evnt, func) {

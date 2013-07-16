@@ -429,7 +429,8 @@ function Circles(spread) {
 			xMin = d3.min(prices);
 			xMax = d3.max(prices);
 		}
-		
+		// Ordenación alfabética
+		data.sort(function(a,b) {return sortName(a.name, b.name)});
 		divWidth = parseInt(div.style("width").split("px")[0]);
 		divHeight = parseInt(div.style("height").split("px")[0]);
 
@@ -474,6 +475,42 @@ function Circles(spread) {
 				.attr("transform", "translate(0," + (height+40) + ")");
 		}
 		var shapes = chart.select(".shapes");
+		var legend = chart.select(".legend");
+		// Muestra la leyenda sobre la información pasada como parámetro
+		function showLegendItem(i, show, node) {
+			if (!node) node = d3.select(legend.selectAll("rect")[0][i]);
+			if (show) {
+				node.attr("fill", "#fff").transition().duration(50).attr("y",5).attr("height",15);
+				legend.selectAll("text")[0][i].style.display = "block";
+				
+			} else {
+				node.attr("fill", function(d) {return d}).transition().duration(50).attr("y",10).attr("height",10);
+				legend.selectAll("text")[0][i].style.display = "none";
+			}
+		}
+		function Legend(data, color, callbackOver, callbackOut, callbackClick) {
+			legend.selectAll(".item").remove();	// limpieza de leyenda anterior
+			var items = legend.selectAll(".item").data(data)
+				.enter()
+					.append("g").attr("class", "item")
+					.attr("transform", function(d,i) {return "translate("+i*4+",0)"});
+			items.append("rect").attr("x",0).attr("y",10).attr("width",4).attr("height",10)
+				.datum(function(d,i) {return color ? ((i%2) ? color[0] : color[1]) : d.c})
+				.attr("fill", function(d,i) {return d})
+				.on("mouseover" , function(d,i) {
+					showLegendItem(i,true,d3.select(this)); 
+					if (callbackOver) callbackOver(i);})
+				.on("mouseout", function(d,i) {
+					showLegendItem(i,false,d3.select(this)); 
+					if  (callbackOut) callbackOut(i);})
+				.on("mousedown", function(d,i) {
+					if (callbackClick) callbackClick(i);
+				});
+			items.append("text").data(data)
+				.text(function(d,i) {return (i+1)+". "+d.name})
+				.attr("text-anchor", "middle")
+				.style("display", "none");
+		}
 		function updateAxes() {
 			var x_axis = chart.select(".x.axis");
 				x_axis.transition().duration(500).call(xAxis);
@@ -485,6 +522,18 @@ function Circles(spread) {
 					.attr("transform", "translate(-15,0)");
 		}
 		updateAxes();
+		// Leyenda principal de provincias
+		function mainLegend() {
+			Legend(data, null, 
+				function(i){
+					provinceHoverIn(shapes.selectAll(".circle")[0][i]);
+				}, function(i) {
+					provinceHoverOut(shapes.selectAll(".circle")[0][i]);
+				}, function(i) {
+					provinceClick(shapes.selectAll(".circle")[0][i]);
+				});	
+		}
+		mainLegend();
 		// dispersión de precios
 		var spreads_min = shapes.selectAll(".spread.min").data(data);
 		spreads_min.transition().duration(500)
@@ -557,30 +606,32 @@ function Circles(spread) {
 			infoText.push("Precio medio: " + d.p.toFixed(3) + " €/l");
 			return infoText;
 		}
-		function provinceHoverIn(d) {
-			var circle = d3.select(this);
-			if (circle.attr("r")!=RZOOM) {
+		function provinceHoverIn(circle) {
+			circle = d3.select(circle);
+			if (circle.attr("r")==radius) {
+				var d = circle.data()[0];
 				circle.attr("opacity", 1);
 				var options = {	"r": 100,
 								"fill": "#7e2516",
-								"stroke": "#ccc",
+								"stroke": "#333",
 								"stroke-width": 5};
 				showTooltip("pinfo", chart, provinceInfo(d), options, {cx:x(d.p), cy:y(d.n), r:d.r+2});	
 			}
 		}
-		function provinceHoverOut(d) {
-			var circle = d3.select(this);
-			if (circle.attr("r")!=RZOOM) {
+		function provinceHoverOut(circle) {
+			circle = d3.select(circle);
+			if (parseInt(circle.attr("r"))!=RZOOM) {
 				circle.attr("opacity", .8);
 				hideTooltip("pinfo");
-			} 
+			}
 		}
 		function hideTooltip(id) {
 			chart.select("#"+id).remove();
 		}
-		function provinceClick(d) { /* Ciudades de una provincia */
-			var circle = d3.select(this);
-			if (circle.attr("r")==RZOOM) {
+		function provinceClick(circle) { /* Ciudades de una provincia */
+			var circle = d3.select(circle);
+			var d = circle.data()[0];
+			if (parseInt(circle.attr("r"))==RZOOM) {
 				chart.attr("class", "chart");
 				x.domain([xMin,xMax]);
 				y.domain([yMin,yMax]);
@@ -588,7 +639,7 @@ function Circles(spread) {
 				shapes.selectAll(".city").remove();				// Borrar todas las ciudades
 				circles.transition().duration(500).ease("bounce").attr("r",function(d) {return d.r});
 				hideTooltip("pinfo");
-				chart.select(".legend").selectAll(".item").remove();
+				mainLegend();
 				return;
 			}
 			chart.attr("class", "chart white");
@@ -624,47 +675,21 @@ function Circles(spread) {
 				}
 			}
 			// Ordenación alfabética
-			cdata.sort(function(a,b) {return (a.name<b.name) ?  -1 : 1});
+			cdata.sort(function(a,b) {return sortName(a.name, b.name)});
 			x.domain([pstats.min, pstats.max]);
 			y.domain([1, nMax]);
 			updateAxes();
-			// Leyenda de ciudadas
-			function showLegendItem(i, show, node) {
-				if (!node) node = d3.select(legend.selectAll("rect")[0][i]);
-				if (show) {
-					node.attr("fill", "#fff").transition().duration(50).attr("y",5).attr("height",15);
-					legend.selectAll("text")[0][i].style.display = "block";
-					
-				} else {
-					node.attr("fill", (i%2) ? colorDark : colorBright).transition().duration(50).attr("y",10).attr("height",10);
-					legend.selectAll("text")[0][i].style.display = "none";
-				}
-			}
-			var legend = chart.select(".legend");
-			var items = legend.selectAll(".item").data(cdata)
-				.enter()
-					.append("g").attr("class", "item")
-					.attr("transform", function(d,i) {return "translate("+i*3+",0)"});
-			items.append("rect").attr("x",0).attr("y",10).attr("width",3).attr("height",10)
-				.attr("fill", function(d,i) { return (i%2) ? colorDark : colorBright})
-				.on("mouseover" , function(d,i) {showLegendItem(i,true,d3.select(this)); showCity(shapes.selectAll(".city")[0][i]);})
-				.on("mouseout", function(d,i) {showLegendItem(i,false,d3.select(this)); hideCity(shapes.selectAll(".city")[0][i]);});
-			items.append("text").data(cdata)
-				.text(function(d,i) {return d.name})
-				.attr("text-anchor", "middle")
-				.style("display", "none");
 			// la información de las ciudades
 			var cities = shapes.selectAll(".city").data(cdata);
 			function showCity(node) {
 				var node = d3.select(node);
 				var d = node[0][0].__data__;
 				var infoText = [d.name];
-				var newColor = colorBright;
-				node.attr("fill", newColor).attr("stroke-width", 4);
+				node.attr("fill", colorDark).attr("stroke-width", 4);
 				infoText.push(d.n + " puntos de venta");
 				infoText.push("Precio medio: "+d.mu.toFixed(3) + " €/l");
 				var options = {	"r": 100,
-								"fill": newColor,
+								"fill": colorBright,
 								"stroke": "#fff",
 								"stroke-width": 3};
 				showTooltip("tinfo", chart, infoText, options, {cx:x(d.mu), cy:y(d.n), r:0, stroke: "#fff"});
@@ -673,6 +698,15 @@ function Circles(spread) {
 				d3.select(node).attr("fill", color).attr("stroke-width", 1);
 				hideTooltip("tinfo");
 			}
+			// Leyenda de ciudadas
+			Legend(cdata, [colorDark,colorBright], 
+				function(i) {	// callbackOver
+					showCity(shapes.selectAll(".city")[0][i]);
+				}, 
+				function(i) {	// callbackOut
+					hideCity(shapes.selectAll(".city")[0][i]);
+				});
+
 			cities.enter()
 				.append("rect")
 				.attr("class", "city")
@@ -686,9 +720,9 @@ function Circles(spread) {
 			cities.on("mouseover", function(d,i) {showCity(this); showLegendItem(i,true);})
 			cities.on("mouseout", function(d,i) {hideCity(this); showLegendItem(i,false);});
 		}
-		circles.on("mouseover", provinceHoverIn);
-		circles.on("mouseout", provinceHoverOut);
-		circles.on("mousedown", provinceClick);
+		circles.on("mouseover",function(d,i) {provinceHoverIn(this)});
+		circles.on("mouseout", function(d,i) {provinceHoverOut(this)});
+		circles.on("mousedown", function(d,i) {provinceClick(this)});
 	}
 }
 
@@ -798,7 +832,7 @@ function Brands(spread) {
 			infoText.push(d.price.toFixed(3) + " €/l");
 			var options = {	"r": 100,
 							"fill": "#7e2516",
-							"stroke": "#ccc",
+							"stroke": "#333",
 							"stroke-width": 5};
 			showTooltip("pinfo", chart, infoText, options, {cx:x(d.brand),cy:y(d.prov),r:8+Math.sqrt(d.n)});
 		});
@@ -1098,7 +1132,7 @@ function Histogram() {
 				infoText.push("entre " + pmin + " y " + pmax + " €/l");
 				var options = {	"r": 100,
 								"fill": "#7e2516",
-								"stroke": "#ccc",
+								"stroke": "#333",
 								"stroke-width": 5};
 				showTooltip("tooltip", chart, infoText, options);
 			});
@@ -1118,8 +1152,8 @@ function showTooltip(id, where, infoText, options, anchor) {
 		posX = 100; posY = 100;	// Esquina superior derecha
 	} else {
 		var mousePos = d3.mouse(where.node());
-		var x = (anchor.cx || mousePos[0]), 
-			y = (anchor.cy || mousePos[1]);
+		var x = anchor ? anchor.cx : mousePos[0],
+			y = anchor ? anchor.cy : mousePos[1];
 		var width = parseInt(where.attr("width").split("px")[0]);
 		var height = parseInt(where.attr("height").split("px")[0]);
 		var posX = x + ((x<(width/2)) ? 100 : -100);
@@ -1136,11 +1170,11 @@ function showTooltip(id, where, infoText, options, anchor) {
 			.attr("cx", anchor.cx)
 			.attr("cy", anchor.cy)
 			.attr("r", anchor.r)
-			.attr("stroke",anchor.stroke  || "#ccc").attr("stroke-width",2).attr("fill", "none");
+			.attr("stroke",anchor.stroke  || "#333").attr("stroke-width",2).attr("fill", "none");
 		tooltip.append("line")
 			.attr("x1", anchor.cx+dx).attr("y1", anchor.cy+dy)
 			.attr("x2", anchor.cx+dx).attr("y2", anchor.cy+dy)
-			.attr("stroke", anchor.stroke || "#ccc").attr("stroke-width",2)
+			.attr("stroke", anchor.stroke || "#333").attr("stroke-width",2)
 			.transition().duration(200)
 				.attr("x2", posX).attr("y2", posY);
 	}
