@@ -38,7 +38,7 @@
   min-height: 90px;
   background-color: #333;
   z-index: 2000;
-  font-size: 1.1em;
+  font-size: 18px;
   padding: 5px;
   top: 0;
 }
@@ -55,29 +55,15 @@
 
 #info {
   margin-top: 5px;
-  height: 1em;
+  height: .9em;
   color: #fff;
   font-size: .8em;
   padding: 2px 10px 2px 10px;
-  opacity: 0;
-  background-color: #d24e33;
   -webkit-transition: opacity .1;
      -moz-transition: opacity .1;
       -ms-transition: opacity .1;
        -o-transition: opacity .1;
           transition: opacity .1;
-}
-#info.show {
-  opacity: 1;
-}
-#info:before {
-  background-color: #fff;
-  border-radius: 30px;
-  content: "\a0\a0\69\a0\a0";
-  width: 10px;
-  height: 10px;
-  color: #333;
-  margin-right: 10px;
 }
 label {
   font-size: .8em;
@@ -155,7 +141,7 @@ h1 {
   background: rgb(8,8,8);
   background: rgba(8,8,8,0.8);
   padding: 5px;
-  width: 140px;
+  width: 180px;
   cursor: pointer;
   border-radius: 3px;
 }
@@ -200,7 +186,7 @@ h1 {
   background: rgb(8,8,8);
   background: rgba(8,8,8,0.8);
   padding: 5px;
-  width: 250px;
+  width: 280px;
   cursor: pointer;
   border-radius: 3px;
 }
@@ -231,7 +217,7 @@ h1 {
 }
 ul.droplist  {
   margin-top: 10px;
-  font-size: 12px;
+  font-size: 14px;
   list-style: none;
   overflow: hidden;
   /*padding-right: 15px;*/
@@ -473,7 +459,7 @@ input:checked + label:before {
   font-size: .8em;
 }
 #raphael .legend .item {
-  height: 8px;
+  height: 12px;
 }
 #raphael .legend .itempad {
   height: 25px;
@@ -486,7 +472,7 @@ input:checked + label:before {
 }
 #raphael .legend .color {
   width: 10px;
-  height: 8px;
+  height: 12px;
   margin-right: 5px;
 }
 #raphael .legend .colorpad {
@@ -527,6 +513,9 @@ input:checked + label:before {
 }
 #raphael .legend .low {
   background-color: #0f0;
+}
+#raphael .legend .na {
+  background-color: #ccc;
 }
 #openmap {
   float: right;

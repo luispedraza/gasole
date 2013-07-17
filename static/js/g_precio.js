@@ -113,6 +113,7 @@ function reprojectLatLon(latlon) {
 function array2color(a) {return "rgb(" + a.join(",") + ")";}
 // Obtiene un color para un precio, interpolado entre dos colores extremos
 function pickColor(x, xmin, xmax, xmu) {
+	if (xmax==xmin) return array2color(CMU);
 	if ((x>xmax)||(x<xmin)) {return "#000";};
 	if (typeof xmu == "undefined") xmu = (xmin+xmax)/2;	// media aritmética
 	var cmin=CMIN,cmax=CMAX;
@@ -1106,6 +1107,15 @@ function updateAll(recompute) {
 	updateHeatMap();	// Mapa de concentración
 	drawMarkers();		// Mapa de marcadores
 	drawPriceGrid();	// Mapa de retícula de precios
+	// Información
+	var infoDiv = document.getElementById("info");
+	var stats = theStats.stats[TYPE];
+	var infoContent = "Selecciona aquí un combustible y una combinación de provincias.";
+	if (stats) {
+		if (stats.n=="0") infoContent = "No hay ningún resultado que mostrar";
+		else infoContent = "Se han encontrado " + stats.n + " puntos de venta a un precio medio de " + stats.mu.toFixed(3) + " €/l";
+	}
+	infoDiv.textContent = infoContent;	
 }
 
 // MUestra/oculta el contenedor de un gráfico y las indicaciones
