@@ -601,3 +601,18 @@ input:checked + label:before {
 #brands .axis path, #brands .axis line {
   display: none;
 }
+/* Publicidad */
+.ads {
+  background-color: red;
+}
+.ads.toolbar {
+  width: 470px;
+  height: 60px;
+  float: right;
+}
+.ads.main {
+  width: 970px;
+  height: 90px;
+  margin-right: auto;
+  margin-left: auto;
+}
