@@ -150,11 +150,10 @@ def gas_update_csv(option="1"):
 
 # Actualización desde fichero excel zipeado
 def gas_update_xls(option="1"):
-	result = ResultIter()
+	xls_result = ResultIter()
+	data_error = False
 	rpcs = []
-	def handle_xls_result(rpc, o, result=result):
-		if not result:
-			return
+	def handle_xls_result(rpc, o):
 		rpc_res = rpc.get_result()
 		page = html.document_fromstring(rpc_res.content)
 		tables = page.xpath("body/table")
@@ -165,7 +164,7 @@ def gas_update_xls(option="1"):
 				if row_data[7] == "P":	# guardo sólo gaslineras de venta público
 					date = map(int, row_data[4].split("/"))
 					date.reverse();
-					result.add_item(
+					xls_result.add_item(
 						province = row_data[0],
 						town     = row_data[1],
 						station  = row_data[2] + " [" + re.sub("\s+", "", row_data[3]) + "]",
@@ -173,11 +172,11 @@ def gas_update_xls(option="1"):
 						label    = row_data[6],
 						hours    = row_data[9],
 						option   = {o: float(re.sub(",", ".", row_data[5]))})
+			logging.info("fin procesando %s: %s" %(o, memory_usage().current()))
 		else:
 			logging.info("sin informacion en %s" %o)
-			result = None		# cuando falla un tipo no devolvemos resultado
-			return
-		logging.info("fin procesando %s: %s" %(o, memory_usage().current()))
+			data_error = True
+		
 	def create_xls_callback(rpc, o):
 		return lambda: handle_xls_result(rpc, o)
 	
@@ -195,7 +194,7 @@ def gas_update_xls(option="1"):
 		rpcs.append(rpc)
 	for rpc in rpcs:
 		rpc.wait()
-	return result
+	return xls_result if not data_error else None
 
 # Actualización por búsqueda directa
 def gas_update_search(option="1", prov="01"):

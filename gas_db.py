@@ -106,6 +106,7 @@ def updateDB(dnew, dold):
 
 def data2store(data):
 	if not data:
+		logging.info("no hay datos que gaurdar")
 		return
 	cachedata = json.loads(getAll().decode('zlib'))
 	for p in data: # recorremos las provincias

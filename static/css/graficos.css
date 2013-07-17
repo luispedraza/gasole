@@ -379,7 +379,7 @@ input[type=radio], input[type=checkbox] {
 #map-container {
   height: 500px;
   position: relative;
-  background-color: #b5d0d0;
+  /*background-color: #b5d0d0;*/
 }
 #layers {
   border: 1px solid #333;
