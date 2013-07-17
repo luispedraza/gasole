@@ -607,11 +607,11 @@ function Circles(spread) {
 		function showLegendItem(i, show, node) {
 			if (!node) node = d3.select(legend.selectAll("rect")[0][i]);
 			if (show) {
-				node.attr("fill", "#fff").transition().duration(50).attr("y",5).attr("height",15);
+				node.transition().duration(50).attr("y",5).attr("height",15);
 				legend.selectAll("text")[0][i].style.display = "block";
 				
 			} else {
-				node.attr("fill", function(d) {return d}).transition().duration(50).attr("y",10).attr("height",10);
+				node.transition().duration(50).attr("y",10).attr("height",10);
 				legend.selectAll("text")[0][i].style.display = "none";
 			}
 		}
@@ -622,6 +622,7 @@ function Circles(spread) {
 					.append("g").attr("class", "item")
 					.attr("transform", function(d,i) {return "translate("+i*4+",0)"});
 			items.append("rect").attr("x",0).attr("y",10).attr("width",4).attr("height",10)
+				.style("display", function(d) {return d.n ? "block" : "none"})
 				.datum(function(d,i) {return color ? ((i%2) ? color[0] : color[1]) : d.c})
 				.attr("fill", function(d,i) {return d})
 				.on("mouseover" , function(d,i) {
@@ -651,15 +652,14 @@ function Circles(spread) {
 		updateAxes();
 		// Leyenda principal de provincias
 		function mainLegend() {
-			var ldata = data.filter(function(i) {return REGIONS[i.name].selected});
+			// var ldata = data.filter(function(i) {return REGIONS[i.name].selected});
+			ldata = data;
 			Legend(ldata, null,
 				function(i){
 					provinceHoverIn(shapes.selectAll(".circle")[0][i]);
-				},
- function(i) {
+				}, function(i) {
 					provinceHoverOut(shapes.selectAll(".circle")[0][i]);
-				},
- function(i) {
+				}, function(i) {
 					provinceClick(shapes.selectAll(".circle")[0][i]);
 				});	
 		}
@@ -832,7 +832,7 @@ function Circles(spread) {
 				hideTooltip("tinfo");
 			}
 			// Leyenda de ciudadas
-			Legend(cdata, [colorDark,colorBright], 
+			Legend(cdata, [colorDark,"#fff"], 
 				function(i) {	// callbackOver
 					showCity(shapes.selectAll(".city")[0][i]);
 				},
