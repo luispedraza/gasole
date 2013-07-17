@@ -306,7 +306,7 @@ class Stats(BaseAuthHandler):
     def get(self):
         self.render("base.html",
             title = u"Gráficos: el precio y la distribución de la gasolina en España.",
-            scripts = get_js('precio.js',DEBUG),
+            scripts = get_js('charts.js',DEBUG),
             styles  = ['/css/graficos.css'],
             content = jinja_env.get_template("charts.html").render())
         

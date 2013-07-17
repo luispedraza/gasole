@@ -39,23 +39,11 @@ MEDIA_JS = {
 		'extern':	['google_maps_api_v3.js'],
 		'api':		[GOOGLE_MAPS_API]
 		},
-	'cantidad.js' : {
-		'src':		['utils.js','g_cantidad.js','search.js'],
-		'libs': 	[],
-		'extern':	['google_maps_api_v3.js'],
-		'api':		[GOOGLE_MAPS_VIS_API]
-		},
-	'precio.js': {
-		'src':		['utils.js','g_precio.js','search.js'],
+	'charts.js': {
+		'src':		['utils.js','charts.js','search.js'],
 		'libs': 	['jscolor.js','heatmap.js','heatmap-openlayers.js','d3.js','raphael.min.js'],
 		'extern':	['google_maps_api_v3.js'],
-		'api':		[OPENLAYERS_API, GOOGLE_MAPS_API]
-		},
-	'variedad.js': {
-		'src':		['stats.js','search.js', 'utils.js'],
-		'libs': 	['polymaps.min.js','jquery.min.js','raphael.min.js','kartograph.min.js'],
-		'extern':	['google_maps_api_v3.js'],
-		'api':		[D3_API, OPENLAYERS_API, GOOGLE_MAPS_API]
+		'api':		[OPENLAYERS_API]
 		},
 	'noticias.js': {
 		'src':		['search.js', 'utils.js'],
