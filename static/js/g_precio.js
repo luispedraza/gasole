@@ -980,7 +980,7 @@ function Brands(spread) {
 
 /* Rejilla de precios, según tamaño GRID_RESOLUTION */
 function computePriceGrid() {
-	if (!theStats.stats[TYPE]) return;
+	if (!theStats.stats[TYPE]) return theGrid={};
 	var bounds = theStats.stats[TYPE].g;				// límites del resultado
 	var bl = reprojectLatLon([bounds[0],bounds[2]]), 	// bottom-left
 		tr = reprojectLatLon([bounds[1],bounds[3]]), 	// top-right
@@ -1011,14 +1011,14 @@ function computePriceGrid() {
 			resulty.p = (resulty.p*resulty.n+price)/(++resulty.n);
 		}
 	});
-	theGrid = {pmin:pmin, pmax:pmax, ox: blx, oy: bly, grid: result};
+	theGrid={pmin:pmin, pmax:pmax, ox: blx, oy: bly, grid: result};
 }
 
 /* Función que actualiza todos los gráficos,
 y recalcula las estadísticas en caso necesario */
 function updateAll(recompute) {
 	/* Acatualización del mapa de concentración */
-	function updateHeatMap() {
+	function drawHeatMap() {
 		var heatPoints = [];
 		function addStation(s) {if (s.ll && s.o[TYPE]) heatPoints.push({lonlat: s.ll, count: 1});};
 		gasoleProcess(theInfo, addStation);
@@ -1104,7 +1104,7 @@ function updateAll(recompute) {
 	circles.draw();		// Dibujo del gráfico de círculos
 	brands.draw();		// Dibujo del gráfico de marcas
 	raphaelUpdate();	// Dibujo del mapa Raphael
-	updateHeatMap();	// Mapa de concentración
+	drawHeatMap();	// Mapa de concentración
 	drawMarkers();		// Mapa de marcadores
 	drawPriceGrid();	// Mapa de retícula de precios
 	// Información
