@@ -96,10 +96,8 @@ h1 {
 }
 .description {
   color: #333;
-  margin-bottom: 10px;
   width: 800px;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 25px auto 10px auto;
   -moz-column-count:2; /* Firefox */
   -webkit-column-count:2; /* Safari and Chrome */
   column-count:2;
@@ -114,7 +112,7 @@ h1 {
        -o-transition: max-height .5s;
           transition: max-height .5s;
 }
-.more:hover + .description, h1 + .description {
+.more:hover + .description, .description.visible {
   max-height: 300px;
 }
 .description p {
