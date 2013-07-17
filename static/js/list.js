@@ -16,9 +16,9 @@ var stats = null;
 //var pump_svg = "M213.275-53.875c2.913,2.906,4.371,6.415,4.375,10.525v215.8c0.005,4.14-1.453,7.673-4.375,10.6l-0.025,0.025 c-2.927,2.922-6.46,4.381-10.6,4.375H160.2c-4.14,0.006-7.674-1.453-10.601-4.375l-0.024-0.025c-2.923-2.927-4.381-6.46-4.375-10.6 v-146h-18.55V83.85c0,6.667-3.334,10-10,10H96.05L72.275,191H127v45.15h-256V191h55.65l-24.3-97.15h-20.6c-6.667,0-10-3.333-10-10 v-76h42.85V56.3h171V-50.95H-85.05V2h-43.2v-81.85c0-6.667,3.333-10,10-10h44.3v-6.25c0-6.667,3.333-10,10-10h126.3 c6.667,0,10,3.333,10,10v6.25h44.301c6.666,0,10,3.333,10,10v76.3h33.55c4.14-0.006,7.673,1.453,10.6,4.375l0.025,0.025 c1.849,1.854,3.107,3.954,3.774,6.3c0.058,0.197,0.099,0.397,0.125,0.6c0.099,0.252,0.173,0.519,0.226,0.8 c0.168,0.93,0.251,1.896,0.25,2.9v146h12.45V-2.2c-5.996-2.521-10.996-5.596-15-9.225l-0.051-0.05 c-0.477-0.45-0.935-0.9-1.375-1.35c-0.571-0.565-1.104-1.132-1.6-1.7c-0.016-0.018-0.032-0.034-0.05-0.05 c-1.509-1.708-2.851-3.507-4.025-5.4v0.025c-1.046-1.694-1.929-3.461-2.649-5.3c-1.189-2.647-2.073-5.447-2.65-8.4v-0.025 c-0.3-1.553-0.524-3.161-0.675-4.825v-0.05c-0.594-7.077,0.448-15.043,3.125-23.9l-23.75-24.025 c-2.877-2.978-4.311-6.502-4.3-10.575c-0.003-4.168,1.497-7.71,4.5-10.625l0.024-0.025c2.932-2.868,6.457-4.301,10.575-4.3h0.05 c4.098,0.047,7.598,1.539,10.5,4.475l53,53.65H213.275z";
 // marcadores de gasolineras
 var MARKER_IMG = {
-	max: new google.maps.MarkerImage("/img/sprt.png", new google.maps.Size(25, 25, "px", "px"), new google.maps.Point(29,473), null, null),
-	min: new google.maps.MarkerImage("/img/sprt.png", new google.maps.Size(25, 25, "px", "px"), new google.maps.Point(2,473), null, null),
-	mu: new google.maps.MarkerImage("/img/sprt.png", new google.maps.Size(25, 25, "px", "px"), new google.maps.Point(34,441), null, null)
+	max: new google.maps.MarkerImage("/img/sprt.png", new google.maps.Size(25, 25, "px", "px"), new google.maps.Point(29,500), null, null),
+	min: new google.maps.MarkerImage("/img/sprt.png", new google.maps.Size(25, 25, "px", "px"), new google.maps.Point(2,500), null, null),
+	mu: new google.maps.MarkerImage("/img/sprt.png", new google.maps.Size(25, 25, "px", "px"), new google.maps.Point(34,468), null, null)
 }
 
 
