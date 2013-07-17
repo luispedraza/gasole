@@ -303,38 +303,22 @@ def handle_500(request, response, exception):
     response.write(jinja_env.get_template("500.html").render())
 
 class Stats(BaseAuthHandler):
-    def get(self, g_type, province, city):
-        if not province and not city:
-            pass
-        the_scripts = []
-        the_styles = []
-        title = ""
-        if (g_type=="precio"):
-            the_scripts = get_js('precio.js',DEBUG)
-            the_styles=['/css/graficos.css']
-            title = u"El Precio del Combustible en España."
-        elif (g_type=="cantidad"):
-            the_scripts = [GOOGLE_MAPS_VIS_API, MAPBOX_API]+get_js('cantidad.js',DEBUG)
-            the_styles=["/css/g_cantidad.css", MAPBOX_CSS]
-        elif (g_type=="variedad"):
-            the_scripts = [GOOGLE_MAPS_VIS_API]+get_js('variedad.js',DEBUG)
-            the_styles=["/css/g_variedad.css"]
+    def get(self):
         self.render("base.html",
-            title=u"Gráficos: "+title,
-            scripts = the_scripts,
-            styles  = the_styles,
-            content = jinja_env.get_template("g_"+g_type+".html").render(
-                map = jinja_env.get_template("spain.svg").render()))
+            title = u"Gráficos: el precio y la distribución de la gasolina en España.",
+            scripts = get_js('precio.js',DEBUG),
+            styles  = ['/css/graficos.css'],
+            content = jinja_env.get_template("charts.html").render())
         
-class StatsApi(BaseHandler):
-    def get(self, prov, town):
-        info = {}
-        if not prov and not town:
-            # info = memcache.get("stats");
-            # if not info:
-            #     info = compute_stats()
-            #     memcache.set("stats", info)
-            self.render_json(compute_stats())
+# class StatsApi(BaseHandler):
+#     def get(self, prov, town):
+#         info = {}
+#         if not prov and not town:
+#             # info = memcache.get("stats");
+#             # if not info:
+#             #     info = compute_stats()
+#             #     memcache.set("stats", info)
+#             self.render_json(compute_stats())
 
 # webapp2 config
 app_config = {
@@ -352,8 +336,8 @@ app = webapp2.WSGIApplication([
     ('/admin/?', AdminHandler),
     ('/admin/update/?(\w+)?', AdminUpdate),
     ('/admin/search/?', AdminSearch),
-    ('/graficos/([^ \/]+)/?([^ \/]+)?/?([^ \/]+)?/?', Stats),
-    ('/stats/?([^ \/]+)?/?([^ \/]+)?/?', StatsApi),
+    ('/graficos/?', Stats),
+    # ('/stats/?([^ \/]+)?/?([^ \/]+)?/?', StatsApi),
     ('/data/(\w+)/(\w+)', Data),
     ('/gasolineras/?([^ \/]+)/?([^ \/]+)?/?', List),
     ('/ficha/?([^ \/]+)/?([^ \/]+)?/?([^ \/]+)?', Detail),
