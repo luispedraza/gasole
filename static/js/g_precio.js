@@ -233,7 +233,7 @@ function openMapinit() {
 	function initOpenstreet() {
 		var aliasproj = new OpenLayers.Projection("EPSG:3857");
 		map = new OpenLayers.Map("openmap")
-		openMapOSM = new OpenLayers.Layer.OSM("OpenStreet Map");
+		openMapOSM = new OpenLayers.Layer.OSM("OpenStreetMap");
 		openMapOSM.projection = aliasproj;
 		map.addLayer(openMapOSM);
 		return map;
@@ -412,8 +412,9 @@ function initControl() {
 		var why = document.getElementById("whyhide");
 		why.onmouseover = function(e) {
 			var whymsg = document.createElement("div");
-			whymsg.innerHTML = "<p>Estas regiones disfrutan de un rémien tributario específico que hace que en ellas los precios del combustible sean sensiblemente inferiores a la media</p>";
-			whymsg.innerHTML += "<p>Por este motivo puede ser conveniente su exclusión de los gráficos para que los colore…</p>";
+			whymsg.innerHTML = "<p>Estas regiones disfrutan de un rémien tributario específico que hace que en ellas los precios del combustible sean sensiblemente inferiores a la media.</p>";
+			whymsg.innerHTML += "<p>Por este motivo puede ser conveniente su exclusión de los gráficos generales, para que su influencia no oculte las diferencias de precio que puedan darse entre el resto de regiones de España.</p>";
+			whymsg.innerHTML += "<p>Puedes consultar más información sobre precios e impuestos en la sección de INFORMACIÓN de GasOle.</p>";
 			whymsg.id = "explainhide";
 			whymsg.style.left = e.clientX-document.body.scrollLeft+"px";
 			whymsg.style.top = e.clientY+document.body.scrollTop+"px";
@@ -445,12 +446,6 @@ function initControl() {
 	initOptions();			// Selector de tipo de combustible
 	initProvinces();		// Selector de provincias en la barra
 	initToolbar();
-	// Ocultar Textos 
-	addEvent(document.getElementById("hidet"),"change", function() {
-		var hideText=this.checked;
-		d3.selectAll(".description")
-			.attr("class", hideText ? "no description" : "description");
-	});
 	// Apilar barras
 	addEvent(document.getElementById("stack"), "change", function() {
 		histogram.stacked = this.checked; histogram.draw();

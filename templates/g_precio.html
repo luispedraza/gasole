@@ -8,18 +8,24 @@ body {
 <div id="textcontent">
 
 	<h1>Gráficos de precio y distribución de gasolineras, por provincias y por marcas</h1>
-	<input id="hidet" name="hidet" type="checkbox">
-	<label id="hidet-label" for="hidet">Ocultar explicaciones</label>
 	<div class="description">
-		<p>Aquí encontrarás una serie de gráficos interactivos que te ayudarán a comprender mejor cómo se distribuyen geográficamente las gasolineras  en España, cuáles son los precios en las diferentes regiones, qué marcas son más caras y cuáles más baratas… Puedes presonalizar los gráficos para obtener la perspectiva de la información que te resulte más útil.</p>
+		<p>Aquí encontrarás una serie de <strong>gráficos interactivos</strong> que te ayudarán a comprender mejor cómo se distribuyen geográficamente las gasolineras  en España, cuáles son los precios en las diferentes regiones, qué marcas son más caras y cuáles más baratas… Puedes presonalizar los gráficos para obtener la perspectiva de la información que te resulte más útil.</p>
 
-		<p>Comienza seleccionando en la barra superior el tipo de combustible que quieras investigar.</p>
+		<p>Comienza seleccionando en la barra de configuración gris que verás más abajo <strong>el tipo de combustible</strong> que quieras investigar. A continuación selecciona <strong>la provincia o combinación de provincias de tu interés</strong>. También puedes personalizar los colores que representarán a las diferentes regiones en los gráficos que se generarán a continuación.</p>
+		<p>Esta barra te acompañará en tu recorrido por toda la página, de manera que en cualquier momento podrás modificar estas selecciones.</p>
 	</div>
 
-
-	<h2>Mapas de distribución geográfica de gasolineras y precios</h2>
+	<h2>Mapas de distribución geográfica de gasolineras y precios</h2><span class="more">[?]</span>
 	<div class="description">
-		<p>Ayúdante de las opciones disponibles en los dos mapas inferiores para visualizar de qué manera se distribuyen las gasolineras por españa; dónde se alcanzan mayores concentraciones, así como qué ciudadanos pagan más dinero por llenar el depósito de gasolina.</p>
+		<p>Ayúdate de las opciones disponibles en en la barra de configuración o haz click directamente sobre el mapa de la izquierda para visualizar <strong>de qué manera se distribuyen las gasolineras por España</strong>; dónde se alcanzan mayores concentraciones, así como qué ciudadanos pagan más dinero por llenar el depósito de gasolina.</p>
+		<p>El mapa esquemático de la izquierda te muestra <strong>cuál es el precio del combustible en cada provincia</strong> o ciudad autónoma, diferenciando entre ellas mediante un código de color: en verde las más baratas y en rojo las más caras, pasando por el color amarillo que muestra las regiones con un precio intermedio dentro de la selección actual.</p>
+		<p><strong>El mapa de la derecha te permitirá jugar con tres capas diferentes</strong>:</p>
+		<ul>
+			<li>OpenStreetMap te muestra un <strong>mapa general</strong> de carreteras y limites administrativos, que sirve como base al resto de la información presentada</li>
+			<li>Un <strong>mapa de precios</strong> que consiste en una retícula coloreada según el mismo código que el mapa de la izquierda, y te permite observar la distribución de precios con una mayor resolución: desde los 20 km. hasta los 300 km. de lado de cada cuadradito.</li>
+			<li>Un mapa de calor que te muestra la <strong>concentración de gasolineras</strong>; desde el azul pálido para las zonas menos provistas, hasta el púrpura que señala las áreas con mayor concentración.</li>
+			<li>Los <strong>marcadores individuales de cada una de las gasolineras</strong>. Para que comiencen a mostrarse deberás acercarte suficientemente al mapa.</li>
+		</ul>
 	</div>
 
 <div id="toolbar-container">
@@ -55,21 +61,21 @@ body {
 				src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 			</script>
 		</div>
-
-		<!-- <div class="toolbar-item">
-			<div id="brand-list">
-				<div id="">Marcas</div>
-				<ul id="brand" class="droplist"></ul>
-			</div>
-		</div> -->
-	
 	</div>
 
 
 </div> <!--toolbar-container-->
 
 	<div id="map-container">
-		<div id="raphael"></div>
+		<div id="raphael">
+			<div class="legend">
+				<div class="item"><div class="color high"></div><div>Precio alto</div></div>
+				<div class="itempad"><div class="colorpad medium-high"></div></div>
+				<div class="item"><div class="color medium"></div><div>Precio medio</div></div>
+				<div class="itempad"><div class="colorpad low-medium"></div></div>
+				<div class="item"><div class="color low"></div><div>Precio bajo</div></div>
+			</div>
+		</div>
 		<div id="openmap"></div>
 		<div id="layers">
 			<div class="sprt layers"></div>
@@ -79,17 +85,17 @@ body {
 	</div>
 
 	
-	<h2>Histograma de precios</h2>
+	<h2>Histograma de precios</h2><span class="more">[?]</span>
 	<div class="description">
-		<p>Se muestra el histograma de precios para la selección de provincias considerada. El rango horizontal se divide en 10 tramos de precios, desde el precio mínimo de todas las gasolineras de la selección de provincias, hasta el precio máximo.</p>
+		<p>Este gráfico muestra el <strong>histograma de precios para el tipo de combustible y la selección de provincias considerada</strong>.</p>
+		<p>El rango horizontal se divide en 10 tramos de precios, desde el precio mínimo alcanzado en los puntos de venta de la selección, hasta el precio máximo. Para cada intevalo de precios se muestra el número de gasolineras que ofrecen el combustible en ese rango de precios. El color de cada barra indica la provincia a la cuál se refieren los datos.</p>
+		<p>Es posible apilar las barras para mostrar gráficamente el resultado agregado de toda la selección en cada intervalo de precios.</p>
 	</div>
 
 	<div id="histogram-container" class="chart off">
-				<div class="chart_msg">Selecciona al menos una Provincia</div>
+		<input id="stack" name="stack" type="checkbox"><label for="stack">Apilar las barras</label>
+		<div class="chart_msg">Selecciona al menos una Provincia</div>
 		<div id="histogram" class="d3"></div>
-		<label for="stack">Apilar las barras</label>
-		<input id="stack" name="stack" type="checkbox">
-
 	</div>
 	<div class="ads main">
 		<script type="text/javascript"><!--
@@ -105,17 +111,16 @@ body {
 		</script>
 	</div>
 
-	<h2>Precio y puntos de venta por provincia</h2>
+	<h2>Precio y puntos de venta por provincia</h2><span class="more">[?]</span>
 	<div class="description">
-		<p>Se muestra el número de puntos de venta y precio medio de oferta por provincia y tipo de combustible seleccionado.</p>
+		<p>Aquí se muestra el <strong>número de puntos de venta</strong> (eje vertical, en escala logarítmica para mayor claridad) y <strong>precio medio de oferta</strong> (en el eje horizontal) en cada provincia seleccionada.</p>
+		<p>Al pulsar sobre cada uno de los círculos, que representa una provincia, se accede a la información detallada del precio medio y número de puntos de venta en cada una de las ciudades de esa provincia en la que está disponible el combustible seleccionado.</p>
 	</div>
 	
 	<div id="circles-container" class="chart off">
-			<div class="chart_msg">Selecciona al menos una Provincia</div>
+		<input id="spread" name="spread" type="checkbox"><label for="spread">Mostrar dispersión</label>
+		<div class="chart_msg">Selecciona al menos una Provincia</div>
 		<div id="circles" class="d3"></div>
-		<label for="spread">Mostrar dispersión</label>
-		<input id="spread" name="spread" type="checkbox">
-	
 	</div>
 	<div class="ads main">
 		<script type="text/javascript"><!--
@@ -131,8 +136,12 @@ body {
 		</script>
 	</div>
 
-	<h2>Cuotas de mercado de las empresas</h2>
-	<p>Observa la cuota de mercado que alcanza cada marca de combustible en cada una de las provincias de España, así como el precio medio del combustible que ofrece a sus clientes.</p>
+	<h2>Cuotas de mercado de las empresas</h2><span class="more">[?]</span>
+	<div class="description">
+		<p>Este último gráfico muestra la <strong>cuota de mercado que alcanza cada marca de combustible en cada una de las provincias seleccionadas, así como el precio medio del combustible que ofrece a sus clientes</strong>.</p>
+		<p>Para cada provincia y marca disponible, se representa un círculo de área proporcional al número total de gasolineras, y cuyo color indica el precio medio ofrecido para esta combinación siguiendo el mismo criterio que en el resto de gráficos (en rojo las más caras, en verde las más económicas, y en todos amarillentos y anaranjados las de precio intermedio)</p>
+		<p>Es importante resaltar que <strong>la información en este caso es meramente orientativa</strong>, puesto que los datos ofrecidos por el Ministerio de Industria, Energía y Comercio a través del Geoportal no son del todo claros en cuanto a la empresa que corresponde a cada una de las gasolineras. <strong>Todas aquellas estaciones cuya marca no queda del todo clara o representa una cuota de mercado muy marginal, se agrupan bajo el distintivo genérico "otras"</strong>.</p>
+	</div>
 
 	<div id="brands-container" class="chart off">
 			<div class="chart_msg">Selecciona al menos una Provincia</div>
