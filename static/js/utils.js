@@ -597,9 +597,19 @@ function sortName(a,b) {
 
 // Para agregar eventos 
 function addEvent(el, evnt, func) {
-		if(el.addEventListener) {
-			el.addEventListener(evnt, func, false);
-		} else if(el.attachEvent) {
-			el.attachEvent('on'+evnt, func);
-		}
+	if(el.addEventListener) {
+		el.addEventListener(evnt, func, false);
+	} else if(el.attachEvent) {
+		el.attachEvent('on'+evnt, func);
 	}
+}
+
+/* Función que confierte un círculo en un path, para transformaciones de raphael */
+// NO BORRAR, PUEDE SER ÚTIL
+// function circle2path(x , y, r) // x and y are center and r is the radius
+// {
+// 	// https://groups.google.com/forum/#!topic/raphaeljs/6gH8TiOWlAw
+// 	var s = "M";
+// 	s = s + "" + (x) + "," + (y-r) + "A"+r+","+r+",0,1,1,"+(x-0.1)+","+(y-r)+"z";
+// 	return s;
+// }
