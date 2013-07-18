@@ -1068,21 +1068,13 @@ function updateAll(recompute) {
 			colorCache = {};
 		}
 	}
-	tic();
 	histogram.draw();	// Dibujo del gráfico histograma
-	console.log("histograma"); toc();tic();
 	circles.draw();		// Dibujo del gráfico de círculos
-	console.log("círculos"); toc();tic();
 	brands.draw();		// Dibujo del gráfico de marcas
-	console.log("marcas"); toc();tic();
 	raphaelUpdate();	// Dibujo del mapa Raphael
-	console.log("raphael"); toc();tic();
 	drawMarkers();		// Mapa de marcadores
-	console.log("marcadores"); toc();tic();
 	drawPriceGrid();	// Mapa de retícula de precios
-	console.log("grid"); toc();tic();
 	drawHeatMap();
-	console.log("calor"); toc();
 
 	// Información
 	var infoDiv = document.getElementById("info");
