@@ -279,12 +279,12 @@ function openMapinit() {
 
 /* Actualización de la rejilla de precios */
 function drawPriceGrid() {
-	if (!theGrid) return;
-	priceLayer.removeAllFeatures();	// limpieza
-	var pmin = theGrid.pmin;
-	var pmax = theGrid.pmax;
-	var grid = theGrid.grid;
-	var features = [];
+	priceLayer.removeAllFeatures();			// limpieza
+	if (!theGrid || !theStats.stats[TYPE]) return;
+	var pmin = theStats.stats[TYPE].min,
+		pmax = theStats.stats[TYPE].max,
+		grid = theGrid.grid,
+		features = [];
 	for (var x in grid) {
 		var xo = grid[x].x;
 		for (var y in grid[x]) {
@@ -483,7 +483,8 @@ function initControl() {
 				if ((newValue<=0) || (newValue>300000)) return;
 				GRID_RESOLUTION=newValue;
 				value.textContent = "Resolución: " + newValue/1000 + " km.";
-				computePriceGrid();
+				theGrid = new PriceGrid(theStats.stats[TYPE]);
+				gasoleProcess(theInfo, callbackGrid);
 				drawPriceGrid();
 			}
 			bUp.onclick = function(e) {stopEvent(e);valueChange(1)};
@@ -979,132 +980,95 @@ function Brands(spread) {
 }
 
 /* Rejilla de precios, según tamaño GRID_RESOLUTION */
-function computePriceGrid() {
-	if (!theStats.stats[TYPE]) return theGrid={};
-	var bounds = theStats.stats[TYPE].g;				// límites del resultado
+function PriceGrid(stats) {
+	var bounds = stats.g;								// límites del resultado
 	var bl = reprojectLatLon([bounds[0],bounds[2]]), 	// bottom-left
 		tr = reprojectLatLon([bounds[1],bounds[3]]), 	// top-right
 		width = tr.lon-bl.lon,
-		height = tr.lat-bl.lat;
-	var xBins = Math.ceil(width/GRID_RESOLUTION),		// Número de bins horizontales
+		height = tr.lat-bl.lat,
+		xBins = Math.ceil(width/GRID_RESOLUTION),		// Número de bins horizontales
 		yBins = Math.ceil(height/GRID_RESOLUTION);		// Número de bins verticales
-	var offsetX = (xBins*GRID_RESOLUTION - width)/2,
-		offsetY = (xBins*GRID_RESOLUTION - height)/2;
-	var blx = bl.lon-offsetX,
-		bly = bl.lat-offsetY;							// Orígenes de la cuadrícula
-	var result = {},
-
-		pmin = 100, 
-		pmax = 0;
-		var floor = Math.floor;
-	gasoleProcess(theInfo, function(s) {
-		if (s.ll && s.o[TYPE]) {
-			var price = s.o[TYPE];
-			if (price<pmin) pmin=price;
-			else if (price>pmax) pmax=price;
-			var xindex = floor((s.ll.lon-blx)/GRID_RESOLUTION);
-			if (!result[xindex]) result[xindex] = {x: blx + xindex*GRID_RESOLUTION};
-			var resultx = result[xindex];
-			var yindex = floor((s.ll.lat-bly)/GRID_RESOLUTION);
-			if (!resultx[yindex]) resultx[yindex] = {y: bly + yindex*GRID_RESOLUTION, p: price, n: 1};
-			var resulty = resultx[yindex];
-			resulty.p = (resulty.p*resulty.n+price)/(++resulty.n);
-		}
-	});
-	theGrid={pmin:pmin, pmax:pmax, ox: blx, oy: bly, grid: result};
+	return {ox:bl.lon-(xBins*GRID_RESOLUTION - width)/2,	// origen x
+			oy:bl.lat-(xBins*GRID_RESOLUTION - height)/2,	// origen y
+			grid:{}};
 }
-
+function callbackGrid(s) {
+	var price = s.o[TYPE];
+	if (s.ll && price) {
+		var ox = theGrid.ox,
+			oy = theGrid.oy,
+			gdata = theGrid.grid;
+		var xindex = Math.floor((s.ll.lon-ox)/GRID_RESOLUTION);
+		if (!gdata[xindex]) gdata[xindex] = {x: ox+xindex*GRID_RESOLUTION};
+		var gdatax = gdata[xindex];
+		var yindex = Math.floor((s.ll.lat-oy)/GRID_RESOLUTION);
+		if (!gdatax[yindex]) gdatax[yindex] = {y: oy+yindex*GRID_RESOLUTION, p: price, n: 1};
+		else { 	var gdataxy = gdatax[yindex];
+				gdataxy.p = (gdataxy.p*gdataxy.n+price)/(++gdataxy.n);} 
+	}
+}
 /* Función que actualiza todos los gráficos,
 y recalcula las estadísticas en caso necesario */
 function updateAll(recompute) {
-	/* Acatualización del mapa de concentración */
-	function drawHeatMap() {
-		var heatPoints = [];
-		function addStation(s) {if (s.ll && s.o[TYPE]) heatPoints.push({lonlat: s.ll, count: 1});};
-		gasoleProcess(theInfo, addStation);
-		heatLayer.setDataSet({max: 1, data: heatPoints});
-	}
-	// Histogramas, distribuciones…
-	// nbins es el número de bins del histograma de precios
-	function computeHistograms(nbins) {
-		// Inicializa un histograma a cero
-		function initHist() {
-			var hist=[];var n = nbins;while (n--) hist[n]=0;return hist;
-		}
-		// Nuevo precio (price) en estadístico de marca (brand) y aumento del # pricebin
-		function addData(where, price, pricebin) {
-			where.n++;				// nueva estación
-			if (where.n==1) {		// es la primera
-				where.max = where.min = where.mu = price;
-			} else {
-				if (price>where.max) where.max=price;
-				else if (price<where.min) where.min=price;
-				where.mu = (where.mu*(where.n-1)+price)/where.n;
-			}
-			if (pricebin) where.hist[pricebin]++;
-		}
-		var sGlobal = theStats.stats;			// Estadísticas globales del resultado
-		var sProvs = theStats.provinces;			// Estadísticas de las provincias consideradas
-		// Cálculo de histogramas
-		for (var o in sGlobal) {
-			var sGlobalO = sGlobal[o],
-				bins = [],
-				gMin = sGlobalO.min,
-				gMax = sGlobalO.max;
-			var step = (gMax-gMin)/nbins;
-			for (var n=0; n<nbins; n++) bins[n] = gMin + n*step;
-			bins.push(gMax);
-			sGlobalO.bins = bins;
-			sGlobalO.brands = {};
-			sGlobalO.hist = initHist();
-			sGlobalO.step = step;
-			for (var p in sProvs) {
-				if (sProvs[p].hasOwnProperty(o)) {
-					var sProvO = sProvs[p][o];
-					sProvO.brands = {};
-					sProvO.hist = initHist();
-					// Y ahora los datos
-					var pdata = theInfo[p];
-					for (var t in pdata) {							// para todas las ciudades
-						var tdata = pdata[t];						
-						for (var s in tdata) {						// para todas las estaciones
-							var sdata = tdata[s];					// información de la estación
-							if (sdata.o.hasOwnProperty(o)) {
-								var brand = checkBrand(sdata.l);
-								var price = sdata.o[o];
-								var b = bins.length-1;
-								while (b--) {
-									if (bins[b]<price) break;
-								}
-								addData(sProvO, price, b);
-								addData(sGlobalO, price, b);
-								if (!sProvO.brands[brand]) sProvO.brands[brand]={n:0};
-								addData(sProvO.brands[brand], price);
-								if (!sGlobalO.brands[brand]) sGlobalO.brands[brand]={n:0};
-								addData(sGlobalO.brands[brand],price);
-							}
-						}
-					}
-				} 
-			}
-		}
-	}
 	if (typeof recompute == "undefined") recompute = true;
 	if (recompute) {
-		// Dalculamos la estadísticas para los datos seleccionados
+		// Calculamos la estadísticas para los datos seleccionados
 		theInfo = {};
 		for (p in REGIONS) { // Selección de datos para construir estadísticas
 			if (REGIONS[p].selected && !skipProv(p)) theInfo[p] = theGasole.info[p];
 		}
 		theStats = new GasoleStats(theInfo, [TYPE]);	// Estadística de la selección
-		computeHistograms(NBINS);						// Cálculo de los datos del histograma
-		computePriceGrid();								// Cálculo de la rejilla de precios
+		var gstats = theStats.stats[TYPE];			// Estadísticas globales del resultado
+		if (gstats) {
+			tic();
+			// HISTOGRAMAS
+			function initHist() {var h = [];for (var i=0;i<NBINS;i++) h[i]=0;return h;}
+			function callbackHistogram(station,p,t,s) {
+				var price = station.o[TYPE];
+				if (price) {
+					var pstats = provinces[p][TYPE];
+					if (!pstats.brands) {
+						pstats.brands={};
+						pstats.hist = initHist();
+					}
+					var brand = checkBrand(station.l);
+					if (!pstats.brands[brand]) pstats.brands[brand]=new Stats();
+					if (!gstats.brands[brand]) gstats.brands[brand]=new Stats();
+					pstats.brands[brand].add(price,[p,t,s]);
+					gstats.brands[brand].add(price,[p,t,s]);
+					var b = Math.min(Math.floor((price-gMin)/step), NBINS-1);
+					pstats.hist[b]++;
+					gstats.hist[b]++;
+				}
+			}
+			var bins = [],
+				gMin = gstats.min,
+				gMax = gstats.max,
+				provinces = theStats.provinces;			// Estadísticas de las provincias consideradas
+			var step = (gMax-gMin)/NBINS;
+			for (var n=0; n<=NBINS; n++) bins[n] = gMin+n*step;
+			gstats.bins = bins;
+			gstats.brands = {};
+			gstats.hist = initHist();
+			gstats.step = step;
+			// REJILLA DE PRECIOS
+			theGrid = new PriceGrid(theStats.stats[TYPE]);
+			// MAPA DE CALOR
+			var heatPoints = [];
+			gasoleProcess(theInfo, function(station,p,t,s) {
+				callbackHistogram(station,p,t,s);	
+				callbackGrid(station);
+				if (station.ll && station.o[TYPE]) heatPoints.push({lonlat: station.ll, count: 1});	// mapa de calor
+			});
+			heatLayer.setDataSet({max: 1, data: heatPoints});	// mapa de calor
+			toc();
+		}
+
 	}
 	histogram.draw();	// Dibujo del gráfico histograma
 	circles.draw();		// Dibujo del gráfico de círculos
 	brands.draw();		// Dibujo del gráfico de marcas
 	raphaelUpdate();	// Dibujo del mapa Raphael
-	drawHeatMap();	// Mapa de concentración
 	drawMarkers();		// Mapa de marcadores
 	drawPriceGrid();	// Mapa de retícula de precios
 	// Información
@@ -1207,11 +1171,8 @@ function Histogram() {
 		}
 		var x_axis = chart.select(".x.axis");
 			x_axis.transition().duration(500).call(xAxis);
-			// x_axis.selectAll("text").style("font-size", ".8em");
-		
 		var y_axis = chart.select(".y.axis");
 			y_axis.transition().duration(500).call(yAxis);
-			y_axis.selectAll("text").style("font-size", ".8em");
 
 		var barWidth = (gridWidth-(2*binMargin));
 		if (!this.stacked) barWidth/=nSeries;	// ancho de cada barra
@@ -1232,8 +1193,7 @@ function Histogram() {
 					return "translate(" + (binMargin+(THAT.stacked ? 0 : si*barWidth)) + ",0)";
 				});
 		series.exit().selectAll("rect")
-			.transition().duration(transY)
-			.attr("height", 0);
+			.transition().duration(transY).attr("height", 0);
 		series.exit().transition().delay(transY).remove();
 		series.each(function(sd,si) {
 			var color = sd.color;
@@ -1246,9 +1206,7 @@ function Histogram() {
 					.attr("y", 
 						function(d,i){
 							var value = d;
-							if (THAT.stacked) {
-								for (var index=0; index<si; index++) value+=data[index].hist[i];
-							}
+							if (THAT.stacked) {for (var index=0; index<si; index++) value+=(data[index].hist[i]);}
 							return y(value);
 						})
 					.attr("height", 
@@ -1265,9 +1223,7 @@ function Histogram() {
 					.attr("y", 
 						function(d,i){
 							var value = d;
-							if (THAT.stacked) {
-								for (var index=0; index<si; index++) value+=data[index].hist[i];
-							}
+							if (THAT.stacked) {for (var index=0; index<si; index++) value+=data[index].hist[i];}
 							return y(value);
 						})
 					.attr("height", function(d,i){return height-y(d);})
@@ -1277,7 +1233,7 @@ function Histogram() {
 				var pmin = bins[i].toFixed(3);
 				var pmax = bins[i+1].toFixed(3);
 				var infoText = ["En " + prettyName(data[si].name)];
-				infoText.push("hay " + d + " puntos de venta");
+				infoText.push("hay " + (d) + " puntos de venta");
 				infoText.push("de " + FUEL_OPTIONS[TYPE].name);
 				infoText.push("entre " + pmin + " y " + pmax + " €/l");
 				var options = {	"r": 100,
