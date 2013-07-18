@@ -604,6 +604,14 @@ function addEvent(el, evnt, func) {
 	}
 }
 
+// Para medir tiempo
+var TIME;
+function tic() {
+	TIME = new Date().getTime();
+}
+function toc() {
+	console.log("Transcurridos: " + (new Date().getTime()-TIME) + " ms");
+}
 /* Función que confierte un círculo en un path, para transformaciones de raphael */
 // NO BORRAR, PUEDE SER ÚTIL
 // function circle2path(x , y, r) // x and y are center and r is the radius
