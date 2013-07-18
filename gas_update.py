@@ -208,7 +208,7 @@ def gas_update_xls(option="1"):
 		option = [option]
 	for o in option:
 		logging.info("Obteniendo %s" %FUEL_OPTIONS[o]["name"])
-		response = urlfetch.fetch(URL_XLS+o)
+		response = urlfetch.fetch(URL_XLS+o, deadline=55)
 		if response.status_code == 200:
 			page = html.document_fromstring(response.content)
 			tables = page.xpath("body/table")
