@@ -15,6 +15,7 @@ if 'lib' not in sys.path:
     sys.path.insert(0, 'libs')
     
 import urllib
+
 from zipfile import ZipFile
 import time
 from StringIO import StringIO
@@ -148,38 +149,57 @@ def gas_update_csv(option="1"):
 	headers = ["Lat.", "Lon.", "Info", "Precio"]
 	return Result(headers=headers, data=data)
 
+# # Actualización desde fichero excel zipeado
+# def gas_update_xls(option="1"):
+# 	xls_result = ResultIter()
+# 	data_error = False
+# 	rpcs = []
+# 	def handle_xls_result(rpc, o):
+# 		rpc_res = rpc.get_result()
+# 		page = html.document_fromstring(rpc_res.content)
+# 		tables = page.xpath("body/table")
+# 		if tables:	# si encuentra tablas en el resultado
+# 			rows = tables[0].findall("tr")
+# 			for tr in rows[3:]:
+# 				row_data = [td.text for td in tr.getchildren()]
+# 				if row_data[7] == "P":	# guardo sólo gaslineras de venta público
+# 					date = map(int, row_data[4].split("/"))
+# 					date.reverse();
+# 					xls_result.add_item(
+# 						province = row_data[0],
+# 						town     = row_data[1],
+# 						station  = row_data[2] + " [" + re.sub("\s+", "", row_data[3]) + "]",
+# 						date     = date,
+# 						label    = row_data[6],
+# 						hours    = row_data[9],
+# 						option   = {o: float(re.sub(",", ".", row_data[5]))})
+# 			logging.info("fin procesando %s: %s" %(o, memory_usage().current()))
+# 		else:
+# 			logging.info("sin informacion en %s" %o)
+# 			data_error = True
+		
+# 	def create_xls_callback(rpc, o):
+# 		return lambda: handle_xls_result(rpc, o)
+	
+# 	logging.info("comienzo gas_update_xls: %s" %memory_usage().current())
+# 	if option == "0":
+# 		option = sorted(FUEL_OPTIONS.keys())[1:]
+# 		logging.info("Buscando datos de todos los tipos")
+# 	else:
+# 		option = [option]
+# 	for o in option:
+# 		logging.info("Obteniendo %s" %FUEL_OPTIONS[o]["name"])
+# 		rpc = urlfetch.create_rpc(deadline=55)
+# 		rpc.callback = create_xls_callback(rpc, o)
+# 		urlfetch.make_fetch_call(rpc, URL_XLS+o)
+# 		rpcs.append(rpc)
+# 	for rpc in rpcs:
+# 		rpc.wait()
+# 	return xls_result if not data_error else None
+
 # Actualización desde fichero excel zipeado
 def gas_update_xls(option="1"):
 	xls_result = ResultIter()
-	data_error = False
-	rpcs = []
-	def handle_xls_result(rpc, o):
-		rpc_res = rpc.get_result()
-		page = html.document_fromstring(rpc_res.content)
-		tables = page.xpath("body/table")
-		if tables:	# si encuentra tablas en el resultado
-			rows = tables[0].findall("tr")
-			for tr in rows[3:]:
-				row_data = [td.text for td in tr.getchildren()]
-				if row_data[7] == "P":	# guardo sólo gaslineras de venta público
-					date = map(int, row_data[4].split("/"))
-					date.reverse();
-					xls_result.add_item(
-						province = row_data[0],
-						town     = row_data[1],
-						station  = row_data[2] + " [" + re.sub("\s+", "", row_data[3]) + "]",
-						date     = date,
-						label    = row_data[6],
-						hours    = row_data[9],
-						option   = {o: float(re.sub(",", ".", row_data[5]))})
-			logging.info("fin procesando %s: %s" %(o, memory_usage().current()))
-		else:
-			logging.info("sin informacion en %s" %o)
-			data_error = True
-		
-	def create_xls_callback(rpc, o):
-		return lambda: handle_xls_result(rpc, o)
-	
 	logging.info("comienzo gas_update_xls: %s" %memory_usage().current())
 	if option == "0":
 		option = sorted(FUEL_OPTIONS.keys())[1:]
@@ -188,13 +208,30 @@ def gas_update_xls(option="1"):
 		option = [option]
 	for o in option:
 		logging.info("Obteniendo %s" %FUEL_OPTIONS[o]["name"])
-		rpc = urlfetch.create_rpc(deadline=55)
-		rpc.callback = create_xls_callback(rpc, o)
-		urlfetch.make_fetch_call(rpc, URL_XLS+o)
-		rpcs.append(rpc)
-	for rpc in rpcs:
-		rpc.wait()
-	return xls_result if not data_error else None
+		response = urlfetch.fetch(URL_XLS+o)
+		if response.status_code == 200:
+			page = html.document_fromstring(response.content)
+			tables = page.xpath("body/table")
+			if tables:	# si encuentra tablas en el resultado
+				rows = tables[0].findall("tr")
+				for tr in rows[3:]:
+					row_data = [td.text for td in tr.getchildren()]
+					if row_data[7] == "P":	# guardo sólo gaslineras de venta público
+						date = map(int, row_data[4].split("/"))
+						date.reverse();
+						xls_result.add_item(
+							province = row_data[0],
+							town     = row_data[1],
+							station  = row_data[2] + " [" + re.sub("\s+", "", row_data[3]) + "]",
+							date     = date,
+							label    = row_data[6],
+							hours    = row_data[9],
+							option   = {o: float(re.sub(",", ".", row_data[5]))})
+				logging.info("fin procesando %s: %s" %(o, memory_usage().current()))
+			else:
+				logging.info("sin informacion en %s" %o)
+				return None
+	return xls_result
 
 # Actualización por búsqueda directa
 def gas_update_search(option="1", prov="01"):
