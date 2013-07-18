@@ -26,7 +26,10 @@ body {
 	float: right;
 	}
 }
-
+#social > div {
+	float: right;
+	margin-bottom: 10px;
+}
 #list {
 	width: 730px;
 	float: right;

@@ -201,6 +201,9 @@ footer ul a:hover{
 	background-color: #fff;
 	color: #333;
 }
+#followme {
+	margin-top: 10px;
+}
 .footer_section {
 	display: inline-block;
 	height: 200px;
