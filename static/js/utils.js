@@ -609,8 +609,8 @@ var TIME;
 function tic() {
 	TIME = new Date().getTime();
 }
-function toc() {
-	console.log("Transcurridos: " + (new Date().getTime()-TIME) + " ms");
+function toc(s) {
+	console.log((s ? (s+" :") : "Transcurridos: ") + (new Date().getTime()-TIME) + " ms");
 }
 /* Función que confierte un círculo en un path, para transformaciones de raphael */
 // NO BORRAR, PUEDE SER ÚTIL

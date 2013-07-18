@@ -3,7 +3,7 @@ var theInfo = null;		// La información de la selección actual
 var theStats = null;	// Estadísticas de la selección actual
 var theGrid = null;		// La rejilla para el mapa
 var TYPE = "1";			// Tipo de combustible seleccionado
-
+var heatPoints = [];	// Lista de puntos para el mapa de calor
 var histogram = new Histogram();
 var circles = new Circles();
 var brands = new Brands();
@@ -112,7 +112,9 @@ function reprojectLatLon(latlon) {
 /* Confierte tres componentes de color en rgb */
 function array2color(a) {return "rgb(" + a.join(",") + ")";}
 // Obtiene un color para un precio, interpolado entre dos colores extremos
+var colorCache={};
 function pickColor(x, xmin, xmax, xmu) {
+	if (x in colorCache) return colorCache[x];
 	if (xmax==xmin) return array2color(CMU);
 	if ((x>xmax)||(x<xmin)) {return "#000";};
 	if (typeof xmu == "undefined") xmu = (xmin+xmax)/2;	// media aritmética
@@ -124,7 +126,9 @@ function pickColor(x, xmin, xmax, xmu) {
 		var val = cmin[c] + (x-xmin) * (cmax[c]-cmin[c]) / (xmax-xmin);
 		rgb[c] = (val<0) ? 0 : Math.round(Math.min(255,val));
 	}
-	return array2color(rgb);
+	var color = array2color(rgb);
+	colorCache[x] = color;
+	return color;
 }
 
 /* Actualización del mapa de Raphael */
@@ -300,6 +304,9 @@ function drawPriceGrid() {
 	priceLayer.addFeatures(features);
 }
 
+function drawHeatMap() {
+	heatLayer.setDataSet({max: 1, data: (theStats.stats[TYPE] ? heatPoints : [])});	// mapa de calor
+}
 /* Inicialización de raphael */
 function raphaelInit() {
 	paper = Raphael("raphael");
@@ -995,6 +1002,7 @@ function PriceGrid(stats) {
 function callbackGrid(s) {
 	var price = s.o[TYPE];
 	if (s.ll && price) {
+		heatPoints.push({lonlat: s.ll, count: 1});	// mapa de calor
 		var ox = theGrid.ox,
 			oy = theGrid.oy,
 			gdata = theGrid.grid;
@@ -1020,7 +1028,6 @@ function updateAll(recompute) {
 		theStats = new GasoleStats(theInfo, [TYPE]);	// Estadística de la selección
 		var gstats = theStats.stats[TYPE];			// Estadísticas globales del resultado
 		if (gstats) {
-			tic();
 			// HISTOGRAMAS
 			function initHist() {var h = [];for (var i=0;i<NBINS;i++) h[i]=0;return h;}
 			function callbackHistogram(station,p,t,s) {
@@ -1051,26 +1058,32 @@ function updateAll(recompute) {
 			gstats.brands = {};
 			gstats.hist = initHist();
 			gstats.step = step;
-			// REJILLA DE PRECIOS
+			// REJILLA DE PRECIOS y MAPA DE CALOR
+			heatPoints = [];
 			theGrid = new PriceGrid(theStats.stats[TYPE]);
-			// MAPA DE CALOR
-			var heatPoints = [];
 			gasoleProcess(theInfo, function(station,p,t,s) {
 				callbackHistogram(station,p,t,s);	
 				callbackGrid(station);
-				if (station.ll && station.o[TYPE]) heatPoints.push({lonlat: station.ll, count: 1});	// mapa de calor
 			});
-			heatLayer.setDataSet({max: 1, data: heatPoints});	// mapa de calor
-			toc();
+			colorCache = {};
 		}
-
 	}
+	tic();
 	histogram.draw();	// Dibujo del gráfico histograma
+	console.log("histograma"); toc();tic();
 	circles.draw();		// Dibujo del gráfico de círculos
+	console.log("círculos"); toc();tic();
 	brands.draw();		// Dibujo del gráfico de marcas
+	console.log("marcas"); toc();tic();
 	raphaelUpdate();	// Dibujo del mapa Raphael
+	console.log("raphael"); toc();tic();
 	drawMarkers();		// Mapa de marcadores
+	console.log("marcadores"); toc();tic();
 	drawPriceGrid();	// Mapa de retícula de precios
+	console.log("grid"); toc();tic();
+	drawHeatMap();
+	console.log("calor"); toc();
+
 	// Información
 	var infoDiv = document.getElementById("info");
 	var stats = theStats.stats[TYPE];
@@ -1155,7 +1168,6 @@ function Histogram() {
 				.attr("transform", "translate(0," + height + ")");
 			chart.append("g")
 				.attr("class", "y axis");
-			
 		}
 		if (nSeries>1) {
 			grid = chart.selectAll(".grid").data(bins);
