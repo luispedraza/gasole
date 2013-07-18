@@ -2,7 +2,8 @@
   font-family: 'digital-7';
   src: url('/font/digital-7.ttf');
 }
-
+#social {
+margin-bottom: 10px;}
 #ads-top {
 	width: 730px;
 	height: 90px;
@@ -90,6 +91,11 @@
 	cursor: pointer;
 	width: 1em;
 	height: 1em;
+}
+#price-board .the_best {
+	margin-left: auto;
+	margin-right: auto;
+	display: block;
 }
 #price-board .rel {
 	width: 100%;

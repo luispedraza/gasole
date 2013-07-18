@@ -221,11 +221,12 @@ function initPrice(price) {
 									candidateMark.setPosition(candidate);
 									candidateMark.setAnimation(google.maps.Animation.BOUNCE)
 								} else {
-									var image = new google.maps.MarkerImage("/img/sprt.png", new google.maps.Size(25, 25, "px", "px"), new google.maps.Point(2,473), null, null);
+									// var image = new google.maps.MarkerImage("/img/sprt.png", new google.maps.Size(25, 25, "px", "px"), new google.maps.Point(2,473), null, null);
 									candidateMark = new google.maps.Marker({
 										map: map,
 										position: candidate,
-										icon: image,
+										// icon: image,
+										icon: "/img/pump_mark.png",
 										animation: google.maps.Animation.BOUNCE
 									});
 								}
