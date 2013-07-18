@@ -11,7 +11,7 @@
 	<meta name="apple-mobile-web-app-capable" content="yes" />
 	<!-- iPhone -->
     <link href="/img/apple-startup-ihone.png" media="(device-width: 320px) and (-webkit-device-pixel-ratio: 1)" rel="apple-touch-startup-image">
-    <!-- iPhone (Retina) -->
+    <!-- iPhone (r) -->
     <link href="/img/apple-startup-ihone.png" media="(device-width: 320px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image">
     <!-- iPhone 5 -->
     <link href="/img/apple-startup-ihone.png"  media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image">
@@ -19,9 +19,9 @@
     <link href="/img/apple-startup-ihone.png" media="(device-width: 768px) and (device-height: 1024px) and (orientation: portrait) and (-webkit-device-pixel-ratio: 1)" rel="apple-touch-startup-image">
     <!-- iPad Landscape -->
     <link href="/img/apple-startup-ihone.png" media="(device-width: 768px) and (device-height: 1024px) and (orientation: landscape) and (-webkit-device-pixel-ratio: 1)" rel="apple-touch-startup-image">
-    <!-- iPad Portrait (Retina) -->
+    <!-- iPad Portrait (r) -->
     <link href="/img/apple-startup-ihone.png" media="(device-width: 768px) and (device-height: 1024px) and (orientation: portrait) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image">
-    <!-- iPad Landscape (Retina) -->
+    <!-- iPad Landscape (r) -->
     <link href="/img/apple-startup-ihone.png" media="(device-width: 768px) and (device-height: 1024px) and (orientation: landscape) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image">
 
 	<link rel="stylesheet" type="text/css" href="/css/base.css" />
@@ -43,43 +43,23 @@
 		})();
 	</script>
 
-	<!--[if lte IE 8]>
-		<script src="/js/my_js_files/excanvas.js"></script>
-	<![endif]-->
-
-
-	<!-- snippet G+ -->
-	<meta itemprop="name" content="Gasolé, gasolina barata e información en gasole.net">
-	<meta itemprop="description" content="Echa un ojo a esta página en gasole.net">
-	<meta itemprop="image" content="http://www.gasole.net/img/logo_small.png">
-	<!-- FB OpenGraph -->
-	<meta property="og:title" content="Gasol&#xe9;, gasolina barata e informaci&#xf3;n en gasole.net" />
-	<meta property="og:type" content="website" />
-	<meta property="og:url" content="http://www.gasole.net" />
-	<meta property="og:image" content="http://www.gasole.net/img/logo_small.png" />
-	<meta property="og:site_name" content="GasOl&#xe9;" />
-	<meta property="fb:admins" content="613759574" />
-
-
 	<!-- sharethis -->
-	<script type="text/javascript">var switchTo5x=true;</script>
+	<script type="text/javascript">
+		var switchTo5x=true;
+	</script>
 	<script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>
-	<script type="text/javascript">stLight.options({publisher: "17c5fc50-e0a1-43cf-b6a3-47bff785eee2", doNotHash: false, doNotCopy: false, hashAddressBar: false});</script>
+	<script type="text/javascript">
+		stLight.options({
+			publisher: "17c5fc50-e0a1-43cf-b6a3-47bff785eee2", 
+			tracking:'google',
+			doNotHash: false, 
+			doNotCopy: false, 
+			onhover: false,
+			hashAddressBar: false});
+	</script>
 </head>
 
-
 <body>
-<!-- FB Like -->
-<div id="fb-root"></div>
-<script>(function(d, s, id) {
-var js, fjs = d.getElementsByTagName(s)[0];
-if (d.getElementById(id)) return;
-js = d.createElement(s); js.id = id;
-js.src = "//connect.facebook.net/es_ES/all.js#xfbml=1&appId=490761724315971";
-fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'facebook-jssdk'));</script>
-<!-- End FB Like -->
-
 <header id="header">
 	{% if user %}
 	<div id="user">
@@ -139,7 +119,9 @@ fjs.parentNode.insertBefore(js, fjs);
 <div class="footer_section" style="width: 730px;float: right;">
 	<h2>Todas las provincias</h2>
 	<ul id="allprovs">
-		<script>initProvLinks("allprovs");</script>
+		<script>
+		initProvLinks("allprovs");
+		</script>
 	</ul>
 </div>
 
