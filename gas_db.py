@@ -98,15 +98,15 @@ def getAll(when=None):
 	return alldata
 
 @db.transactional
-def updateDB(dnew, dold):
+def updateDB(dnew, dold=None):
 	if len(dnew):
 		db.put(dnew)
-	if len(dold):
+	if dold and len(dold):
 		db.delete(dold)
 
 def data2store(data):
 	if not data:
-		logging.info("no hay datos que gaurdar")
+		logging.info("NO HAY DATOS QUE GAURDAR")
 		return
 	cachedata = json.loads(getAll().decode('zlib'))
 	for p in data: # recorremos las provincias
@@ -117,8 +117,8 @@ def data2store(data):
 		_history = []		# nuevos históricos (tantos como _prices)
 		_closed = []		# estaciones cerradas
 		_del_prices = []	# precios actuales a borrar
-		datap = data[p]
-		cachep = cachedata[p]
+		datap = data.get(p)
+		cachep = cachedata.get(p)
 		if not cachep: # nueva provincia
 			cachep = {}
 			_provinces.append(Province(key_name=p))
@@ -170,32 +170,34 @@ def data2store(data):
 		if len(newdata):
 			try:
 				logging.info("==========Guardando datos de %s" %p)
-				updateDB(dnew=newdata, dold=_del_prices)
 				if len(_towns):
-					logging.info("%s ciudades" %len(_towns))
+					logging.info("%s nuevas ciudades" %len(_towns))
 				if len(_stations):
-					logging.info("%s estaciones" %len(_stations))
+					logging.info("%s nuevas estaciones" %len(_stations))
 				if len(_prices):
-					logging.info("%s precios" %len(_prices))
+					logging.info("%s nuevos precios" %len(_prices))
 				if len(_history):
 					logging.info("%s históricos" %len(_history))
 				if len(_closed):
 					logging.info("%s estaciones CERRADAS" %len(_closed))
 				if len(_del_prices):
 					logging.info("%s precios BORRADOS" %len(_del_prices))
+				updateDB(dnew=newdata, dold=_del_prices)
 				json_data = json.dumps({"_data": {p: datap}})
 				ApiJson(key_name=p, json=json_data).put()
 				logging.info("Uso de memoria: %s" %memory_usage().current())
 			except Exception, e:
-				logging.error("***************No se han podido guardar los datos de %s" %p)
+				logging.error("*************** No se han podido guardar los datos de %s" %p)
 				logging.error(str(e))
+				return
 		del newdata
 	try:
 		alldata = json.dumps(data).encode('zlib')
+		updateDB(dnew=[ApiAllJson(json=alldata)])
 		memcache.set("All", alldata)
-		ApiAllJson(json=alldata).put()
 	except Exception, e:
 		logging.error("No se ha podido guardar el Gzip")
+		logging.error(str(e))
 	
 # obtenemos información de la base de datos
 def store2data(option=None, prov_kname=None):
