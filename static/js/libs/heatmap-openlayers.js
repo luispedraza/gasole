@@ -66,20 +66,14 @@ OpenLayers.Layer.Heatmap = OpenLayers.Class(OpenLayers.Layer, {
     setDataSet: function(obj){
         var set = {},
         dataset = obj.data,
-        dlen = dataset.length,
-                entry, lonlat, pixel;
-
+        dlen =  dataset.length,
+                entry, pixel;
         set.max = obj.max;
-        set.data = [];
+        set.data = sdata = [];
         while(dlen--){  // get the pixels for all the lonlat entries
-            entry = dataset[dlen],
-            // lonlat = entry.lonlat.clone().transform(this.projection, this.map.getProjectionObject()),
-            lonlat = entry.lonlat,
-            pixel = this.roundPixels(this.getViewPortPxFromLonLat(lonlat));
-                
-            if(pixel){
-                set.data.push({x: pixel.x, y: pixel.y, count: entry.count});
-            }
+            entry = dataset[dlen];
+            pixel = this.roundPixels(this.getViewPortPxFromLonLat(entry.lonlat));
+            if(pixel) sdata.push({x: pixel.x, y: pixel.y, count: entry.count});
         }
         this.tmpData = obj;
         this.heatmap.store.setDataSet(set);

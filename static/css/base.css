@@ -67,7 +67,7 @@ header, footer {
 	background-color: #333;
 	color: #fff;
 	font-size: 30px;
-	font-weight: bold;
+	/*font-weight: bold;*/
 	padding: 10px;
 }
 strong {
@@ -137,7 +137,7 @@ li.menu.news > a {
 li.menu.search .item {
 	background-color: #8b4163;
 	border-color: #58110e;
-	width: 410px;
+	width: 440px;
 }
 .m_desc {
 	background-color: #f7f7cf;
@@ -208,7 +208,15 @@ footer ul a:hover{
 	display: inline-block;
 	height: 200px;
 }
-
+.footer_section.about {
+	width: 250px;
+}
+.footer_section.about p {
+	margin-top: 10px;
+}
+.footer_section.about a {
+	text-decoration: underline;
+}
 #content {
 	background-color: #fff;
 	position: relative;
@@ -281,7 +289,7 @@ footer ul a:hover{
 	z-index: 100;
 	background-color: #8b4163;
 	border-bottom: 5px solid #58110e;
-	width: 400px;
+	width: 440px;
 	padding: 10px;
 	font-size: 14px;
 	color: #fff;

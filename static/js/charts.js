@@ -1074,7 +1074,9 @@ function updateAll(recompute) {
 	raphaelUpdate();	// Dibujo del mapa Raphael
 	drawMarkers();		// Mapa de marcadores
 	drawPriceGrid();	// Mapa de retícula de precios
+	tic();
 	drawHeatMap();
+	toc();
 
 	// Información
 	var infoDiv = document.getElementById("info");
