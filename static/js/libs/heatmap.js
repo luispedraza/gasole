@@ -33,17 +33,35 @@ var PI2 = Math.PI*2;
         setDataSet: function(obj) {
             var me = this,
                 heatmap = me.get("heatmap"),
-                data = [],
                 d = obj.data,
-                dlen = d.length;
+                dlen = d.length,
+                max = obj.max,
+                radius = heatmap.get("radius"),
+                ctx = heatmap.get("actx"),
+                R = 1.5*radius >> 0,
+                bounds = heatmap.get("bounds");
             heatmap.clear();        // clear the heatmap before the data set gets drawn
-            this.max = obj.max;
+            this.max = max;
+            ctx.shadowOffsetX = 15000; 
+            ctx.shadowOffsetY = 15000; 
+            ctx.shadowBlur = 15;
             // if a legend is set, update it
-            heatmap.get("legend") && heatmap.get("legend").update(obj.max);
+            heatmap.get("legend") && heatmap.get("legend").update(max);
             for (var x in d) {
                 var dx = d[x];
                 for (var y in dx) {
-                    heatmap.drawAlpha(x, y, dx[y]);
+                    var count = dx[y],
+                        xb = x-R, yb = y-R,
+                        xc = x+R, yc = y+R;
+                    ctx.shadowColor = 'rgba(0,0,0,'+count/max+')';
+                    ctx.beginPath();
+                    ctx.arc(x-15000, y-15000, radius, 0, PI2, true);
+                    ctx.closePath();
+                    ctx.fill();
+                    if(xb < bounds["l"]) bounds["l"] = xb;
+                    if(yb < bounds["t"]) bounds["t"] = yb;
+                    if(xc > bounds['r']) bounds['r'] = xc;
+                    if(yc > bounds['b']) bounds['b'] = yc;
                 }
             }
             heatmap.colorize();
@@ -359,29 +377,6 @@ var PI2 = Math.PI*2;
             // after the manipulation process we have to set the manipulated data to the ImageData object
             image.data = imageData;
             ctx.putImageData(image, left, top);
-        },
-        drawAlpha: function(x, y, count){
-            // storing the variables because they will be often used
-            var me = this,
-                radius = me.get("radius"),
-                ctx = me.get("actx"),
-                max = me.get("max"),
-                R = 1.5*radius >> 0,
-                bounds = me.get("bounds"),
-                xb = x - R, yb = y - R >> 0,
-                xc = x + R, yc = y + R;
-            ctx.shadowColor = ('rgba(0,0,0,'+((count)?(count/me.store.max):'0.1')+')');
-            ctx.shadowOffsetX = 15000; 
-            ctx.shadowOffsetY = 15000; 
-            ctx.shadowBlur = 15;
-            ctx.beginPath();
-            ctx.arc(x - 15000, y - 15000, radius, 0, PI2, true);
-            ctx.closePath();
-            ctx.fill();
-            if(xb < bounds["l"]) bounds["l"] = xb;
-            if(yb < bounds["t"]) bounds["t"] = yb;
-            if(xc > bounds['r']) bounds['r'] = xc;
-            if(yc > bounds['b']) bounds['b'] = yc;
         },
         setVisibility: function(v) {
             this.set("visible", v);

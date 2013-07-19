@@ -297,8 +297,8 @@ function drawPriceGrid() {
 	for (var x in grid) {
 		var xo = grid[x].x;
 		for (var y in grid[x]) {
-			var data = grid[x][y];
-			var yo = data.y,
+			var data = grid[x][y],
+				yo = data.y,
 				color = priceColor.get(data.p, pmin, pmax, pmu);
 			var poly = new OpenLayers.Bounds(xo,yo,xo+GRID_RESOLUTION,yo+GRID_RESOLUTION).toGeometry();
 			var polygonFeature = new OpenLayers.Feature.Vector(poly);
@@ -1098,12 +1098,11 @@ function updateAll(recompute) {
 	circles.draw();		// Dibujo del gráfico de círculos
 	brands.draw();		// Dibujo del gráfico de marcas
 	raphaelUpdate();	// Dibujo del mapa Raphael
-	drawMarkers();		// Mapa de marcadores
-	drawPriceGrid();	// Mapa de retícula de precios
-	tic();
-	drawHeatMap();
-	toc();
-
+	setTimeout(function() {
+		drawMarkers();		// Mapa de marcadores
+		drawPriceGrid();	// Mapa de retícula de precios
+		drawHeatMap();
+	}, 100);
 	// Información
 	var infoDiv = document.getElementById("info");
 	var stats = theStats.stats[TYPE];
