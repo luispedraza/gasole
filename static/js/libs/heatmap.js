@@ -40,12 +40,11 @@ var PI2 = Math.PI*2;
             this.max = obj.max;
             // if a legend is set, update it
             heatmap.get("legend") && heatmap.get("legend").update(obj.max);
-            for (i=0;i<dlen;i++) {
-                var point = d[i];
-                heatmap.drawAlpha(point.x, point.y, point.count);
-                if(!data[point.x]) data[point.x] = [];
-                if(!data[point.x][point.y]) data[point.x][point.y] = 0;
-                data[point.x][point.y] += point.count;
+            for (var x in d) {
+                var dx = d[x];
+                for (var y in dx) {
+                    heatmap.drawAlpha(x, y, dx[y]);
+                }
             }
             heatmap.colorize();
             this.set("data", d);
@@ -313,97 +312,55 @@ var PI2 = Math.PI*2;
             return height;
         },
         colorize: function(x, y) {
-                // get the private variables
-                var me = this,
-                    width = me.get("width"),
-                    radius = me.get("radius"),
-                    height = me.get("height"),
-                    actx = me.get("actx"),
-                    ctx = me.get("ctx"),
-                    x2 = radius * 3,
-                    premultiplyAlpha = me.get("premultiplyAlpha"),
-                    palette = me.get("gradient"),
-                    opacity = me.get("opacity"),
-                    bounds = me.get("bounds"),
-                    left, top, bottom, right, 
-                    image, imageData, length, alpha, offset, finalAlpha;
-                
-                if(x != null && y != null){
-                    if(x+x2>width){
-                        x=width-x2;
-                    }
-                    if(x<0){
-                        x=0;
-                    }
-                    if(y<0){
-                        y=0;
-                    }
-                    if(y+x2>height){
-                        y=height-x2;
-                    }
-                    left = x;
-                    top = y;
-                    right = x + x2;
-                    bottom = y + x2;
-
-                }else{
-                    if(bounds['l'] < 0){
-                        left = 0;
-                    }else{
-                        left = bounds['l'];
-                    }
-                    if(bounds['r'] > width){
-                        right = width;
-                    }else{
-                        right = bounds['r'];
-                    }
-                    if(bounds['t'] < 0){
-                        top = 0;
-                    }else{
-                        top = bounds['t'];
-                    }
-                    if(bounds['b'] > height){
-                        bottom = height;
-                    }else{
-                        bottom = bounds['b'];
-                    }    
+            // get the private variables
+            var me = this,
+                width = me.get("width"),
+                radius = me.get("radius"),
+                height = me.get("height"),
+                actx = me.get("actx"),
+                ctx = me.get("ctx"),
+                x2 = radius * 3,
+                premultiplyAlpha = me.get("premultiplyAlpha"),
+                palette = me.get("gradient"),
+                opacity = me.get("opacity"),
+                bounds = me.get("bounds"),
+                image, imageData, length, alpha, offset, finalAlpha,
+                left = (bounds['l'] < 0) ? 0 : bounds['l'],
+                right = (bounds['r'] > width) ? width : bounds['r'],
+                top = (bounds['t'] < 0) ? 0 : bounds['t'],
+                bottom = (bounds['b'] > height) ? height : bounds['b'];
+            image = actx.getImageData(left, top, right-left, bottom-top);
+            imageData = image.data;
+            length = imageData.length;
+            // loop thru the area
+            for(var i=3; i < length; i+=4){
+                // [0] -> r, [1] -> g, [2] -> b, [3] -> alpha
+                alpha = imageData[i],
+                offset = alpha*4;
+                if(!offset) continue;
+                // we ve started with i=3
+                // set the new r, g and b values
+                finalAlpha = (alpha < opacity)?alpha:opacity;
+                imageData[i-3]=palette[offset];
+                imageData[i-2]=palette[offset+1];
+                imageData[i-1]=palette[offset+2];
+                if (premultiplyAlpha) {
+                	// To fix browsers that premultiply incorrectly, we'll pass in a value scaled
+                	// appropriately so when the multiplication happens the correct value will result.
+                	imageData[i-3] /= 255/finalAlpha;
+                	imageData[i-2] /= 255/finalAlpha;
+                	imageData[i-1] /= 255/finalAlpha;
                 }
-                image = actx.getImageData(left, top, right-left, bottom-top);
-                imageData = image.data;
-                length = imageData.length;
-                // loop thru the area
-                for(var i=3; i < length; i+=4){
-                    // [0] -> r, [1] -> g, [2] -> b, [3] -> alpha
-                    alpha = imageData[i],
-                    offset = alpha*4;
-
-                    if(!offset) continue;
-
-                    // we ve started with i=3
-                    // set the new r, g and b values
-                    finalAlpha = (alpha < opacity)?alpha:opacity;
-                    imageData[i-3]=palette[offset];
-                    imageData[i-2]=palette[offset+1];
-                    imageData[i-1]=palette[offset+2];
-                    
-                    if (premultiplyAlpha) {
-                    	// To fix browsers that premultiply incorrectly, we'll pass in a value scaled
-                    	// appropriately so when the multiplication happens the correct value will result.
-                    	imageData[i-3] /= 255/finalAlpha;
-                    	imageData[i-2] /= 255/finalAlpha;
-                    	imageData[i-1] /= 255/finalAlpha;
-                    }
-                    
-                    // we want the heatmap to have a gradient from transparent to the colors
-                    // as long as alpha is lower than the defined opacity (maximum), we'll use the alpha value
-                    imageData[i] = finalAlpha;
-                }
-                // the rgb data manipulation didn't affect the ImageData object(defined on the top)
-                // after the manipulation process we have to set the manipulated data to the ImageData object
-                image.data = imageData;
-                ctx.putImageData(image, left, top);
+                // we want the heatmap to have a gradient from transparent to the colors
+                // as long as alpha is lower than the defined opacity (maximum), we'll use the alpha value
+                imageData[i] = finalAlpha;
+            }
+            // the rgb data manipulation didn't affect the ImageData object(defined on the top)
+            // after the manipulation process we have to set the manipulated data to the ImageData object
+            image.data = imageData;
+            ctx.putImageData(image, left, top);
         },
-        drawAlpha: function(x, y, count, colorize){
+        drawAlpha: function(x, y, count){
             // storing the variables because they will be often used
             var me = this,
                 radius = me.get("radius"),
@@ -462,7 +419,6 @@ var PI2 = Math.PI*2;
 
                     */
                     var x, y;
-
                     if (ev.layerX) { // Firefox
                         x = ev.layerX;
                         y = ev.layerY;

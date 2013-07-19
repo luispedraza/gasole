@@ -68,15 +68,23 @@ OpenLayers.Layer.Heatmap = OpenLayers.Class(OpenLayers.Layer, {
         dataset = obj.data,
         dlen =  dataset.length,
                 entry, pixel;
-        set.max = obj.max;
-        set.data = sdata = [];
-        while(dlen--){  // get the pixels for all the lonlat entries
-            entry = dataset[dlen];
+                smax = 0,
+                sdata = [];
+        for (var i=0;i<dlen;i++) {  // get the pixels for all the lonlat entries
+            entry = dataset[i];
             pixel = this.roundPixels(this.getViewPortPxFromLonLat(entry.lonlat));
-            if(pixel) sdata.push({x: pixel.x, y: pixel.y, count: entry.count});
+            if(pixel) {
+                var x = pixel.x,
+                    y = pixel.y;
+                if (!sdata[x]) sdata[x] = {};
+                var sdatax = sdata[x];
+                if (!sdatax[y]) sdatax[y] = entry.count;
+                else sdatax[y]+=entry.count;
+                if (sdatax[y]>smax) smax = sdatax[y];
+            }
         }
         this.tmpData = obj;
-        this.heatmap.store.setDataSet(set);
+        this.heatmap.store.setDataSet({max: smax, data: sdata});
     },
     // we don't want to have decimal numbers such as xxx.9813212 since they slow canvas performance down + don't look nice
     roundPixels: function(p){
@@ -84,27 +92,6 @@ OpenLayers.Layer.Heatmap = OpenLayers.Class(OpenLayers.Layer, {
         p.x = (p.x >> 0);
         p.y = (p.y >> 0);
         return p;
-    },
-    // same procedure as setDataSet
-    addDataPoint: function(lonlat){
-        var pixel = this.roundPixels(this.mapLayer.getViewPortPxFromLonLat(lonlat)),
-                entry = {lonlat: lonlat},
-                args;
-
-        if(arguments.length == 2){
-            entry.count = arguments[1];
-        }
-
-        this.tmpData.data.push(entry);
-        
-        if(pixel){
-            args = [pixel.x, pixel.y];
-
-            if(arguments.length == 2){
-                args.push(arguments[1]);
-            }
-            this.heatmap.store.addDataPoint.apply(this.heatmap.store, args);
-        }
     },
     toggle: function(){
         this.heatmap.toggleDisplay();

@@ -259,8 +259,8 @@ function openMapinit() {
 	}
 	/* Concentración de gasolineras */
 	function initHeatMap() {
-		var options = { radius:5,
-						gradient: {0.5: "cyan", 0.7: "blue", 1.0: "magenta"}};
+		var options = { radius:10,
+						gradient: {0.5: "cyan", 0.75: "blue", 1.0: "magenta"}};
 		var heatlayer = new OpenLayers.Layer.Heatmap(
 			"Concentración: Mapa de calor", 
 			openMap, openMapOSM, options,
