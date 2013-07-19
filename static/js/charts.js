@@ -112,23 +112,27 @@ function reprojectLatLon(latlon) {
 /* Confierte tres componentes de color en rgb */
 function array2color(a) {return "rgb(" + a.join(",") + ")";}
 // Obtiene un color para un precio, interpolado entre dos colores extremos
-var colorCache={};
-function pickColor(x, xmin, xmax, xmu) {
-	if (x in colorCache) return colorCache[x];
-	if (xmax==xmin) return array2color(CMU);
-	if ((x>xmax)||(x<xmin)) {return "#000";};
-	if (typeof xmu == "undefined") xmu = (xmin+xmax)/2;	// media aritmética
-	var cmin=CMIN,cmax=CMAX;
-	if (x<xmu) {xmax=xmu;cmax=CMU}
-	else {xmin=xmu;cmin=CMU};
-	var rgb = [];
-	for (var c=0; c<3; c++) {
-		var val = cmin[c] + (x-xmin) * (cmax[c]-cmin[c]) / (xmax-xmin);
-		rgb[c] = (val<0) ? 0 : Math.round(Math.min(255,val));
+/** @constructor */
+function PriceColorPicker() {
+	this.colorCache={};
+	this.get = function(x, xmin, xmax, xmu) {
+		if (x in this.colorCache) return this.colorCache[x];
+		if (xmax==xmin) return array2color(CMU);
+		if (x>=xmax) return array2color(CMAX);
+		if (x<=xmin) return array2color(CMIN);
+		if (typeof xmu == "undefined") xmu = (xmin+xmax)/2;	// media aritmética
+		var cmin=CMIN,cmax=CMAX;
+		if (x<xmu) {xmax=xmu;cmax=CMU}
+		else {xmin=xmu;cmin=CMU};
+		var rgb = [];
+		for (var c=0; c<3; c++) {
+			var val = cmin[c] + (x-xmin) * (cmax[c]-cmin[c]) / (xmax-xmin);
+			rgb[c] = (val<0) ? 0 : Math.round(Math.min(255,val));
+		}
+		var color = array2color(rgb);
+		this.colorCache[x] = color;
+		return color;
 	}
-	var color = array2color(rgb);
-	colorCache[x] = color;
-	return color;
 }
 
 /* Actualización del mapa de Raphael */
@@ -141,6 +145,8 @@ function raphaelUpdate() {
 	// precios medios máximo y mínimo
 	var min = d3.min(prices);
 	var max = d3.max(prices);
+	var mu = d3.mean(prices);
+	var priceColor = new PriceColorPicker();
 	paper.forEach(function(e) {
 		if (e.pname) {
 			if (skipProv(e.pname)) {
@@ -150,10 +156,7 @@ function raphaelUpdate() {
 				var currentProvince = pstats[e.pname];
 				if (currentProvince) {
 					var price = currentProvince.hasOwnProperty(TYPE) ? currentProvince[TYPE].mu : null;
-					var fill =  price ? pickColor(price, min, max) : CNA;
-					// var box = e.getBBox();
-					// var radius = price ? Math.sqrt(currentProvince[TYPE].n) : 0;
-					// var circle = paper.circle(box.cx, box.cy, radius).attr({"stroke":"#fff", "fill": "#0f0"});
+					var fill =  price ? priceColor.get(price, min, max, mu) : CNA;
 					e.attr({fill:fill});	
 				} else e.attr({fill:"#333"});
 			}
@@ -260,7 +263,7 @@ function openMapinit() {
 	/* Concentración de gasolineras */
 	function initHeatMap() {
 		var options = { radius:10,
-						gradient: {0.5: "cyan", 0.75: "blue", 1.0: "magenta"}};
+						gradient: {0.5: "cyan", 0.6: "blue", 1.0: "magenta"}};
 		var heatlayer = new OpenLayers.Layer.Heatmap(
 			"Concentración: Mapa de calor", 
 			openMap, openMapOSM, options,
@@ -287,14 +290,16 @@ function drawPriceGrid() {
 	if (!theGrid || !theStats.stats[TYPE]) return;
 	var pmin = theStats.stats[TYPE].min,
 		pmax = theStats.stats[TYPE].max,
+		pmu = theStats.stats[TYPE].mu,
 		grid = theGrid.grid,
-		features = [];
+		features = [],
+		priceColor = new PriceColorPicker();
 	for (var x in grid) {
 		var xo = grid[x].x;
 		for (var y in grid[x]) {
 			var data = grid[x][y];
 			var yo = data.y,
-				color = pickColor(data.p, pmin, pmax);
+				color = priceColor.get(data.p, pmin, pmax, pmu);
 			var poly = new OpenLayers.Bounds(xo,yo,xo+GRID_RESOLUTION,yo+GRID_RESOLUTION).toGeometry();
 			var polygonFeature = new OpenLayers.Feature.Vector(poly);
 			polygonFeature.style = {fillColor: color, strokeColor: "#fff", strokeWidth: 1, fillOpacity: .5};
@@ -319,11 +324,29 @@ function raphaelInit() {
 		});
 		var hoverIn = function() {
 			this.attr("opacity",.5);
-			document.getElementById("prov-current").textContent = this.pname;
+			var pname = this.pname;
+			document.getElementById("prov-current").textContent = pname;
+			pdata = theGasole.stats.provinces[pname][TYPE];
+			if (pdata) {
+				var price = pdata.mu;
+				var box = this.getBBox();
+				var xpos = (box.cx<(paper.width/3)) ? (box.x2) : (box.x-190);
+				var rect = paper.rect(xpos, box.cy, 190, 50, 5).attr({"stroke":"#fff", "fill": "#d24e33","stroke-width": 3});
+				var info = pname+"\n";
+				info+=pdata.n+" puntos de venta de "+FUEL_OPTIONS[TYPE].name+"\n";
+				info+=price.toFixed(3) + " €/l de media";
+				var text = paper.text(xpos+5, box.cy+25, info);
+				text.attr({"fill": "#fff", "text-anchor": "start", "font-size": "11px"});
+				paper.tooltip = paper.set();
+				paper.tooltip.push(rect);
+				paper.tooltip.push(text);
+			}
+			
 		};
 		var hoverOut = function() {
 			this.attr("opacity",1);
 			document.getElementById("prov-current").textContent = "Provincias";
+			paper.tooltip.forEach(function(e){e.remove()});
 		};
 		prov.hover(hoverIn,hoverOut,prov,prov);
 		prov.node.setAttribute("class", "prov");
@@ -883,6 +906,7 @@ function Brands(spread) {
 		var brands = stats.brands;
 		var data = [];
 		var pMin = 1000, pMax = 0;		// Precios máximo y mínimo
+		var psum = 0;
 		for (var p in provinces) {
 			var current = provinces[p][TYPE];
 			if (current) {
@@ -892,12 +916,15 @@ function Brands(spread) {
 					var price = info.mu;
 					if (price<pMin) pMin=price;
 					if (price>pMax) pMax=price;
+					psum+=price;
 					data.push({prov: p, brand: b, n: info.n, price: info.mu});
 				}
 			}
 		}
+		var pMu = psum/data.length;
 		var provincesDomain = Object.keys(provinces);
 		var brandsDomain = Object.keys(brands);
+		var priceColor = new PriceColorPicker();
 		// ajuste del alto del gráfico:
 		var divHeight = Math.max(400,provincesDomain.length*30+70);
 		div.style("height", divHeight+"px");
@@ -956,13 +983,13 @@ function Brands(spread) {
 			.attr("cx", function(d){return x(d.brand)})
 			.attr("cy", function(d) {return y(d.prov)})
 			.attr("r", function(d) {return 4+Math.sqrt(d.n)})
-			.attr("fill", function(d) {return pickColor(d.price, pMin, pMax)});
+			.attr("fill", function(d) {return priceColor.get(d.price, pMin, pMax, pMu)});
 		balls.enter()
 			.append("circle")
 			.attr("cx", function(d){return x(d.brand)})
 			.attr("cy", function(d) {return y(d.prov)})
 			.attr("r", 0)
-			.attr("fill", function(d) {return pickColor(d.price, pMin, pMax)})
+			.attr("fill", function(d) {return priceColor.get(d.price, pMin, pMax, pMu)})
 			.attr("stroke", "#fff")
 			.transition().duration(500).ease("bounce")
 				.attr("r", function(d) {return 4+Math.sqrt(d.n)});
@@ -1065,7 +1092,6 @@ function updateAll(recompute) {
 				callbackHistogram(station,p,t,s);	
 				callbackGrid(station);
 			});
-			colorCache = {};
 		}
 	}
 	histogram.draw();	// Dibujo del gráfico histograma

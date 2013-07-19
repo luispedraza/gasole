@@ -311,7 +311,7 @@ var PI2 = Math.PI*2;
             if(element.style.paddingBottom) height+=element.style.paddingBottom;
             return height;
         },
-        colorize: function(x, y) {
+        colorize: function() {
             // get the private variables
             var me = this,
                 width = me.get("width"),

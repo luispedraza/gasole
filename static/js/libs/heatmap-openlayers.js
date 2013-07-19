@@ -64,16 +64,15 @@ OpenLayers.Layer.Heatmap = OpenLayers.Class(OpenLayers.Layer, {
         };
     },
     setDataSet: function(obj){
-        var set = {},
-        dataset = obj.data,
-        dlen =  dataset.length,
-                entry, pixel;
-                smax = 0,
-                sdata = [];
+        var dataset = obj.data,
+            dlen =  dataset.length,
+            entry, pixel;
+            smax = 0,
+            sdata = [];
         for (var i=0;i<dlen;i++) {  // get the pixels for all the lonlat entries
             entry = dataset[i];
-            pixel = this.roundPixels(this.getViewPortPxFromLonLat(entry.lonlat));
-            if(pixel) {
+            pixel = this.roundPixels(this.mapLayer.getViewPortPxFromLonLat(entry.lonlat));
+            if (pixel) {
                 var x = pixel.x,
                     y = pixel.y;
                 if (!sdata[x]) sdata[x] = {};
@@ -88,20 +87,16 @@ OpenLayers.Layer.Heatmap = OpenLayers.Class(OpenLayers.Layer, {
     },
     // we don't want to have decimal numbers such as xxx.9813212 since they slow canvas performance down + don't look nice
     roundPixels: function(p){
-        if(p.x < 0 || p.y < 0){return false;}
+        if(p.x < 0 || p.y < 0) return false;
         p.x = (p.x >> 0);
         p.y = (p.y >> 0);
         return p;
     },
-    toggle: function(){
-        this.heatmap.toggleDisplay();
-    },
+    toggle: function(){ this.heatmap.toggleDisplay();},
     destroy: function() {
         // for now, nothing special to do here. 
         OpenLayers.Layer.Grid.prototype.destroy.apply(this, arguments);  
     },
-    setVisibility: function(v) {
-        this.heatmap.setVisibility(v);
-    },
+    setVisibility: function(v) { this.heatmap.setVisibility(v);},
     CLASS_NAME: "OpenLayers.Layer.Heatmap"
 });
