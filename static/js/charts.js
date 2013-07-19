@@ -331,7 +331,7 @@ function raphaelInit() {
 				var price = pdata.mu;
 				var box = this.getBBox();
 				var xpos = (box.cx<(paper.width/3)) ? (box.x2) : (box.x-190);
-				var rect = paper.rect(xpos, box.cy, 190, 50, 5).attr({"stroke":"#fff", "fill": "#d24e33","stroke-width": 3});
+				var rect = paper.rect(xpos, box.cy, 190, 50, 5).attr({"stroke":"#fff", "fill": "#7e2516","stroke-width": 3});
 				var info = pname+"\n";
 				info+=pdata.n+" puntos de venta de "+FUEL_OPTIONS[TYPE].name+"\n";
 				info+=price.toFixed(3) + " €/l de media";

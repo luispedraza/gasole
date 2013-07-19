@@ -39,7 +39,7 @@ body {
 #toolbar {
   width: 1030px;
   height: 110px;
-  background-color: #333;
+  background-color: #7e2516;
   z-index: 2000;
   font-size: 18px;
   padding: 5px;
@@ -49,7 +49,6 @@ body {
   height: 20px;
   float: left;
   padding: 3px;
-  background-color: #333;
 }
 .toolbar-item > div {
   border-left: 1px solid #333;
@@ -77,10 +76,23 @@ body {
   float: right;
 }
 label {
+  padding: 3px;
   font-size: .8em;
-}
-label {
   cursor: pointer;
+  border: 1px solid #7e2516;
+  border-radius: 3px;
+}
+input + label:before {
+  content: "\2610";
+  font-size: 15px;
+  margin-right: 5px;
+}
+input:checked + label {
+  color: #fff;
+  background-color: #d24e33;
+}
+input:checked + label:before {
+  content: "\2611";
 }
 h1 {
   background-color: #d24e33;
@@ -96,14 +108,18 @@ h1 {
 .more {
   font-size: 1em;
   margin-left: 10px;
-  background-color: #ccc;
+  background-color: #d24e33;
   color: #fff;
-  padding: 3px;
+  padding: 5px;
   cursor: pointer;
   border-radius: 5px;
+  width: 15px;
+  height: 15px;
+  display: inline-block;
+  text-align: center;
 }
 .more:hover {
-  background-color: #d24e33;
+  background-color: #7e2516;
 }
 .description {
   color: #333;
@@ -428,23 +444,6 @@ li.on .layer-name:before {
 }
 .spinner .button.down:before {
   content: "-";
-}
-input + label:before {
-  content: "\2610";
-  font-size: 15px;
-  margin-right: 5px;
-}
-input:checked + label {
-  color: #fff;
-  background-color: #333;
-}
-input:checked + label:before {
-  content: "\2611";
-}
-
-#toolbar input:checked + label {
-  color: #fff;
-  background-color: #333;
 }
 
 #raphael, #openmap {
