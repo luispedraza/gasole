@@ -186,6 +186,9 @@ h1 {
   background-color: #fff;
   color: #333;
 }
+#checkall {
+  border-color: #000;
+}
 /*Ocultar ceuta, melilla, canarias*/
 #hide {
   border-bottom: 3px solid #333;
@@ -207,6 +210,7 @@ h1 {
 #whyhide + div {
   padding: 10px;
   font-size: 1em;
+  text-align: justify;
 }
 #explainhide {
   font-size: .8em;

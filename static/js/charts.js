@@ -460,6 +460,7 @@ function initControl() {
 	function initToolbar() {
 		toolbarPosition = document.getElementById("toolbar").getBoundingClientRect().top;
 		addEvent(window, "scroll", function() {
+			console.log(window.scrollY, toolbarPosition);
 			var toolbar = document.getElementById("toolbar");
 			if (window.scrollY>=toolbarPosition) {
 				toolbar.style.position = "fixed"; toolbar.style.top = 0;
