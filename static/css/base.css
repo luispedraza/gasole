@@ -53,7 +53,7 @@ body {
 }
 body h1 {
 	font-size: 2em;
-	margin-bottom: 1em;
+	margin-bottom: .5em;
 }
 body h2 {
 	font-size: 1.8em;
@@ -62,6 +62,7 @@ body h2 {
 }
 body p {
 	margin-bottom: .5em;
+	line-height: 1.3em;
 }
 header, footer {
 	background-color: #333;
@@ -418,64 +419,64 @@ footer ul a:hover{
 
 .sprt {display:inline-block; overflow:hidden; background-repeat: no-repeat;background-image:url(/img/sprt.png);}
 
-.a_cards {width:10px; height:5px; background-position: -2px -2px}
-.a_home {width:10px; height:5px; background-position: -14px -2px}
-.a_info {width:10px; height:5px; background-position: -26px -2px}
-.a_news {width:10px; height:5px; background-position: -38px -2px}
-.a_search {width:10px; height:5px; background-position: -50px -2px}
-.a_stats {width:10px; height:5px; background-position: -2px -9px}
-.arrow_white {width:10px; height:5px; background-position: -14px -9px}
-.clock_med {width:20px; height:20px; background-position: -26px -9px}
-.clock_new {width:20px; height:20px; background-position: -2px -31px}
-.clock_old {width:20px; height:20px; background-position: -24px -31px}
-.ic_audio {width:20px; height:20px; background-position: -2px -53px}
-.ic_captcha {width:15px; height:13px; background-position: -24px -53px}
-.ic_content {width:15px; height:13px; background-position: -41px -53px}
-.ic_email {width:15px; height:13px; background-position: -2px -75px}
-.ic_help {width:20px; height:20px; background-position: -19px -75px}
-.ic_image {width:20px; height:20px; background-position: -41px -75px}
-.ic_link {width:15px; height:13px; background-position: -2px -97px}
-.ic_name {width:15px; height:13px; background-position: -19px -97px}
-.ic_points {width:15px; height:13px; background-position: -36px -97px}
-.ic_reload {width:20px; height:20px; background-position: -2px -112px}
-.ic_star {width:15px; height:13px; background-position: -24px -112px}
-.ic_title {width:20px; height:20px; background-position: -41px -112px}
-.layers {width:25px; height:25px; background-position: -2px -134px}
-.locate {width:20px; height:20px; background-position: -29px -134px}
-.logo_fb {width:30px; height:30px; background-position: -2px -161px}
-.logo_fs {width:30px; height:30px; background-position: -2px -193px}
-.logo_gp {width:30px; height:30px; background-position: -2px -225px}
-.logo_tt {width:30px; height:30px; background-position: -2px -257px}
-.m_cards {width:25px; height:25px; background-position: -34px -257px}
-.m_home {width:25px; height:25px; background-position: -2px -289px}
-.m_info {width:25px; height:25px; background-position: -29px -289px}
-.m_news {width:25px; height:25px; background-position: -2px -316px}
-.m_stats {width:25px; height:25px; background-position: -29px -316px}
-.marker_blue {width:15px; height:15px; background-position: -2px -343px}
-.marker_green {width:15px; height:15px; background-position: -19px -343px}
-.marker_red {width:15px; height:15px; background-position: -36px -343px}
-.p_city {width:20px; height:20px; background-position: -2px -360px}
-.p_distance {width:20px; height:20px; background-position: -24px -360px}
-.p_filter {width:20px; height:20px; background-position: -2px -382px}
-.p_info {width:20px; height:20px; background-position: -24px -382px}
-.p_pump {width:20px; height:20px; background-position: -2px -404px}
-.pag_less {width:30px; height:30px; background-position: -24px -404px}
-.pag_more {width:30px; height:30px; background-position: -2px -436px}
-.pump {width:30px; height:30px; background-position: -2px -468px}
-.pump_b {width:25px; height:25px; background-position: -34px -468px}
-.pump_g {width:25px; height:25px; background-position: -2px -500px}
-.pump_r {width:25px; height:25px; background-position: -29px -500px}
-.search_gps {width:20px; height:20px; background-position: -2px -527px}
-.search_icon {width:25px; height:25px; background-position: -24px -527px}
-.sort {width:10px; height:20px; background-position: -51px -527px}
-.sort_down-.sort {width:10px; height:20px; background-position: -2px -554px}
-.sort_up-.sort {width:10px; height:20px; background-position: -2px -554px}
-.star.soff {width:20px; height:20px; background-position: -14px -554px}
-.star.son {width:20px; height:20px; background-position: -36px -554px}
-.star_mini.soff {width:12px; height:12px; background-position: -2px -576px}
-.star_mini.son {width:12px; height:12px; background-position: -16px -576px}
-.the_best {width:35px; height:55px; background-position: -2px -590px}
-
+.a_cards {width:10px; height:5px; background-position: -14px -9px}
+.a_home {width:10px; height:5px; background-position: -2px -16px}
+.a_info {width:10px; height:5px; background-position: -26px -9px}
+.a_news {width:10px; height:5px; background-position: -26px -2px}
+.a_search {width:10px; height:5px; background-position: -14px -2px}
+.a_stats {width:10px; height:5px; background-position: -2px -2px}
+.arrow_white {width:10px; height:5px; background-position: -2px -9px}
+.clock_med {width:20px; height:20px; background-position: -2px -246px}
+.clock_new {width:20px; height:20px; background-position: -24px -224px}
+.clock_old {width:20px; height:20px; background-position: -24px -246px}
+.ic_audio {width:20px; height:20px; background-position: -2px -224px}
+.ic_captcha {width:15px; height:13px; background-position: -19px -60px}
+.ic_content {width:15px; height:13px; background-position: -2px -75px}
+.ic_email {width:15px; height:13px; background-position: -2px -60px}
+.ic_help {width:20px; height:20px; background-position: -2px -202px}
+.ic_image {width:20px; height:20px; background-position: -2px -268px}
+.ic_link {width:15px; height:13px; background-position: -2px -45px}
+.ic_name {width:15px; height:13px; background-position: -2px -30px}
+.ic_points {width:15px; height:13px; background-position: -19px -45px}
+.ic_reload {width:20px; height:20px; background-position: -24px -290px}
+.ic_star {width:15px; height:13px; background-position: -19px -30px}
+.ic_title {width:20px; height:20px; background-position: -24px -180px}
+.layers {width:25px; height:25px; background-position: -2px -555px}
+.locate {width:20px; height:20px; background-position: -24px -268px}
+.logo_fb {width:30px; height:30px; background-position: -2px -673px}
+.logo_fs {width:30px; height:30px; background-position: -2px -641px}
+.logo_gp {width:30px; height:30px; background-position: -2px -609px}
+.logo_tt {width:30px; height:30px; background-position: -2px -801px}
+.m_cards {width:25px; height:25px; background-position: -2px -447px}
+.m_home {width:25px; height:25px; background-position: -2px -474px}
+.m_info {width:25px; height:25px; background-position: -2px -528px}
+.m_news {width:25px; height:25px; background-position: -2px -501px}
+.m_stats {width:25px; height:25px; background-position: -2px -582px}
+.marker_blue {width:15px; height:15px; background-position: -2px -97px}
+.marker_green {width:15px; height:15px; background-position: -2px -114px}
+.marker_red {width:15px; height:15px; background-position: -19px -97px}
+.p_city {width:20px; height:20px; background-position: -2px -158px}
+.p_distance {width:20px; height:20px; background-position: -24px -158px}
+.p_filter {width:20px; height:20px; background-position: -24px -136px}
+.p_info {width:20px; height:20px; background-position: -2px -180px}
+.p_pump {width:20px; height:20px; background-position: -2px -136px}
+.pag_less {width:30px; height:30px; background-position: -2px -737px}
+.pag_more {width:30px; height:30px; background-position: -2px -769px}
+.pump {width:30px; height:30px; background-position: -2px -705px}
+.pump_b {width:25px; height:25px; background-position: -2px -420px}
+.pump_g {width:25px; height:25px; background-position: -2px -312px}
+.pump_r {width:25px; height:25px; background-position: -2px -393px}
+.pump_y {width:25px; height:25px; background-position: -2px -366px}
+.search_gps {width:20px; height:20px; background-position: -19px -114px}
+.search_icon {width:25px; height:25px; background-position: -2px -339px}
+.sort {width:10px; height:20px; background-position: -19px -75px}
+.sort_down-.sort {width:10px; height:20px; background-position: -31px -75px}
+.sort_up-.sort {width:10px; height:20px; background-position: -31px -75px}
+.star.soff {width:20px; height:20px; background-position: -24px -202px}
+.star.son {width:20px; height:20px; background-position: -2px -290px}
+.star_mini.soff {width:12px; height:12px; background-position: -28px -16px}
+.star_mini.son {width:12px; height:12px; background-position: -14px -16px}
+.the_best {width:35px; height:55px; background-position: -2px -833px}
 
 /* Sprites logos */
 .logo {width:30px; height:20px; position: absolute; left: 0; overflow:hidden; background-repeat: no-repeat;background-image:url(/img/logos/logos.png);}

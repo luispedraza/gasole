@@ -7,10 +7,31 @@
 	width: 900px;
 	float: right;
 }
+#home p a {
+	color: #333;
+}
+#presentation {
+	margin-top: 15px;
+}
+#intro {
+	width: 48%;
+	float: left;
+}
+#social {
+	width: 48%;
+	float: right;
+}
+#social form {
+	float: right;
+}
+.addthis_toolbox {
+	margin: 15px 0;
+}
 .panel {
 	width: 48%;
 	border-color: #ccc;
 	border-style: solid;
+	margin-top: 20px;
 }
 .panel.left {
 	float: left;

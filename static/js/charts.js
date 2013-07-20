@@ -919,7 +919,7 @@ function Brands(spread) {
 		var provincesDomain = Object.keys(provinces);
 		var brandsDomain = Object.keys(brands);
 		var priceColor = new PriceColorPicker();
-		// ajuste del alto del gráfico:
+		// ajuste del ALTO del gráfico:
 		var divHeight = Math.max(400,provincesDomain.length*30+70);
 		div.style("height", divHeight+"px");
 		divWidth = parseInt(div.style("width").split("px")[0]);
