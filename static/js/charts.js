@@ -332,8 +332,8 @@ function raphaelInit() {
 				var box = this.getBBox();
 				var xpos = (box.cx<(paper.width/3)) ? (box.x2) : (box.x-190);
 				var rect = paper.rect(xpos, box.cy, 190, 50, 5).attr({"stroke":"#fff", "fill": "#7e2516","stroke-width": 3});
-				var info = pname+"\n";
-				info+=pdata.n+" puntos de venta de "+FUEL_OPTIONS[TYPE].name+"\n";
+				var info = pname+", "+ FUEL_OPTIONS[TYPE].name +"\n";
+				info+=pdata.n+" puntos de venta\n";
 				info+=price.toFixed(3) + " €/l de media";
 				var text = paper.text(xpos+5, box.cy+25, info);
 				text.attr({"fill": "#fff", "text-anchor": "start", "font-size": "11px"});
@@ -667,7 +667,7 @@ function Circles(spread) {
 					if (callbackClick) callbackClick(i);
 				});
 			items.append("text").data(data)
-				.text(function(d,i) {return (i+1)+". "+d.name})
+				.text(function(d,i) {return d.name})
 				.attr("text-anchor", "middle")
 				.style("display", "none");
 		}

@@ -248,6 +248,7 @@ class Api(BaseHandler):
         info = None
         prov = decode_param(prov)
         if station:
+            logging.info("estacion")
             info = getStationJson(prov, decode_param(town), decode_param(station))
         elif prov=="All":
             when = None

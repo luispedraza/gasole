@@ -231,6 +231,9 @@ def gas_update_xls(option="1"):
 			else:
 				logging.info("sin informacion en %s" %o)
 				return None
+		else:
+			logging.info("Error en el geoportal")
+			return None
 	return xls_result
 
 # Actualización por búsqueda directa
