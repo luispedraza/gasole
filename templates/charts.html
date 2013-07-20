@@ -23,51 +23,61 @@
 
 <div id="toolbar-container">
 	<div id="toolbar">
-		<div>
+		<div id="toolbar-header">
 			<div id="social">
 				<!-- AddThis Button BEGIN -->
 				<div class="addthis_toolbox addthis_default_style">
 				<!-- <a class="addthis_counter addthis_pill_style"></a> -->
-				<a class="addthis_button_expanded"></a>
-				<a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
-				<a class="addthis_button_tweet"></a>
-				<a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
 				<a class="addthis_button_linkedin_counter"></a>
+				<a class="addthis_button_expanded"></a>
+				<a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+				<a class="addthis_button_tweet"></a>
+				<a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
+				
 				</div>
 				<!-- <script type="text/javascript">var addthis_config = {"data_track_addressbar":true};</script>-->
 				<!-- AddThis Button END -->
 			</div>
 			<div id="info"></div>
 		</div>
-		<div class="toolbar-item">	<!-- tipo de combustible -->
-			<div id="type-list">
-				<div id="type-current" class="selector">Combustible: </div>
-				<ul id="type" class="droplist"></ul>
+		<div id="toolbar-body">
+			<div class="toolbar-item">	<!-- tipo de combustible -->
+				<div id="type-list">
+					<div id="type-current" class="selector">Combustible: </div>
+					<ul id="type" class="droplist"></ul>
+				</div>
 			</div>
-		</div>
 
-		<div class="toolbar-item"> <!-- selector de provincias -->
-			<div id="prov-list">
-				<div id="prov-current" class="selector">Provincias</div>
-				<ul id="province" class="droplist">
-					<li id="checkall">Marcar Todas</li>
-					<li id="hide">Excluir Ceuta, Melilla y Canarias <span id="whyhide">?</span></li>
-				</ul>
+			<div class="toolbar-item"> <!-- selector de provincias -->
+				<div id="prov-list">
+					<div id="prov-current" class="selector">Provincias</div>
+					<ul id="province" class="droplist">
+						<li id="checkall">Marcar Todas</li>
+						<li id="hide"><span>Excluir Ceuta, Melilla y Canarias </span><span id="whyhide">?</span>
+							<div>
+								<p>Estas regiones disfrutan de un rémien tributario específico que hace que en ellas los precios del combustible sean sensiblemente inferiores a la media.</p>
+								<p>Por este motivo puede ser conveniente su exclusión de los gráficos generales, para que su influencia no oculte las diferencias de precio que puedan darse entre el resto de regiones de España.</p>
+								<p>Puedes consultar más información sobre precios e impuestos en la sección de INFORMACIÓN de GasOle.net.</p>
+							</div>
+						</li>
+
+					</ul>
+				</div>
 			</div>
-		</div>
 
-		<div class="ads toolbar">
-			<script type="text/javascript"><!--
-				google_ad_client = "ca-pub-9285487390483271";
-				/* gasole charts toolbar */
-				google_ad_slot = "1742256320";
-				google_ad_width = 468;
-				google_ad_height = 60;
-				//-->
+			<div class="ads toolbar">
+				<script type="text/javascript"><!--
+					google_ad_client = "ca-pub-9285487390483271";
+					/* gasole charts toolbar */
+					google_ad_slot = "1742256320";
+					google_ad_width = 468;
+					google_ad_height = 60;
+					//-->
+					</script>
+					<script type="text/javascript"
+					src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 				</script>
-				<script type="text/javascript"
-				src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
-			</script>
+			</div>
 		</div>
 	</div>
 </div> <!--toolbar-container-->

@@ -33,17 +33,25 @@ body {
   position: relative;
 }
 #toolbar-container {
-  width: 1030px;
-  height: 120px;
+  width: 1040px;
+  height: 110px;
 }
 #toolbar {
-  width: 1030px;
+  width: 1040px;
   height: 110px;
   background-color: #7e2516;
   z-index: 2000;
   font-size: 18px;
-  padding: 5px;
   top: 0;
+}
+#toolbar-header {
+ background-color: #d24e33;
+ height: 20px;
+ padding: 5px;
+}
+#toolbar-body {
+  background-color: #7e2516;
+  padding: 5px;
 }
 .toolbar-item {
   height: 20px;
@@ -57,7 +65,6 @@ body {
 
 #info, #social {
   margin-top: 2px;
-  margin-bottom: 10px;
   height: 20px;
   color: #fff;
   font-size: .8em;
@@ -73,6 +80,9 @@ body {
   padding-left: 10px;
 }
 #social {
+  float: right;
+}
+#social a {
   float: right;
 }
 label {
@@ -190,6 +200,13 @@ h1 {
   border-radius: 5px;
   display: inline-block;
   text-align: center;
+}
+#whyhide:hover {
+  background-color: #7e2516;
+}
+#whyhide + div {
+  padding: 10px;
+  font-size: 1em;
 }
 #explainhide {
   font-size: .8em;

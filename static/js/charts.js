@@ -442,17 +442,10 @@ function initControl() {
 		// Explicación 
 		var why = document.getElementById("whyhide");
 		why.onmouseover = function(e) {
-			var whymsg = document.createElement("div");
-			whymsg.innerHTML = "<p>Estas regiones disfrutan de un rémien tributario específico que hace que en ellas los precios del combustible sean sensiblemente inferiores a la media.</p>";
-			whymsg.innerHTML += "<p>Por este motivo puede ser conveniente su exclusión de los gráficos generales, para que su influencia no oculte las diferencias de precio que puedan darse entre el resto de regiones de España.</p>";
-			whymsg.innerHTML += "<p>Puedes consultar más información sobre precios e impuestos en la sección de INFORMACIÓN de GasOle.</p>";
-			whymsg.id = "explainhide";
-			whymsg.style.left = e.clientX-document.body.scrollLeft+"px";
-			whymsg.style.top = e.clientY+document.body.scrollTop+"px";
-			document.body.appendChild(whymsg);
+			document.getElementById("hide").style.height = "250px";
 		}
 		why.onmouseout = function() {
-			document.body.removeChild(document.getElementById("explainhide"));
+			document.getElementById("hide").style.height = "";
 		}
 		// Selector de provincias en TOOL
 		initProvLinks("province", function(e) {
