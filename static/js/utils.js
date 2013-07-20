@@ -510,7 +510,7 @@ function Gasole(callback) {
 		return result;
 	}
 
-	this.callback = callback;
+	this.callback = callback;	// al final de la carga de los datos
 	this.stats = null;
 	this.info = null; 		// datos de la api
 	this.date = null;		// fecha de actualización
@@ -521,8 +521,15 @@ function Gasole(callback) {
 		var req = new XMLHttpRequest();
 		req.gasole = this;
 		req.onload = function() {
-			var date = new Date();
-			this.gasole.init(JSON.parse(this.responseText), date);
+			var date = null;
+			var newdata = JSON.parse(this.responseText);
+			if (newdata._meta) {		// compatibilidad api antigua sin _meta
+				date = new Date(newdata._meta.ts);
+				newdata = newdata._data;	
+			} else {
+				date = new Date();
+			}
+			this.gasole.init(newdata,date);
 			localStorage.setItem("gasole", '{"ts": '+ date.getTime() +',"data": '+this.responseText+',"stats": '+JSON.stringify(this.gasole.stats)+'}');
 			if (this.gasole.callback) this.gasole.callback();
 		}

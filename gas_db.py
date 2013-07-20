@@ -9,6 +9,7 @@ from gas_update import *
 import logging
 import os
 from google.appengine.api.runtime import memory_usage
+from time import time # para el timestamp
 
 DEBUG = os.environ['SERVER_SOFTWARE'].startswith('Dev')
 
@@ -103,6 +104,9 @@ def data2store(data):
 		logging.info("NO HAY DATOS QUE GAURDAR")
 		return
 	cachedata = json.loads(getAll().decode('zlib'))
+	if "_meta" in cachedata:		# compatibilidad con la api antigua
+		cachedata = cachedata.get("_data")
+
 	for p in data: # recorremos las provincias
 		_provinces = []		# nuevas provincias
 		_towns = []			# nuevas ciudades
@@ -186,7 +190,8 @@ def data2store(data):
 				return
 		del newdata
 	try:
-		alldata = json.dumps(data).encode('zlib')
+		ts = int(time()*1000)
+		alldata = json.dumps({"_meta":{"ts":ts}, "_data":data}).encode('zlib')
 		updateDB(dnew=[ApiAllJson(json=alldata)])
 		memcache.set("All", alldata)
 	except Exception, e:

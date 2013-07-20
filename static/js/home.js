@@ -16,12 +16,13 @@ window.addEventListener("load", function() {
 	}
 	initProvLinks("province");
 	var gasole = new Gasole(function () {
-		console.log(this);
 		var stats = this.stats.stats;
 		for (var o in stats) {
 			fillPriceDigits(document.getElementById("p_"+FUEL_OPTIONS[o]["short"]).children[0], stats[o].mu);
 			fillPriceDigits(document.getElementById("min_"+FUEL_OPTIONS[o]["short"]).children[0], stats[o].min);
 			fillPriceDigits(document.getElementById("max_"+FUEL_OPTIONS[o]["short"]).children[0], stats[o].max);
 		}
+		var updated = this.date.toLocaleString();
+		document.getElementById("updated").textContent = "(*) Precios actualizados el " + updated;
 	});
 })
