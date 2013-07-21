@@ -26,9 +26,19 @@ body {
 	float: right;
 	}
 }
-#social > div {
+#social > div, #social form {
 	float: right;
 	margin-bottom: 10px;
+}
+.panel #social input[type=image] {
+	/*margin-top: 1px;*/
+	height: 16px;
+	width: auto;
+	margin-right: 10px;
+	border-radius: 3px;
+}
+.panel #social input[type=image]:hover {
+	opacity: .8;
 }
 #list {
 	width: 730px;
