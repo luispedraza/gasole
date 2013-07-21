@@ -19,7 +19,9 @@
 }
 #social {
 	width: 48%;
+	height: 60px;
 	float: right;
+	margin: 15px 0;
 }
 #social form {
 	float: right;
@@ -31,8 +33,18 @@
 #social form input[type="image"]:hover {
 	opacity: .8;
 }
+#social .flattr {
+	float: left;
+	margin-top: -1px;
+	margin-left: 3px;
+}
 .addthis_toolbox {
-	margin: 15px 0;
+	height: 60px;
+	float:left;
+}
+.addthis_toolbox a {
+	display: inline-block;
+	vertical-align: top;
 }
 .panel {
 	width: 48%;
