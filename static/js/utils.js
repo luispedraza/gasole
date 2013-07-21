@@ -615,6 +615,14 @@ function addEvent(el, evnt, func) {
 	}
 }
 
+// Formateo de la fecha de actualización
+function formatUpdate(date) {
+	var u = "Precios actualizados el ";
+	u += date.getDate() + " de " + MONTHS[date.getMonth()];
+	u += " a las " + ("0" + date.getHours()).slice(-2) + ":" + ("0" + date.getMinutes()).slice(-2);
+	return u;
+}
+
 // Para medir tiempo
 var TIME;
 function tic() {

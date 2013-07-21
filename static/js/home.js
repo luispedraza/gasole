@@ -22,9 +22,6 @@ window.addEventListener("load", function() {
 			fillPriceDigits(document.getElementById("min_"+FUEL_OPTIONS[o]["short"]).children[0], stats[o].min);
 			fillPriceDigits(document.getElementById("max_"+FUEL_OPTIONS[o]["short"]).children[0], stats[o].max);
 		}
-		var date = this.date;
-		var updated = date.getDate() + " de " + MONTHS[date.getMonth()];
-		updated += " a las " + ("0" + date.getHours()).slice(-2) + ":" + ("0" + date.getMinutes()).slice(-2);
-		document.getElementById("updated").innerHTML = "<sup>*</sup>Precios actualizados el " + updated;
+		document.getElementById("updated").innerHTML = "<sup>*</sup> " + formatUpdate(this.date);
 	});
 })

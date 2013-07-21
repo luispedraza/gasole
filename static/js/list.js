@@ -594,5 +594,6 @@ window.addEventListener("load", function() {
 		stats = new GasoleStats(info._data).stats;
 		computeWeights(stats);
 		processData(info);
+		document.getElementById("updated").textContent = "("+formatUpdate(this.date)+")";
 	});
 })
