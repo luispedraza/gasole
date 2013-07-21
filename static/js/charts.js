@@ -530,7 +530,7 @@ function initControl() {
 			if (tcontainer.getBoundingClientRect().top<=0) {
 				toolbar.style.position = "fixed"; toolbar.style.top = 0;
 			} else 
-				toolbar.style.position = "relative";	
+				toolbar.style.position = "relative";
 		})
 	}
 	initToolbar();

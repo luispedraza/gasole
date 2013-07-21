@@ -408,7 +408,8 @@ footer ul a:hover{
 	left: 0;
 }
 .price .back.point {
-	width: 5px;
+	width: .1em;
+	height: 1em;
 }
 /* sprites */
 .arrow {
