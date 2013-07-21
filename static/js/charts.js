@@ -99,8 +99,6 @@ var CMIN = [0,255,0];	// verde para las baratas
 var CMU = [255,255,0]	// amarillo para las intermedias
 var CMAX = [255,0,0];	// rojo para las caras
 var CNA = "#ccc";		// color de provincias no mostradas
-/* Posición de la barra de herramientas */
-var toolbarPosition = 0;
 
 function reprojectLatLon(latlon) {
 	var proj = new OpenLayers.Projection("EPSG:4326");
@@ -456,21 +454,8 @@ function initControl() {
 		// desplegar la lista de provincias
 		document.getElementById("prov-list").onclick = dropList;
 	}
-	/* La barra de controles */
-	function initToolbar() {
-		toolbarPosition = document.getElementById("toolbar").getBoundingClientRect().top;
-		addEvent(window, "scroll", function() {
-			console.log(window.scrollY, toolbarPosition);
-			var toolbar = document.getElementById("toolbar");
-			if (window.scrollY>=toolbarPosition) {
-				toolbar.style.position = "fixed"; toolbar.style.top = 0;
-			} else 
-				toolbar.style.position = "relative";	
-		})
-	}
 	initOptions();			// Selector de tipo de combustible
 	initProvinces();		// Selector de provincias en la barra
-	initToolbar();
 	// Apilar barras
 	addEvent(document.getElementById("stack"), "change", function() {
 		histogram.stacked = this.checked; histogram.draw();
@@ -537,6 +522,18 @@ function initControl() {
 		}
 	}
 	initLayers();
+	/* La barra de controles */
+	function initToolbar() {
+		addEvent(window, "scroll", function() {
+			var toolbar = document.getElementById("toolbar");
+			var tcontainer = document.getElementById("toolbar-container");
+			if (tcontainer.getBoundingClientRect().top<=0) {
+				toolbar.style.position = "fixed"; toolbar.style.top = 0;
+			} else 
+				toolbar.style.position = "relative";	
+		})
+	}
+	initToolbar();
 }
 
 /** @constructor */
