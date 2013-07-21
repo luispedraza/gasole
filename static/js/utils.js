@@ -93,12 +93,20 @@ var APIS = 	{ 	"gasolineras": "api",
 				"ficha": "api"
 			};
 
+// Para agregar eventos 
+function addEvent(el, evnt, func) {
+	if(el.addEventListener) {
+		el.addEventListener(evnt, func, false);
+	} else if(el.attachEvent) {
+		el.attachEvent('on'+evnt, func);
+	}
+}
 
 /* Bloqueo de scroll en el body cuando se hace scroll en un elemento */
 function lockScroll(id) {
 	if (typeof id=="string") id = document.getElementById(id);
-	id.addEventListener("mouseover", function() {document.body.style.overflow = "hidden";})
-	id.addEventListener("mouseout", function() {document.body.style.overflow = "auto";})
+	addEvent(id,"mouseover", function() {document.body.style.overflow = "hidden";})
+	addEvent(id,"mouseout", function() {document.body.style.overflow = "auto";})
 }
 
 /* Lista de provincias para incluir en un div de ID dado, un acción a ejecutar en el click.
@@ -604,15 +612,6 @@ function sortName(a,b) {
 		return r;
 	}
 	return (accentsTidy(a)<accentsTidy(b)) ?  -1 : 1;
-}
-
-// Para agregar eventos 
-function addEvent(el, evnt, func) {
-	if(el.addEventListener) {
-		el.addEventListener(evnt, func, false);
-	} else if(el.attachEvent) {
-		el.attachEvent('on'+evnt, func);
-	}
 }
 
 // Formateo de la fecha de actualización
