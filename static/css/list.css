@@ -26,9 +26,12 @@ body {
 	float: right;
 	}
 }
-#social > div, #social form {
+#social > div, #social form, #social > a {
 	float: right;
 	margin-bottom: 10px;
+}
+#social .flattr img {
+	height: 18px;
 }
 .panel #social input[type=image] {
 	/*margin-top: 1px;*/
@@ -109,6 +112,7 @@ body {
 	border: 1px inset #fff;
 }
 #updated {
+	margin-top: 3px;
 	float: right;
 	font-size: .8em;
 }
