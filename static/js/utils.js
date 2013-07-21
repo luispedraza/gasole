@@ -525,19 +525,23 @@ function Gasole(callback) {
 			var newdata = JSON.parse(this.responseText);
 			if (newdata._meta) {		// compatibilidad api antigua sin _meta
 				date = new Date(newdata._meta.ts);
-				newdata = newdata._data;	
+				newdata = newdata._data;
 			} else {
 				date = new Date();
 			}
 			this.gasole.init(newdata,date);
-			localStorage.setItem("gasole", '{"ts": '+ date.getTime() +',"data": '+this.responseText+',"stats": '+JSON.stringify(this.gasole.stats)+'}');
+			var data2store = {	ts: date.getTime(),
+								data: newdata,
+								stats: this.gasole.stats};
+			localStorage.setItem("gasole", JSON.stringify(data2store));
 			if (this.gasole.callback) this.gasole.callback();
 		}
 		req.open("GET", "/api/All");
 		req.send();
 	} else {
 		var data = JSON.parse(storedData);
-		this.init(data.data, new Date(data.ts), data.stats);
+		console.log(data);
+		this.init(data.data._data, new Date(data.ts), data.stats);
 		if (this.callback) this.callback();
 	}
 }

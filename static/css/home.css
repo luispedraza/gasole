@@ -43,6 +43,7 @@
 	width: 160px;
 	height: 600px;
 	float: left;
+	margin-top:20px;
 }
 /* El mapa */
 #map {
