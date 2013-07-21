@@ -206,10 +206,10 @@ function initPrice(price) {
 							tr.setAttribute("data-p", result[i].prov);
 							tr.setAttribute("data-t", result[i].t);
 							tr.setAttribute("data-s", result[i].a);
-							tr.addEventListener("click", function() {
+							addEvent(tr,"click", function() {
 								window.location = "/ficha/"+encodeName(this.getAttribute("data-p"))+"/"+encodeName(this.getAttribute("data-t"))+"/"+encodeName(this.getAttribute("data-s"));
 							});
-							tr.addEventListener("mouseover", function() {
+							addEvent(tr,"mouseover", function() {
 								var bounds = new google.maps.LatLngBounds();
 								var current = new google.maps.LatLng(sdata.i.g[0], sdata.i.g[1]);
 								bounds.extend(current);
@@ -218,6 +218,7 @@ function initPrice(price) {
 								bounds.extend(candidate);
 								map.fitBounds(bounds);
 								if (candidateMark) {
+									candidateMark.setMap(map);
 									candidateMark.setPosition(candidate);
 									candidateMark.setAnimation(google.maps.Animation.BOUNCE)
 								} else {
@@ -230,6 +231,9 @@ function initPrice(price) {
 										animation: google.maps.Animation.BOUNCE
 									});
 								}
+							});
+							addEvent(tr,"mouseout", function() {
+								if (candidateMark) candidateMark.setMap(null);
 							});
 							table.appendChild(tr);
 						}

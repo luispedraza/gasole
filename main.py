@@ -225,7 +225,6 @@ class Detail(BaseAuthHandler):
              error["c_captcha"] = u"La solución del captcha no es correcta."
         result = None
         if not len(error) and user:
-            logging.info("nuevo comentario")
             add_comment(p, t, s, user, points, content, replyto)
             result = "El comentario se ha publicado con éxito."
         self.get(province=province, town=town, station=station, error=error, result=result)
@@ -248,7 +247,6 @@ class Api(BaseHandler):
         info = None
         prov = decode_param(prov)
         if station:
-            logging.info("estacion")
             info = getStationJson(prov, decode_param(town), decode_param(station))
         elif prov=="All":
             when = None

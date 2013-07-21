@@ -309,7 +309,7 @@ function initControl() {
 	for (var f=0; f<filterT.length; f++) {
 		if (stats[filterT[f].className.split(" ")[0].split("_")[1]]) {
 			filter.push(filterT[f].className);
-			filterT[f].addEventListener("click", function() {
+			addEvent(filterT[f],"click", function() {
 				var cname = this.className.split(" ");
 				var newCname = cname[0]+" "+((cname[1]=="on") ? "off" : "on");
 				this.className = newCname;
@@ -333,7 +333,7 @@ function initControl() {
 	// Ordenación de la tabla
 	var heads = document.getElementById("table").getElementsByTagName("th");
 	for (var h=0; h<heads.length; h++) {
-		heads[h].addEventListener("click", function(ev) {
+		addEvent(heads[h],"click", function() {
 			sortTable(this.className.match(/T_\w+/)[0],
 				this.className.match("sort_up"),
 				this.hasAttribute("data-float"));
@@ -493,7 +493,7 @@ function populateTable(types) {
 					td_dist.id="td-"+markers.length;
 					markers.push(marker);
 					td_dist.setAttribute("data-geo", dataPTS.g.join(","));
-					td_dist.addEventListener("click", function() {
+					addEvent(td_dist,"click", function() {
 						var marker = markers[this.id.split("-")[1]];
 						showDetail(marker);
 					});
@@ -571,7 +571,7 @@ function processData(info) {
 	paginateTable(0);
 }
 
-window.addEventListener("load", function() {
+addEvent(window,"load", function() {
 	new Gasole(function() {
 		var info = {"_data": {}};
 		var pathArray = decodeArray(window.location.pathname.split("/"));

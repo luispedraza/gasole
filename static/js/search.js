@@ -30,7 +30,7 @@ function initGeoloc() {
 	if (!navigator.geolocation) {
 		loc.style.display = "none";
 	} else {
-		loc.addEventListener("click", loadCurrentPosition);
+		addEvent(loc,"click", loadCurrentPosition);
 	}
 }
 /* Muestra los resultados de geolocalización */
@@ -54,7 +54,7 @@ function showResult(r,s) {
 				newA.setAttribute("loc", 
 					[r[i].formatted_address, r[i].geometry.location.lat(), r[i].geometry.location.lng()]
 					.join("##"));
-				newA.addEventListener("click", function() {
+				addEvent(newA,"click", function() {
 					searchLocation(this.getAttribute("loc"));
 				});
 				resultsList.appendChild(newL);
@@ -132,7 +132,7 @@ function mySlider(div) {
 	div.appendChild(bar);
 	div.setAttribute("newval", div.getAttribute("value"));
 	updateSlider(div);
-	div.addEventListener("mousemove", function(e) {
+	addEvent(div,"mousemove", function(e) {
 		var bar = this.getElementsByClassName("new-val")[0];
 		bar.style.display = "block";
 		var width = e.clientX - this.getBoundingClientRect().left;
@@ -147,28 +147,19 @@ function mySlider(div) {
 		bar.textContent = "Radio: " + newval.toFixed(1) + " km.";
 		this.setAttribute("newval", newval);
 	});
-	div.addEventListener("click", function(e) {
+	addEvent(div,"click", function(e) {
 		this.getElementsByClassName("new-val")[0].style.display = "none";
 		updateSlider(this);
 	});
-	div.addEventListener("mouseout", function(e) {
+	addEvent(div,"mouseout", function(e) {
 		this.getElementsByClassName("new-val")[0].style.display = "none";
 	})
 }
 
-window.addEventListener("load", function() {
+addEvent(window,"load", function() {
 	var sliders = document.getElementsByClassName("my-slider");
 	for (var i=0; i<sliders.length; i++) {
 		mySlider(sliders[i]);
-	}
-	var map = document.getElementById("map");
-	if (map) {
-		var provinces = map.getElementsByClassName("prov");
-		for (var p=0; p<provinces.length; p++) {
-			provinces[p].addEventListener("click", function() {
-
-			})
-		}
 	}
 	initGeoloc();
 });

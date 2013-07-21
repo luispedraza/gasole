@@ -16,13 +16,13 @@ OPENLAYERS_API = 'http://openlayers.org/api/OpenLayers.js'
 
 MEDIA_JS = {
 	'home.js': {
-		'src':		['search.js', 'home.js', 'utils.js'],
+		'src':		['utils.js','search.js', 'home.js'],
 		'libs': 	[],
 		'extern':	['google_maps_api_v3.js'],
 		'api':		[GOOGLE_MAPS_API]
 		},
 	'mobile.js': {
-		'src':		['search.js', 'mobile.js', 'utils.js'],
+		'src':		['utils.js','search.js', 'mobile.js'],
 		'libs': 	[],
 		'extern':	['google_maps_api_v3.js'],
 		'api':		[GOOGLE_MAPS_API]

@@ -1,16 +1,16 @@
-window.addEventListener("load", function() {
+addEvent(window,"load", function() {
 	/* Eventos del mapa */
 	for (var p in PROVS) {
 		prov = document.getElementById("P"+PROVS[p]);
-		prov.addEventListener("click", function() {
+		addEvent(prov,"click", function() {
 			var pname = getProvName(this.id.slice(1));
 			window.location = window.location.origin + "/gasolineras/" + encodeName(pname);
 		});
-		prov.addEventListener("mouseover", function() {
+		addEvent(prov,"mouseover", function() {
 			var pname = getProvName(this.id.slice(1));
 			document.getElementById("prov-current").textContent = pname;
 		});
-		prov.addEventListener("mouseout", function() {
+		addEvent(prov,"mouseout", function() {
 			document.getElementById("prov-current").textContent = "lista de provincias";
 		});
 	}
