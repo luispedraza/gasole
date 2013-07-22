@@ -256,40 +256,40 @@ function distance(a,b,r) {
 
 // Distancia de un punto a una recta
 function distanceOrto(p, p1,p2) {
-    // if start and end point are on the same x the distance is the difference in X.
-    if (p1.lng()==p2.lng()) return Math.abs(p.lat()-p1.lat());
-    else {
-        var slope = (p2.lat() - p1.lat())/(p2.lng() - p1.lng());
-        var intercept = p1.lat()-(slope*p1.lng());
-        return Math.abs(slope*p.lng()-p.lat()+intercept)/Math.sqrt(slope*slope+1);
-    }
+	// if start and end point are on the same x the distance is the difference in X.
+	if (p1.lng()==p2.lng()) return Math.abs(p.lat()-p1.lat());
+	else {
+		var slope = (p2.lat() - p1.lat())/(p2.lng() - p1.lng());
+		var intercept = p1.lat()-(slope*p1.lng());
+		return Math.abs(slope*p.lng()-p.lat()+intercept)/Math.sqrt(slope*slope+1);
+	}
 }
 // Ramer–Douglas–Peucker algorithm
 // http://karthaus.nl/rdp/js/rdp.js
 function properRDP(points,epsilon){
 	if (typeof(epsilon)=="undefined") epsilon = 1*Km2LL;
-    var firstPoint=points[0];
-    var lastPoint=points[points.length-1];
-    if (points.length<3){
-        return points;
-    }
-    var index=-1;
-    var dist=0;
-    for (var i=1;i<points.length-1;i++){
-        var cDist=distanceOrto(points[i],firstPoint,lastPoint);
-        if (cDist>dist){
-            dist=cDist;
-            index=i;
-        }
-    }
-    if (dist>epsilon){
-        var l1=points.slice(0, index+1);
-        var l2=points.slice(index);
-        var r1=properRDP(l1,epsilon);
-        var r2=properRDP(l2,epsilon);
-        // concat r2 to r1 minus the end/startpoint that will be the same
-         return r1.slice(0,r1.length-1).concat(r2);
-    } else return [firstPoint,lastPoint];
+	var firstPoint=points[0];
+	var lastPoint=points[points.length-1];
+	if (points.length<3){
+		return points;
+	}
+	var index=-1;
+	var dist=0;
+	for (var i=1;i<points.length-1;i++){
+		var cDist=distanceOrto(points[i],firstPoint,lastPoint);
+		if (cDist>dist){
+			dist=cDist;
+			index=i;
+		}
+	}
+	if (dist>epsilon){
+		var l1=points.slice(0, index+1);
+		var l2=points.slice(index);
+		var r1=properRDP(l1,epsilon);
+		var r2=properRDP(l2,epsilon);
+		// concat r2 to r1 minus the end/startpoint that will be the same
+		 return r1.slice(0,r1.length-1).concat(r2);
+	} else return [firstPoint,lastPoint];
 }
 
 /********************/
@@ -589,13 +589,13 @@ function gasoleProcess(ginfo, callback) {
 // http://blog.patricktresp.de/2012/02/internet-explorer-8-and-all-the-fun-stuff-e-stoppropagation-e-preventdefault-mousedown/
 function stopEvent(e) {
 	//e.cancelBubble is supported by IE -
-    // this will kill the bubbling process.
+	// this will kill the bubbling process.
 	e.cancelBubble = true;
 	e.returnValue = false;
 	//e.stopPropagation works only in Firefox.
 	if ( e.stopPropagation ) e.stopPropagation();
 	if ( e.preventDefault ) e.preventDefault();		
-    return false;
+	return false;
 }
 
 // Para ordenar dos nombres alfabéticamente
@@ -603,12 +603,12 @@ function stopEvent(e) {
 function sortName(a,b) {
 	function accentsTidy(s) {
 		var r=s.toLowerCase();
-        r = r.replace(new RegExp(/\s/g),"");	// borrar espacios
-        r = r.replace(new RegExp(/[àá]/g),"a");
-        r = r.replace(new RegExp(/[èé]/g),"e");
-        r = r.replace(new RegExp(/[ìí]/g),"i");
-        r = r.replace(new RegExp(/[òó]/g),"o");
-        r = r.replace(new RegExp(/[ùú]/g),"u");
+		r = r.replace(new RegExp(/\s/g),"");	// borrar espacios
+		r = r.replace(new RegExp(/[àá]/g),"a");
+		r = r.replace(new RegExp(/[èé]/g),"e");
+		r = r.replace(new RegExp(/[ìí]/g),"i");
+		r = r.replace(new RegExp(/[òó]/g),"o");
+		r = r.replace(new RegExp(/[ùú]/g),"u");
 		return r;
 	}
 	return (accentsTidy(a)<accentsTidy(b)) ?  -1 : 1;
@@ -621,6 +621,28 @@ function formatUpdate(date) {
 	u += " a las " + ("0" + date.getHours()).slice(-2) + ":" + ("0" + date.getMinutes()).slice(-2);
 	return u;
 }
+
+// Array.filter
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
+if (!Array.prototype.filter) {
+	Array.prototype.filter = function(fun /*, thisp*/) {
+		"use strict";
+		if (this == null) throw new TypeError();
+		var t = Object(this);
+		var len = t.length >>> 0;
+		if (typeof fun != "function") throw new TypeError();
+		var res = [];
+		var thisp = arguments[1];
+		for (var i = 0; i < len; i++) {
+			if (i in t) {
+				var val = t[i]; // in case fun mutates this
+				if (fun.call(thisp, val, i, t)) res.push(val);
+			}
+		}
+		return res;
+	};
+}
+
 
 // Para medir tiempo
 var TIME;

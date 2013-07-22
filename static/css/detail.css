@@ -2,8 +2,34 @@
   font-family: 'digital-7';
   src: url('/font/digital-7.ttf');
 }
+#breadcrumb {
+	color: #fff;
+	height: 30px;
+	width: 100%;
+}
+#breadcrumb a, #breadcrumb span {
+	display: inline-block;
+	float: left;
+	text-decoration: none;
+	color: #fff;
+}
+#breadcrumb .bc {
+	font-size: .8em;
+	height: 16px;
+	padding: 4px 5px 2px 4px;
+	background-color: #333;
+	cursor: pointer;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	max-width: 210px;
+}
+#breadcrumb .bc:hover {
+	color: #ccc;
+}
 #social {
-margin-bottom: 10px;}
+	margin-bottom: 10px;
+}
 #ads-top {
 	width: 730px;
 	height: 90px;
@@ -99,23 +125,25 @@ margin-bottom: 10px;}
 }
 #price-board .rel {
 	width: 100%;
-	height: 0;
+	max-height: 0;
 	clear: both;
-	padding-top: 5px;
 	-webkit-transition: all .5s ease;
 	-moz-transition: all .5s ease;
 	-ms-transition: all .5s ease;
 	-o-transition: all .5s ease;
 	transition: all .5s ease;
 }
+#price-board .rel > p {
+	padding-top: 12px;
+}
 #price-board .rel.on {
-	height: 150px;
+	max-height: 150px;
 }
 #price-board .rel-list {
 	padding: 5px;
 	margin-top: 5px;
 	border: 1px solid #fff;
-	height: 100px;
+	max-height: 100px;
 	overflow: auto;
 }
 
@@ -127,6 +155,10 @@ margin-bottom: 10px;}
 }
 #price-board table {
 	width: 100%;
+}
+#price-board td {
+	font-size: .9em;
+	padding: 2px;
 }
 #price-board tr:hover {
 	background-color: #fff;
