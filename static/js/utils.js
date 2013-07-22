@@ -668,7 +668,9 @@ function breadCrumb(id, label) {
 			div.appendChild(bc);
 			return;
 		}
-		bc.textContent = decodeName(pathArray[2]);
+		var name = decodeName(pathArray[2]);
+		bc.textContent = name;
+		bc.title = "Ver todas las gasolineras en la provincia de "+name;
 		var plink = "/gasolineras/"+pathArray[2];
 		bc.href = plink;
 		div.appendChild(bc);
@@ -676,7 +678,9 @@ function breadCrumb(id, label) {
 			div.innerHTML+=separator;
 			bc = document.createElement("a");
 			bc.className = "bc";
-			bc.textContent = decodeName(pathArray[3]);
+			name = decodeName(pathArray[3]);
+			bc.textContent = name;
+			bc.title = "Ver todas las gasolineras en la localidad de "+name;
 			bc.href = plink+"/"+pathArray[3];
 			div.appendChild(bc);
 		}
