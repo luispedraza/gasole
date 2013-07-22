@@ -235,12 +235,13 @@ footer ul a:hover{
 	column-gap:10px;*/
 }
 #user {
-	width: 50px;
+	padding: 3px;
 	font-size: 12px;
 	float: right;
+	border: 1px solid #ccc;
 }
 #user img {
-	border: 1px solid #fff;
+	border-bottom: 1px solid #ccc;
 	margin-bottom: 5px;
 }
 #user a {
@@ -248,6 +249,10 @@ footer ul a:hover{
 	width: 50px;
 	color: #fff;
 	text-decoration: none;
+	text-align: center;
+}
+#logout:after {
+	content: " \2716";
 }
 
 /* Formulario de búsqueda */

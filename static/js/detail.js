@@ -42,7 +42,7 @@ function initPoints() {
 	}
 	var stars = document.getElementById("c_points_div").getElementsByClassName("star");
 	for (var s=0, sl=stars.length; s<sl; s++) {
-		stars[s].addEventListener("mouseout", function() {
+		addEvent(stars[s],"mouseout", function() {
 			var val = document.getElementById("c_points").value;
 			var msg = document.getElementById("c_points_text");
 			if (!val){
@@ -61,7 +61,7 @@ function initPoints() {
 			}
 			
 		});
-		stars[s].addEventListener("mouseover", function() {
+		addEvent(stars[s],"mouseover", function() {
 			if (timeOut) clearTimeout(timeOut);
 			document.getElementById("c_points_div").className = "";
 			var id = this.id.split("_")[1];
@@ -70,7 +70,7 @@ function initPoints() {
 			msg.textContent = POINTS[id];
 			msg.className = "sel";
 		});
-		stars[s].addEventListener("click", function() {
+		addEvent(stars[s],"click", function() {
 			var id = this.id.split("_")[1];
 			document.getElementById("c_points").value = parseInt(id)+1;
 			document.getElementById("c_points_text").className = "sel";
@@ -159,12 +159,11 @@ function initPrice(price) {
 		dmore.className = "more";
 		dmore.id = "more-"+p;
 		dmore.textContent = "+";
-		dmore.addEventListener("click", function(e) {
+		addEvent(dmore,"click", function(e) {
 			var radius = 5;
 			var type = this.id.split("-")[1];
 			var div = document.getElementById("rel-"+type);
 			var price = sdata.i.o[type];
-			console.log(price);
 			if (this.textContent=="+") {
 				this.textContent="x";
 				div.className+=" on";
@@ -178,7 +177,6 @@ function initPrice(price) {
 					var rlen=result.length;
 					if (rlen) {
 						for (var i=rlen-1; i>=0; i--) if (result[i].p>=price) result.splice(i,1);	// precios más caros
-						console.log(result);
 						rlen = result.length;
 						if (!rlen) {
 							div.innerHTML = "<p>La más barata para este combustible en un radio de "+radius+" km.</p>";
@@ -265,7 +263,7 @@ function fillReplyTo(id) {
 	document.getElementById("comments").scrollIntoView();
 	document.getElementById("c_replyto").value = id;
 	document.getElementById("section_points").style.display = "none";
-	document.getElementById("replyto_cancel").addEventListener("click", function() {
+	addEvent(document.getElementById("replyto_cancel"),"click", function() {
 		document.getElementById("replyto").style.display = "none";
 		document.getElementById("replyto_name").innerHTML = "";
 		document.getElementById("replyto_msg").innerHTML = "";
@@ -343,7 +341,7 @@ function fillComments(comments) {
 		newCReply.textContent = "responder…";
 		newCReply.className = "reply button";
 		newCReply.id = "replyto-"+comments[c].id;
-		newCReply.addEventListener("click", function(e) {
+		addEvent(newCReply,"click", function(e) {
 			var id = this.id.split("-")[1];
 			fillReplyTo(id);
 		})
@@ -376,16 +374,17 @@ function processData(info) {
 	initMap(info.i.g);
 	initPrice(info.i.o);
 	(info.c.length!=0) ? fillComments(info.c) : (document.getElementById("no-comments").style.display="block");
-
-	if (document.getElementById("c_replyto").value) {
-		fillReplyTo(document.getElementById("c_replyto").value);
+	var replyto = document.getElementById("c_replyto");
+	if (replyto.value) {
+		fillReplyTo(replyto.value);
 	}
 	// relleno de http:// en c_link
-	document.getElementById("c_link").addEventListener("click", function() {
+	var clink = document.getElementById("c_link");
+	addEvent(clink,"click", function() {
 		if (this.value == "")
 			this.value = "http://";
 	});
-	document.getElementById("c_link").addEventListener("blur", function() {
+	addEvent(clink,"blur", function() {
 		if (this.value == "http://")
 			this.value = "";
 	});
@@ -451,7 +450,7 @@ function amChart(chartData) {
     chart.write("chart");
 }
 
-window.addEventListener("load", function() {
+addEvent(window,"load", function() {
 	// Resultado de una acción anterior: un comentario
 	var result = document.getElementById("result");
 	if (result) {
@@ -474,7 +473,7 @@ window.addEventListener("load", function() {
 		}
 	}
 	var path = decodeArray(window.location.pathname.split("/"));
-	sdata = {'p':path[2], 't': path[3], 's': path[4]};		// toda la información de la aestación
+	sdata = {'p':path[2], 't': path[3], 's': path[4]};		// toda la información de la estación
 	gasole = new Gasole(function() {
 		sdata.i = this.info[sdata.p][sdata.t][sdata.s];
 		getApiData(function(d) {
