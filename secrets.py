@@ -15,13 +15,13 @@ FACEBOOK_APP_ID = ' 490761724315971'
 FACEBOOK_APP_SECRET = '2767adcf73fe6bd67a55c0a480a89c86'
 
 # https://www.linkedin.com/secure/developer
-LINKEDIN_CONSUMER_KEY = 'consumer key'
-LINKEDIN_CONSUMER_SECRET = 'consumer secret'
+# LINKEDIN_CONSUMER_KEY = 'consumer key'
+# LINKEDIN_CONSUMER_SECRET = 'consumer secret'
 
 # https://manage.dev.live.com/AddApplication.aspx
 # https://manage.dev.live.com/Applications/Index
-WL_CLIENT_ID = 'client id'
-WL_CLIENT_SECRET = 'client secret'
+# WL_CLIENT_ID = 'client id'
+# WL_CLIENT_SECRET = 'client secret'
 
 # https://dev.twitter.com/apps
 TWITTER_CONSUMER_KEY = 'rS5bk7yQiJJdNqfpzQDFHA'
@@ -38,14 +38,14 @@ AUTH_CONFIG = {
                   'https://www.googleapis.com/auth/userinfo.profile'),
   'facebook'    : (FACEBOOK_APP_ID, FACEBOOK_APP_SECRET,
                   'user_about_me'),
-  'windows_live': (WL_CLIENT_ID, WL_CLIENT_SECRET,
-                  'wl.signin'),
+  # 'windows_live': (WL_CLIENT_ID, WL_CLIENT_SECRET,
+  #                 'wl.signin'),
   'foursquare'  : (FOURSQUARE_CLIENT_ID,FOURSQUARE_CLIENT_SECRET,
                   'authorization_code'),
 
   # OAuth 1.0 providers don't have scopes
   'twitter'     : (TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET),
-  'linkedin'    : (LINKEDIN_CONSUMER_KEY, LINKEDIN_CONSUMER_SECRET),
+  # 'linkedin'    : (LINKEDIN_CONSUMER_KEY, LINKEDIN_CONSUMER_SECRET),
 
   # OpenID doesn't need any key/secret
 }

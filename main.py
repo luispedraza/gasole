@@ -121,10 +121,10 @@ class AdminSearch(BaseHandler):
             db.put(_geodata)
             logging.info("guardadas %s posiciones" %len(_geodata))
 
-class Data(BaseAuthHandler):
-    def get(self, option, province):
-        data = get_means(option)
-        self.render_json(data)
+# class Data(BaseAuthHandler):
+#     def get(self, option, province):
+#         data = get_means(option)
+#         self.render_json(data)
 
 class List(BaseAuthHandler):
     def get(self, province, city):
@@ -258,9 +258,9 @@ class Api(BaseHandler):
         self.response.headers['Content-Type'] = 'application/json; charset=utf-8'
         self.write(info)
 
-class GeoApi(BaseHandler):
-    def get(self, place, lat, lon, dist):
-        self.render_json({"_near": place, "_data": get_near(lat=float(lat), lon=float(lon), dist=float(dist))})
+# class GeoApi(BaseHandler):
+#     def get(self, place, lat, lon, dist):
+#         self.render_json({"_near": place, "_data": get_near(lat=float(lat), lon=float(lon), dist=float(dist))})
 
 class SearchResults(BaseAuthHandler):
     def get(self, place, lat, lon, dist):
@@ -337,11 +337,11 @@ app = webapp2.WSGIApplication([
     ('/admin/search/?', AdminSearch),
     ('/graficos/?', Stats),
     # ('/stats/?([^ \/]+)?/?([^ \/]+)?/?', StatsApi),
-    ('/data/(\w+)/(\w+)', Data),
+    # ('/data/(\w+)/(\w+)', Data),
     ('/gasolineras/?([^ \/]+)/?([^ \/]+)?/?', List),
     ('/ficha/?([^ \/]+)/?([^ \/]+)?/?([^ \/]+)?', Detail),
     ('/api/?([^ \/]+)/?([^ \/]+)?/?([^ \/]+)?', Api),
-    ('/geo/(.+)/(.+)/(.+)/(.+)/?', GeoApi),
+    # ('/geo/(.+)/(.+)/(.+)/(.+)/?', GeoApi),
     ('/resultados/(.+)/(.+)/(.+)/(.+)/?', SearchResults),
     ('/info/(noticias|tarjetas|combustibles)/?', Info),
     webapp2.Route('/login/<provider>', handler=BaseAuthHandler, name='auth_login', handler_method='_login'),
