@@ -225,6 +225,34 @@ footer ul a:hover{
 	margin-top: 10px;
 	margin-bottom: 20px;
 }
+/* Miga de pan */
+#breadcrumb {
+	color: #fff;
+	height: 30px;
+	width: 730px;
+	float: right;
+}
+#breadcrumb a, #breadcrumb span {
+	display: inline-block;
+	float: left;
+	text-decoration: none;
+	color: #fff;
+}
+#breadcrumb .bc {
+	font-size: .8em;
+	height: 16px;
+	padding: 4px 10px 2px 4px;
+	background-color: #333;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	max-width: 250px;
+}
+#breadcrumb .bc:hover {
+	color: #ccc;
+}
+
+
 #textcontent {
 	padding: 30px;
 /*	-moz-column-count:2;

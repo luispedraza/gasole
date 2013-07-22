@@ -268,6 +268,10 @@ body {
 	border-top: 1px solid #aaa;
 	margin-top: 15px;
 }
+.panel:first-child {
+	border: none;
+	margin-top: 0;
+}
 .p_head {
 	vertical-align: middle;
 	margin-top: 5px;

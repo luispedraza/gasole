@@ -652,6 +652,44 @@ function tic() {
 function toc(s) {
 	console.log((s ? (s+" :") : "Transcurridos: ") + (new Date().getTime()-TIME) + " ms");
 }
+/* Inserta la miga de pan */
+function breadCrumb(id, label) {
+	var div = document.getElementById(id);
+	console.log(div);
+	if (div) {
+		var separator = "<span class='sprt breadcrumb'>&nbsp;</span>";
+		div.innerHTML = "<a href='/' class='bc'>Gasolineras</a>"+separator;
+		var pathArray = window.location.pathname.split("/");
+		var bc = document.createElement("a");
+		bc.className = "bc";
+		if (pathArray[1]=="resultados") {
+			bc.textContent = "Cerca de "+decodeName(pathArray[2]);
+			bc.href = "#";
+			div.appendChild(bc);
+			return;
+		}
+		bc.textContent = decodeName(pathArray[2]);
+		var plink = "/gasolineras/"+pathArray[2];
+		bc.href = plink;
+		div.appendChild(bc);
+		if (pathArray[3]) {
+			div.innerHTML+=separator;
+			bc = document.createElement("a");
+			bc.className = "bc";
+			bc.textContent = decodeName(pathArray[3]);
+			bc.href = plink+"/"+pathArray[3];
+			div.appendChild(bc);
+		}
+		if (pathArray[4]) {
+			div.innerHTML+=separator;
+			bc = document.createElement("a");
+			bc.className = "bc";
+			bc.textContent = "Gasolinera " + (label ? label : "") + " en " + toTitle(decodeName(pathArray[4]));
+			bc.href = window.location.pathname;
+			div.appendChild(bc);
+		}
+	}
+}
 /* Función que confierte un círculo en un path, para transformaciones de raphael */
 // NO BORRAR, PUEDE SER ÚTIL
 // function circle2path(x , y, r) // x and y are center and r is the radius

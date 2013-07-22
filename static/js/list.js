@@ -572,6 +572,7 @@ function processData(info) {
 }
 
 addEvent(window,"load", function() {
+	breadCrumb("breadcrumb");	// miga de pan 
 	new Gasole(function() {
 		var info = {"_data": {}};
 		var pathArray = decodeArray(window.location.pathname.split("/"));

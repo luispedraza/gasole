@@ -2,31 +2,7 @@
   font-family: 'digital-7';
   src: url('/font/digital-7.ttf');
 }
-#breadcrumb {
-	color: #fff;
-	height: 30px;
-	width: 100%;
-}
-#breadcrumb a, #breadcrumb span {
-	display: inline-block;
-	float: left;
-	text-decoration: none;
-	color: #fff;
-}
-#breadcrumb .bc {
-	font-size: .8em;
-	height: 16px;
-	padding: 4px 5px 2px 4px;
-	background-color: #333;
-	cursor: pointer;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-	max-width: 210px;
-}
-#breadcrumb .bc:hover {
-	color: #ccc;
-}
+
 #social {
 	margin-bottom: 10px;
 }

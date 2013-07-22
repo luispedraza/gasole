@@ -478,23 +478,11 @@ addEvent(window,"load", function() {
 			}
 		}
 	}
-	var pathArray = window.location.pathname.split("/");
-	console.log(pathArray);
-	var path = decodeArray(pathArray);
+	var path = decodeArray(window.location.pathname.split("/"));
 	sdata = {'p':path[2], 't': path[3], 's': path[4]};		// toda la información de la estación
 	gasole = new Gasole(function() {
 		sdata.i = this.info[sdata.p][sdata.t][sdata.s];
-		var bc = document.getElementById("bcp");
-		bc.textContent = sdata.p;
-		var plink = "/gasolineras/"+encodeName(sdata.p);
-		bc.href = plink;
-		console.log(bc.href);
-		bc = document.getElementById("bct");
-		bc.textContent = sdata.t;
-		bc.href = plink+"/"+encodeName(sdata.t);
-		bc = document.getElementById("bcs");
-		bc.textContent = sdata.i.l + " en " +toTitle(sdata.s);
-		bc.href = window.location.pathname;
+		breadCrumb("breadcrumb", sdata.i.l);	// miga de pan del detalle
 		getApiData(function(d) {
 			sdata.c = d._comments;
 			sdata.h = d._history;
