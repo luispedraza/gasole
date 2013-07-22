@@ -549,7 +549,7 @@ function Gasole(callback) {
 	} else {
 		var data = JSON.parse(storedData);
 		console.log(data);
-		this.init(data.data._data, new Date(data.ts), data.stats);
+		this.init(data.data, new Date(data.ts), data.stats);
 		if (this.callback) this.callback();
 	}
 }
