@@ -111,10 +111,10 @@ def data2store(data):
 		_provinces = []		# nuevas provincias
 		_towns = []			# nuevas ciudades
 		_stations = []		# nuevas gasolineras
-		_prices = []		# precios nuevos o actualizados
+		# _prices = []		# precios nuevos o actualizados
 		_history = []		# nuevos históricos (tantos como _prices)
 		_closed = []		# estaciones cerradas
-		_del_prices = []	# precios actuales a borrar
+		# _del_prices = []	# precios actuales a borrar
 		datap = data.get(p)
 		cachep = cachedata.get(p)
 		if not cachep: # nueva provincia
@@ -149,7 +149,7 @@ def data2store(data):
 					parent_key = db.Key.from_path('Province', p, 'Town', t, 'GasStation', s)
 					date = Date(*datas["d"])
 					props = dict((FUEL_OPTIONS[o]["short"], datas["o"][o]) for o in datas["o"])
-					_prices.append(PriceData(key_name=s, parent=parent_key, date=date, **props))
+					# _prices.append(PriceData(key_name=s, parent=parent_key, date=date, **props))
 					_history.append(HistoryData(parent=parent_key, date=date, **props))
 			if len(cachet)==0: 	# no quedan estaciones, para optimizar la búsqueda de cerradas
 				del cachep[t]	# eliminamos la ciudad de cache
@@ -163,8 +163,8 @@ def data2store(data):
 					label = caches["l"],
 					hours = caches["h"],
 					closed = True))
-				_del_prices.append(db.Key.from_path('Province', p, 'Town', t, 'GasStation', s, 'PriceData', s))
-		newdata = _provinces+_towns+_stations+_prices+_history+_closed
+				# _del_prices.append(db.Key.from_path('Province', p, 'Town', t, 'GasStation', s, 'PriceData', s))
+		newdata = _provinces+_towns+_stations+_history+_closed #+_prices
 		if len(newdata):
 			try:
 				logging.info("==========Guardando datos de %s" %p)
@@ -172,15 +172,15 @@ def data2store(data):
 					logging.info("%s nuevas ciudades" %len(_towns))
 				if len(_stations):
 					logging.info("%s nuevas estaciones" %len(_stations))
-				if len(_prices):
-					logging.info("%s nuevos precios" %len(_prices))
+				# if len(_prices):
+				# 	logging.info("%s nuevos precios" %len(_prices))
 				if len(_history):
 					logging.info("%s históricos" %len(_history))
 				if len(_closed):
 					logging.info("%s estaciones CERRADAS" %len(_closed))
-				if len(_del_prices):
-					logging.info("%s precios BORRADOS" %len(_del_prices))
-				updateDB(dnew=newdata, dold=_del_prices)
+				# if len(_del_prices):
+				# 	logging.info("%s precios BORRADOS" %len(_del_prices))
+				updateDB(dnew=newdata)
 				json_data = json.dumps({"_data": {p: datap}})
 				ApiJson(key_name=p, json=json_data).put()
 				logging.info("Uso de memoria: %s" %memory_usage().current())
