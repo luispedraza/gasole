@@ -258,6 +258,19 @@ class Api(BaseHandler):
         self.response.headers['Content-Type'] = 'application/json; charset=utf-8'
         self.write(info)
 
+#api de comentarios de una gasolinera
+class CommentsApi(BaseHandler):
+    def get(self,p,t,s):
+        self.response.headers['Content-Type'] = 'application/json; charset=utf-8'
+        comments = get_comments(decode_param(p), decode_param(t), decode_param(s))
+        self.write(json.dumps(comments))
+#api de históricos de una gasolinera
+class HistoryApi(BaseHandler):
+    def get(self,p,t,s):
+        self.response.headers['Content-Type'] = 'application/json; charset=utf-8'
+        history = get_history(decode_param(p), decode_param(t), decode_param(s))
+        self.write(json.dumps(history))
+
 # class GeoApi(BaseHandler):
 #     def get(self, place, lat, lon, dist):
 #         self.render_json({"_near": place, "_data": get_near(lat=float(lat), lon=float(lon), dist=float(dist))})
@@ -344,6 +357,8 @@ app = webapp2.WSGIApplication([
     # ('/geo/(.+)/(.+)/(.+)/(.+)/?', GeoApi),
     ('/resultados/(.+)/(.+)/(.+)/(.+)/?', SearchResults),
     ('/info/(noticias|tarjetas|combustibles)/?', Info),
+    webapp2.Route(r'/api/c/<p>/<t>/<s>', handler=CommentsApi, name='comments-api'),
+    webapp2.Route(r'/api/h/<p>/<t>/<s>', handler=HistoryApi, name='history-api'),
     webapp2.Route('/login/<provider>', handler=BaseAuthHandler, name='auth_login', handler_method='_login'),
     webapp2.Route('/login/<provider>/callback', handler=BaseAuthHandler, name='auth_callback', handler_method='_auth_callback'),
     webapp2.Route('/logout', handler=BaseAuthHandler, name='auth_logout', handler_method='_logout'),
