@@ -263,15 +263,17 @@ footer ul a:hover{
 	column-gap:10px;*/
 }
 #user {
-	padding: 3px;
+	padding: 4px;
 	font-size: 12px;
 	float: right;
 	border: 1px solid #ccc;
 }
-#user img {
+#user .avatar {
 	border-bottom: 1px solid #ccc;
 	margin-bottom: 5px;
-	padding: 2px;
+	padding-bottom: 2px;
+	width: 50px;
+	height: auto;
 }
 #user a {
 	display: block;

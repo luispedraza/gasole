@@ -11,80 +11,8 @@ var map = null;				// el mapa
 var candidateMark = null; 	// marcador de gasolinera propuesta por el recomendador
 var moreR = 5;				// Radio de búsqueda para gasolineras alternativas
 
-function initMap(latlon) {
-	var mapdiv = document.getElementById("map");
-	if (!latlon) {
-		mapdiv.style.display = "none";
-		return;
-	}
-	var position = new google.maps.LatLng(latlon[0], latlon[1]);
-	var mapOptions = {
-		center: position,
-		zoom: 15,
-		mapTypeId: google.maps.MapTypeId.ROADMAP
-	};
-	map = new google.maps.Map(mapdiv,
-		mapOptions);
-	markerCenter = new google.maps.Marker({
-    	map: map,
-    	position: position,
-    	animation: google.maps.Animation.DROP,
-		icon: '/img/pump_mark.png'
-	});
-}
-
-/* Eventos para valoración de una gasolinera */
-function initPoints() {
-	var timeOut=null;
-	function selStar(i){
-		var stars = document.getElementById("c_points_div").getElementsByClassName("star");
-		for (var s=0; s<stars.length; s++) {
-			var id=parseInt(stars[s].id.split("_")[1]);
-			var cname = stars[s].className;
-			if (id<=i) stars[s].className = cname.replace("off", "on");
-			else stars[s].className = cname.replace("on", "off");
-		}
-	}
-	var stars = document.getElementById("c_points_div").getElementsByClassName("star");
-	for (var s=0, sl=stars.length; s<sl; s++) {
-		addEvent(stars[s],"mouseout", function() {
-			var val = document.getElementById("c_points").value;
-			var msg = document.getElementById("c_points_text");
-			if (!val){
-				timeOut = setTimeout(function() {
-					msg.textContent = "Debes asignar una puntuación";
-					msg.className = "error";
-					msg.style.display = "block";
-					selStar(-1);
-				}, 500);
-			}
-			else {
-				val = parseInt(val)-1;
-				selStar(val);
-				msg.textContent = POINTS[val];
-				msg.className = "sel";
-			}
-			
-		});
-		addEvent(stars[s],"mouseover", function() {
-			if (timeOut) clearTimeout(timeOut);
-			document.getElementById("c_points_div").className = "";
-			var id = this.id.split("_")[1];
-			selStar(parseInt(id));
-			var msg = document.getElementById("c_points_text");
-			msg.textContent = POINTS[id];
-			msg.className = "sel";
-		});
-		addEvent(stars[s],"click", function() {
-			var id = this.id.split("_")[1];
-			document.getElementById("c_points").value = parseInt(id)+1;
-			document.getElementById("c_points_text").className = "sel";
-		});
-	}
-}
-function resetError(d) {
-	document.getElementById("error_"+d.id).style.display = "none";
-	d.className = "";
+function resetError() {
+	this.className = this.className.replace("error", "");
 }
 function onBlurName(d) {
 	var val = clearHtmlTags(d.value);
@@ -139,19 +67,6 @@ function onBlurContent(d) {
 		d.className = "ok";
 	}
 }
-function insertLogo(label) {
-	var logoId = getLogo(label);
-	var logoDiv = document.getElementById("station-logo");
-	if (logoId) {
-		var imgUrl = "/img/logos/" + logoId + "_w.png";
-		logoDiv.style.backgroundImage = "url("+imgUrl+")";
-	}
-	else {
-		logoDiv.style.backgroundImage = "url('/img/logos/otra_w.png')";
-		logoDiv.textContent = label;
-	}
-}
-
 // Información relacionada con un tipo de precio
 function showMore() {
 	var type = this.id.split("-")[1];
@@ -238,26 +153,6 @@ function showMore() {
 		rel.className = rel.className.replace(" on", "");
 	}
 }
-/* Inicializa tablón de precios y reomendador */
-function initPrice(price) {
-	for (var p in price) {
-		var type = FUEL_OPTIONS[p]["short"];
-		var dsec = document.getElementById("sec-"+type);
-		dsec.style.display = "block";
-		fillPriceDigits(document.getElementById(type), price[p]);
-		// Recomendador
-		var dmore = document.createElement("div");
-		dmore.className = "more";
-		dmore.id = "more-"+p;
-		dmore.textContent = "+";
-		dmore.onclick = showMore;
-		dsec.appendChild(dmore);
-		var drelated = document.createElement("div");
-		drelated.id = "rel-"+p;
-		drelated.className = "rel";
-		dsec.appendChild(drelated);
-	}
-}
 function fillReplyTo(id) {
 	var comment = document.getElementById("comment-"+id);
 	document.getElementById("replyto_name").innerHTML = comment.getElementsByClassName("c_name")[0].textContent.bold();
@@ -275,26 +170,26 @@ function fillReplyTo(id) {
 	})
 }
 
-/* rellena una valoración basada en la puntuación */
-function fillStars(div, p) {
-	p--;
-	div.textContent = POINTS[p]+": ";
-	div.className = "c_points";
-	for (var s=0; s<5; s++) {
-		var star = document.createElement("div");
-		star.className = "sprt star_mini";
-		star.className += (s<=p) ? " son" : " soff";
-		div.appendChild(star);
-	}
-}
-
 /* Rellena los comentarios de la gasolinera */
 function fillComments(comments) {
+	/* rellena una valoración basada en la puntuación */
+	function fillStars(div, p) {
+		p--;
+		div.innerHTML = "<p>"+POINTS[p]+"</p>";
+		div.className = "c_points";
+		for (var s=0; s<5; s++) {
+			var star = document.createElement("div");
+			star.className = "sprt star_mini";
+			star.className += (s<=p) ? " son" : " soff";
+			div.appendChild(star);
+		}
+	}
 	if (comments.length==0) {
 		document.getElementById("no-comments").style.display="block";
 		return;
 	}
 	var commentsDiv = document.getElementById("old_comments");
+	commentsDiv.innerHTML="";
 	var total_points = 0;
 	var n_comments = 0;
 	var comments_length = comments.length;
@@ -307,6 +202,11 @@ function fillComments(comments) {
 		newComment.className = "c_comment";
 		newComment.id = "comment-"+comments[c].id;
 
+		var newCAvatar = document.createElement("img");
+		newCAvatar.className = "c_avatar";
+		newCAvatar.src = comments[c].avatar;
+		newComment.appendChild(newCAvatar);
+
 		var points = comments[c].points;
 		if (points) {
 			points = parseInt(points);
@@ -316,12 +216,6 @@ function fillComments(comments) {
 			newComment.appendChild(newCPoints);
 			n_comments++;
 		}
-
-		var newCAvatar = document.createElement("img");
-		newCAvatar.className = "c_avatar";
-		newCAvatar.src = comments[c].avatar;
-		newComment.appendChild(newCAvatar);
-
 		var newCName = document.createElement("div");
 		newCName.className = "c_name";
 		if (comments[c].link) newCName.innerHTML = "<a href='" + comments[c].link + "' rel='external nofollow'>"+comments[c].name+"</a>";
@@ -374,33 +268,124 @@ function fillComments(comments) {
 		fillStars(document.getElementById("points"), Math.round(total_points/n_comments));
 	}
 }
+/* Procesamiento de los datos de la gasolinera */
 function processData(info) {
-	document.getElementById("hours").textContent = info.i.h;
-	insertLogo(info.i.l);
-	initMap(info.i.g);
-	initPrice(info.i.o);
-	fillComments(info.c);
-	var replyto = document.getElementById("c_replyto");
-	if (replyto.value) {
-		fillReplyTo(replyto.value);
-	}
+	/* Eventos para valoración de una gasolinera */
+	(function initPoints() {
+		var timeOut=null;
+		function selStar(i){
+			var stars = document.getElementById("c_points_div").getElementsByClassName("star");
+			for (var s=0; s<stars.length; s++) {
+				var id=parseInt(stars[s].id.split("_")[1]);
+				var cname = stars[s].className;
+				if (id<=i) stars[s].className = cname.replace("off", "on");
+				else stars[s].className = cname.replace("on", "off");
+			}
+		}
+		var stars = document.getElementById("c_points_div");
+		for (var s=0; s<5; s++) {
+			var star = document.createElement("div");
+			star.className = "sprt star soff";
+			star.id = "star_"+s;
+			stars.appendChild(star);
+			addEvent(star,"mouseout", function() {
+				var val = document.getElementById("c_points").value;
+				var msg = document.getElementById("c_points_text");
+				if (!val){
+					timeOut = setTimeout(function() {
+						msg.textContent = "Debes asignar una puntuación";
+						msg.className = "error";
+						msg.style.display = "block";
+						selStar(-1);
+					}, 500);
+				}
+				else {
+					val = parseInt(val)-1;
+					selStar(val);
+					msg.textContent = POINTS[val];
+					msg.className = "sel";
+				}
+			});
+			addEvent(star,"mouseover", function() {
+				if (timeOut) clearTimeout(timeOut);
+				document.getElementById("c_points_div").className = "";
+				var id = this.id.split("_")[1];
+				selStar(parseInt(id));
+				var msg = document.getElementById("c_points_text");
+				msg.textContent = POINTS[id];
+				msg.className = "sel";
+			});
+			addEvent(star,"click", function() {
+				var id = this.id.split("_")[1];
+				document.getElementById("c_points").value = parseInt(id)+1;
+				document.getElementById("c_points_text").className = "sel";
+			});
+		}
+	})();
+	/* Inicializa el mapa */
+	(function initMap(latlon) {
+		var mapdiv = document.getElementById("map");
+		if (!latlon) {
+			mapdiv.style.display = "none";
+			return;
+		}
+		var position = new google.maps.LatLng(latlon[0], latlon[1]);
+		var mapOptions = {
+			center: position,
+			zoom: 15,
+			mapTypeId: google.maps.MapTypeId.ROADMAP
+		};
+		map = new google.maps.Map(mapdiv,
+			mapOptions);
+		markerCenter = new google.maps.Marker({
+	    	map: map,
+	    	position: position,
+	    	animation: google.maps.Animation.DROP,
+			icon: '/img/pump_mark.png'
+		});
+	})(info.i.g);
+	/* El horario de la gasaolinera*/
+	(function initHours(h) {
+		document.getElementById("hours").textContent = h;	
+	})(info.i.h);
+	/* El logo de la gasolinera */
+	(function insertLogo(label) {
+		var logoId = getLogo(label);
+		var logoDiv = document.getElementById("station-logo");
+		if (logoId) {
+			var imgUrl = "/img/logos/" + logoId + "_w.png";
+			logoDiv.style.backgroundImage = "url("+imgUrl+")";
+		}
+		else {
+			logoDiv.style.backgroundImage = "url('/img/logos/otra_w.png')";
+			logoDiv.textContent = label;
+		}
+	})(info.i.l);
+	/* Inicializa tablón de precios y reomendador */
+	(function initPrice(price) {
+		for (var p in price) {
+			var type = FUEL_OPTIONS[p]["short"];
+			var dsec = document.getElementById("sec-"+type);
+			dsec.style.display = "block";
+			fillPriceDigits(document.getElementById(type), price[p]);
+			// Recomendador
+			var dmore = document.createElement("div");
+			dmore.className = "more";
+			dmore.id = "more-"+p;
+			dmore.textContent = "+";
+			dmore.onclick = showMore;
+			dsec.appendChild(dmore);
+			var drelated = document.createElement("div");
+			drelated.id = "rel-"+p;
+			drelated.className = "rel";
+			dsec.appendChild(drelated);
+		}
+	})(info.i.o);
 	// relleno de http:// en c_link
 	var clink = document.getElementById("c_link");
-	addEvent(clink,"click", function() {
-		if (this.value == "")
-			this.value = "http://";
-	});
-	addEvent(clink,"blur", function() {
-		if (this.value == "http://")
-			this.value = "";
-	});
-
-    /* Amchart */
-    amChart(info.h);
-    /* Puntuaciones (estrellas) */
-    initPoints();
+	addEvent(clink,"click", function() {if (this.value == "") this.value = "http://";});
+	addEvent(clink,"blur", function() {if (this.value == "http://") this.value = "";});
 }
-
 function amChart(chartData) {
 	var chart;
 	for (var i in chartData) chartData[i].d = new Date(chartData[i].d);
@@ -456,6 +441,67 @@ function amChart(chartData) {
     chart.write("chart");
 }
 
+/* Enviar un nuevo comentario */
+function postComment(e) {
+	stopEvent(e);
+	console.log("enviando");
+	function encodeParams(dict) {
+		params = ""
+		for (var k in dict) {
+			params += k+"="+dict[k]+"&";
+		}
+		return params;
+	}
+	var req = new XMLHttpRequest();
+	var url = document.URL.replace("ficha", "api/c");
+	req.open("POST", url, true);
+	req.setRequestHeader("content-type", "application/x-www-form-urlencoded; charset=utf-8");
+	req.onload = function(r) {
+		var response = JSON.parse(this.responseText);
+		var result = document.getElementById("result");
+		result.style.display = "block";
+		result.scrollIntoView();
+		console.log(result);
+		if (response.hasOwnProperty("OK")) {
+			window.location = window.location.pathname+"#comments";
+			window.location.reload();
+			return;
+		}
+		result.className = "e";
+		result.innerHTML = "<p>Se han detectado errores en el formulario:</p>";
+		for (var e in response) {
+			var field=null;
+			if (e=="c_points") {
+				field = document.getElementById("c_points_div");
+				field.className = "perror";
+			}
+			else {
+				field = document.getElementById(e);
+				field.className = "error";	
+			} 
+			addEvent(field,"focus",resetError);
+			var newE = document.createElement("div");
+			newE.id = "em_"+e;
+			newE.textContent = response[e];
+			result.appendChild(newE);
+		}
+	}
+	var comment = {
+		c_replyto: document.getElementById("c_replyto").value,
+		c_content: document.getElementById("c_content").value,
+		c_points: document.getElementById("c_points").value,
+		recaptcha_response_field: Recaptcha.get_response(),
+		recaptcha_challenge_field: Recaptcha.get_challenge()
+	};
+	if (document.getElementById("user-data")){
+		comment.c_name = document.getElementById("c_name").value;
+		comment.c_email = document.getElementById("c_email").value;
+		comment.c_link = document.getElementById("c_link").value;
+	}
+	console.log(comment);
+	req.send(encodeParams(comment));
+	return false;
+}
 addEvent(window,"load", function() {
 	// Resultado de una acción anterior: un comentario
 	var result = document.getElementById("result");
@@ -463,30 +509,18 @@ addEvent(window,"load", function() {
 		result.scrollIntoView();
 		if (checkLocalStorage()) localStorage.removeItem(getKey());
 	}
-	var error = document.getElementById("error");
-	if (error) {
-		error.scrollIntoView();
-		var lis = error.getElementsByTagName("li");
-		for (var l=0; l<lis.length; l++) {
-			var cname = lis[l].id.replace("e_", "");
-			var e = null;
-			if (cname == "c_points") {
-				document.getElementById("c_points_div").className = "perror";
-			} else {
-				var e = document.getElementById(cname);
-				if (e) e.className = "error";
-			}
-		}
-	}
 	var path = decodeArray(window.location.pathname.split("/"));
 	sdata = {'p':path[2], 't': path[3], 's': path[4]};		// toda la información de la estación
 	gasole = new Gasole(function() {
 		sdata.i = this.info[sdata.p][sdata.t][sdata.s];
 		breadCrumb("breadcrumb", sdata.i.l);	// miga de pan del detalle
-		getApiData(function(d) {
-			sdata.c = d._comments;
-			sdata.h = d._history;
-			processData(sdata);
-		})
-	})
+		processData(sdata);
+	});
+	document.getElementById("chart").onclick = function() {
+		this.className="";
+		this.textContent="";
+		getApiData("history", amChart);
+	}
+	getApiData("comments", fillComments, (window.location.href.match("#comments")!=null));
+	document.getElementById("send_comment").onclick = postComment;
 })

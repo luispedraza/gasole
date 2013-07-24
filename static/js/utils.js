@@ -88,11 +88,6 @@ var COLORS = {
 
 var LS_EXPIRE = 3600000;				// Expiración de localStorage, 1 hora
 
-var APIS = 	{ 	"gasolineras": "api",
-				"resultados": "geo",
-				"ficha": "api"
-			};
-
 // Para agregar eventos 
 function addEvent(el, evnt, func) {
 	if(el.addEventListener) {
@@ -132,16 +127,10 @@ function initProvLinks(id, callback) {
 }
 
 /* Obtener nombre de provincia a partir de id */
-function getProvName(id) {
-	for (k in PROVS) if (PROVS[k] == id) return k;
-}
-
+function getProvName(id) {for (k in PROVS) if (PROVS[k] == id) return k;}
 
 /* Elimina el etiquetado HTML de un texto para su envío al servidor */
-function clearHtmlTags(s) {
-	return s.replace(/(<([^>]+)>)/ig,"")
-}
-
+function clearHtmlTags(s) {return s.replace(/(<([^>]+)>)/ig,"")}
 /* Elimina errores y uniformiza nombres de direcciones de gasolineras */
 function toTitle(s) {
 	return s.replace(" [N]", "")
@@ -175,9 +164,11 @@ function getLogo(label) {
 }
 
 /* Decodifica un nombre de url a representación humana */
-function decodeName(s) {
-	return decodeURI(s).replace(/_/g, " ").replace(/\|/g, "/");
-}
+function decodeName(s) {return decodeURI(s).replace(/_/g, " ").replace(/\|/g, "/");}
+/* Decodifica un array de nombres url a nombre legible */
+function decodeArray(a) {for (var n=0; n<a.length; n++) a[n]=decodeName(a[n]); return a;}
+/* Codifica un nombre para utilizar en una url */
+function encodeName(s) {return s.replace(/\//g, "|").replace(/ /g, "_");}
 
 /* Hace que un nombre sea más bonito para representación en pantalla */
 function prettyName(s) {
@@ -189,16 +180,6 @@ function prettyName(s) {
 			.replace("(", "").replace(")", " ") + s.split(" (")[0];
 	}
 	return s;
-}
-
-/* Decodifica un array de nombres url a nombre legible */
-function decodeArray(a) {
-	for (var n=0; n<a.length; n++) a[n]=decodeName(a[n]); return a;
-}
-
-/* Codifica un nombre para utilizar en una url */
-function encodeName(s) {
-	return s.replace(/\//g, "|").replace(/ /g, "_");
 }
 
 /* Comprueba si existe almacenamiento local en el navegador */
@@ -214,27 +195,32 @@ function checkLocalStorage() {
 function getKey() {return window.location.pathname.split("/").slice(1).join("*");}
 
 /* Obtención de datos de la api a partir de la url de la página actual */
-function getApiData(callback) {	
-	var key = getKey();
+function getApiData(option, callback, reload) {
+	if (typeof reload == "undefined") reload=false;
+	var key = option+"*"+getKey();
+	var ts = new Date().getTime();
 	if (checkLocalStorage()) {
 		if (localStorage.hasOwnProperty(key)) {
 			localData = JSON.parse(localStorage[key]);
-			if ((new Date().getTime()-localData.ts)>LS_EXPIRE) localStorage.removeItem(key);
+			if (((ts-localData.ts)>LS_EXPIRE) || reload)
+				localStorage.removeItem(key);
 			else {callback(localData.data); return;};
 		}
-	} 
+	}
 	var req = new XMLHttpRequest();
 	req.onload = function(r) {
 		var info = JSON.parse(this.responseText);
 		if (checkLocalStorage())
 			localStorage.setItem(key, JSON.stringify(
-				{"ts": new Date().getTime(), "data": info}));
+				{"ts": ts, "data": info}));
 		callback(info);
 	};
-	var option = window.location.pathname.split("/")[1];
-	req.open("GET", document.URL.replace(option, APIS[option]));
-	req.send();	
-	
+	var url = "api/";
+	if 		(option=="history") 	url+="h";
+	else if (option=="comments") 	url+="c";
+	var current = window.location.pathname.split("/")[1];
+	req.open("GET", document.URL.replace(current, url));
+	req.send();
 }
 
 /****************************/
@@ -655,7 +641,6 @@ function toc(s) {
 /* Inserta la miga de pan */
 function breadCrumb(id, label) {
 	var div = document.getElementById(id);
-	console.log(div);
 	if (div) {
 		var separator = "<span class='sprt breadcrumb'>&nbsp;</span>";
 		div.innerHTML = "<a href='/' class='bc'>Gasolineras</a>"+separator;

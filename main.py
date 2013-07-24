@@ -136,15 +136,12 @@ class List(BaseAuthHandler):
             content=jinja_env.get_template("list.html").render())
 
 class Detail(BaseAuthHandler):
-    def get(self, province, town, station, error={}, result=None):
+    def get(self, province, town, station):
         # Vista de detalle de una gasolinera
-        data = {}
-        if error:
-            data = {k: self.request.get(k) for k in self.request.arguments()}
         p = decode_param(province)
         t = decode_param(town)
         s = decode_param(station)
-        address = s.replace(" [D]", " (margen der.)").replace(" [I]", " (margen izq.)").replace(" [N]", "")
+        address = s.replace(" [D]", " (m.d.)").replace(" [I]", " (m.i.)").replace(" [N]", "")
         title = "Gasolinera en " + address + ", " + t
         edit_station = {}
         if users.is_current_user_admin():
@@ -152,6 +149,10 @@ class Detail(BaseAuthHandler):
             if sdata:
                 edit_station = {k: getattr(sdata,k) or "" for k in sdata.properties()}
         user = self.get_logged_user()
+        service = None
+        if user:
+            service=user.auth_ids[0].split(":")[0]
+        logging.info(user)
         self.render("base.html",
             title = title,
             styles=['/css/detail.css'],
@@ -160,74 +161,9 @@ class Detail(BaseAuthHandler):
             content=jinja_env.get_template("detail.html").render(
                 title=title,
                 edit_station=edit_station,
-                data=data,
-                error=error,
-                result=result,
-                user=user
+                user=user,
+                service=service
                 ))
-    def post(self, province, town, station):
-        p = decode_param(province)
-        t = decode_param(town)
-        s = decode_param(station)
-        # Actualización de datos de la gasolinera:
-        if users.is_current_user_admin() and self.request.get("edit_station"):
-            sdata = GasStation.get(db.Key.from_path('Province', p, 'Town', t, 'GasStation', s))
-            if self.request.get("lat") and self.request.get("lon"):
-                sdata.geopt = db.GeoPt(float(self.request.get("lat")), float(self.request.get("lon")))
-            if self.request.get("phone"):
-                sdata.phone = self.request.get("phone")
-            if self.request.get("email"):
-                sdata.email = self.request.get("email")
-            if self.request.get("link"):
-                sdata.link = self.request.get("link")
-            sdata.put()
-            self.get(province=province, town=town, station=station)
-            return
-        # Creación de un nuevo comentario sobre una estación
-        error = {}
-        user = {}
-        if self.logged_in:
-            user = self.current_user
-        else:
-            name=remove_html_tags(self.request.get("c_name").strip())
-            if not name:
-                error["c_name"] = u"Debes indicar tu nombre en el comentario."
-            email=self.request.get("c_email").strip().lower()
-            if not email:
-                error["c_email"] = u"Debes indicar tu dirección de correo electrónico (no será guardada ni mostrada)."
-            elif not is_email_valid(email):
-                error["c_email"] = u"La dirección de correo electrónico no es válida."
-            if not len(error):
-                hashemail = md5(email).hexdigest()
-                avatar = "http://www.gravatar.com/avatar/"+hashemail+"?s=100&d="+urllib.quote_plus(u'http://www.gasole.net/img/avatar.png')
-                link = self.request.get("c_link").strip()
-                self._on_signin({'name':name,'link':link,'avatar':avatar,'id':hashemail}, None, provider='gasole',redirect=False)
-                user = self.current_user
-                self.auth.unset_session()
-        replyto = self.request.get("c_replyto")
-        points = None
-        if not replyto:
-            points=get_points(self.request.get("c_points"))
-            if not points:
-                error["c_points"] = u"Olvidaste valorar esta gasolinera."
-            else:
-                points=int(points)
-        content=remove_html_tags(self.request.get("c_content").strip())
-        if not content:
-            error["c_content"] = u"El texto del comentario está vacío."
-        challenge_field = self.request.get("recaptcha_challenge_field")
-        response_field = self.request.get("recaptcha_response_field")
-        captcha_result = verifyCaptcha(
-            challenge_field=challenge_field,
-            response_field=response_field,
-            remote_ip=self.request.remote_addr)
-        if not captcha_result.is_valid:
-             error["c_captcha"] = u"La solución del captcha no es correcta."
-        result = None
-        if not len(error) and user:
-            add_comment(p, t, s, user, points, content, replyto)
-            result = "El comentario se ha publicado con éxito."
-        self.get(province=province, town=town, station=station, error=error, result=result)
 
 # class Gzip(BaseHandler):
 #     def get(self, prov, town, station):
@@ -258,12 +194,92 @@ class Api(BaseHandler):
         self.response.headers['Content-Type'] = 'application/json; charset=utf-8'
         self.write(info)
 
+# api de actualización de estaciones
+class StationApi(BaseAuthHandler):
+     def post(self,p,t,s):
+        if not p or not t or not s:
+            return
+        pname = decode_param(p)
+        tname = decode_param(t)
+        sname = decode_param(s)
+        # Actualización de datos de la gasolinera:
+        if users.is_current_user_admin() and self.request.get("edit_station"):
+            sdata = GasStation.get(db.Key.from_path('Province', pname, 'Town', tname, 'GasStation', sname))
+            lat = self.request.get("lat")
+            lon = self.request.get("lon")
+            phone = self.request.get("phone")
+            email = self.request.get("email")
+            link = self.request.get("link")
+            if lat and lon:
+                sdata.geopt = db.GeoPt(float(lat), float(lon))
+            if phone:
+                sdata.phone = phone
+            if email:
+                sdata.email = email
+            if link:
+                sdata.link = link
+            sdata.put()
+            self.redirect("/ficha/"+p+"/"+t+"/"+s)
+
 #api de comentarios de una gasolinera
-class CommentsApi(BaseHandler):
+class CommentsApi(BaseAuthHandler):
     def get(self,p,t,s):
         self.response.headers['Content-Type'] = 'application/json; charset=utf-8'
         comments = get_comments(decode_param(p), decode_param(t), decode_param(s))
         self.write(json.dumps(comments))
+    def post(self,p,t,s):
+        if not p or not t or not s:
+            return
+        pname = decode_param(p)
+        tname = decode_param(t)
+        sname = decode_param(s)
+        # Creación de un nuevo comentario sobre una estación
+        result = {}
+        user = None
+        if self.logged_in:
+            user = self.current_user
+        else:
+            name=remove_html_tags(self.request.get("c_name").strip())
+            if not name:
+                result["c_name"] = u"Debes indicar tu nombre en el comentario."
+            email=self.request.get("c_email").strip().lower()
+            if not email:
+                result["c_email"] = u"Debes indicar tu dirección de correo electrónico (no será guardada ni mostrada)."
+            elif not is_email_valid(email):
+                result["c_email"] = u"La dirección de correo electrónico no es válida."
+            if not len(result):
+                hashemail = md5(email).hexdigest()
+                avatar = "http://www.gravatar.com/avatar/"+hashemail+"?s=100&d="+urllib.quote_plus(u'http://www.gasole.net/img/avatar.png')
+                link = self.request.get("c_link").strip()
+                self._on_signin({'name':name,'link':link,'avatar':avatar,'id':hashemail}, None, provider='gasole',redirect=False)
+                user = self.current_user
+                self.auth.unset_session()
+
+        replyto = self.request.get("c_replyto")
+        points = None
+        if not replyto:
+            points=get_points(self.request.get("c_points"))
+            if not points:
+                result["c_points"] = u"Olvidaste valorar esta gasolinera."
+            else:
+                points=int(points)
+        content=remove_html_tags(self.request.get("c_content").strip())
+        if not content:
+            result["c_content"] = u"El texto del comentario está vacío."
+        challenge_field = self.request.get("recaptcha_challenge_field")
+        response_field = self.request.get("recaptcha_response_field")
+        captcha_result = verifyCaptcha(
+            challenge_field=challenge_field,
+            response_field=response_field,
+            remote_ip=self.request.remote_addr)
+        if not captcha_result.is_valid:
+             result["recaptcha_response_field"] = u"La solución del captcha no es correcta."
+        if not len(result):
+            add_comment(pname, tname, sname, user, points, content, replyto)
+            result["OK"] = u"El comentario se ha publicado con éxito."
+        self.response.headers['Content-Type'] = 'application/json; charset=utf-8'
+        self.write(json.dumps(result))
+
 #api de históricos de una gasolinera
 class HistoryApi(BaseHandler):
     def get(self,p,t,s):
@@ -357,8 +373,9 @@ app = webapp2.WSGIApplication([
     # ('/geo/(.+)/(.+)/(.+)/(.+)/?', GeoApi),
     ('/resultados/(.+)/(.+)/(.+)/(.+)/?', SearchResults),
     ('/info/(noticias|tarjetas|combustibles)/?', Info),
-    webapp2.Route(r'/api/c/<p>/<t>/<s>', handler=CommentsApi, name='comments-api'),
-    webapp2.Route(r'/api/h/<p>/<t>/<s>', handler=HistoryApi, name='history-api'),
+    webapp2.Route(r'/api/c/<p>/<t>/<s>', handler=CommentsApi, name='comments-api'), # comentarios
+    webapp2.Route(r'/api/h/<p>/<t>/<s>', handler=HistoryApi, name='history-api'),   # históricos
+    webapp2.Route(r'/api/s/<p>/<t>/<s>', handler=StationApi, name='station-api'),   # actualización de info
     webapp2.Route('/login/<provider>', handler=BaseAuthHandler, name='auth_login', handler_method='_login'),
     webapp2.Route('/login/<provider>/callback', handler=BaseAuthHandler, name='auth_callback', handler_method='_auth_callback'),
     webapp2.Route('/logout', handler=BaseAuthHandler, name='auth_logout', handler_method='_logout'),

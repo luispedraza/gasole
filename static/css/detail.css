@@ -205,8 +205,13 @@
 	height: 400px;
 	clear: both;
 }
+#chart.button {
+	padding: 20px 0;
+	height: 20px;
+	text-align: center;
+}
 #edit, #comments {
-	width: 100%;
+	width: 730px;
 	float: right;
 }
 #comments form {
@@ -214,10 +219,10 @@
 }
 #comments textarea {
 	margin-top: 5px;
-	width: 328px;
+	width: 290px;
 	padding: 5px;
-	font-size: 1em;
-	height: 150px;
+	font-size: .9em;
+	height: 100px;
 	outline: none;
 	border: 1px solid #d3d3d3;
 }
@@ -229,22 +234,54 @@
 #user-data {
 	margin-top: 20px;
 }
+#username.logged {
+	color: #fff;
+	background-color: #333;
+	font-size: .9em;
+	height: 44px;
+	padding: 4px;
+	border-radius: 3px;
+}
+#username.logged a {
+	color: #fff !important;
+}
+#username.logged .logout {
+	background-color: #777;
+	font-size: .8em;
+	padding: 3px;
+	float: right;
+	border-radius: 3px;
+}
+#username.logged .logout:hover {
+	background-color: #fff;
+	color: #333 !important;
+}
+#username.logged .logout:after {
+	content: " \2716";
+}
+#user-link {
+	margin-bottom: 10px;
+}
 #comments .section {
 	margin-top: 20px;
 	min-height: 40px;
 }
-
-#comments h2 {
-	border-bottom: 3px solid #000;
-}
 #comments-new h2 {
-	margin-bottom: 35px;
+	margin-bottom: 38px;
+}
+#comments-new {
+	width: 300px;
+	float: left;
+}
+#comments-old {
+	width: 400px;
+	float: right;
 }
 
 #comments input[type=text], #comments input[type=email] {
 	width: 190px;
 	height: 20px;
-	font-size: 1em;
+	font-size: .9em;
 	outline: none;
 	border: 1px solid #d3d3d3;
 	padding: 3px;
@@ -275,7 +312,7 @@ div.error {
 	color: #fff;
 }
 #comments label {
-	font-size: .9em;
+	font-size: .8em;
 }
 
 .login {
@@ -343,15 +380,13 @@ div.error {
 .comment .title {
 	font-size: 1.2em;
 }
-#username {
-	font-size: 1.1em;
-}
 #comments-new a {
 	color: #333;
 	text-decoration: none;
 }
-.avatar {
-	width: 50px;
+#username .avatar {
+	width: 40px;
+	border: 1px solid #fff;
 	height: auto;
 	float: left;
 	margin-right: 10px;
@@ -359,21 +394,13 @@ div.error {
 #social-login {
 	float: right;
 }
-
-#comments-new {
-	width: 340px;
-	float: left;
-}
-#comments-old {
-	width: 730px;
-	float: right;
-}
 .button {
 	color: #fff;
 	background-color: #333;
-	border-radius: 5px;
-	border: 3px solid #333;
+	border-radius: 3px;
 	cursor: pointer;
+	border: none;
+	padding: 3px;
 }
 .button:hover {
 	background-color: #555;
@@ -402,7 +429,7 @@ div.error {
 	padding-top: 30px;
 }
 #old_comments .c_block .c_block {
-	padding: 15px 0px 0px 50px;
+	padding: 15px 0px 0px 30px;
 	margin-left: 0;
 	border-bottom: 1px dotted #d3d3d3;
 	height: 50px;
@@ -418,7 +445,7 @@ div.error {
 	background-color: #fff;
 	border: 1px solid #d3d3d3;
 	padding: 10px 10px 30px 10px;
-	min-height: 100px;
+	min-height: 40px;
 	position: relative;
 }
 #old_comments .replies .c_comment {
@@ -427,7 +454,7 @@ div.error {
 	float: right;
 }
 #old_comments .c_avatar {
-	width: 50px;
+	width: 30px;
 	height: auto;
 	float: left;
 	margin-right: 5px;
@@ -444,14 +471,14 @@ div.error {
 }
 
 #old_comments .c_points{
+	float: right;
 	height: 20px;
 	font-size: .8em;
 }
 #old_comments .c_content {
-	padding: 0px 15px;
 	clear: both;
-	margin-top: 5px;
-	margin-left: 120px;
+	margin-top: 10px;
+	color: #777;
 }
 #old_comments .reply {
 	font-size: .8em;
@@ -464,26 +491,19 @@ div.error {
 	display: none;
 }
 #result {
+	display: none;
 	background-color: #3399CC;
 	border-radius: 5px;
 	padding: 10px;
 	color: #fff;
 	margin-bottom: 10px;
 }
-#error {
-	padding: 5px;
+#result.e {
 	background-color: #d24e33;
-	border-radius: 5px;
-	color: #fff;
-	margin-bottom: 10px;
 }
-#error ul {
-	margin: 5px;
+#result.e div {
 	padding-left: 15px;
-	list-style-type:square;
-}
-#error li {
-	margin-top: 3px;
+	margin-bottom: 3px;
 }
 
 
