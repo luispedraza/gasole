@@ -530,7 +530,7 @@ function Gasole(callback) {
 			localStorage.setItem("gasole", JSON.stringify(data2store));
 			if (this.gasole.callback) this.gasole.callback();
 		}
-		req.open("GET", "/api/All");
+		req.open("GET", "/api/gasole");
 		req.send();
 	} else {
 		var data = JSON.parse(storedData);

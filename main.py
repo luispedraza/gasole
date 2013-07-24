@@ -179,18 +179,12 @@ class Detail(BaseAuthHandler):
 #         toc()
 
 class Api(BaseHandler):
-    def get(self, prov, town, station):
-        info = None
-        prov = decode_param(prov)
-        if station:
-            info = getStationJson(prov, decode_param(town), decode_param(station))
-        elif prov=="All":
-            when = None
-            if town:
-                when = datetime.datetime.combine(datetime.date(*map(int,town.split("-"))), datetime.time(12))
-            info = getAll(when).decode('zlib')
-        else:
-            info = getProvinceJson(prov)
+    def get(self,date=None):
+        # when = None
+        # if date:
+        #     when = datetime.datetime.combine(datetime.date(*map(int,date.split("-"))), datetime.time(12))
+        # info = getGasole(when).decode('zlib')
+        info = getGasole().decode('zlib')
         self.response.headers['Content-Type'] = 'application/json; charset=utf-8'
         self.write(info)
 
@@ -369,7 +363,7 @@ app = webapp2.WSGIApplication([
     # ('/data/(\w+)/(\w+)', Data),
     ('/gasolineras/?([^ \/]+)/?([^ \/]+)?/?', List),
     ('/ficha/?([^ \/]+)/?([^ \/]+)?/?([^ \/]+)?', Detail),
-    ('/api/?([^ \/]+)/?([^ \/]+)?/?([^ \/]+)?', Api),
+    ('/api/gasole', Api),
     # ('/geo/(.+)/(.+)/(.+)/(.+)/?', GeoApi),
     ('/resultados/(.+)/(.+)/(.+)/(.+)/?', SearchResults),
     ('/info/(noticias|tarjetas|combustibles)/?', Info),

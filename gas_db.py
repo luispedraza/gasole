@@ -82,7 +82,7 @@ def getStationJson(p, t, s):
 	return jsondata
 
 # Obtiene todo en formato JSON
-def getAll(when=None):
+def getGasole(when=None):
 	if when:
 		alldata = ApiAllJson.all().filter('date <=', when).order('-date').get().json
 	else:
@@ -103,7 +103,7 @@ def data2store(data):
 	if not data:
 		logging.info("NO HAY DATOS QUE GAURDAR")
 		return
-	cachedata = json.loads(getAll().decode('zlib'))
+	cachedata = json.loads(getGasole().decode('zlib'))
 	if "_meta" in cachedata:		# compatibilidad con la api antigua
 		cachedata = cachedata.get("_data")
 
