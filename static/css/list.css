@@ -531,7 +531,7 @@ th .sprt.sort {
 	transform: rotate(180deg);
 }
 
-th.off, td.off,tr.r_off, tr.f_off, tr.p_off {
+th.off, td.off,tr.r_off, tr.f_off {
 	display: none;
 }
 

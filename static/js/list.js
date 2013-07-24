@@ -1,4 +1,5 @@
-var	map,			// el mapa de Google
+var	gasoleData,		// datos de la api
+	map,			// el mapa de Google
 	place = "",
 	markers = [],	// lista de marcadores sobre el mapa
 	province = null,
@@ -59,19 +60,20 @@ function newReference(loc) {
 }
 /* Paginación de la tabla */
 function paginateTable(index) {
-	var rows = document.getElementById("table-data").getElementsByClassName("r_on");
-	var rlen = rows.length;
-	var pager = document.getElementById("pager-links");
+	var rows = document.getElementById("table-data").getElementsByClassName("r_on"),
+		rlen = rows.length,
+		pager = document.getElementById("pager-links");
 	if (!rlen) {
-		pager.innerHTML = "<p>No hay resultados coincidentes con los criterios de búsqueda.<br>Comprueba el filtro y tipos de combustible seleccionados.</p>"; return;	
+		pager.innerHTML = "<p>No hay resultados coincidentes con los criterios de búsqueda.<br>Comprueba el filtro y tipos de combustible seleccionados.</p>"; 
+		return;	
 	}
+	
 	if (index === "more") index = Math.min(pagerCurrent+pagerN, parseInt(rlen/pagerN)*pagerN);
 	else if (index === "less") index = Math.max(pagerCurrent-pagerN, 0);
 	if (index>=rlen) return;
 	pager.innerHTML = "";
 	for (var r=0; r<rlen; r++) {
-		rows[r].className = rows[r].className.replace(" p_off", "");
-		if ((r<index)||(r>=index+pagerN)) rows[r].className+=" p_off";
+		rows[r].style.display = (((r<index)||(r>=index+pagerN)) ? "none" : "");
 		if (r%pagerN == 0) {
 			var p = document.createElement("div");
 			p.innerHTML = ((r+1) + "<br/>" + Math.min(r+pagerN, rlen));
@@ -97,16 +99,6 @@ function calcDistances() {
 	}
 	sortTable("T_DIST", false, true);
 }
-function mapCluster() {
-	if (document.getElementById("cluster").checked) {
-		for (var m=0, mlen=markers.length; m<mlen; m++) {
-			if (markers[m].getMap()) cluster.addMarker(markers[m]);
-		}
-	} else {
-		cluster.clearMarkers();
-		updateMarkers();
-	}
-}
 function markerColor(sel, price) {
 	var mean = 0;
 	var n = 0;
@@ -125,75 +117,41 @@ function markerColor(sel, price) {
 	if (mean<.66) return COLORS.mu;
 	return COLORS.max;
 }
-function markerImage(sel, price) {
-	var mean = 0;
-	var n = 0;
-	for (var i=0; i<sel.length; i++) {
-		var current = sel[i];
-		var p = price[current];
-		var s = stats[current];
-		if (s && p) {
-			var range = s.max-s.min;
-			if (range) mean = (mean*n+((p-s.min)/range))/++n;
-			else mean = mean*n+.5/++n;
-		}
-	}
-	if (n==0) return null;
-	if (mean<.33) return MARKER_IMG.min;
-	if (mean<.66) return MARKER_IMG.mu;
-	return MARKER_IMG.max;
-}
 function updateMarkers() {
-	var rows = document.getElementById("table-data").getElementsByTagName("tr");
-	selection = getSelTypes();
-	for (var r=0; r<rows.length; r++) {
-		var marker = markers[rows[r].id.split("-")[1]];
-		if (marker) {
-			if (rows[r].className.match("r_on")) {
-				// var color = markerColor(selection, marker.get("price"));
-				var img = markerImage(selection, marker.get("price"));
-				if (img) {
-					marker.setMap(map);
-					// marker.icon.fillColor = color;
-					marker.icon = img;
-					continue;
-				}
+	/* Obtiene icono de gasolinera para un precio */
+	function markerImage(sel, price) {
+		var mean = 0;
+		var n = 0;
+		for (var i=0; i<sel.length; i++) {
+			var current = sel[i];
+			var p = price[current];
+			var s = stats[current];
+			if (s && p) {
+				var range = s.max-s.min;
+				if (range) mean = (mean*n+((p-s.min)/range))/++n;
+				else mean = mean*n+.5/++n;
 			}
-			marker.setMap(null);
+		}
+		if (n==0) return null;
+		if (mean<.33) return MARKER_IMG.min;
+		if (mean<.66) return MARKER_IMG.mu;
+		return MARKER_IMG.max;
+	}
+	var rows = document.getElementById("table-data").getElementsByTagName("tr"),
+		selection = getSelTypes(),
+		marker, row, img;
+	for (var r=0, rlen=rows.length; r<rlen; r++) {
+		row = rows[r];
+		marker = markers[row.id.split("-")[1]];
+		if (marker) {
+			if (row.className.match("r_on")) {
+				marker.icon = markerImage(selection, marker.get("price"));
+				marker.setMap(map);
+			} else {
+				marker.setMap(null);
+			} 
 		}
 	}
-}
-function initMap() {
-	var mapOptions = {
-		mapTypeId: google.maps.MapTypeId.ROADMAP
-	};
-	map = new google.maps.Map(document.getElementById("google_map"),
-		mapOptions);
-	var clusterOptions = {
-		imagePath: "/",
-		styles: [{height: 40, width: 40, url: "/img/cluster.png", backgroundPosition: "-2px -2px"},
-			{height: 50, width: 50, url: "/img/cluster.png", backgroundPosition: "-44px -2px"},
-			{height: 60, width: 60, url: "/img/cluster.png", backgroundPosition: "-2px -54px"},
-			{height: 70, width: 70, url: "/img/cluster.png", backgroundPosition: "-2px -116px"}]
-	}
-	// cluster = new MarkerClusterer(map);
-	cluster = new MarkerClusterer(map, null, clusterOptions);
-	// adsense
-	if (window.location.hostname.match("localhost")) return;
-	var adUnitDiv = document.createElement('div');
-	var adUnitOptions = {
-		format: google.maps.adsense.AdFormat.VERTICAL_BANNER,
-		position: google.maps.ControlPosition.RIGHT_TOP,
-		backgroundColor: '#c4d4f3',
-		borderColor: '#e5ecf9',
-		titleColor: '#0000cc',
-		textColor: '#000000',
-		urlColor: '#009900',
-		map: map,
-		visible: true,
-		publisherId: 'pub-9285487390483271'
-	}
-	adUnit = new google.maps.adsense.AdUnit(adUnitDiv, adUnitOptions);
 }
 /* Ordenación de la tabla */
 function sortTable(cname, reverse, isfloat) {
@@ -243,58 +201,106 @@ function sortTable(cname, reverse, isfloat) {
 }
 /* Filtro de resultados por tipo de combustible */
 function filterTypes(filter) {
-	for (var i=0; i<filter.length; i++) {
-		var f=filter[i].split(" ");
-		var type=f[0];
-		var c_off=type + " off";
-		var c_on=type + " on";
-		var c_na=type;
-		var cells=document.getElementById("table").getElementsByClassName(type);
+	for (var i=0, fl=filter.length; i<fl; i++) {
+		var f=filter[i].split(" "),
+			type=f[0],
+			c_off=type + " off",
+			c_on=type + " on",
+			c_na=type,
+			cells=document.getElementById("table").getElementsByClassName(type),
+			cell,
+			disable = (f[1]=="off");
 		for (var c=0, clen=cells.length; c<clen; c++) {
-			var cell = cells[c];
-			if (f[1]=="off") cell.className = c_off;
-			else if (cell.textContent) cells[c].className = c_on;
-			else cells[c].className = c_na;
+			cell = cells[c];
+			if (disable) cell.className = c_off;
+			else if (cell.textContent) cell.className = c_on;
+			else cell.className = c_na;
 		}
 	}
-	var rows = document.getElementById("table-data").getElementsByTagName("tr");
-	for (var r=0, rlen=rows.length; r<rlen; r++)
-		rows[r].className = rows[r].getElementsByClassName("on").length ? "r_on" : "r_off";
+	var row;
+	gasoleProcess(gasoleData._data, function(sdata) {
+		row = sdata.row;
+		row.className = row.getElementsByClassName("on").length ? "r_on" : "r_off";
+	})	
 }
 /* Filtro de resultados por contenido de texto */
+// function filterText() {
+// 	function cleanFilter(s) {
+// 		return s.toLowerCase()
+// 			.replace(/\s+/g," ")
+// 			.replace(/\s$/,"")
+// 			.replace(/^\s/,"")
+// 			.replace(/[áàä]/g, "a")
+// 			.replace(/[éèë]/g, "e")
+// 			.replace(/[íìï]/g, "i")
+// 			.replace(/[óòö]/g, "o")
+// 			.replace(/[úùü]/g, "u");
+// 	}
+// 	var filtervalue = cleanFilter(document.getElementById("contains").value);
+// 	if (filtervalue.length) {
+// 		var terms = filtervalue.split(/\s/),
+// 			tlen = terms.length,
+// 			rows = document.getElementById("table-data").getElementsByTagName("tr"),
+// 			rlen = rows.length;
+// 		for (var f=0; f<rlen; f++) {	// todas las filas
+// 			var row = rows[f];
+// 			if (row.className=="r_off") continue;
+// 			for (var t=0; t<tlen; t++) {
+// 				var found = false;
+// 				var term = RegExp(terms[t]);
+// 				var cells = row.getElementsByTagName("td");
+// 				for (var c=0; c<2; c++) found = found || (term.exec(cleanFilter(cells[c].textContent))!=null);
+// 				row.className = found ? "r_on" : "f_off";
+// 				if (!found) break;
+// 			}
+// 		}
+// 	} else {
+// 		for (var f=0; f<rlen; f++) rows[f].className="r_on";
+// 	}
+// }
 function filterText() {
 	function cleanFilter(s) {
 		return s.toLowerCase()
+			.replace(/\s+/g," ")
+			.replace(/\s$/,"")
+			.replace(/^\s/,"")
 			.replace(/[áàä]/g, "a")
 			.replace(/[éèë]/g, "e")
 			.replace(/[íìï]/g, "i")
 			.replace(/[óòö]/g, "o")
 			.replace(/[úùü]/g, "u");
 	}
-	var filtervalue = document.getElementById("contains").value;
-	var rows = document.getElementById("table-data").getElementsByTagName("tr");
-	var rlen = rows.length;
+	var filtervalue = cleanFilter(document.getElementById("contains").value);
 	if (filtervalue.length) {
-		var terms = filtervalue.split(/ +/);
-		for (var f=0; f<rlen; f++) {
-			var row = rows[f];
-			if (row.className=="r_off") continue;
-			for (var t=0, tlen=terms.length; t<tlen; t++) {
-				if (terms[t].length) {
-					var found = false;
-					var term = RegExp(cleanFilter(terms[t]));
-					var cells = row.getElementsByTagName("td");
-					for (var c=0; c<2; c++) found = found || (term.exec(cleanFilter(cells[c].textContent))!=null);
-					row.className = found ? "r_on" : "f_off";
-					if (!found) break;
-				}
+		var terms = filtervalue.split(/\s/),
+			tlen = terms.length;
+		gasoleProcess(gasoleData._data, function(sdata,p,t,s) {
+			var row = sdata.row;
+			if (row.className=="r_off") return;
+			var text = cleanFilter(p+" "+t+" "+s);
+			for (var t=0; t<tlen; t++) {
+				var term = RegExp(terms[t]);
+				found = (term.exec(text)!=null);
+				row.className = found ? "r_on" : "f_off";
 			}
-		}
+		});
 	} else {
-		for (var f=0; f<rlen; f++) rows[f].className="r_on";
 	}
 }
+
 function initControl() {
+	// Cluster del mapa
+	function mapCluster() {
+		if (document.getElementById("cluster").checked) {
+			for (var m=0, mlen=markers.length; m<mlen; m++) {
+				if (markers[m].getMap()) cluster.addMarker(markers[m]);
+			}
+		} else {
+			cluster.clearMarkers();
+			updateMarkers();
+		}
+	}
+	document.getElementById("cluster").onclick = mapCluster;
 	// Filtro de tipo de gasolina. Elimina columnas
 	var filterT = document.getElementById("fuel-type").getElementsByTagName("li");
 	var filter = [];
@@ -384,27 +390,6 @@ function showDetail(marker) {
 		markerDetail.setAnimation(null);
 	});
 }
-/* Tabla resumen informativo */
-function populateInfo() {
-	var divInfo = document.getElementById("info");
-	var divSum = document.getElementById("summary-b");
-	for (var t in stats) {
-		var data = stats[t];
-		var tr = document.createElement("tr");
-		tr.className = "data T_"+t;
-		var td = document.createElement("td");
-		td.textContent = FUEL_OPTIONS[t].name; tr.appendChild(td);
-		td = document.createElement("td");
-		td.textContent = data.n; tr.appendChild(td);
-		td = document.createElement("td");
-		td.innerHTML = "<span>"+data.min.toFixed(3)+"</span>"; td.className="price min"; tr.appendChild(td);
-		td = document.createElement("td");
-		td.innerHTML = "<span>"+data.mu.toFixed(3)+"</span>"; td.className="price mean"; tr.appendChild(td);
-		td = document.createElement("td");
-		td.innerHTML = "<span>"+data.max.toFixed(3)+"</span>"; td.className="price max"; tr.appendChild(td);
-		divSum.appendChild(tr);
-	}
-}
 /* Tipos de comsbutible seleccionados por el usuario */
 function getSelTypes() {
 	var res = [];
@@ -412,121 +397,171 @@ function getSelTypes() {
 	for (var t=0; t<types.length; t++) res.push(parseInt(types[t].className.split(" ")[0].split("_")[1]));
 	return res;
 }
-/* Rellena la tabla de resultados con la información proporcionada */
-function populateTable(data) {
-	var table = document.getElementById("table-data"),
-		cities = [],
-		today = new Date(),
-		pdata, tdata, sdata, t_ref, t_link, s_tlink;
-	table.innerHTML = "";
-	for (var p in data) {
-		pdata = data[p];
-		for (var t in pdata) {
-			tdata = pdata[t];
-			t_ref = encodeName(t);
-			t_link = "/gasolineras/"+province+"/"+t_ref // enlace a una ciudad
-			s_link = "/ficha/"+province+"/"+t_ref+"/"	// stub de enlacae a una gasolinera
-			cities.push([t, t_link]);						// nueva ciudad
-			for (var s in tdata) {
-				sdata = tdata[s];
-				var label = sdata.l;
-				var tr = document.createElement("tr");
-				tr.className = "r_on";
-				var td_town = document.createElement("td");
-					var a_town = document.createElement("a");
-					a_town.href = t_link;
-					a_town.title = "Todas las gasolineras de " + t;
-					a_town.textContent = t;
-					td_town.className = "T_LOC";
-					td_town.appendChild(a_town);
-					tr.appendChild(td_town);
-				var td_s = document.createElement("td");
-					var a_s = document.createElement("a");
-					a_s.href = s_link + encodeName(s);
-					a_s.textContent = toTitle(s);
-					a_s.title = "Ficha de la gasolinera "+label+" en " + t + ", " + a_s.textContent;
-					td_s.className = "T_ADDR";
-					td_s.setAttribute("label", label);
-					var td_ref = document.createElement("div");
-					td_ref.className = "ref";
-					var dl = document.createElement("div");
-					dl.className = "logo " + (getLogo(label) || "otra");
-					td_ref.appendChild(dl);
-					td_ref.appendChild(a_s);
-					td_s.appendChild(td_ref);
-					tr.appendChild(td_s);
-				var td_dist = document.createElement("td");
-					// Marcadores
-					var geo = sdata.g;
-					if (geo) {
-						td_dist.className = "T_DIST";
-						var pos = new google.maps.LatLng(geo[0], geo[1]);
-						var options = { 
-							icon: null,
-							map: map, 
-							position: pos };
-						var marker = new google.maps.Marker(options);
-						google.maps.event.addListener(marker, 'click', function(e) {
-							showDetail(this);
-						});
-						marker.set("price", sdata.o);
-						tr.id="tr-"+markers.length;
-						td_dist.id="td-"+markers.length;
-						markers.push(marker);
-						td_dist.setAttribute("data-geo", geo.join(","));
-						addEvent(td_dist,"click", function() {
-							var marker = markers[this.id.split("-")[1]];
-							showDetail(marker);
-						});
-						marker.set("id", tr.id);
-						bounds.extend(pos);
-						td_dist.innerHTML = "<div class='ref'><div title='Mostrar en el mapa' class='sprt locate'></div><span></span></div>";
-					}
-					tr.appendChild(td_dist);
-				// Fecha de actualización
-				var td_date = document.createElement("td");
-					td_date.className = "T_DATE";
-					var dd = document.createElement("div");
-					var date = new Date(sdata.d);
-					var days = (today-date)/TO_DAYS;
-					dd.className = "sprt clock";
-					if (days<1) dd.className += "_new";
-					else if (days>7) dd.className += "_old";
-					else dd.className += "_med";
-					td_date.title = date.toLocaleDateString();
-					td_date.innerHTML = "<span>"+date.getTime()+"</span>";
-					td_date.appendChild(dd);
-					tr.appendChild(td_date);
-				// Precios
-				for (var o in FUEL_OPTIONS) {
-					otd = document.createElement("td");
-					otd.className = "T_" + o;
-					var price = sdata.o[o];
-					if (price) {
-						otd.textContent = price.toFixed(3);
-						otd.className += " on";
-					}
-					tr.appendChild(otd);
-				}
-				table.appendChild(tr);
-			}
-			map.fitBounds(bounds);
-		}
-	}
-	var clen = cities.length;
-	if (clen>1) { // Lista de ciudades
-		var citiesList = document.getElementById("cities-list");
-		cities.sort(function(a, b) {return sortName(a[0],b[0]);});
-		var city;
-		for (var c=0; c<clen; c++) {
-			city = cities[c];
-			citiesList.innerHTML+="<li><a href='"+city[1]+"'>"+city[0]+"</a></li>";
-		}
-	}
-	else document.getElementById("p-cities").style.display = "none";
-}
 // Procesamiento de los datos, construcción de la tabla
 function processData(info) {
+	function populateInfo() {
+		/* Tabla resumen informativo */
+		var divInfo = document.getElementById("info");
+		var divSum = document.getElementById("summary-b");
+		for (var t in stats) {
+			var data = stats[t];
+			var tr = document.createElement("tr");
+			tr.className = "data T_"+t;
+			var td = document.createElement("td");
+			td.textContent = FUEL_OPTIONS[t].name; tr.appendChild(td);
+			td = document.createElement("td");
+			td.textContent = data.n; tr.appendChild(td);
+			td = document.createElement("td");
+			td.innerHTML = "<span>"+data.min.toFixed(3)+"</span>"; td.className="price min"; tr.appendChild(td);
+			td = document.createElement("td");
+			td.innerHTML = "<span>"+data.mu.toFixed(3)+"</span>"; td.className="price mean"; tr.appendChild(td);
+			td = document.createElement("td");
+			td.innerHTML = "<span>"+data.max.toFixed(3)+"</span>"; td.className="price max"; tr.appendChild(td);
+			divSum.appendChild(tr);
+		}
+	}
+	function populateTable(data) {
+		/* Rellena la tabla de resultados con la información proporcionada */
+		var table = document.getElementById("table-data"),
+			cities = [],
+			today = new Date(),
+			pdata, tdata, sdata, t_ref, t_link, s_tlink;
+		table.innerHTML = "";
+		for (var p in data) {
+			pdata = data[p];
+			for (var t in pdata) {
+				tdata = pdata[t];
+				t_ref = encodeName(t);
+				t_link = "/gasolineras/"+province+"/"+t_ref // enlace a una ciudad
+				s_link = "/ficha/"+province+"/"+t_ref+"/"	// stub de enlacae a una gasolinera
+				cities.push([t, t_link]);						// nueva ciudad
+				for (var s in tdata) {
+					sdata = tdata[s];
+					var label = sdata.l;
+					var tr = document.createElement("tr");
+					tr.className = "r_on";
+					var td_town = document.createElement("td");
+						var a_town = document.createElement("a");
+						a_town.href = t_link;
+						a_town.title = "Todas las gasolineras de " + t;
+						a_town.textContent = t;
+						td_town.className = "T_LOC";
+						td_town.appendChild(a_town);
+						tr.appendChild(td_town);
+					var td_s = document.createElement("td");
+						var a_s = document.createElement("a");
+						a_s.href = s_link + encodeName(s);
+						a_s.textContent = toTitle(s);
+						a_s.title = "Ficha de la gasolinera "+label+" en " + t + ", " + a_s.textContent;
+						td_s.className = "T_ADDR";
+						td_s.setAttribute("label", label);
+						var td_ref = document.createElement("div");
+						td_ref.className = "ref";
+						var dl = document.createElement("div");
+						dl.className = "logo " + (getLogo(label) || "otra");
+						td_ref.appendChild(dl);
+						td_ref.appendChild(a_s);
+						td_s.appendChild(td_ref);
+						tr.appendChild(td_s);
+					var td_dist = document.createElement("td");
+						// Marcadores
+						var geo = sdata.g;
+						if (geo) {
+							td_dist.className = "T_DIST";
+							var pos = new google.maps.LatLng(geo[0], geo[1]);
+							var options = { 
+								icon: null,
+								map: map, 
+								position: pos };
+							var marker = new google.maps.Marker(options);
+							google.maps.event.addListener(marker, 'click', function(e) {
+								showDetail(this);
+							});
+							marker.set("price", sdata.o);
+							tr.id="tr-"+markers.length;
+							td_dist.id="td-"+markers.length;
+							markers.push(marker);
+							td_dist.setAttribute("data-geo", geo.join(","));
+							addEvent(td_dist,"click", function() {
+								var marker = markers[this.id.split("-")[1]];
+								showDetail(marker);
+							});
+							marker.set("id", tr.id);
+							bounds.extend(pos);
+							td_dist.innerHTML = "<div class='ref'><div title='Mostrar en el mapa' class='sprt locate'></div><span></span></div>";
+						}
+						tr.appendChild(td_dist);
+					// Fecha de actualización
+					var td_date = document.createElement("td");
+						td_date.className = "T_DATE";
+						var dd = document.createElement("div");
+						var date = new Date(sdata.d);
+						var days = (today-date)/TO_DAYS;
+						dd.className = "sprt clock";
+						if (days<1) dd.className += "_new";
+						else if (days>7) dd.className += "_old";
+						else dd.className += "_med";
+						td_date.title = date.toLocaleDateString();
+						td_date.innerHTML = "<span>"+date.getTime()+"</span>";
+						td_date.appendChild(dd);
+						tr.appendChild(td_date);
+					// Precios
+					for (var o in FUEL_OPTIONS) {
+						otd = document.createElement("td");
+						otd.className = "T_" + o;
+						var price = sdata.o[o];
+						if (price) {
+							otd.textContent = price.toFixed(3);
+							otd.className += " on";
+						}
+						tr.appendChild(otd);
+					}
+					table.appendChild(tr);
+					sdata.row = tr;
+				}
+			}
+		}
+		map.fitBounds(bounds);
+		var clen = cities.length;
+		if (clen>1) { // Lista de ciudades
+			var citiesList = document.getElementById("cities-list");
+			cities.sort(function(a, b) {return sortName(a[0],b[0]);});
+			var city;
+			for (var c=0; c<clen; c++) {
+				city = cities[c];
+				citiesList.innerHTML+="<li><a href='"+city[1]+"'>"+city[0]+"</a></li>";
+			}
+		}
+		else document.getElementById("p-cities").style.display = "none";
+	}
+	function initMap() {
+		/* Inicializa el mapa */
+		map = new google.maps.Map(document.getElementById("google_map"),
+			{mapTypeId: google.maps.MapTypeId.ROADMAP});
+		var clusterOptions = {
+			imagePath: "/",
+			styles: [{height: 40, width: 40, url: "/img/cluster.png", backgroundPosition: "-2px -2px"},
+				{height: 50, width: 50, url: "/img/cluster.png", backgroundPosition: "-44px -2px"},
+				{height: 60, width: 60, url: "/img/cluster.png", backgroundPosition: "-2px -54px"},
+				{height: 70, width: 70, url: "/img/cluster.png", backgroundPosition: "-2px -116px"}]
+		}
+		cluster = new MarkerClusterer(map, null, clusterOptions);
+		if (window.location.hostname.match("localhost")) return;
+		var adUnitDiv = document.createElement('div');
+		var adUnitOptions = {
+			format: google.maps.adsense.AdFormat.VERTICAL_BANNER,
+			position: google.maps.ControlPosition.RIGHT_TOP,
+			backgroundColor: '#c4d4f3',
+			borderColor: '#e5ecf9',
+			titleColor: '#0000cc',
+			textColor: '#000000',
+			urlColor: '#009900',
+			map: map,
+			visible: true,
+			publisherId: 'pub-9285487390483271'
+		}
+		adUnit = new google.maps.adsense.AdUnit(adUnitDiv, adUnitOptions);
+	}
 	var h1 = document.getElementById("title");
 	if (info["_near"]) {
 		h1.textContent = "Gasolineras cerca de: " + info["_near"];
@@ -547,27 +582,27 @@ function processData(info) {
 addEvent(window,"load", function() {
 	breadCrumb("breadcrumb");	// miga de pan
 	new Gasole(function() {
-		var info = {"_data": {}};
+		gasoleData = {"_data": {}};
 		var pathArray = decodeArray(window.location.pathname.split("/"));
 		var option = pathArray[1]; // gasolineras, resultados, ficha
 		if (option == "gasolineras") {
 			province  = pathArray[2];
 			if (pathArray[3]) {		// si hay ciudad
 				town = pathArray[3];
-				info._data[province] = {};
-				info._data[province][town] = this.info[province][town];
-			} else info._data[province] = this.info[province];
+				gasoleData._data[province] = {};
+				gasoleData._data[province][town] = this.info[province][town];
+			} else gasoleData._data[province] = this.info[province];
 		} else if (option == "resultados") {
 			var location = new SearchLocations();
 			var place = pathArray[2];
 			location.add(place, [parseFloat(pathArray[3]),parseFloat(pathArray[4])]);
 			location.radius = parseFloat(pathArray[5]);
-			info._data = this.nearData(location);
-			info._near = place;
+			gasoleData._data = this.nearData(location);
+			gasoleData._near = place;
 		}
-		stats = new GasoleStats(info._data).stats;
+		stats = new GasoleStats(gasoleData._data).stats;
 		computeWeights(stats);
-		processData(info);
+		processData(gasoleData);
 		// fecha de actualización
 		document.getElementById("updated").textContent = "("+formatUpdate(this.date)+")";
 	});
