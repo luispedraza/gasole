@@ -264,6 +264,7 @@ function filterText() {
 			.replace(/\s+/g," ")
 			.replace(/\s$/,"")
 			.replace(/^\s/,"")
+			.replace(/´/g,"")
 			.replace(/[áàä]/g, "a")
 			.replace(/[éèë]/g, "e")
 			.replace(/[íìï]/g, "i")
@@ -271,20 +272,30 @@ function filterText() {
 			.replace(/[úùü]/g, "u");
 	}
 	var filtervalue = cleanFilter(document.getElementById("contains").value);
+	console.log(filtervalue);
 	if (filtervalue.length) {
 		var terms = filtervalue.split(/\s/),
 			tlen = terms.length;
 		gasoleProcess(gasoleData._data, function(sdata,p,t,s) {
 			var row = sdata.row;
 			if (row.className=="r_off") return;
-			var text = cleanFilter(p+" "+t+" "+s);
+			var text = cleanFilter(p+" "+t+" "+s+" "+sdata.l);
 			for (var t=0; t<tlen; t++) {
-				var term = RegExp(terms[t]);
-				found = (term.exec(text)!=null);
-				row.className = found ? "r_on" : "f_off";
+				var found = (RegExp(terms[t]).exec(text)!=null);
+				if (!found) {
+					row.className = "f_off";
+					return;
+				} else {
+					row.className = "r_on";
+				}
 			}
 		});
 	} else {
+		gasoleProcess(gasoleData._data, function(sdata) {
+			var row = sdata.row;
+			if (row.className=="r_off") return;
+			row.className = "r_on";
+		});
 	}
 }
 
