@@ -334,19 +334,12 @@ function initControl() {
 	// Para que no haga scroll el documento cuando se hace scroll en cities-list
 	lockScroll("cities-list");
 }
+/* Muestra los detalles al clickar en un marcador */
 function showDetail(marker) {
+	if (markerDetail) markerDetail.setAnimation(null);
+	markerDetail = marker;
 	map.panTo(marker.position);
-	// map.setZoom(16);
-	if (!markerDetail) markerDetail = new google.maps.Marker({
-		position: marker.position,
-		map: map,
-		animation: google.maps.Animation.BOUNCE,
-		icon: '/img/pump_mark.png'
-	}); 
-	else {
-		markerDetail.setMap(map); 
-		markerDetail.position = marker.position;
-		markerDetail.setAnimation(google.maps.Animation.BOUNCE);};
+	marker.setAnimation(google.maps.Animation.BOUNCE);
 	var det=document.getElementById("detail");
 	det.className = "on";
 	var row = document.getElementById(marker.get("id"));
@@ -357,22 +350,23 @@ function showDetail(marker) {
 		.getElementsByTagName("a")[0].href;
 	var city = row.getElementsByClassName("T_LOC")[0].textContent;
 	document.getElementById("d-title").textContent = 
-		"Gasolinera '"+label+"' en "+city+", "+address;
-		document.getElementById("d-link").href = link;
+		"Gasolinera "+label+" en "+city+", "+address;
+	document.getElementById("d-link").href = link;
 	var priceList = document.getElementById("d-prices");
 	priceList.innerHTML = "";
 	var prices = row.getElementsByTagName("td");
 	for (var p=4, plen=prices.length; p<plen; p++) {
 		var val = prices[p].textContent;
-		if (!val) continue;
-		var t = prices[p].className.match(/T_\w+/)[0].replace("T_", "");
-		var newL = document.createElement("li");
-		newL.textContent = FUEL_OPTIONS[t].name;
-		newL.className = "T_"+t;
-		var newP = document.createElement("div");
-		newP.textContent = val;
-		newL.appendChild(newP);
-		priceList.appendChild(newL);
+		if (val) {
+			var t = prices[p].className.match(/T_\w+/)[0].replace("T_", "");
+			var newL = document.createElement("li");
+			newL.textContent = FUEL_OPTIONS[t].name;
+			newL.className = "T_"+t;
+			var newP = document.createElement("div");
+			newP.textContent = val;
+			newL.appendChild(newP);
+			priceList.appendChild(newL);	
+		}
 	}
 	var dateDiv = document.getElementById("d-date");
 	var clockDiv = document.getElementById("d-clock");
@@ -387,9 +381,10 @@ function showDetail(marker) {
 	clockDiv.className = cname;
 	google.maps.event.addListenerOnce(map, "mousedown", function() {
 		document.getElementById("detail").className = "";
-		markerDetail.setMap(null);
-	})
+		markerDetail.setAnimation(null);
+	});
 }
+/* Tabla resumen informativo */
 function populateInfo() {
 	var divInfo = document.getElementById("info");
 	var divSum = document.getElementById("summary-b");
@@ -398,7 +393,7 @@ function populateInfo() {
 		var tr = document.createElement("tr");
 		tr.className = "data T_"+t;
 		var td = document.createElement("td");
-		td.textContent = FUEL_OPTIONS[t]["name"]; tr.appendChild(td);
+		td.textContent = FUEL_OPTIONS[t].name; tr.appendChild(td);
 		td = document.createElement("td");
 		td.textContent = data.n; tr.appendChild(td);
 		td = document.createElement("td");
