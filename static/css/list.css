@@ -47,6 +47,7 @@ body {
 	width: 730px;
 	float: right;
 	font-size: .9em;
+	border-top: 1px solid #fff;
 }
 #control {
 	background-color: #333;
@@ -172,7 +173,7 @@ body {
 	position: absolute;
 	bottom: 0;
 	left: 0;
-	width: 710px;
+	width: 720px;
 	height: 0;
 	background: rgb(8,8,8);
 	background: rgba(8,8,8,0.8);
@@ -182,52 +183,70 @@ body {
 	-ms-transition: all .3s;
 	transition: all .3s;
 	overflow: hidden;
-	padding: 10px;
+	padding: 5px;
 	opacity: 0;
 }
 #detail.on {
-	height: 70px;
+	height: 80px;
 	opacity: 1;
 }
 #d-link {
+	margin-left: 15px;
 	text-align: center;
-	text-decoration: none;
 	padding: 3px;
 	color: #fff;
-	border-radius: 3px;
 	display: block;
 	margin-top: 10px;
 	font-size: .9em;
-	background-color: #888;
 	width: 130px;
 }
 #d-link:hover {
-	background-color: #333;
+	color: #ccc;
+}
+#d-close {
+	float: right;
+	width: 10px;
+	height: 10px;
+	cursor: pointer;
+}
+#d-close:hover {
+	color: #ccc;
+}
+#d-close:after {
+	content: "\2716";
 }
 #d-title {
-	border-bottom: 1px dotted #fff;
+	margin-left: 25px;
+	font-size: 1.1em;
+	margin-bottom: 3px;
+	border-bottom: 1px solid #ccc;
 }
 #d-prices {
 	float: right;
-	width: 500px;
 	padding: 3px;
 }
 #d-prices li {
 	font-size: 12px;
 	float: left;
 	width: 68px;
-	position: relative;
-	border: 1px solid #fff;
-	height: 25px;
-	padding: 1px;
-	margin-right: 1px;
+	height: 100px;
+	padding: 2px;
+	margin-right: 5px;
 	border-radius: 3px;
+	text-align: center;
+	border: 1px solid #ccc;
 }
 #d-prices li div {
-	position: absolute;
-	top: 30px;
-	font-size: 30px;
+	text-align: center;
+}
+#d-prices li div:first-child {
+	height: 2.2em;
+	margin-bottom: 5px;
+	border-bottom: 1px solid #fff;
+}
+#d-prices li div.p {
 	font-family: 'digital-7', sans-serif;
+	font-size: 25px;
 }
 #d-updated {
 	padding: 2px;
@@ -238,7 +257,7 @@ body {
 	margin-right: 3px;
 }
 #d-info {
-	width: 200px;
+	width: 180px;
 	float: left;
 }
 #d-clock {

@@ -223,41 +223,7 @@ function filterTypes(filter) {
 		row.className = row.getElementsByClassName("on").length ? "r_on" : "r_off";
 	})	
 }
-/* Filtro de resultados por contenido de texto */
-// function filterText() {
-// 	function cleanFilter(s) {
-// 		return s.toLowerCase()
-// 			.replace(/\s+/g," ")
-// 			.replace(/\s$/,"")
-// 			.replace(/^\s/,"")
-// 			.replace(/[áàä]/g, "a")
-// 			.replace(/[éèë]/g, "e")
-// 			.replace(/[íìï]/g, "i")
-// 			.replace(/[óòö]/g, "o")
-// 			.replace(/[úùü]/g, "u");
-// 	}
-// 	var filtervalue = cleanFilter(document.getElementById("contains").value);
-// 	if (filtervalue.length) {
-// 		var terms = filtervalue.split(/\s/),
-// 			tlen = terms.length,
-// 			rows = document.getElementById("table-data").getElementsByTagName("tr"),
-// 			rlen = rows.length;
-// 		for (var f=0; f<rlen; f++) {	// todas las filas
-// 			var row = rows[f];
-// 			if (row.className=="r_off") continue;
-// 			for (var t=0; t<tlen; t++) {
-// 				var found = false;
-// 				var term = RegExp(terms[t]);
-// 				var cells = row.getElementsByTagName("td");
-// 				for (var c=0; c<2; c++) found = found || (term.exec(cleanFilter(cells[c].textContent))!=null);
-// 				row.className = found ? "r_on" : "f_off";
-// 				if (!found) break;
-// 			}
-// 		}
-// 	} else {
-// 		for (var f=0; f<rlen; f++) rows[f].className="r_on";
-// 	}
-// }
+
 function filterText() {
 	function cleanFilter(s) {
 		return s.toLowerCase()
@@ -272,7 +238,6 @@ function filterText() {
 			.replace(/[úùü]/g, "u");
 	}
 	var filtervalue = cleanFilter(document.getElementById("contains").value);
-	console.log(filtervalue);
 	if (filtervalue.length) {
 		var terms = filtervalue.split(/\s/),
 			tlen = terms.length;
@@ -353,6 +318,12 @@ function initControl() {
 }
 /* Muestra los detalles al clickar en un marcador */
 function showDetail(marker) {
+	function hideDetail() {
+		document.getElementById("detail").className = "";
+		markerDetail.setAnimation(null);
+	}
+	google.maps.event.addListenerOnce(map, "mousedown", hideDetail);
+	document.getElementById("d-close").onclick=hideDetail;
 	if (markerDetail) markerDetail.setAnimation(null);
 	markerDetail = marker;
 	map.panTo(marker.position);
@@ -366,8 +337,7 @@ function showDetail(marker) {
 	var link = row.getElementsByClassName("T_ADDR")[0]
 		.getElementsByTagName("a")[0].href;
 	var city = row.getElementsByClassName("T_LOC")[0].textContent;
-	document.getElementById("d-title").textContent = 
-		"Gasolinera "+label+" en "+city+", "+address;
+	document.getElementById("d-title").textContent = "Gasolinera "+label+" en "+city+", "+address;
 	document.getElementById("d-link").href = link;
 	var priceList = document.getElementById("d-prices");
 	priceList.innerHTML = "";
@@ -377,11 +347,8 @@ function showDetail(marker) {
 		if (val) {
 			var t = prices[p].className.match(/T_\w+/)[0].replace("T_", "");
 			var newL = document.createElement("li");
-			newL.textContent = FUEL_OPTIONS[t].name;
 			newL.className = "T_"+t;
-			var newP = document.createElement("div");
-			newP.textContent = val;
-			newL.appendChild(newP);
+			newL.innerHTML="<div>"+FUEL_OPTIONS[t].name+"</div><div class='p'>"+val+"</div>";
 			priceList.appendChild(newL);	
 		}
 	}
@@ -394,12 +361,8 @@ function showDetail(marker) {
 		ago = " hace "+Math.floor(days)+" día" + ((days>2) ? "s" : "");
 		cname += (days<=7) ? "_med" : "_old";
 	}
-	dateDiv.textContent = "Precios actualizados "+ago;
+	dateDiv.innerHTML = "Precios actualizados<br>"+ago;
 	clockDiv.className = cname;
-	google.maps.event.addListenerOnce(map, "mousedown", function() {
-		document.getElementById("detail").className = "";
-		markerDetail.setAnimation(null);
-	});
 }
 /* Tipos de comsbutible seleccionados por el usuario */
 function getSelTypes() {
