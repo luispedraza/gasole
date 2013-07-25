@@ -84,7 +84,7 @@
 	<div class="p_head"><div class="sprt p_distance"></div><h2>Distancia</h2>
 		<div class="floater-r" id="distance">
 		<form action="javascript:newReference()">
-		<input id="from" type="search" placeholder="Ej.: Gran Vía 27, o Parque de Atracciones…" />
+		<input id="from" type="search" placeholder="Ej.: Gran Vía 27, o Aeropuerto" />
 		<p class="tooltip">Referencia para cálculo de distancias</p>
 		</form>
 		</div>
@@ -130,7 +130,10 @@
 
 <div id="map_area">
 	<div id="toolbar">
-		<div id="m-density" title="Muestra la gasolineras agrupadas según su densidad"><label for="cluster">Mapa de concentración</label><input type="checkbox" id="cluster" name="cluster"></div>
+		<div id="m-density" title="Muestra la gasolineras agrupadas según su densidad">
+			<input type="checkbox" id="cluster" name="cluster">
+			<label for="cluster">Agrupar marcadores</label>
+		</div>
 		<div id="legend">
 			<div class="title">Leyenda</div>
 			<div class="item">
@@ -147,9 +150,9 @@
 			</div>
 			<div class="item">
 			<div class="title">Fecha de actualización de precios, hace…</div>
-			<div class="subitem"><div class="sprt clock_new"></div>…menos de 24 h.</div>
-			<div class="subitem"><div class="sprt clock_med"></div>…menos de 1 semana</div>
-			<div class="subitem"><div class="sprt clock_old"></div>…más de 1 semana</div>
+			<div class="subitem"><div class="sprt clock_new"></div><div>…menos de<br>24 h.</div></div>
+			<div class="subitem"><div class="sprt clock_med"></div><div>…menos de<br>1 semana</div></div>
+			<div class="subitem"><div class="sprt clock_old"></div><div>…más de<br>1 semana</div></div>
 			</div>
 		</div>
 	</div>

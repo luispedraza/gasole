@@ -127,14 +127,36 @@ body {
 }
 #toolbar {
 	font-size: 12px;
-	height: 20px;
+	height: 25px;
 	background-color: #333;
 	color: #fff;
 	position: relative;
 }
-#toolbar div {
-	padding: 1px;
+#m-density {
 	float: left;
+}
+#m-density label {
+	cursor: pointer;
+	padding: 2px;
+	margin: 2px;
+	display: block;
+	border-radius: 3px;
+}
+#m-density label:after {
+	font-size: 1.2em;
+	margin-left: 5px;
+	content: "\2610";
+}
+#m-density input:checked + label {
+	background-color: #fff;
+	color: #333;
+}
+#m-density input:checked + label:after {
+	content: "\2611";
+}
+
+#m-density input {
+	display: none;
 }
 #legend {
 	cursor: help;
@@ -163,6 +185,7 @@ body {
 #legend .subitem {
 	padding: 5px;
 	margin-right: 10px;
+	display: inline-block;
 }
 #legend:hover {
 	height: 320px;
@@ -321,6 +344,7 @@ body {
 	padding: 1px;
 	border-radius: 5px;
 	float: right;
+	outline: none;
 }
 .panel input:hover + .tooltip {
 	opacity: 1;
