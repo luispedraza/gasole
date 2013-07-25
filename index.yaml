@@ -19,3 +19,9 @@ indexes:
   ancestor: yes
   properties:
   - name: date
+
+- kind: HistoryData
+  ancestor: yes
+  properties:
+  - name: date
+    direction: desc

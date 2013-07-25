@@ -238,14 +238,45 @@ def data2store(data):
 # 	return near.data
 
 def get_history(p, t, s, days=30):
-	result = []
+	key="history-"+p+t+s
+	dbKey = db.Key.from_path('Province', p, 'Town', t, 'GasStation', s)
+	cachehistory = memcache.get(key)
+	if cachehistory:	# está en cache, ¿está actualizada?
+		cache_date = cachehistory["date"]
+		update_date = db.Query(HistoryData, projection=['date']).ancestor(dbKey).order('-date').get().date
+		if cache_date==update_date:
+			logging.info("encontrados en cache")
+			return cachehistory["history"]
+	logging.info("buscando en db")
+	allhistory = []
 	when = Date.today()-Timedelta(days)		# desde qué día pedir datos
-	q = HistoryData.all().ancestor(db.Key.from_path('Province', p, 'Town', t, 'GasStation', s)).filter('date >=', when).order('date')
+	q = HistoryData.all().ancestor(dbKey).filter('date >=', when).order('date')
+	date=None
 	for h in q:
+		date = h.date
 		newdata = {k: getattr(h, k) for k in h.dynamic_properties()}
-		newdata["d"] = h.date.isoformat()
-		result.append(newdata)
-	return result
+		newdata["d"] = date.isoformat()
+		allhistory.append(newdata)
+	memcache.set(key,{"date":date,"history":allhistory})
+	return allhistory
+
+# esta solución requiere borrar memcache al actualizar los datos, puesto que no se hacen comprobaciones
+# def get_history(p, t, s, days=30):
+# 	key="history-"+p+t+s
+# 	dbKey = db.Key.from_path('Province', p, 'Town', t, 'GasStation', s)
+# 	cachehistory = memcache.get(key)
+# 	if cachehistory:	# está en cache, ¿está actualizada?
+# 		logging.info("encontrada en cache")
+# 		return cachehistory
+# 	allhistory = []
+# 	when = Date.today()-Timedelta(days)		# desde qué día pedir datos
+# 	q = HistoryData.all().ancestor(dbKey).filter('date >=', when).order('date')
+# 	for h in q:
+# 		newdata = {k: getattr(h, k) for k in h.dynamic_properties()}
+# 		newdata["d"] = h.date.isoformat()
+# 		allhistory.append(newdata)
+# 	memcache.set(key,allhistory)
+# 	return allhistory
 
 # función auxiliar para formatear un comentario
 def format_comment(c):
