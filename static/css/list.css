@@ -44,10 +44,23 @@ body {
 	opacity: .8;
 }
 #list {
+	position: relative;
 	width: 730px;
 	float: right;
 	font-size: .9em;
 	border-top: 1px solid #fff;
+}
+#no-results {
+	position: absolute;
+	top: 50px;
+	font-size: 20px;
+	text-align: center;
+	width: 100%;
+	color: #fff;
+	background-color: #006699;
+	border-radius: 3px;
+	padding: 10px 0;
+	display: none;
 }
 #control {
 	background-color: #333;

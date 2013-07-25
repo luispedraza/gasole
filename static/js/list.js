@@ -62,27 +62,31 @@ function newReference(loc) {
 function paginateTable(index) {
 	var rows = document.getElementById("table-data").getElementsByClassName("r_on"),
 		rlen = rows.length,
+		nores = document.getElementById("no-results"),
+		pagerDiv = document.getElementById("pager"),
 		pager = document.getElementById("pager-links");
-	if (!rlen) {
-		pager.innerHTML = "<p>No hay resultados coincidentes con los criterios de búsqueda.<br>Comprueba el filtro y tipos de combustible seleccionados.</p>"; 
-		return;	
-	}
-	
-	if (index === "more") index = Math.min(pagerCurrent+pagerN, parseInt(rlen/pagerN)*pagerN);
-	else if (index === "less") index = Math.max(pagerCurrent-pagerN, 0);
-	if (index>=rlen) return;
-	pager.innerHTML = "";
-	for (var r=0; r<rlen; r++) {
-		rows[r].style.display = (((r<index)||(r>=index+pagerN)) ? "none" : "");
-		if (r%pagerN == 0) {
-			var p = document.createElement("div");
-			p.innerHTML = ((r+1) + "<br/>" + Math.min(r+pagerN, rlen));
-			p.setAttribute("onclick", "javascript:paginateTable(" + r + ");");
-			(r==index) ? (p.className="p current"):(p.className="p");
-			pager.appendChild(p);
+	if (rlen!=0) {
+		nores.style.display="none";
+		pagerDiv.style.display="block";
+		if (index === "more") index = Math.min(pagerCurrent+pagerN, parseInt(rlen/pagerN)*pagerN);
+		else if (index === "less") index = Math.max(pagerCurrent-pagerN, 0);
+		if (index>=rlen) return;
+		pager.innerHTML = "";
+		for (var r=0; r<rlen; r++) {
+			rows[r].style.display = (((r<index)||(r>=index+pagerN)) ? "none" : "");
+			if (r%pagerN == 0) {
+				var p = document.createElement("div");
+				p.innerHTML = ((r+1) + "<br/>" + Math.min(r+pagerN, rlen));
+				p.setAttribute("onclick", "javascript:paginateTable(" + r + ");");
+				(r==index) ? (p.className="p current"):(p.className="p");
+				pager.appendChild(p);
+			}
 		}
-	}
-	pagerCurrent = index;
+		pagerCurrent = index;
+	} else {
+		nores.style.display="block";
+		pagerDiv.style.display="none";
+	} 
 }
 /* Cálculo de distancias al marcador de referencia */
 function calcDistances() {
@@ -232,11 +236,10 @@ function filterText() {
 			var text = cleanFilter(t+" "+s+" "+sdata.l);
 			for (var t=0; t<tlen; t++) {
 				var found = (RegExp(terms[t]).exec(text)!=null);
-				if (!found) {
+				if (found) row.className = "r_on";
+				else {
 					row.className = "f_off";
 					return;
-				} else {
-					row.className = "r_on";
 				}
 			}
 		});
