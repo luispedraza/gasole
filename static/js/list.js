@@ -168,7 +168,6 @@ function sortTable(cname, reverse) {
 		a=a[0];b=b[0];
 		if (a<b) return -1;if (b<a) return 1;return 0;
 	})
-	console.log(array);
 	if (reverse) array.reverse();
 	var rows = table_data.getElementsByTagName("tr");
 	var static_rows = [];
@@ -216,7 +215,7 @@ function filterText() {
 			.replace(/\s+/g," ")
 			.replace(/\s$/,"")
 			.replace(/^\s/,"")
-			.replace(/´/g,"")
+			.replace(/[´,.;]/g,"")
 			.replace(/[áàä]/g, "a")
 			.replace(/[éèë]/g, "e")
 			.replace(/[íìï]/g, "i")
@@ -230,7 +229,7 @@ function filterText() {
 		gasoleProcess(gasoleData._data, function(sdata,p,t,s) {
 			var row = sdata.row;
 			if (row.className=="r_off") return;
-			var text = cleanFilter(p+" "+t+" "+s+" "+sdata.l);
+			var text = cleanFilter(t+" "+s+" "+sdata.l);
 			for (var t=0; t<tlen; t++) {
 				var found = (RegExp(terms[t]).exec(text)!=null);
 				if (!found) {
@@ -285,11 +284,11 @@ function initControl() {
 	}
 	filterTypes(filter);
 	// Filtro de contenido de texto
-	document.getElementById("contains").onkeyup = function() {
+	addEvent(document.getElementById("contains"), "input", function() {
 		filterText();
 		paginateTable(0);
 		updateMarkers();
-	}
+	});
 	// Ordenación de la tabla
 	var heads = document.getElementById("table").getElementsByTagName("th");
 	for (var h=0; h<heads.length; h++) {
