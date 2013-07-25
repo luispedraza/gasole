@@ -316,6 +316,8 @@ function showDetail(marker) {
 		document.getElementById("detail").className = "";
 		markerDetail.setAnimation(null);
 	}
+	document.getElementById("cluster").checked=false;
+	document.getElementById("cluster").onclick();
 	google.maps.event.addListenerOnce(map, "mousedown", hideDetail);
 	document.getElementById("d-close").onclick=hideDetail;
 	if (markerDetail) markerDetail.setAnimation(null);
