@@ -53,33 +53,17 @@ class Comment(db.Model):
 	date = db.DateTimeProperty(auto_now_add=True)
 	replyto = db.IntegerProperty()
 
-def getProvinceData(p):
-	return json.loads(getProvinceJson(p))["_data"][p]
-
-def getProvinceJson(p):
-	jsondata = memcache.get(p)
-	if jsondata:
-		return jsondata
-	model = ApiJson.get_by_key_name(p)
-	if model:
-		memcache.set(p, model.json)
-		return model.json
-	jsondata = json.dumps({"_data": store2data(prov_kname=p)})
-	ApiJson(key_name=p, json=jsondata).put()
-	memcache.set(p, jsondata)
-	return jsondata
-
-def getStationJson(p, t, s):
-	skey = p+t+s
-	jsondata = memcache.get(skey)
-	if jsondata:
-		logging.info("Datos de gasolinera encontrados en memcache")
-		return jsondata
-	jsondata = json.dumps({
-		"_history": get_history(p,t,s),
-		"_comments" : get_comments(p,t,s)})
-	memcache.set(skey, jsondata)
-	return jsondata
+# def getStationJson(p, t, s):
+# 	skey = p+t+s
+# 	jsondata = memcache.get(skey)
+# 	if jsondata:
+# 		logging.info("Datos de gasolinera encontrados en memcache")
+# 		return jsondata
+# 	jsondata = json.dumps({
+# 		"_history": get_history(p,t,s),
+# 		"_comments" : get_comments(p,t,s)})
+# 	memcache.set(skey, jsondata)
+# 	return jsondata
 
 # Obtiene todo en formato JSON
 def getGasole(when=None):
@@ -199,59 +183,59 @@ def data2store(data):
 		logging.error(str(e))
 	
 # obtenemos información de la base de datos
-def store2data(option=None, prov_kname=None):
-	q = PriceData.all()
-	if prov_kname:
-		q.ancestor(db.Key.from_path('Province', prov_kname))
-	result = ResultIter()
-	for price in q:
-		prices = {FUEL_REVERSE[o]: getattr(price, o) for o in price.dynamic_properties()}
-		station = price.parent()
-		latlon = None
-		if (station.geopt):
-			latlon = [station.geopt.lat, station.geopt.lon]
-		date = price.date
-		result.add_item(
-			province = price.key().parent().parent().parent().name(),
-			town     = price.key().parent().parent().name(),
-			station  = price.key().name(),
-			label    = station.label,
-			date     = [date.year, date.month, date.day],
-			option   = prices,
-			hours    = station.hours,
-			latlon   = latlon)
-	return result.data
+# def store2data(option=None, prov_kname=None):
+# 	q = PriceData.all()
+# 	if prov_kname:
+# 		q.ancestor(db.Key.from_path('Province', prov_kname))
+# 	result = ResultIter()
+# 	for price in q:
+# 		prices = {FUEL_REVERSE[o]: getattr(price, o) for o in price.dynamic_properties()}
+# 		station = price.parent()
+# 		latlon = None
+# 		if (station.geopt):
+# 			latlon = [station.geopt.lat, station.geopt.lon]
+# 		date = price.date
+# 		result.add_item(
+# 			province = price.key().parent().parent().parent().name(),
+# 			town     = price.key().parent().parent().name(),
+# 			station  = price.key().name(),
+# 			label    = station.label,
+# 			date     = [date.year, date.month, date.day],
+# 			option   = prices,
+# 			hours    = station.hours,
+# 			latlon   = latlon)
+# 	return result.data
 
-def get_near(lat, lon, dist):
-	near = ResultIter()
-	# http://www.csgnetwork.com/degreelenllavcalc.html
-	dlat = dist/111.03461
-	dlon = dist/85.39383
-	ne = db.GeoPt(lat=lat+dlat, lon=lon+dlon)
-	sw = db.GeoPt(lat=lat-dlat, lon=lon-dlon)
-	q = GasStation.all().filter('geopt >', sw).filter('geopt <', ne)
-	keys = []
-	for g in q:
-		if abs(g.geopt.lon-lon) < dlon:
-			keys.append(db.Key.from_path('PriceData', g.key().name(), parent=g.key()))
-	q = PriceData.get(keys)
-	for price in q:
-		prices = {FUEL_REVERSE[o]: getattr(price, o) for o in price.dynamic_properties()}
-		station = price.parent()
-		latlon = None
-		if (station.geopt):
-			latlon = [station.geopt.lat, station.geopt.lon]
-		date = price.date
-		near.add_item(
-			province = price.key().parent().parent().parent().name(),
-			town     = price.key().parent().parent().name(),
-			station  = price.key().name(),
-			label    = station.label,
-			date     = [date.year, date.month, date.day],
-			option   = prices,
-			hours    = station.hours,
-			latlon   = latlon)
-	return near.data
+# def get_near(lat, lon, dist):
+# 	near = ResultIter()
+# 	# http://www.csgnetwork.com/degreelenllavcalc.html
+# 	dlat = dist/111.03461
+# 	dlon = dist/85.39383
+# 	ne = db.GeoPt(lat=lat+dlat, lon=lon+dlon)
+# 	sw = db.GeoPt(lat=lat-dlat, lon=lon-dlon)
+# 	q = GasStation.all().filter('geopt >', sw).filter('geopt <', ne)
+# 	keys = []
+# 	for g in q:
+# 		if abs(g.geopt.lon-lon) < dlon:
+# 			keys.append(db.Key.from_path('PriceData', g.key().name(), parent=g.key()))
+# 	q = PriceData.get(keys)
+# 	for price in q:
+# 		prices = {FUEL_REVERSE[o]: getattr(price, o) for o in price.dynamic_properties()}
+# 		station = price.parent()
+# 		latlon = None
+# 		if (station.geopt):
+# 			latlon = [station.geopt.lat, station.geopt.lon]
+# 		date = price.date
+# 		near.add_item(
+# 			province = price.key().parent().parent().parent().name(),
+# 			town     = price.key().parent().parent().name(),
+# 			station  = price.key().name(),
+# 			label    = station.label,
+# 			date     = [date.year, date.month, date.day],
+# 			option   = prices,
+# 			hours    = station.hours,
+# 			latlon   = latlon)
+# 	return near.data
 
 def get_history(prov, town, station):
 	result = []
@@ -262,22 +246,32 @@ def get_history(prov, town, station):
 		result.append(newdata)
 	return result
 
-def get_comments(prov, town, station):
-	result = []
-	q = Comment.all().ancestor(db.Key.from_path('Province', prov, 'Town', town, 'GasStation', station)).order('date')
-	for c in q:
-		result.append({
-			"date": c.date.isoformat(),
+# función auxiliar para formatear un comentario
+def format_comment(c):
+	return {"date": c.date.isoformat(),
 			"name": c.name,
 			"avatar": c.avatar,
 			"link": c.link or "",
 			"points": c.points,
 			"content": c.content,
 			"replyto": c.replyto,
-			"id": c.key().id()})
-	return result
+			"id": c.key().id()}
 
+# obtiene todos los comentarios de una estación
+def get_comments(p, t, s):
+	key="comments-"+p+t+s
+	allcomments = memcache.get(key)
+	if not allcomments:
+		allcomments = []
+		q = Comment.all().ancestor(db.Key.from_path('Province', p, 'Town', t, 'GasStation', s)).order('date')
+		for c in q:
+			allcomments.append(format_comment(c))
+		memcache.set(key,allcomments)
+	return allcomments
+
+# inserta un nuevo comentario de una gasolinera
 def add_comment(p, t, s, user, points, content, replyto):
+	key="comments-"+p+t+s
 	comment = Comment(
 		userid=user.key.id(),
 		name=user.name,
@@ -287,32 +281,12 @@ def add_comment(p, t, s, user, points, content, replyto):
 		content=db.Text(content),
 		replyto=int(replyto) if replyto else None,
 		parent=db.Key.from_path('Province',p,'Town',t,'GasStation',s))
-	comment.put()
-	memcache.delete(p+t+s)
-
-# def mean_val(array):
-# 	return sum(values)/len(values)
-
-# precios medios de combustible por provincia
-# def get_means(option):
-# 	data = memcache.get("means_"+option)
-# 	if not data:
-# 		data = {}
-# 		q = Province.all()
-# 		for province in q:
-# 			values = []
-# 			p = province.key().name()
-# 			datap = memcache.get(p) or store2data(prov_kname=p).get(p)
-# 			for t in datap.keys():
-# 				for s in datap[t].keys():
-# 					station = datap[t][s]
-# 					price = station["o"].get(option)
-# 					if price:
-# 						values.append(price)
-# 			if len(values):
-# 				data[p] = value = mean_val(values)
-# 			else:
-# 				data[p] = None
-# 		memcache.set("means_"+option, data)
-# 	return data
+	try:
+		comment.put()
+		allcomments = get_comments(p,t,s)
+		allcomments.append(format_comment(comment))
+		memcache.set(key,allcomments)
+		return True
+	except:
+		return False
 

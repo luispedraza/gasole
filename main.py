@@ -152,7 +152,6 @@ class Detail(BaseAuthHandler):
         service = None
         if user:
             service=user.auth_ids[0].split(":")[0]
-        logging.info(user)
         self.render("base.html",
             title = title,
             styles=['/css/detail.css'],
@@ -269,8 +268,10 @@ class CommentsApi(BaseAuthHandler):
         if not captcha_result.is_valid:
              result["recaptcha_response_field"] = u"La solución del captcha no es correcta."
         if not len(result):
-            add_comment(pname, tname, sname, user, points, content, replyto)
-            result["OK"] = u"El comentario se ha publicado con éxito."
+            if add_comment(pname, tname, sname, user, points, content, replyto):
+                result["OK"] = u"El comentario se ha publicado con éxito."
+            else:
+                result["ERROR"] = u"Por un problema en el servidor no se ha podido guardar el comentario. Por favor, inténtalo de nuevo más tarde."
         self.response.headers['Content-Type'] = 'application/json; charset=utf-8'
         self.write(json.dumps(result))
 

@@ -430,7 +430,6 @@ function Gasole(callback) {
 	// @param loc: lugar y radio de búsqueda
 	// @param sort: criterio de ordenación
 	this.nearDataArray = function(loc, type, sort) {
-		console.log(loc);
 		var l = loc.latlng(); if (!l) return;			// lugar de búsqueda
 		var r = loc.radius;								// radio de búsqueda
 		this.stats = new Stats();
@@ -534,7 +533,6 @@ function Gasole(callback) {
 		req.send();
 	} else {
 		var data = JSON.parse(storedData);
-		console.log(data);
 		this.init(data.data, new Date(data.ts), data.stats);
 		if (this.callback) this.callback();
 	}
