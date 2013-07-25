@@ -94,10 +94,10 @@ function calcDistances() {
 			var dlat = (latlon[0] - markerCenter.position.lat()) * Lat2Km;
 			var dlon = (latlon[1] - markerCenter.position.lng()) * Lon2Km;
 			var dist = Math.sqrt(dlat*dlat+dlon*dlon).toFixed(1);
-			tds[i].getElementsByTagName("span")[0].textContent = dist;
+			tds[i].textContent = dist;
 		}
 	}
-	sortTable("T_DIST", false, true);
+	sortTable("T_DIST", false);
 }
 function markerColor(sel, price) {
 	var mean = 0;
@@ -154,41 +154,27 @@ function updateMarkers() {
 	}
 }
 /* Ordenación de la tabla */
-function sortTable(cname, reverse, isfloat) {
+function sortTable(cname, reverse) {
 	if (typeof reverse == "undefined") reverse = false;
-	function quickSort(a) {
-		var alen = a.length;
-		/* Ordenación QuickSort de una tabla */
-		if (alen<=1) return a;
-		var npivot = Math.floor(Math.random()*alen);
-		for (var p=npivot+1; p<alen; p++)
-			if (a[p][0]!=a[npivot][0]) break;
-		var pivot = a.splice(p-1, 1);
-		alen = a.length;
-		var less = [];
-		var greater = [];
-		for (var i=0; i<alen; i++) {
-			if (a[i][0]<=pivot[0][0])
-				less.push(a[i]);
-			else greater.push(a[i]);
-		}
-		return quickSort(less).concat(pivot, quickSort(greater));
+	var table_data = document.getElementById("table-data"),
+		values = table_data.getElementsByClassName(cname),
+		array = [],
+		value;
+	for (var v=0, vlen=values.length; v<vlen; v++) {
+		value = values[v].textContent;
+		if (value) array.push([parseFloat(value), v]);
 	}
-	var table_data = document.getElementById("table-data");
-	var values = table_data.getElementsByClassName(cname);
-	var array = [];
-	for (var v=0, vlen=values.length; v<vlen; v++)
-		if (values[v].textContent) {
-			var newval = (isfloat ? parseFloat(values[v].textContent) : values[v].textContent);
-			array.push([newval, v]);
-		}
-	array = quickSort(array);
+	array.sort(function(a,b) {
+		a=a[0];b=b[0];
+		if (a<b) return -1;if (b<a) return 1;return 0;
+	})
+	console.log(array);
 	if (reverse) array.reverse();
 	var rows = table_data.getElementsByTagName("tr");
 	var static_rows = [];
 	for (var r=0, rlen=rows.length; r<rlen; r++) static_rows.push(rows[r]);
-	for (var e=0, alen=array.length; e<alen; e++) {
-		table_data.insertBefore(static_rows[array[e][1]], table_data.children[e]);
+	for (var e=array.length-1; e>=0; e--) {
+		table_data.insertBefore(static_rows[array[e][1]], table_data.children[0]);
 	}
 	var headers = document.getElementById("table").getElementsByTagName("th");
 	for (var h=0, hlen=headers.length; h<hlen; h++) {
@@ -309,8 +295,7 @@ function initControl() {
 	for (var h=0; h<heads.length; h++) {
 		addEvent(heads[h],"click", function() {
 			sortTable(this.className.match(/T_\w+/)[0],
-				this.className.match("sort_up"),
-				this.hasAttribute("data-float"));
+				this.className.match("sort_up")!=null);
 		})
 	}
 	// Para que no haga scroll el documento cuando se hace scroll en cities-list
@@ -438,10 +423,10 @@ function processData(info) {
 						td_s.appendChild(td_ref);
 						tr.appendChild(td_s);
 					var td_dist = document.createElement("td");
+					td_dist.className = "T_DIST";
 						// Marcadores
 						var geo = sdata.g;
 						if (geo) {
-							td_dist.className = "T_DIST";
 							var pos = new google.maps.LatLng(geo[0], geo[1]);
 							var options = { 
 								icon: null,
@@ -462,7 +447,6 @@ function processData(info) {
 							});
 							marker.set("id", tr.id);
 							bounds.extend(pos);
-							td_dist.innerHTML = "<div class='ref'><div title='Mostrar en el mapa' class='sprt locate'></div><span></span></div>";
 						}
 						tr.appendChild(td_dist);
 					// Fecha de actualización

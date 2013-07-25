@@ -679,6 +679,27 @@ function breadCrumb(id, label) {
 		}
 	}
 }
+/* Para ordenamiento de vectores (no empleado) */
+// function quickSort(a) {
+// 	var alen = a.length;
+// 	/* Ordenación QuickSort de una tabla */
+// 	if (alen<=1) return a;
+// 	var npivot = Math.floor(Math.random()*alen);
+// 	for (var p=npivot+1; p<alen; p++)
+// 		if (a[p][0]!=a[npivot][0]) break;
+// 	var pivot = a.splice(p-1, 1);
+// 	alen = a.length;
+// 	var less = [];
+// 	var greater = [];
+// 	for (var i=0; i<alen; i++) {
+// 		if (a[i][0]<=pivot[0][0])
+// 			less.push(a[i]);
+// 		else greater.push(a[i]);
+// 	}
+// 	return quickSort(less).concat(pivot, quickSort(greater));
+// }
+
+
 /* Función que confierte un círculo en un path, para transformaciones de raphael */
 // NO BORRAR, PUEDE SER ÚTIL
 // function circle2path(x , y, r) // x and y are center and r is the radius

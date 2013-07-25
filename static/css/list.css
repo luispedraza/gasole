@@ -441,22 +441,11 @@ th.T_LOC, th.T_ADDR, th.T_DIST, th.T_DATE {
 .T_LOC {
 	width: 95px;
 }
-
-#table tr:hover td.T_DIST .locate{
-	top: 2px;
-	left: 2px;
-}
-#table tr:hover td.T_DIST span {
-	display: none;
-}
-#table td.T_DIST .locate {
-	position: absolute;
-	left: -50px;
-	top: 2px;
-	-webkit-transition: left .2s ease-in;
-	   -moz-transition: left .2s ease-in;
-	    -ms-transition: left .2s ease-in;
-	        transition: left .2s ease-in;
+#table tr:hover td.T_DIST {
+	font-size: 0;
+	background-repeat: no-repeat;
+	background-image: url('/img/locate.png');
+	background-position: 3px 3px;
 }
 .T_DIST {
 	cursor: pointer;	
@@ -615,9 +604,14 @@ th.off, td.off,tr.r_off, tr.f_off {
 	display: inline-block;
 	margin-right: 5px;
 }
+#pager .p.current:hover {
+	background-color: #fff;
+}
 #pager .p:hover {
 	background-color: #555;
-	color: #fff;
+}
+#pager .p:active {
+	background-color: #000;
 }
 #pager-links {
 	width: 650px;
