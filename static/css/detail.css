@@ -490,20 +490,34 @@ div.error {
 .c_block .c_block .c_block .reply {
 	display: none;
 }
+#result-container {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgb(30, 30, 30); /* The Fallback */
+   	background: rgba(30, 30, 30, 0.8); 
+}
 #result {
-	display: none;
+	width: 400px;
+	margin-top: 100px;
+	margin-left: auto;
+	margin-right: auto;
 	background-color: #3399CC;
 	border-radius: 5px;
 	padding: 10px;
 	color: #fff;
-	margin-bottom: 10px;
 }
 #result.e {
 	background-color: #d24e33;
 }
 #result.e div {
-	padding-left: 15px;
+	margin-left: 15px;
+	padding: 5px;
 	margin-bottom: 3px;
+	color: #d24e33;
+	background-color: #fff;
 }
 
 

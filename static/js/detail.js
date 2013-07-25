@@ -172,6 +172,7 @@ function fillReplyTo(id) {
 
 /* Rellena los comentarios de la gasolinera */
 function fillComments(comments) {
+	console.log(comments);
 	/* rellena una valoración basada en la puntuación */
 	function fillStars(div, p) {
 		p--;
@@ -398,7 +399,7 @@ function amChart(chartData) {
 	};
     chart.dataProvider = chartData;
     chart.marginTop = 20;
-    // chart.autoMarginOffset = 40;
+    chart.autoMarginOffset = 40;
     chart.marginRight = 0;        
     chart.categoryField = "d";
     chart.addTitle("Evolución histórica de los precios", 15);
@@ -441,68 +442,77 @@ function amChart(chartData) {
     chart.write("chart");
 }
 
-/* Enviar un nuevo comentario */
-function postComment(e) {
-	stopEvent(e);
-	console.log("enviando");
-	function encodeParams(dict) {
-		params = ""
-		for (var k in dict) {
-			params += k+"="+dict[k]+"&";
-		}
-		return params;
-	}
-	var req = new XMLHttpRequest();
-	var url = document.URL.replace("ficha", "api/c");
-	req.open("POST", url, true);
-	req.setRequestHeader("content-type", "application/x-www-form-urlencoded; charset=utf-8");
-	req.onload = function(r) {
-		var response = JSON.parse(this.responseText);
-		var result = document.getElementById("result");
-		result.style.display = "block";
-		result.scrollIntoView();
-		console.log(result);
-		if (response.hasOwnProperty("OK")) {
-			window.location = window.location.pathname+"#comments";
-			window.location.reload();
-			return;
-		}
-		result.className = "e";
-		result.innerHTML = "<p>Se han detectado errores en el formulario:</p>";
-		for (var e in response) {
-			var field=null;
-			if (e=="c_points") {
-				field = document.getElementById("c_points_div");
-				field.className = "perror";
-			}
-			else {
-				field = document.getElementById(e);
-				field.className = "error";	
-			} 
-			addEvent(field,"focus",resetError);
-			var newE = document.createElement("div");
-			newE.id = "em_"+e;
-			newE.textContent = response[e];
-			result.appendChild(newE);
-		}
-	}
-	var comment = {
-		c_replyto: document.getElementById("c_replyto").value,
-		c_content: document.getElementById("c_content").value,
-		c_points: document.getElementById("c_points").value,
-		recaptcha_response_field: Recaptcha.get_response(),
-		recaptcha_challenge_field: Recaptcha.get_challenge()
-	};
-	if (document.getElementById("user-data")){
-		comment.c_name = document.getElementById("c_name").value;
-		comment.c_email = document.getElementById("c_email").value;
-		comment.c_link = document.getElementById("c_link").value;
-	}
-	console.log(comment);
-	req.send(encodeParams(comment));
-	return false;
-}
 addEvent(window,"load", function() {
+	/* Enviar un nuevo comentario */
+	function postComment(e) {
+		/* Mostrar el resultado de la publicación */
+		function showResult(response) {
+			var rCont = document.createElement("div");
+			rCont.id="result-container";
+			document.body.appendChild(rCont);
+			window.onclick = function() {
+				document.body.removeChild(document.getElementById("result-container"));
+				window.onclick = null;
+			};
+			var rDiv = document.createElement("div");
+			rDiv.id="result";
+			if (response.hasOwnProperty("OK")) {
+				getApiData("comments", fillComments, true);
+				rDiv.innerHTML = "<p>Gracias. Tu comentario ha sido publicado.</p>";
+			} else {
+				rDiv.className = "e";
+				rDiv.innerHTML = "<p>Se han detectado errores en el formulario:</p>";
+				for (var e in response) {
+					var field=null;
+					if (e=="c_points") {
+						field = document.getElementById("c_points_div");
+						field.className = "perror";
+					}
+					else {
+						field = document.getElementById(e);
+						field.className = "error";	
+					} 
+					addEvent(field,"focus",resetError);
+					var newE = document.createElement("div");
+					newE.id = "em_"+e;
+					newE.textContent = response[e];
+					rDiv.appendChild(newE);
+				}
+			}
+			rCont.appendChild(rDiv);
+		}
+		stopEvent(e);
+		console.log("enviando");
+		function encodeParams(dict) {
+			params = ""
+			for (var k in dict) {
+				params += k+"="+dict[k]+"&";
+			}
+			return params;
+		}
+		var req = new XMLHttpRequest();
+		var url = document.URL.replace("ficha", "api/c");
+		req.open("POST", url, true);
+		req.setRequestHeader("content-type", "application/x-www-form-urlencoded; charset=utf-8");
+		req.onload = function(r) {
+			var response = JSON.parse(this.responseText);
+			showResult(response);
+		}
+		var comment = {
+			c_replyto: document.getElementById("c_replyto").value,
+			c_content: document.getElementById("c_content").value,
+			c_points: document.getElementById("c_points").value,
+			recaptcha_response_field: Recaptcha.get_response(),
+			recaptcha_challenge_field: Recaptcha.get_challenge()
+		};
+		if (document.getElementById("user-data")){
+			comment.c_name = document.getElementById("c_name").value;
+			comment.c_email = document.getElementById("c_email").value;
+			comment.c_link = document.getElementById("c_link").value;
+		}
+		req.send(encodeParams(comment));
+		return false;
+	}
 	// Resultado de una acción anterior: un comentario
 	var result = document.getElementById("result");
 	if (result) {
@@ -515,12 +525,16 @@ addEvent(window,"load", function() {
 		sdata.i = this.info[sdata.p][sdata.t][sdata.s];
 		breadCrumb("breadcrumb", sdata.i.l);	// miga de pan del detalle
 		processData(sdata);
+		var title=document.getElementById("maintitle");
+		title.textContent="Ficha de la Gasolinera " + 
+			sdata.i.l + " en " + toTitle(sdata.s) + ", " + toTitle(sdata.t);
 	});
 	document.getElementById("chart").onclick = function() {
+		document.getElementById("chart").onclick = null;
 		this.className="";
 		this.textContent="";
 		getApiData("history", amChart);
 	}
-	getApiData("comments", fillComments, (window.location.href.match("#comments")!=null));
 	document.getElementById("send_comment").onclick = postComment;
+	// document.getElementById("comment-form").action = postComment;
 })

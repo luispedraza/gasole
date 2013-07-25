@@ -55,7 +55,7 @@
 <div id="detail">
 	
 	<div id="breadcrumb"></div>
-	<h1>Ficha de la {{title}}</h1>
+	<h1 id="maintitle">Ficha de la {{title}}</h1>
 	<div id="social">
 		<!-- AddThis Button BEGIN -->
 		<div class="addthis_toolbox addthis_default_style">
@@ -82,7 +82,7 @@
 			</script>
 		</div>
 		<div id="map"></div>
-		<div id="chart" class="button"><div class="sprt m_stats"></div> Mostrar gráfico histórico de precios (últimos 30 días)</div>
+		<div id="chart" class="button"><div class="sprt m_stats"></div>&nbsp;Mostrar Gráfico Histórico de Precios</div>
 	</div>
 </div><!--detail-->
 
@@ -109,11 +109,8 @@
 		<div id="old_comments"></div>
 	</div>
 
-
-
 	<div id="comments-new">
 	<h2>Tu comentario</h2>
-		<div id="result"></div>
 		{% if not user %}
 		<div class="clearer">
 			<div class="in">Inicia sesión… </div>
@@ -126,7 +123,7 @@
 		</div>
 		{% endif %}
 
-	<form>
+	<form id="comment-form">
 		{% if user %}
 		<div id="username" class="clearer logged">
 			<a class="logout" href="/logout"></a>
