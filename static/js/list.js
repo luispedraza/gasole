@@ -6,7 +6,6 @@ var	gasoleData,		// datos de la api
 	town=null,
 	markerCenter=null,
 	markerDetail=null,
-	pagerN = 15,
 	pagerCurrent = null,
 	cluster = null,
 	bounds = new google.maps.LatLngBounds(),
@@ -67,7 +66,8 @@ function newReference(loc) {
 }
 /* Paginación de la tabla */
 function paginateTable(index) {
-	var rows = document.getElementById("table-data").getElementsByClassName("r_on"),
+	var pagerN = 15,
+		rows = document.getElementById("table-data").getElementsByClassName("r_on"),
 		rlen = rows.length,
 		nores = document.getElementById("no-results"),
 		pagerDiv = document.getElementById("pager"),
@@ -90,6 +90,7 @@ function paginateTable(index) {
 			}
 		}
 		pagerCurrent = index;
+		pagerDiv.style.display = (rlen<=pagerN) ? "none" : "block";
 	} else {
 		nores.style.display="block";
 		pagerDiv.style.display="none";

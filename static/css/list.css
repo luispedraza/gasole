@@ -568,6 +568,9 @@ th.T_8 {
 	text-align: left;
 	border-left: 1px solid #fff;
 }
+#table th:hover {
+	opacity: .8;
+}
 th .sprt.sort {
 	-webkit-transition: all .5s;
 	-moz-transition: all .5s;
