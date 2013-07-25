@@ -4,7 +4,7 @@ addEvent(window,"load", function() {
 		prov = document.getElementById("P"+PROVS[p]);
 		addEvent(prov,"click", function() {
 			var pname = getProvName(this.id.slice(1));
-			window.location = window.location.origin + "/gasolineras/" + encodeName(pname);
+			window.location = "/gasolineras/" + encodeName(pname);
 		});
 		addEvent(prov,"mouseover", function() {
 			var pname = getProvName(this.id.slice(1));
