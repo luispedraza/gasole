@@ -1,9 +1,9 @@
 var	gasoleData,		// datos de la api
 	map,			// el mapa de Google
-	place = "",
-	markers = [],	// lista de marcadores sobre el mapa
-	province = null,
-	town = null,
+	place = null,	// El lugar de referenciaa
+	markers=[],	// lista de marcadores sobre el mapa
+	province=null,
+	town=null,
 	markerCenter=null,
 	markerDetail=null,
 	pagerN = 15,
@@ -19,44 +19,51 @@ var MARKER_IMG = {
 	mu: new google.maps.MarkerImage("/img/sprt.png", new google.maps.Size(25, 25, "px", "px"), new google.maps.Point(2,444), null, null)
 }
 
-
 // Pesos para colores de gasolinera
 function computeWeights(stats) {
 	var N=0;
 	for (var t in stats) N+=stats[t].n;
 	for (var t in stats) stats[t].w = stats[t].n/N;
 }
+/* Búsqueda de nuevo punto de referencia para el cálculo de distancias */
 function newReference(loc) {
-	var location = loc;
-	if(!location) location = document.getElementById("from").value;
-	var geocoder = new google.maps.Geocoder();
-	geocoder.geocode({'address': location}, function (res, stat) {
-		var infoDiv = document.getElementById("distance-info");
-		if (stat == google.maps.GeocoderStatus.OK) {
-			if (!markerCenter) {
-				markerCenter = new google.maps.Marker({
-	            	map: map,
-	            	position: res[0].geometry.location,
-	            	icon: '/img/center_mark.png'
-				});
-			} else {
-				markerCenter.setPosition(res[0].geometry.location);
-			}
-			markerCenter.set("place", res[0].formatted_address);
-			map.panTo(res[0].geometry.location);
-			bounds.extend(markerCenter.position);
-			map.fitBounds(bounds);
-			calcDistances();
-			var nearest = document.getElementById("table-data").getElementsByTagName("tr")[0];
-			if (nearest) {
-				infoDiv.innerHTML = "La gasolinera más próxima a " + 
-					res[0].formatted_address + " se encuentra en " + 
-					nearest.getElementsByClassName("T_ADDR")[0].textContent;
-			} else infoDiv.innerHTML = "No se ha encontrado ninguna gasolinera. Intenta ampliar el radio de busqueda";
-			return;
+	function fillLocation(latlon, addr) {
+		bounds.extend(latlon);
+		map.fitBounds(bounds);
+		if (!markerCenter) {
+			markerCenter = new google.maps.Marker({
+            	map: map,
+            	position: latlon,
+            	icon: '/img/center_mark.png'
+			});
+		} else {
+			markerCenter.setPosition(latlon);
 		}
-		infoDiv.innerHTML = "No se ha podido localizar la referencia.";
-	});
+		calcDistances();
+		// El punto más cercano
+		var nearest = document.getElementById("table-data").getElementsByTagName("tr")[0];
+		if (nearest) {
+			infoDiv.innerHTML = "La gasolinera más próxima en línera recta a " + 
+				addr + " se encuentra en " + 
+				nearest.getElementsByClassName("T_ADDR")[0].textContent;
+		} else
+			infoDiv.innerHTML = "No se ha encontrado ninguna gasolinera.";
+		markerCenter.setAnimation(google.maps.Animation.DROP);
+	}
+	var infoDiv = document.getElementById("distance-info");
+	if(typeof loc == "undefined") {
+		loc = document.getElementById("from").value;
+		var geocoder = new google.maps.Geocoder();
+		geocoder.geocode({'address': loc}, function (res, stat) {
+			if (stat == google.maps.GeocoderStatus.OK)	// encontrado el resultado
+				fillLocation(res[0].geometry.location, res[0].formatted_address);
+			else 
+				infoDiv.innerHTML = "No se ha podido encontrar el lugar.";
+		});	
+	} else {
+		var latlng = loc.latlng();
+		fillLocation(new google.maps.LatLng(latlng[0], latlng[1]), loc.name());
+	} 
 }
 /* Paginación de la tabla */
 function paginateTable(index) {
@@ -88,17 +95,16 @@ function paginateTable(index) {
 		pagerDiv.style.display="none";
 	} 
 }
-/* Cálculo de distancias al marcador de referencia */
+/* Cálculo de distancias al marcador de referencia markerCenter */
 function calcDistances() {
 	var tds = document.getElementById("table-data").getElementsByClassName("T_DIST");
 	for (var i=0, tdslen=tds.length; i<tdslen; i++) {
 		var latlon = tds[i].getAttribute("data-geo");
 		if (latlon) {
 			latlon = latlon.split(",");
-			var dlat = (latlon[0] - markerCenter.position.lat()) * Lat2Km;
-			var dlon = (latlon[1] - markerCenter.position.lng()) * Lon2Km;
-			var dist = Math.sqrt(dlat*dlat+dlon*dlon).toFixed(1);
-			tds[i].textContent = dist;
+			var dlat = (parseFloat(latlon[0]) - markerCenter.position.lat()) * Lat2Km;
+			var dlon = (parseFloat(latlon[1]) - markerCenter.position.lng()) * Lon2Km;
+			tds[i].textContent = Math.sqrt(dlat*dlat+dlon*dlon).toFixed(1);
 		}
 	}
 	sortTable("T_DIST", false);
@@ -212,7 +218,7 @@ function filterTypes(filter) {
 		row.className = row.getElementsByClassName("on").length ? "r_on" : "r_off";
 	})	
 }
-
+/* Filtrado de resultados por contenido de texto */
 function filterText() {
 	function cleanFilter(s) {
 		return s.toLowerCase()
@@ -251,7 +257,7 @@ function filterText() {
 		});
 	}
 }
-
+/* Inicializa los controles */
 function initControl() {
 	// Cluster del mapa
 	function mapCluster() {
@@ -494,7 +500,25 @@ function processData(info) {
 		}
 		else document.getElementById("p-cities").style.display = "none";
 	}
-	function initMap() {
+	populateTable(info._data);
+	populateInfo();
+	initControl();
+	updateMarkers();
+	var h1 = document.getElementById("title");
+	if (place) {
+		h1.textContent = "Gasolineras cerca de: " + place.name();
+	}
+	else {
+		h1.textContent = "Gasolineras en " + ((town) ? (prettyName(town) + ", ") : ("la ")) + "provincia de " + prettyName(province);
+		place = new SearchLocations();
+		var	center = bounds.getCenter();
+		place.add("la posición del marcador azul", [center.lat(),center.lng()]);	// el centro de los resultados
+	}
+	newReference(place);
+}
+addEvent(window,"load", function() {
+	breadCrumb("breadcrumb");	// miga de pan
+	(function initMap() {
 		/* Inicializa el mapa */
 		map = new google.maps.Map(document.getElementById("google_map"),
 			{mapTypeId: google.maps.MapTypeId.ROADMAP});
@@ -521,26 +545,7 @@ function processData(info) {
 			publisherId: 'pub-9285487390483271'
 		}
 		adUnit = new google.maps.adsense.AdUnit(adUnitDiv, adUnitOptions);
-	}
-	var h1 = document.getElementById("title");
-	if (info["_near"]) {
-		h1.textContent = "Gasolineras cerca de: " + info["_near"];
-		place = info["_near"];
-	}
-	else {
-		h1.textContent = "Gasolineras en " + ((town) ? (prettyName(town) + ", ") : ("la ")) + "provincia de " + prettyName(province);
-		place = ((town) ? (town + ", " + province) : (province));
-	}
-	initMap();
-	populateTable(info._data);
-	populateInfo();
-	initControl();
-	newReference(place);
-	updateMarkers();
-	paginateTable(0);
-}
-addEvent(window,"load", function() {
-	breadCrumb("breadcrumb");	// miga de pan
+	})();
 	new Gasole(function() {
 		gasoleData = {"_data": {}};
 		var pathArray = decodeArray(window.location.pathname.split("/"));
@@ -551,13 +556,13 @@ addEvent(window,"load", function() {
 				town = pathArray[3];
 				gasoleData._data[province] = {};
 				gasoleData._data[province][town] = this.info[province][town];
-			} else gasoleData._data[province] = this.info[province];
+			} else 
+				gasoleData._data[province] = this.info[province];
 		} else if (option == "resultados") {
-			var location = new SearchLocations();
-			var place = pathArray[2];
-			location.add(place, [parseFloat(pathArray[3]),parseFloat(pathArray[4])]);
-			location.radius = parseFloat(pathArray[5]);
-			gasoleData._data = this.nearData(location);
+			place = new SearchLocations();
+				place.add(pathArray[2], [parseFloat(pathArray[3]),parseFloat(pathArray[4])]);
+			place.radius = parseFloat(pathArray[5]);
+			gasoleData._data = this.nearData(place);
 			gasoleData._near = place;
 		}
 		stats = new GasoleStats(gasoleData._data).stats;
