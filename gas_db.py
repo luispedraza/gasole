@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import json
-from datetime import date as Date
+from datetime import date as Date, timedelta as Timedelta
 from google.appengine.ext import db
 from google.appengine.api import memcache
 from gas_update import *
@@ -237,9 +237,10 @@ def data2store(data):
 # 			latlon   = latlon)
 # 	return near.data
 
-def get_history(prov, town, station):
+def get_history(p, t, s, days=30):
 	result = []
-	q = HistoryData.all().ancestor(db.Key.from_path('Province', prov, 'Town', town, 'GasStation', station)).order('date')
+	when = Date.today()-Timedelta(days)		# desde qué día pedir datos
+	q = HistoryData.all().ancestor(db.Key.from_path('Province', p, 'Town', t, 'GasStation', s)).filter('date >=', when).order('date')
 	for h in q:
 		newdata = {k: getattr(h, k) for k in h.dynamic_properties()}
 		newdata["d"] = h.date.isoformat()
