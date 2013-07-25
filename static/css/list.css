@@ -290,6 +290,7 @@ body {
 	clear: both;
 	border-top: 1px solid #aaa;
 	margin-top: 15px;
+	min-height: 40px;
 }
 .panel:first-child {
 	border: none;
@@ -370,6 +371,9 @@ body {
 #cities-list a:hover {
 	color: #fff;
 	background-color: #3399CC;
+}
+#fuel-type {
+	height: 50px;
 }
 #fuel-type li {
 	float: left;
