@@ -14,8 +14,8 @@ from time import time # para el timestamp
 DEBUG = os.environ['SERVER_SOFTWARE'].startswith('Dev')
 
 ## Guarda los últimos datos en formato json
-class ApiJson(db.Model):
-	json = db.TextProperty(required=True)
+# class ApiJson(db.Model):
+# 	json = db.TextProperty(required=True)
 ## Guarda todos los datos en formato json
 class ApiAllJson(db.Model):
 	json = db.BlobProperty(required=True)
@@ -41,6 +41,10 @@ class PriceData(db.Expando):
 	date = db.DateProperty()
 ## Modelo de histórico de precios
 class HistoryData(db.Expando):
+	date = db.DateProperty()
+## Todos los históricos de una gasolinera, para obtener rápidamente
+class ApiHistoryJson(db.Model):
+	json = db.TextProperty()
 	date = db.DateProperty()
 ## Modelo de comentario
 class Comment(db.Model):
@@ -85,7 +89,7 @@ def updateDB(dnew, dold=None):
 
 def data2store(data):
 	if not data:
-		logging.info("NO HAY DATOS QUE GAURDAR")
+		logging.info("NO HAY DATOS QUE GUARDAR")
 		return
 	cachedata = json.loads(getGasole().decode('zlib'))
 	if "_meta" in cachedata:		# compatibilidad con la api antigua
@@ -165,8 +169,8 @@ def data2store(data):
 				# if len(_del_prices):
 				# 	logging.info("%s precios BORRADOS" %len(_del_prices))
 				updateDB(dnew=newdata)
-				json_data = json.dumps({"_data": {p: datap}})
-				ApiJson(key_name=p, json=json_data).put()
+				# json_data = json.dumps({"_data": {p: datap}})
+				# ApiJson(key_name=p, json=json_data).put()
 				logging.info("Uso de memoria: %s" %memory_usage().current())
 			except Exception, e:
 				logging.error("*************** No se han podido guardar los datos de %s" %p)
@@ -237,28 +241,47 @@ def data2store(data):
 # 			latlon   = latlon)
 # 	return near.data
 
-def get_history(p, t, s, days=30):
-	key="history-"+p+t+s
-	dbKey = db.Key.from_path('Province', p, 'Town', t, 'GasStation', s)
-	cachehistory = memcache.get(key)
-	if cachehistory:	# está en cache, ¿está actualizada?
-		cache_date = cachehistory["date"]
-		update_date = db.Query(HistoryData, projection=['date']).ancestor(dbKey).order('-date').get().date
-		if cache_date==update_date:
-			logging.info("encontrados en cache")
-			return cachehistory["history"]
-	logging.info("buscando en db")
-	allhistory = []
-	when = Date.today()-Timedelta(days)		# desde qué día pedir datos
-	q = HistoryData.all().ancestor(dbKey).filter('date >=', when).order('date')
-	date=None
+
+# esta función devuelve un json
+def get_history(p, t, s):
+	key="history-"+p+t+s 	# la clave de memcache
+	dbKey = db.Key.from_path('Province', p, 'Town', t, 'GasStation', s)	# clave de históricos individuales
+	update_date = db.Query(HistoryData, projection=['date']).ancestor(dbKey).order('-date').get().date
+	local_date = None
+	local_json = None
+	# buscamos en cache
+	cache_history = memcache.get(key)		# datos en cache
+	if cache_history:	# está en cache, ¿está actualizada?
+		local_date = cache_history["date"]
+		local_json = cache_history["json"]
+		if local_date == update_date:		# coinciden las fechas
+			return local_json
+	db_history = ApiHistoryJson.get(db.Key.from_path('Province', p, 'Town', t, 'GasStation', s,'ApiHistoryJson', s))
+	if db_history:		# está en db, ¿está actualizada?
+		local_date = db_history.date
+		local_json = db_history.json
+		if local_date == update_date:
+			memcache.set(key,{"date":local_date,"json":local_json})
+			return local_json
+	allhistory = []	
+	q = HistoryData.all().ancestor(dbKey).order('date')
+	if local_date!=None:	# ya tenemos datos, sólo hay que agregar los nuevos
+		# when = Date.today()-Timedelta(days)		# desde qué día pedir datos
+		allhistory = json.loads(local_json)
+		q.filter('date >', local_date)
+	new_local_date = None	# ¿Cuál es la nueva fecha local?
 	for h in q:
-		date = h.date
 		newdata = {k: getattr(h, k) for k in h.dynamic_properties()}
-		newdata["d"] = date.isoformat()
+		new_local_date = h.date
+		newdata["d"] = new_local_date.isoformat()
 		allhistory.append(newdata)
-	memcache.set(key,{"date":date,"history":allhistory})
-	return allhistory
+	local_json = json.dumps(allhistory)
+	memcache.set(key,{"date":new_local_date,"json":local_json})
+	ApiHistoryJson(key_name=s,
+		parent=dbKey,
+		date=new_local_date,
+		json=local_json).put()
+	return local_json
 
 # esta solución requiere borrar memcache al actualizar los datos, puesto que no se hacen comprobaciones
 # def get_history(p, t, s, days=30):

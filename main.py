@@ -280,7 +280,7 @@ class HistoryApi(BaseHandler):
     def get(self,p,t,s):
         self.response.headers['Content-Type'] = 'application/json; charset=utf-8'
         history = get_history(decode_param(p), decode_param(t), decode_param(s))
-        self.write(json.dumps(history))
+        self.write(history)
 
 # class GeoApi(BaseHandler):
 #     def get(self, place, lat, lon, dist):
