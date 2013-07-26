@@ -139,6 +139,7 @@ li.menu.search .item {
 	background-color: #8b4163;
 	border-color: #58110e;
 	width: 440px;
+	overflow-x: hidden;
 }
 .m_desc {
 	background-color: #f7f7cf;
