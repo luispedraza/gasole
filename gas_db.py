@@ -337,8 +337,8 @@ def add_comment(p, t, s, user, points, content, replyto):
 		replyto=int(replyto) if replyto else None,
 		parent=db.Key.from_path('Province',p,'Town',t,'GasStation',s))
 	try:
-		comment.put()
 		allcomments = get_comments(p,t,s)
+		comment.put()
 		allcomments.append(format_comment(comment))
 		memcache.set(key,allcomments)
 		return comment.key().id()	# devuelvo el id del nuevo comentario

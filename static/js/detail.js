@@ -191,6 +191,8 @@ function showMore() {
 }
 /* Rellena los comentarios de la gasolinera */
 function fillComments(comments) {
+	var clen=comments.length;
+	if (clen==0) return;
 	function fillReplyTo() {
 		/* Para contestar a un comentario existente */
 		var id=this.id.split("-")[1];
@@ -222,11 +224,7 @@ function fillComments(comments) {
 		for (var s=0; s<5; s++) 
 			div.innerHTML+="<div class='sprt star_mini s"+((s<=p) ? "on" : "off")+"'></div>";
 	}
-	var clen=comments.length;
-	if (clen==0) {
-		document.getElementById("no-comments").style.display="block";
-		return;
-	}
+	document.getElementById("no-comments").style.display="none";
 	var commentsDiv = document.getElementById("old_comments"),
 		total_points = 0,			// suma total de puntos
 		n_comments = 0;				// número de comentarios con puntiación
@@ -459,6 +457,7 @@ function postComment() {
 	}
 	/* Mostrar el resultado de la publicación */
 	function showResult(response,local) {
+		console.log(response);
 		window.onclick = hideResult;
 		var rDiv = document.createElement("div");
 		rDiv.id="result";
