@@ -343,5 +343,5 @@ def add_comment(p, t, s, user, points, content, replyto):
 		memcache.set(key,allcomments)
 		return comment.key().id()	# devuelvo el id del nuevo comentario
 	except:
-		return False
+		return None
 
