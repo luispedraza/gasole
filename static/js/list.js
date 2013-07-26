@@ -395,15 +395,16 @@ function processData(info) {
 		var table = document.getElementById("table-data"),
 			cities = [],
 			today = new Date(),
-			pdata, tdata, sdata, t_ref, t_link, s_tlink;
+			pdata, tdata, sdata, t_ref, t_link, s_tlink,
+			p_ref = encodeName(province);
 		table.innerHTML = "";
 		for (var p in data) {
 			pdata = data[p];
 			for (var t in pdata) {
 				tdata = pdata[t];
 				t_ref = encodeName(t);
-				t_link = "/gasolineras/"+province+"/"+t_ref // enlace a una ciudad
-				s_link = "/ficha/"+province+"/"+t_ref+"/"	// stub de enlacae a una gasolinera
+				t_link = "/gasolineras/"+p_ref+"/"+t_ref // enlace a una ciudad
+				s_link = "/ficha/"+p_ref+"/"+t_ref+"/"	// stub de enlace a una gasolinera
 				cities.push([t, t_link]);						// nueva ciudad
 				for (var s in tdata) {
 					sdata = tdata[s];
