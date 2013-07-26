@@ -341,7 +341,7 @@ def add_comment(p, t, s, user, points, content, replyto):
 		allcomments = get_comments(p,t,s)
 		allcomments.append(format_comment(comment))
 		memcache.set(key,allcomments)
-		return True
+		return comment.key().id()	# devuelvo el id del nuevo comentario
 	except:
 		return False
 

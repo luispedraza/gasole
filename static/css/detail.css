@@ -533,6 +533,9 @@ div.error {
 	text-align: center;
 	height: 1.2em;
 }
+.c_comment.strong {
+	box-shadow: 0 0 5px #3399CC;
+}
 
 
 

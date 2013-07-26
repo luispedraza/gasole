@@ -268,8 +268,9 @@ class CommentsApi(BaseAuthHandler):
         if not captcha_result.is_valid:
              result["recaptcha_response_field"] = u"La solución del captcha no es correcta."
         if not len(result):
-            if add_comment(pname, tname, sname, user, points, content, replyto):
-                result["OK"] = u"El comentario se ha publicado con éxito."
+            new_id = add_comment(pname, tname, sname, user, points, content, replyto)
+            if new_id!=None:
+                result["OK"] = new_id
             else:
                 result["ERROR"] = u"Por un problema en el servidor no se ha podido guardar el comentario. Por favor, inténtalo de nuevo más tarde."
         self.response.headers['Content-Type'] = 'application/json; charset=utf-8'
@@ -299,7 +300,7 @@ class Info(BaseAuthHandler):
     def get(self, section):
         content_html = ""
         scripts = ""
-        styles = ""
+        styles = ["/css/info.css"]
         if section=="combustibles":
             content_html="info_combustibles.html"
         elif section=="tarjetas":

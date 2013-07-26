@@ -456,7 +456,6 @@ addEvent(window,"load", function() {
 			var rDiv = document.createElement("div");
 			rDiv.id="result";
 			if (response.hasOwnProperty("OK")) {
-				getApiData("comments", fillComments, true);
 				rDiv.innerHTML = "<p>Gracias. Tu comentario ha sido publicado y se mostrará en unos instantes.</p><div class='bullets'></div>";
 				var Nbullet=0;
 				var interval = setInterval(function() {
@@ -466,7 +465,16 @@ addEvent(window,"load", function() {
 						clearInterval(interval);
 						hideResult();	
 					} 
-				},1000)
+				},1000);
+				// Los nuevos comentarios
+				var newID = response["OK"];
+				getApiData("comments", function(d) {
+					fillComments(d);
+					var newComment = document.getElementById("comment-"+newID);
+					newComment.scrollIntoView();
+					newComment.className="c_comment strong";
+				}, true);
+				
 			} else {
 				Recaptcha.reload();
 				rDiv.className = "e";
