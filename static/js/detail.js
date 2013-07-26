@@ -445,21 +445,30 @@ function amChart(chartData) {
 addEvent(window,"load", function() {
 	/* Enviar un nuevo comentario */
 	function postComment(e) {
+		/* Ocultar el resultado de la publicación */
+		function hideResult() {
+			document.body.removeChild(document.getElementById("result-container"));
+			window.onclick = null;
+		}
 		/* Mostrar el resultado de la publicación */
 		function showResult(response) {
-			var rCont = document.createElement("div");
-			rCont.id="result-container";
-			document.body.appendChild(rCont);
-			window.onclick = function() {
-				document.body.removeChild(document.getElementById("result-container"));
-				window.onclick = null;
-			};
+			window.onclick = hideResult;
 			var rDiv = document.createElement("div");
 			rDiv.id="result";
 			if (response.hasOwnProperty("OK")) {
 				getApiData("comments", fillComments, true);
-				rDiv.innerHTML = "<p>Gracias. Tu comentario ha sido publicado.</p>";
+				rDiv.innerHTML = "<p>Gracias. Tu comentario ha sido publicado y se mostrará en unos instantes.</p><div class='bullets'></div>";
+				var Nbullet=0;
+				var interval = setInterval(function() {
+					Nbullet++;
+					document.getElementById("result").getElementsByClassName("bullets")[0].innerHTML+="&#8226;";
+					if (Nbullet==4){
+						clearInterval(interval);
+						hideResult();	
+					} 
+				},1000)
 			} else {
+				Recaptcha.reload();
 				rDiv.className = "e";
 				rDiv.innerHTML = "<p>Se han detectado errores en el formulario:</p>";
 				for (var e in response) {
@@ -471,14 +480,18 @@ addEvent(window,"load", function() {
 					else {
 						field = document.getElementById(e);
 						field.className = "error";	
-					} 
+					}
 					addEvent(field,"focus",resetError);
 					var newE = document.createElement("div");
 					newE.id = "em_"+e;
 					newE.textContent = response[e];
 					rDiv.appendChild(newE);
 				}
+				rDiv.innerHTML+="<div class='button'>De acuerdo, me ha quedado claro</div>";
 			}
+			var rCont = document.createElement("div");
+			rCont.id="result-container";
+			document.body.appendChild(rCont);
 			rCont.appendChild(rDiv);
 		}
 		stopEvent(e);
@@ -536,5 +549,5 @@ addEvent(window,"load", function() {
 		getApiData("history", amChart);
 	}
 	document.getElementById("send_comment").onclick = postComment;
-	// document.getElementById("comment-form").action = postComment;
+	getApiData("comments", fillComments, false);
 })

@@ -497,7 +497,7 @@ div.error {
 	right: 0;
 	bottom: 0;
 	background: rgb(30, 30, 30); /* The Fallback */
-   	background: rgba(30, 30, 30, 0.8); 
+   	background: rgba(30, 30, 30, 0.8);
 }
 #result {
 	width: 400px;
@@ -505,20 +505,35 @@ div.error {
 	margin-left: auto;
 	margin-right: auto;
 	background-color: #3399CC;
-	border-radius: 5px;
-	padding: 10px;
+	border-radius: 3px;
+	padding: 30px;
 	color: #fff;
+	font-size: 1.2em;
 }
 #result.e {
 	background-color: #d24e33;
 }
 #result.e div {
-	margin-left: 15px;
 	padding: 5px;
 	margin-bottom: 3px;
 	color: #d24e33;
 	background-color: #fff;
+	border-radius: 3px;
 }
+#result div.bullets {
+	height: 2.5em;
+	font-size: 2em;
+	text-align: center;
+}
+#result.e div.button {
+	margin-top: 20px;
+	background-color: transparent;
+	color: #fff;
+	outline: 1px solid #fff;
+	text-align: center;
+	height: 1.2em;
+}
+
 
 
 
