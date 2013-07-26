@@ -63,7 +63,7 @@ class BaseHandler(webapp2.RequestHandler):
 	def initialize(self, *a, **kw):
 		webapp2.RequestHandler.initialize(self, *a, **kw)
 		self.user = users.get_current_user()
-		logging.info("Usuario: %s" %self.user)
+		# logging.info("Usuario: %s" %self.user)
 
 	def render_json(self, d):
 		json_txt = json.dumps(d)

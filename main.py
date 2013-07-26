@@ -29,10 +29,6 @@ def toc():
 def decode_param(s):
     return s.decode('utf-8').replace("_", " ").replace("|", "/")
 
-def remove_html_tags(data):
-    p = re.compile(r'<.*?>')
-    return p.sub('', data)
-
 def get_points(s):
     try:
         return int(s)
@@ -216,6 +212,11 @@ class StationApi(BaseAuthHandler):
 
 #api de comentarios de una gasolinera
 class CommentsApi(BaseAuthHandler):
+    def remove_html_tags(self,s):
+        p = re.compile(r'<.*?>')
+        return p.sub('', s)
+    def clean_field(self,s):
+        return self.remove_html_tags(urllib.unquote(s).strip())
     def get(self,p,t,s):
         self.response.headers['Content-Type'] = 'application/json; charset=utf-8'
         comments = get_comments(decode_param(p), decode_param(t), decode_param(s))
@@ -227,52 +228,56 @@ class CommentsApi(BaseAuthHandler):
         tname = decode_param(t)
         sname = decode_param(s)
         # Creación de un nuevo comentario sobre una estación
+        errors = []
         result = {}
         user = None
         if self.logged_in:
             user = self.current_user
         else:
-            name=remove_html_tags(self.request.get("c_name").strip())
+            name=self.clean_field(self.request.get("c_name"))
             if not name:
-                result["c_name"] = u"Debes indicar tu nombre en el comentario."
-            email=self.request.get("c_email").strip().lower()
+                errors.append("no_name")
+            email=self.clean_field(self.request.get("c_email")).lower()
             if not email:
-                result["c_email"] = u"Debes indicar tu dirección de correo electrónico (no será guardada ni mostrada)."
+                errors.append("no_email")
             elif not is_email_valid(email):
-                result["c_email"] = u"La dirección de correo electrónico no es válida."
-            if not len(result):
+                errors.append("nv_email")
+            if not len(errors):
                 hashemail = md5(email).hexdigest()
                 avatar = "http://www.gravatar.com/avatar/"+hashemail+"?s=100&d="+urllib.quote_plus(u'http://www.gasole.net/img/avatar.png')
-                link = self.request.get("c_link").strip()
+                link = self.clean_field(self.request.get("c_link"))
                 self._on_signin({'name':name,'link':link,'avatar':avatar,'id':hashemail}, None, provider='gasole',redirect=False)
                 user = self.current_user
                 self.auth.unset_session()
-
         replyto = self.request.get("c_replyto")
         points = None
         if not replyto:
             points=get_points(self.request.get("c_points"))
             if not points:
-                result["c_points"] = u"Olvidaste valorar esta gasolinera."
+                errors.append("no_points")
             else:
                 points=int(points)
-        content=remove_html_tags(self.request.get("c_content").strip())
+        content=self.clean_field(self.request.get("c_content"))
         if not content:
-            result["c_content"] = u"El texto del comentario está vacío."
-        challenge_field = self.request.get("recaptcha_challenge_field")
-        response_field = self.request.get("recaptcha_response_field")
-        captcha_result = verifyCaptcha(
-            challenge_field=challenge_field,
-            response_field=response_field,
-            remote_ip=self.request.remote_addr)
-        if not captcha_result.is_valid:
-             result["recaptcha_response_field"] = u"La solución del captcha no es correcta."
-        if not len(result):
+            errors.append("no_content")
+        challenge_field = self.clean_field(self.request.get("recaptcha_challenge_field"))
+        response_field = self.clean_field(self.request.get("recaptcha_response_field"))
+        try:
+            captcha_result = verifyCaptcha(
+                challenge_field=challenge_field,
+                response_field=response_field,
+                remote_ip=self.request.remote_addr)
+            if not captcha_result.is_valid:
+                errors.append("bad_captcha")
+        except:
+            errors.append("err_captcha")
+        if not len(errors):
             new_id = add_comment(pname, tname, sname, user, points, content, replyto)
             if new_id!=None:
                 result["OK"] = new_id
             else:
-                result["ERROR"] = u"Por un problema en el servidor no se ha podido guardar el comentario. Por favor, inténtalo de nuevo más tarde."
+                errors.append("server_error")
+        result["ERROR"] = errors
         self.response.headers['Content-Type'] = 'application/json; charset=utf-8'
         self.write(json.dumps(result))
 

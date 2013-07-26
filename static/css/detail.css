@@ -287,8 +287,7 @@
 	padding: 3px;
 	float: right;
 }
-#c_points_div.perror, #comments input[type=text].error, #comments input[type=email].error, #comments textarea.error {
-	border: 1px solid #d24e33;
+.error {
 	box-shadow: 0 0 12px #d24e33;
 }
 #comments input[type=text].ok, #comments input[type=email].ok, #comments textarea.ok {
@@ -297,13 +296,16 @@
 p.info {
 	float: left;
 }
-div.error {
+div.warning {
 	float: right;
 	color: #d24e33;
 	width: 194px;
 	font-size: .8em;
 	display: none;
 	margin-top: 2px;
+}
+.error + div.warning {
+	display: block;
 }
 #comments input[type=submit] {
 	width: 100%;
@@ -323,25 +325,26 @@ div.error {
 }
 
 #replyto {
+	background-color: #333;
+	border-radius: 3px;
 	display: none;
-	background-color: white;
-	color: black;
-	padding: 10px;
+	color: #fff;
+	padding: 5px;
 	margin-top: 5px;
-	border: 1px solid #333;
-}
-#replyto_name {
-	border-bottom: 1px dotted #333;
 }
 #replyto_msg {
 	max-height: 100px;
 	overflow: scroll;
-	margin-top: 10px;
+	padding: 5px;
+	background-color: #fff;
+	color: #333;
+	margin-top: 5px;
 }
 #replyto_cancel {
 	font-size: .8em;
 	padding: 3px;
 	float: right;
+	border: 1px solid #ccc;
 }
 
 #c_points {
@@ -362,11 +365,15 @@ div.error {
 	     -o-transition: all .25s linear;
 	        transition: all .25s linear;
 }
-#section_points div.sel{
+#c_points_text {
+	opacity: 0;
 	color: #3399CC;
 	float: right;
 	width: 194px;
 	margin-top: 2px;
+}
+#c_points_text.sel {
+	opacity: 1;
 }
 .star {
 	margin: 0;
@@ -404,6 +411,9 @@ div.error {
 }
 .button:hover {
 	background-color: #555;
+}
+.button:active {
+	background-color: #000;
 }
 
 #recaptcha_image {
@@ -522,7 +532,7 @@ div.error {
 }
 #result div.bullets {
 	height: 2.5em;
-	font-size: 2em;
+	font-size: .5em;
 	text-align: center;
 }
 #result.e div.button {
@@ -536,9 +546,3 @@ div.error {
 .c_comment.strong {
 	box-shadow: 0 0 5px #3399CC;
 }
-
-
-
-
-
-

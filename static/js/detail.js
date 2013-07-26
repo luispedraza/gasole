@@ -4,68 +4,93 @@ var POINTS = [
 				"Está bien en general",			// 3
 				"Muy recomendable",				// 8
 				"¡Excelente!"					// 10
-			]
+			];
+var POST_ERRORS = {
+	"no_name": ["c_name","Debes indicar tu nombre en el comentario."],
+	"no_email": ["c_email","Debes indicar tu dirección de correo electrónico (no será guardada ni mostrada)."],
+	"nv_email": ["c_email","La dirección de correo electrónico no es válida."],
+	"no_points": ["c_points","Olvidaste valorar esta gasolinera."],
+	"no_content": ["c_content","El texto del comentario está vacío."],
+	"bad_captcha": ["recaptcha_response_field","La solución del captcha no es correcta."],
+	"err_captcha": [null,"No se ha podido verificar el captcha. Por favor, inténtalo de nuevo más tarde."],
+	"server_error": [null,"Por un problema en el servidor no se ha podido guardar el comentario. Por favor, inténtalo de nuevo más tarde."]
+}
 var gasole = null;			// todo gasole
 var sdata = null;			// esta estación
 var map = null;				// el mapa
 var candidateMark = null; 	// marcador de gasolinera propuesta por el recomendador
 var moreR = 5;				// Radio de búsqueda para gasolineras alternativas
 
+function initPoints() {
+	var timeOut=null,
+		sDiv=document.getElementById("c_points_div"),
+		mDiv=document.getElementById("c_points_text"),
+		points=document.getElementById("c_points");
+	function selStar(i){
+		var stars = sDiv.getElementsByClassName("star");
+		for (var s=0; s<stars.length; s++) {
+			var id=parseInt(stars[s].id.split("_")[1]);
+			stars[s].className="sprt star s"+((id<=i) ? "on" : "off");
+		}
+	}
+	sDiv.innerHTML="";
+	for (var s=0; s<5; s++) {
+		var star = document.createElement("div");
+		star.className = "sprt star soff";
+		star.id = "star_"+s;
+		addEvent(star,"mouseout", function() {
+			var val = points.value;
+			if (!val){
+				timeOut = setTimeout(function() {
+					sDiv.className="error";
+					mDiv.className="";
+					selStar(-1);
+				}, 500);
+			}
+			else {
+				val = parseInt(val)-1;
+				selStar(val);
+				sDiv.className="";
+				mDiv.textContent = POINTS[val];
+			}
+		});
+		addEvent(star,"mouseover", function() {
+			if (timeOut) clearTimeout(timeOut);
+			sDiv.className = "";
+			var id = this.id.split("_")[1];
+			selStar(parseInt(id));
+			mDiv.textContent= POINTS[id];
+			mDiv.className = "sel";
+		});
+		addEvent(star,"click", function() {
+			var id = this.id.split("_")[1];
+			points.value = parseInt(id)+1;
+			mDiv.className = "sel";
+		});
+		sDiv.appendChild(star);
+	}
+}
 function resetError() {
 	this.className = this.className.replace("error", "");
 }
-function onBlurName(d) {
-	var val = clearHtmlTags(d.value);
-	d.value = val;
-	var de = document.getElementById("error_"+d.id);
-	if (!val.length) {
-		d.className = "error";
-		de.style.display = "block";
-		de.textContent = "Debes indicar tu nombre";
-	}
-	else {
-		d.className = "ok";
-		de.style.display = "none";
-	}
+function onBlurName() {
+	var val = clearHtmlTags(this.value);
+	this.value = val;
+	this.className = ((!val.length) ? "error": "ok");
 }
-function onBlurEmail(d) {
+function onBlurEmail() {
 	function validEmail(s) {
 		var re = new RegExp("[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?");
 		return re.test(s);
 	}
-	var val = clearHtmlTags(d.value);
-	d.value = val;
-	var de = document.getElementById("error_"+d.id);
-	if (!val.length) {
-		de.textContent = "Debes indicar tu e-mail";
-	}
-	else {
-		val = val.toLowerCase().replace(/^\s+|\s+$/g,'');
-		if (validEmail(val)) {
-			d.value = val;
-			d.className = "ok";
-			de.style.display = "none";
-			return;
-		} else {
-			de.textContent = "El e-mail no parece válido";
-		}
-	}
-	d.className = "error";
-	de.style.display = "block";
+	var val = clearHtmlTags(this.value.toLowerCase().replace(/^\s+|\s+$/g,''));
+	this.value = val;
+	this.className = ((!val.length)|| (!validEmail(val))) ? "error" : "ok";
 }
-function onBlurContent(d) {
-	var val = clearHtmlTags(d.value);
-	d.value = val;
-	var de = document.getElementById("error_"+d.id);
-	if (!val.length) {
-		de.textContent = "¡No olvides escribir tu comentario!";
-		d.className = "error";
-		de.style.display = "block";
-	}
-	else {
-		de.style.display ="none";
-		d.className = "ok";
-	}
+function onBlurContent() {
+	var val = clearHtmlTags(this.value);
+	this.value = val;
+	this.className = (!val.length) ? "error" : "ok";
 }
 // Información relacionada con un tipo de precio
 function showMore() {
@@ -153,176 +178,113 @@ function showMore() {
 		rel.className = rel.className.replace(" on", "");
 	}
 }
-function fillReplyTo(id) {
-	var comment = document.getElementById("comment-"+id);
-	document.getElementById("replyto_name").innerHTML = comment.getElementsByClassName("c_name")[0].textContent.bold();
-	document.getElementById("replyto_msg").innerHTML = comment.getElementsByClassName("c_content")[0].innerHTML;
-	document.getElementById("replyto").style.display = "block";
-	document.getElementById("comments").scrollIntoView();
-	document.getElementById("c_replyto").value = id;
-	document.getElementById("section_points").style.display = "none";
-	addEvent(document.getElementById("replyto_cancel"),"click", function() {
-		document.getElementById("replyto").style.display = "none";
-		document.getElementById("replyto_name").innerHTML = "";
-		document.getElementById("replyto_msg").innerHTML = "";
-		document.getElementById("c_replyto").value = "";
-		document.getElementById("section_points").style.display = "block";
-	})
-}
-
 /* Rellena los comentarios de la gasolinera */
 function fillComments(comments) {
-	console.log(comments);
-	/* rellena una valoración basada en la puntuación */
-	function fillStars(div, p) {
-		p--;
-		div.innerHTML = "<p>"+POINTS[p]+"</p>";
-		div.className = "c_points";
-		for (var s=0; s<5; s++) {
-			var star = document.createElement("div");
-			star.className = "sprt star_mini";
-			star.className += (s<=p) ? " son" : " soff";
-			div.appendChild(star);
-		}
+	function fillReplyTo() {
+		/* Para contestar a un comentario existente */
+		var id=this.id.split("-")[1];
+			comment = document.getElementById("comment-"+id),
+			dName=document.getElementById("replyto_name"),
+			dMsg=document.getElementById("replyto_msg"),
+			dReplyTo=document.getElementById("replyto"),
+			inputReplyTo=document.getElementById("c_replyto"),
+			dPoints=document.getElementById("section_points");
+		dName.innerHTML = comment.getElementsByClassName("c_name")[0].textContent.bold();
+		dMsg.innerHTML = comment.getElementsByClassName("c_content")[0].innerHTML;
+		inputReplyTo.value = id;
+		dReplyTo.style.display = "block";
+		dPoints.style.display = "none";
+		document.getElementById("replyto_cancel").onclick = function() {
+			// cancela contestar a un comentario
+			dName.innerHTML = "";
+			dMsg.innerHTML = "";
+			inputReplyTo.value = "";
+			dReplyTo.style.display = "none";
+			dPoints.style.display = "block";
+		};
+		document.getElementById("comments").scrollIntoView();
 	}
-	if (comments.length==0) {
+	function fillStars(div,p) {
+		/* rellena una valoración basada en la puntuación */
+		div.innerHTML = "<p>"+POINTS[--p]+"</p>";
+		div.className = "c_points";
+		for (var s=0; s<5; s++) 
+			div.innerHTML+="<div class='sprt star_mini s"+((s<=p) ? "on" : "off")+"'></div>";
+	}
+	var clen=comments.length;
+	if (clen==0) {
 		document.getElementById("no-comments").style.display="block";
 		return;
 	}
-	var commentsDiv = document.getElementById("old_comments");
+	var commentsDiv = document.getElementById("old_comments"),
+		total_points = 0,			// suma total de puntos
+		n_comments = 0;				// número de comentarios con puntiación
 	commentsDiv.innerHTML="";
-	var total_points = 0;
-	var n_comments = 0;
-	var comments_length = comments.length;
-	for (var c=0; c<comments_length; c++) {
+	for (var c=0; c<clen; c++) {
+		var comment=comments[c],
+			points=comment.points,
+			name=comment.name,
+			link=comment.link,
+			title=comment.title,
+			id=comment.id,
+			replyto=comment.replyto;
 		var newCommentBlock = document.createElement("div");
-		newCommentBlock.className = "c_block";
-		newCommentBlock.id = "block-"+comments[c].id;
-
+			newCommentBlock.className = "c_block";
+			newCommentBlock.id = "block-"+id;
 		var newComment = document.createElement("div");
-		newComment.className = "c_comment";
-		newComment.id = "comment-"+comments[c].id;
-
+			newComment.className = "c_comment";
+			newComment.id = "comment-"+id;
 		var newCAvatar = document.createElement("img");
-		newCAvatar.className = "c_avatar";
-		newCAvatar.src = comments[c].avatar;
-		newComment.appendChild(newCAvatar);
-
-		var points = comments[c].points;
+			newCAvatar.className = "c_avatar";
+			newCAvatar.src = comment.avatar;
+			newComment.appendChild(newCAvatar);
 		if (points) {
-			points = parseInt(points);
 			total_points+=points;
+			n_comments++;
+			points = parseInt(points);
 			var newCPoints = document.createElement("div");
 			fillStars(newCPoints,points);
 			newComment.appendChild(newCPoints);
-			n_comments++;
 		}
 		var newCName = document.createElement("div");
-		newCName.className = "c_name";
-		if (comments[c].link) newCName.innerHTML = "<a href='" + comments[c].link + "' rel='external nofollow'>"+comments[c].name+"</a>";
-		else newCName.textContent = comments[c].name;
-		newComment.appendChild(newCName);
+			newCName.className = "c_name";
+			newCName.innerHTML = link ? ("<a href='"+link+"' rel='external nofollow'>"+name+"</a>") : name;
+			newComment.appendChild(newCName);
 		var newCDate = document.createElement("div");
-		newCDate.className = "c_date";
-		newCDate.textContent = new Date(comments[c].date).toLocaleDateString();
-		newComment.appendChild(newCDate);
-		
-		if (comments[c].title) {
+			newCDate.className = "c_date";
+			newCDate.textContent = new Date(comment.date).toLocaleDateString();
+			newComment.appendChild(newCDate);
+		if (title) {
 			var newCTitle = document.createElement("div");
-			newCTitle.className = "c_title";
-			newCTitle.textContent = comments[c].title;
-			newComment.appendChild(newCTitle);	
+				newCTitle.className = "c_title";
+				newCTitle.textContent = title;
+				newComment.appendChild(newCTitle);	
 		}
-		
 		var newCContent = document.createElement("div");
-		newCContent.className = "c_content";
-		newCContent.innerHTML = comments[c].content.replace(/\n/g, "<br>");
-		newComment.appendChild(newCContent);
-
+			newCContent.className = "c_content";
+			newCContent.innerHTML = comment.content.replace(/\n/g, "<br>");
+			newComment.appendChild(newCContent);
 		var newCReply = document.createElement("div");
-		newCReply.textContent = "responder…";
-		newCReply.className = "reply button";
-		newCReply.id = "replyto-"+comments[c].id;
-		addEvent(newCReply,"click", function(e) {
-			var id = this.id.split("-")[1];
-			fillReplyTo(id);
-		})
-		newComment.appendChild(newCReply);
-		// Inserto el comentario en el block:
-		newCommentBlock.appendChild(newComment);
-		// Div auxiliar para respuestas:
-		var newCReplies = document.createElement("div");
-		newCReplies.id = "replies-"+comments[c].id;
-		newCReplies.className = "replies";
-		newCommentBlock.appendChild(newCReplies);
-
+			newCReply.textContent = "responder…";
+			newCReply.className = "reply button";
+			newCReply.id = "replyto-"+id;
+			addEvent(newCReply,"click",fillReplyTo);
+			newComment.appendChild(newCReply);
+		newCommentBlock.appendChild(newComment);			// inserción del comentario en el bloque
+		var newCReplies = document.createElement("div");	// div auxiliar para respuestas
+			newCReplies.id = "replies-"+id;
+			newCReplies.className = "replies";
+			newCommentBlock.appendChild(newCReplies);
 		// Inserto el comentario
-		if (comments[c].replyto) {
-			document.getElementById("replies-"+comments[c].replyto).appendChild(newCommentBlock);
-		} else {
-			commentsDiv.appendChild(newCommentBlock);	
-		}
+		if (replyto) document.getElementById("replies-"+replyto).appendChild(newCommentBlock);
+		else commentsDiv.appendChild(newCommentBlock);
 	}
-	if (total_points!=0) {
-		// var points = Math.round(total_points/n_comments);
-		// document.getElementById("points").innerHTML = points.toFixed(1) + " (" + n_comments + " valoraciones)";
-		fillStars(document.getElementById("points"), Math.round(total_points/n_comments));
-	}
+	if (total_points) fillStars(document.getElementById("points"), Math.round(total_points/n_comments));
 }
 /* Procesamiento de los datos de la gasolinera */
 function processData(info) {
 	/* Eventos para valoración de una gasolinera */
-	(function initPoints() {
-		var timeOut=null;
-		function selStar(i){
-			var stars = document.getElementById("c_points_div").getElementsByClassName("star");
-			for (var s=0; s<stars.length; s++) {
-				var id=parseInt(stars[s].id.split("_")[1]);
-				var cname = stars[s].className;
-				if (id<=i) stars[s].className = cname.replace("off", "on");
-				else stars[s].className = cname.replace("on", "off");
-			}
-		}
-		var stars = document.getElementById("c_points_div");
-		for (var s=0; s<5; s++) {
-			var star = document.createElement("div");
-			star.className = "sprt star soff";
-			star.id = "star_"+s;
-			stars.appendChild(star);
-			addEvent(star,"mouseout", function() {
-				var val = document.getElementById("c_points").value;
-				var msg = document.getElementById("c_points_text");
-				if (!val){
-					timeOut = setTimeout(function() {
-						msg.textContent = "Debes asignar una puntuación";
-						msg.className = "error";
-						msg.style.display = "block";
-						selStar(-1);
-					}, 500);
-				}
-				else {
-					val = parseInt(val)-1;
-					selStar(val);
-					msg.textContent = POINTS[val];
-					msg.className = "sel";
-				}
-			});
-			addEvent(star,"mouseover", function() {
-				if (timeOut) clearTimeout(timeOut);
-				document.getElementById("c_points_div").className = "";
-				var id = this.id.split("_")[1];
-				selStar(parseInt(id));
-				var msg = document.getElementById("c_points_text");
-				msg.textContent = POINTS[id];
-				msg.className = "sel";
-			});
-			addEvent(star,"click", function() {
-				var id = this.id.split("_")[1];
-				document.getElementById("c_points").value = parseInt(id)+1;
-				document.getElementById("c_points_text").className = "sel";
-			});
-		}
-	})();
+	initPoints();
 	/* Inicializa el mapa */
 	(function initMap(latlon) {
 		var mapdiv = document.getElementById("map");
@@ -384,8 +346,10 @@ function processData(info) {
 	})(info.i.o);
 	// relleno de http:// en c_link
 	var clink = document.getElementById("c_link");
-	addEvent(clink,"click", function() {if (this.value == "") this.value = "http://";});
-	addEvent(clink,"blur", function() {if (this.value == "http://") this.value = "";});
+	if (clink) {
+		addEvent(clink,"click", function() {if (this.value == "") this.value = "http://";});
+		addEvent(clink,"blur", function() {if (this.value == "http://") this.value = "";});	
+	}
 }
 function amChart(chartData) {
 	var chart;
@@ -441,121 +405,113 @@ function amChart(chartData) {
     // WRITE
     chart.write("chart");
 }
-
-addEvent(window,"load", function() {
-	/* Enviar un nuevo comentario */
-	function postComment(e) {
-		/* Ocultar el resultado de la publicación */
-		function hideResult() {
-			document.body.removeChild(document.getElementById("result-container"));
-			window.onclick = null;
+/* Enviar un nuevo comentario */
+function postComment() {
+	var form = this;
+	// Limpieza del formulario
+	function clearForm() {
+		var elements = form.elements;
+		for (var i=0;i<elements.length;i++) {
+			var e=elements[i];
+			if (e.type!="submit") e.value=e.className="";
 		}
-		/* Mostrar el resultado de la publicación */
-		function showResult(response) {
-			window.onclick = hideResult;
-			var rDiv = document.createElement("div");
-			rDiv.id="result";
-			if (response.hasOwnProperty("OK")) {
-				rDiv.innerHTML = "<p>Gracias. Tu comentario ha sido publicado y se mostrará en unos instantes.</p><div class='bullets'></div>";
-				var Nbullet=0;
-				var interval = setInterval(function() {
-					Nbullet++;
-					document.getElementById("result").getElementsByClassName("bullets")[0].innerHTML+="&#8226;";
-					if (Nbullet==4){
+		initPoints();
+		Recaptcha.reload();
+		var replyBtn = document.getElementById("replyto_cancel");
+		if (replyBtn && replyBtn.onclick) replyBtn.onclick();	// para limpiar respuesta a 
+	}
+	/* Ocultar el resultado de la publicación */
+	function hideResult() {
+		document.body.removeChild(document.getElementById("result-container"));
+		window.onclick = null;
+	}
+	/* Mostrar el resultado de la publicación */
+	function showResult(response) {
+		console.log(response);
+		window.onclick = hideResult;
+		var rDiv = document.createElement("div");
+		rDiv.id="result";
+		if (response.hasOwnProperty("OK")) {
+			clearForm();	// limpiamos el formulario
+			rDiv.innerHTML = "<p>Gracias. Tu comentario ha sido publicado y se mostrará en unos instantes.</p><div class='bullets'></div>";
+			var nBullet=0;
+			var interval = setInterval(function() {
+				nBullet++;
+				var rd = document.getElementById("result");
+				if (rd) {
+					var bullet = rd.getElementsByClassName("bullets")[0];
+					bullet.innerHTML+="&#8226;";
+					if (nBullet==40){
 						clearInterval(interval);
-						hideResult();	
-					} 
-				},1000);
-				// Los nuevos comentarios
-				var newID = response["OK"];
-				getApiData("comments", function(d) {
-					fillComments(d);
-					var newComment = document.getElementById("comment-"+newID);
-					newComment.scrollIntoView();
-					newComment.className="c_comment strong";
-				}, true);
-				
-			} else {
-				Recaptcha.reload();
-				rDiv.className = "e";
-				rDiv.innerHTML = "<p>Se han detectado errores en el formulario:</p>";
-				for (var e in response) {
-					var field=null;
-					if (e=="c_points") {
-						field = document.getElementById("c_points_div");
-						field.className = "perror";
+						hideResult();
 					}
-					else {
-						field = document.getElementById(e);
-						field.className = "error";	
-					}
-					addEvent(field,"focus",resetError);
-					var newE = document.createElement("div");
-					newE.id = "em_"+e;
-					newE.textContent = response[e];
-					rDiv.appendChild(newE);
+				} else clearInterval(interval);
+			},50);
+			// Los nuevos comentarios
+			var newID = response["OK"];
+			getApiData("comments", function(d) {
+				fillComments(d);
+				var newComment = document.getElementById("comment-"+newID);
+				newComment.scrollIntoView();
+				newComment.className="c_comment strong";
+			}, true);
+		} else {
+			var errors=response.ERROR;
+			rDiv.className = "e";
+			rDiv.innerHTML = "<p>Se han detectado errores en el formulario:</p>";
+			for (var i=0;i<errors.length;i++) {
+				var e=errors[i],
+					fieldID=POST_ERRORS[e][0],	// campo del formulario
+					emsg=POST_ERRORS[e][1];		// mensaje de error
+				if (fieldID) {
+					var field=document.getElementById(fieldID);
+					field.className = "error";
 				}
-				rDiv.innerHTML+="<div class='button'>De acuerdo, me ha quedado claro</div>";
+				rDiv.innerHTML+=("<div>"+emsg+"</div>");
 			}
-			var rCont = document.createElement("div");
-			rCont.id="result-container";
-			document.body.appendChild(rCont);
-			rCont.appendChild(rDiv);
+			rDiv.innerHTML+="<div class='button'>De acuerdo, me ha quedado claro.</div>";
+			// captcha correcto, no se puede reutilizar
+			if (errors.indexOf("bad_captcha")<0) Recaptcha.reload();
 		}
-		stopEvent(e);
-		console.log("enviando");
-		function encodeParams(dict) {
-			params = ""
-			for (var k in dict) {
-				params += k+"="+dict[k]+"&";
-			}
-			return params;
-		}
-		var req = new XMLHttpRequest();
-		var url = document.URL.replace("ficha", "api/c");
-		req.open("POST", url, true);
-		req.setRequestHeader("content-type", "application/x-www-form-urlencoded; charset=utf-8");
-		req.onload = function(r) {
-			var response = JSON.parse(this.responseText);
-			showResult(response);
-		}
-		var comment = {
-			c_replyto: document.getElementById("c_replyto").value,
-			c_content: document.getElementById("c_content").value,
-			c_points: document.getElementById("c_points").value,
-			recaptcha_response_field: Recaptcha.get_response(),
-			recaptcha_challenge_field: Recaptcha.get_challenge()
-		};
-		if (document.getElementById("user-data")){
-			comment.c_name = document.getElementById("c_name").value;
-			comment.c_email = document.getElementById("c_email").value;
-			comment.c_link = document.getElementById("c_link").value;
-		}
-		req.send(encodeParams(comment));
-		return false;
+		var rCont = document.createElement("div");
+		rCont.id="result-container";
+		document.body.appendChild(rCont);
+		rCont.appendChild(rDiv);
 	}
-	// Resultado de una acción anterior: un comentario
-	var result = document.getElementById("result");
-	if (result) {
-		result.scrollIntoView();
-		if (checkLocalStorage()) localStorage.removeItem(getKey());
+	var elements = form.elements,
+		segments = [];
+	for (var nItem=0; nItem<elements.length; nItem++) {
+		field = elements[nItem];
+		 if (!field.hasAttribute("name")) continue;
+		 segments.push(field.name+"="+encodeURIComponent(clearHtmlTags(field.value)));
 	}
-	var path = decodeArray(window.location.pathname.split("/"));
-	sdata = {'p':path[2], 't': path[3], 's': path[4]};		// toda la información de la estación
-	gasole = new Gasole(function() {
-		sdata.i = this.info[sdata.p][sdata.t][sdata.s];
-		breadCrumb("breadcrumb", sdata.i.l);	// miga de pan del detalle
-		processData(sdata);
-		var title=document.getElementById("maintitle");
-		title.textContent="Ficha de la Gasolinera " + 
-			sdata.i.l + " en " + toTitle(sdata.s) + ", " + toTitle(sdata.t);
-	});
+	var req = new XMLHttpRequest();
+	req.open("POST", document.URL.replace("ficha", "api/c"), true);
+	req.setRequestHeader("content-type", "application/x-www-form-urlencoded; charset=utf-8");
+	req.onload = function(r) {showResult(JSON.parse(this.responseText));}
+	req.send(segments.join("&"));
+	return false;
+}
+addEvent(window,"load", function() {
+	getApiData("comments", fillComments, false);					// los comentarios
+	// Para mostrar los gráficos
 	document.getElementById("chart").onclick = function() {
-		document.getElementById("chart").onclick = null;
+		this.onclick = null;
 		this.className="";
-		this.textContent="";
+		this.innerHTML="";
 		getApiData("history", amChart);
 	}
-	document.getElementById("send_comment").onclick = postComment;
-	getApiData("comments", fillComments, false);
+	var path = decodeArray(window.location.pathname.split("/"));
+	sdata = {'p':path[2], 't': path[3], 's': path[4]};				// toda la información de la estación
+	gasole = new Gasole(function() {
+		sdata.i = this.info[sdata.p][sdata.t][sdata.s];
+		breadCrumb("breadcrumb", sdata.i.l);						// miga de pan del detalle
+		processData(sdata);
+		document.getElementById("maintitle").textContent =
+			"Ficha de la Gasolinera " + sdata.i.l + " en " + toTitle(sdata.s) + ", " + toTitle(sdata.t);
+	});
+	document.getElementById("comment-form").onsubmit = postComment;
+	var field = document.getElementById("c_name"); if (field) field.onblur = onBlurName;
+	field = document.getElementById("c_email"); if (field) field.onblur = onBlurEmail;
+	field = document.getElementById("c_content"); if (field) field.onblur = onBlurContent;
 })
