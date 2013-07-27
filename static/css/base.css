@@ -340,7 +340,7 @@ footer ul a:hover{
 }
 #results-list {
 	max-height: 200px;
-	overflow: scroll;
+	overflow-y: auto;
 	padding-bottom: 10px;
 }
 #results-list li {

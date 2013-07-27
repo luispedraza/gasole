@@ -120,7 +120,7 @@
 	margin-top: 5px;
 	border: 1px solid #fff;
 	max-height: 100px;
-	overflow: auto;
+	overflow-y: auto;
 }
 
 #price-board table .label {
@@ -334,7 +334,7 @@ div.warning {
 }
 #replyto_msg {
 	max-height: 100px;
-	overflow: scroll;
+	overflow-y: auto;
 	padding: 5px;
 	background-color: #fff;
 	color: #333;

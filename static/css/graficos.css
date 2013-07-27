@@ -308,7 +308,7 @@ ul.droplist li.on:hover {
 }
 .on ul.droplist {
   max-height: 350px;
-  overflow-y: scroll;
+  overflow-y: auto;
   border-top: 1px solid #fff;
 }
 
