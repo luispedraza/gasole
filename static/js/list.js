@@ -563,6 +563,7 @@ addEvent(window,"load", function() {
 			gasoleData._data = this.nearData(place);
 			gasoleData._near = place;
 			h1.textContent = "Gasolineras cerca de: " + place.name();
+			document.getElementById("address").value = place.name();
 		}
 		stats = new GasoleStats(gasoleData._data).stats;
 		computeWeights(stats);

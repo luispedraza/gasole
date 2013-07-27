@@ -365,13 +365,6 @@ footer ul a:hover{
 	        transition: max-height .4s;
 	color: #fff;
 }
-
-#search-box .button:hover {
-	opacity: .8;
-}
-#search-box .button:active {
-	background-color: #8B4163;
-}
 #search-form {
 	display: inline-block;
 	margin-left: 10px;
@@ -426,6 +419,12 @@ footer ul a:hover{
 	background-color: #58110E;
 	text-align: center;
 	cursor: pointer;
+}
+#search-box .button:hover {
+	opacity: .8;
+}
+#search-box .button:active {
+	background-color: #8B4163;
 }
 
 /* my-slider */

@@ -1,5 +1,9 @@
 (function(w) {
 	var searchDistance = null;
+	/* Va a por los resultados de búsqueda */
+	function loadLocation(l) {
+		window.location=l+"/"+searchDistance.getvalue()
+	}
 	/* Muestra el spinner de carga */
 	function showLoader() {
 		document.getElementById("results-title").textContent = "Buscando…";
@@ -60,18 +64,18 @@
 					place = encodeURIComponent(addr);
 				if (addr.match(/España$/)) {
 					valid++; added=i;
-					href = "/resultados/"+place+"/"+loc.lat()+"/"+loc.lng()+"/"+searchDistance.getvalue();
+					href = "/resultados/"+place+"/"+loc.lat()+"/"+loc.lng();
 					var newLi = document.createElement("li");
 					var newA = document.createElement("a");
 					newA.href = href;
 					newA.textContent = addr;
-					newA.onclick = function() {window.location=this.href};
+					newA.onclick = function() {loadLocation(this.href)};
 					newLi.appendChild(newA);
 					resultsList.appendChild(newLi);
 					// resultsList.innerHTML+="<li><a href='"+href+"'>"+addr+"</a></li>";
 				}
 			}
-			if (valid==1) window.location=href;
+			if (valid==1) loadLocation(href);
 	 		else if (valid > 1) {
 	 			titleDiv.textContent = "Encontrados "+valid+ " lugares:";
 	 			return;	
@@ -83,6 +87,13 @@
 	function geoCode() {
 		var l = document.getElementById("address").value;
 		if (!l) return;
+		var thePath = window.location.pathname.split("/");
+		if ((thePath[1]=="resultados") && (encodeURIComponent(l)==thePath[2])) {
+			// Ya estoy en la página de resultados, cambiar radio tal vez
+			thePath[thePath.length-1]=searchDistance.getvalue();
+			window.location=thePath.join("/");
+			return;
+		}
 		showLoader();
 		var geocoder = new google.maps.Geocoder();
 		geocoder.geocode({'address': l, 'region': 'es'}, showResult);
@@ -90,7 +101,7 @@
 	}
 	function Slider(div) {
 		this.value = 2.6,
-		this.max = 10,
+		this.max = 20,
 		this.min = 1,
 		this.step = .5,
 		this.candidate = this.value;
