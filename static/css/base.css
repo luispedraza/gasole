@@ -415,8 +415,10 @@ footer ul a:hover{
 	height: 16px;
 	float: right;
 	padding: 5px;
-	border: 1px solid #fff;
-	background-color: #58110E;
+	border-top: 1px solid rgba(255,255,255,.2);
+	border-bottom: 1px solid rgba(0,0,0,.2);
+	background-color: rgba(255,255,255,.1);
+	box-shadow: 0 0 0 1px rgba(0,0,0,.3);
 	text-align: center;
 	cursor: pointer;
 }
@@ -424,7 +426,8 @@ footer ul a:hover{
 	opacity: .8;
 }
 #search-box .button:active {
-	background-color: #8B4163;
+	background-color: rgba(0,0,0,.1);
+	border: 1px solid rgba(0,0,0,.1);
 }
 
 /* my-slider */
