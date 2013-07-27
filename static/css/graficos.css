@@ -478,20 +478,19 @@ li.on .layer-name:before {
   position: absolute;
   bottom: 20px;
   left: 0;
-  width: 30px;
+  width: 200px;
   overflow: visible;
   white-space: nowrap;
   font-size: .8em;
 }
 #raphael .legend .item {
   height: 12px;
+  clear: both;
 }
 #raphael .legend .itempad {
   height: 25px;
+  clear: both;
 }
-/*#raphael .legend .item:before {
-  content: "\25c4";
-}*/
 #raphael .legend div {
   float: left;
 }
@@ -499,9 +498,6 @@ li.on .layer-name:before {
   width: 10px;
   height: 12px;
   margin-right: 5px;
-}
-#raphael .legend .color + div {
-  text-indent: 10px;
 }
 #raphael .legend .colorpad {
     width: 10px;

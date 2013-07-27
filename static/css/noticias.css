@@ -37,8 +37,10 @@
 	float: right;
 }
 .tumblr_description p:first-child:first-letter, .image + p:first-letter {
-	font-size: 2em;
-	padding-bottom: 5px;
+	font-size: 250%;
+    float: left;
+    margin: 10px 4px 0 0;
+    font-weight: bold;
 }
 .tumblr_description p.image {
 	width: 250px;

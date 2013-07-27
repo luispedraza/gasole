@@ -172,6 +172,7 @@ body {
 	display: none;
 }
 #legend {
+	background-color: #333;
 	cursor: help;
 	border: 1px solid #333;
 	width: 300px;
@@ -180,9 +181,11 @@ body {
 	position: absolute;
 	right: 0;
 	height: 16px;
-	-webkit-transition: height .2s ease-in;
-	    -ms-transition: height .2s ease-in;
-	        transition: height .2s ease-in;
+	-webkit-transition: all .2s;
+	   -moz-transition: all .2s;
+	    -ms-transition: all .2s;
+	     -o-transition: all .2s;
+	        transition: all .2s;
 }
 #legend .title {
 	font-size: 1em;
@@ -191,9 +194,12 @@ body {
 }
 #legend .item {
 	color: #333;
-	border-bottom: 1px dotted #333;
 	padding: 5px;
 	width: 100%;
+}
+#legend .item .title {
+	background-color: #333;
+	color: #fff;
 }
 #legend .subitem {
 	padding: 5px;
