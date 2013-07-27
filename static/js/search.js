@@ -61,17 +61,29 @@
 				if (addr.match(/España$/)) {
 					valid++; added=i;
 					href = "/resultados/"+place+"/"+loc.lat()+"/"+loc.lng()+"/"+searchDistance.getvalue();
-					resultsList.innerHTML+="<li><a href='"+href+"'>"+addr+"</a></li>";
+					var newLi = document.createElement("li");
+					var newA = document.createElement("a");
+					newA.href = href;
+					newA.textContent = addr;
+					newA.onclick = function() {window.location=this.href};
+					newLi.appendChild(newA);
+					resultsList.appendChild(newLi);
+					// resultsList.innerHTML+="<li><a href='"+href+"'>"+addr+"</a></li>";
 				}
 			}
 			if (valid==1) window.location=href;
-	 		else if (valid > 1) titleDiv.textContent = "Encontrados "+valid+ " lugares:";
-		} else titleDiv.innerHTML = "No se ha podido encontrar el lugar. Inténtalo de nuevo";
+	 		else if (valid > 1) {
+	 			titleDiv.textContent = "Encontrados "+valid+ " lugares:";
+	 			return;	
+	 		} 
+		}
+		titleDiv.innerHTML = "No se ha podido encontrar el lugar. Inténtalo de nuevo";
 	}
 	/* Codifica una dirección, obteniendo lat y lon */
 	function geoCode() {
-		showLoader();
 		var l = document.getElementById("address").value;
+		if (!l) return;
+		showLoader();
 		var geocoder = new google.maps.Geocoder();
 		geocoder.geocode({'address': l, 'region': 'es'}, showResult);
 		return false;
@@ -120,6 +132,14 @@
 		})
 	}
 	addEvent(w,"load", function() {
+		var menuSearch = document.getElementById("menu-search");
+		addEvent(menuSearch,"click", function(e) {
+			stopEvent(e);
+			this.className="menu search enabled";
+			addEvent(document, "click", function() {
+				menuSearch.className="menu search";
+			})
+		})
 		document.getElementById("search-form").onsubmit=geoCode;
 		document.getElementById("search-b").onclick=geoCode;
 		lockScroll("results-list");

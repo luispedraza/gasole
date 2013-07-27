@@ -322,7 +322,7 @@ footer ul a:hover{
 	height: 20px;
 	margin: 5px;
 }
-.menu.search:hover #search-box {
+.menu.search.enabled #search-box {
 	max-height: 400px;
 }
 .menu.search .sprt.search_icon {
@@ -347,6 +347,8 @@ footer ul a:hover{
 }
 
 #search-box {
+	border: 1px solid #fff;
+	border-top: none;
 	max-height: 0;
 	position: absolute;
 	left: 0;
