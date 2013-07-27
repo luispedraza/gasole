@@ -646,7 +646,7 @@ function breadCrumb(id, label) {
 		var bc = document.createElement("a");
 		bc.className = "bc";
 		if (pathArray[1]=="resultados") {
-			bc.textContent = "Cerca de "+decodeName(pathArray[2]);
+			bc.textContent = "Cerca de "+decodeURIComponent(pathArray[2]);
 			bc.href = "#";
 			div.appendChild(bc);
 			return;

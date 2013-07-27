@@ -100,10 +100,10 @@
 		return false;
 	}
 	function Slider(div) {
-		this.value = 2.6,
+		this.value = 2,
 		this.max = 20,
 		this.min = 1,
-		this.step = .5,
+		this.step = .2,
 		this.candidate = this.value;
 		var slider = this;
 			sliderDiv=document.getElementById(div),
@@ -119,12 +119,12 @@
 		padDiv.style.top = padDiv.style.left = padDiv.style.right = padDiv.style.bottom = 0;
 		sliderDiv.appendChild(padDiv);
 		this.getvalue = function() {return Math.round(this.value/this.step)*this.step;}
-		function updateSlider(v) {
+		this.updateSlider = function(v) {
 			var width = (v-slider.min) * sliderDiv.clientWidth/(slider.max-slider.min);
 			barDiv.style.width = Math.round(width)+"px";
 			barDiv.textContent = "Radio: " + v.toFixed(1) + " km.";
 		}
-		updateSlider(this.value);
+		this.updateSlider(this.value);
 		addEvent(padDiv,"mousemove", function(e) {
 			var width = (e.clientX-2) - this.getBoundingClientRect().left;
 			var newval = slider.min + width * (slider.max-slider.min)/this.clientWidth;
@@ -132,14 +132,14 @@
 			newval = Math.max(slider.min,newval);
 			newval = Math.min(slider.max,newval);
 			slider.candidate = newval;
-			updateSlider(slider.candidate);
+			slider.updateSlider(slider.candidate);
 		});
 		addEvent(padDiv,"click", function(e) {
 			slider.value=slider.candidate;
-			updateSlider(slider.value);
+			slider.updateSlider(slider.value);
 		});
 		addEvent(padDiv,"mouseout", function(e) {
-			updateSlider(slider.value);
+			slider.updateSlider(slider.value);
 		})
 	}
 	addEvent(w,"load", function() {
@@ -155,7 +155,12 @@
 		document.getElementById("search-b").onclick=geoCode;
 		lockScroll("results-list");
 		searchDistance = new Slider("search-d");
-
 		initGeoloc();
+		var thePath = window.location.pathname.split("/");
+		if (thePath[1]=="resultados") {
+			var place = decodeURIComponent(thePath[2]);
+			document.getElementById("address").value = place;
+			searchDistance.updateSlider(parseFloat(thePath[5]));
+		}
 	});
 })(window);
