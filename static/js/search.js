@@ -1,21 +1,5 @@
 (function(w) {
-	var distance = null;
-	/* Ir a por los resultados de búsqueda */
-	function searchLocation (loc) {
-		var lat="", lon="", address="";
-		if (typeof(loc)=="object") {
-			lat = loc.geometry.location.lat();
-			lon = loc.geometry.location.lng();
-			address = encodeURI(loc.formatted_address);
-		} else if (typeof(loc)=="string") {
-			var temp = loc.split("##");
-			address = temp[0];
-			lat = temp[1];
-			lon = temp[2];
-		}
-		var d = document.getElementById("search-d").getAttribute("value");
-		window.location = "/resultados/"+address+"/"+lat+"/"+lon+"/"+distance.getvalue();
-	}
+	var searchDistance = null;
 	/* Muestra el spinner de carga */
 	function showLoader() {
 		document.getElementById("results-title").textContent = "Buscando…";
@@ -62,41 +46,27 @@
 	}
 	/* Muestra los resultados de geolocalización */
 	function showResult(r,s) {
-		console.log(r,s);
 		var resultsDiv = document.getElementById("results");
 		resultsDiv.style.display = "block";
-		var resultsList = document.getElementById("results-list");
+		var resultsList = document.getElementById("results-list"),
+			titleDiv = document.getElementById("results-title");
 		resultsList.innerHTML = "";
 		if (s == google.maps.GeocoderStatus.OK) {
-			var valid=0, added=0;
+			var valid=0, added=0, href;
 			for (var i=0; i<r.length; i++) {
-				var addr = r[i].formatted_address;
+				var rplace = r[i],
+					loc=rplace.geometry.location,
+					addr = rplace.formatted_address,
+					place = encodeURIComponent(addr);
 				if (addr.match(/España$/)) {
-					console.log(typeof(r[i]));
 					valid++; added=i;
-					var newL = document.createElement("li");
-					var newA = document.createElement("a");
-					newL.appendChild(newA);
-					newA.textContent = addr;
-					newA.href = "#";
-					newA.setAttribute("loc", 
-						[r[i].formatted_address, r[i].geometry.location.lat(), r[i].geometry.location.lng()]
-						.join("##"));
-					addEvent(newA,"click", function() {
-						searchLocation(this.getAttribute("loc"));
-					});
-					resultsList.appendChild(newL);
+					href = "/resultados/"+place+"/"+loc.lat()+"/"+loc.lng()+"/"+searchDistance.getvalue();
+					resultsList.innerHTML+="<li><a href='"+href+"'>"+addr+"</a></li>";
 				}
 			}
-			if (valid==1) {
-				searchLocation(r[added]); return;
-			}
-	 		else if (valid > 1) {
-				document.getElementById("results-title").textContent = "Encontrados "+valid+ " lugares:";
-				return;
-			};
-		}
-		resultsList.innerHTML = "<li>No se ha podido encontrar el lugar. Inténtalo de nuevo</li>";
+			if (valid==1) window.location=href;
+	 		else if (valid > 1) titleDiv.textContent = "Encontrados "+valid+ " lugares:";
+		} else titleDiv.innerHTML = "No se ha podido encontrar el lugar. Inténtalo de nuevo";
 	}
 	/* Codifica una dirección, obteniendo lat y lon */
 	function geoCode() {
@@ -151,8 +121,10 @@
 	}
 	addEvent(w,"load", function() {
 		document.getElementById("search-form").onsubmit=geoCode;
+		document.getElementById("search-b").onclick=geoCode;
 		lockScroll("results-list");
-		distance = new Slider("search-d");
+		searchDistance = new Slider("search-d");
+
 		initGeoloc();
 	});
 })(window);

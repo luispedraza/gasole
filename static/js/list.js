@@ -2,8 +2,6 @@ var	gasoleData,		// datos de la api
 	map,			// el mapa de Google
 	place = null,	// El lugar de referenciaa
 	markers=[],	// lista de marcadores sobre el mapa
-	province=null,
-	town=null,
 	markerCenter=null,
 	markerDetail=null,
 	pagerCurrent = null,
@@ -395,11 +393,11 @@ function processData(info) {
 		var table = document.getElementById("table-data"),
 			cities = [],
 			today = new Date(),
-			pdata, tdata, sdata, t_ref, t_link, s_tlink,
-			p_ref = encodeName(province);
+			pdata, tdata, sdata, p_ref, t_ref, t_link, s_tlink;
 		table.innerHTML = "";
 		for (var p in data) {
 			pdata = data[p];
+			p_ref = encodeName(p);
 			for (var t in pdata) {
 				tdata = pdata[t];
 				t_ref = encodeName(t);
@@ -508,12 +506,7 @@ function processData(info) {
 	populateInfo();
 	initControl();
 	updateMarkers();
-	var h1 = document.getElementById("title");
-	if (place) {
-		h1.textContent = "Gasolineras cerca de: " + place.name();
-	}
-	else {
-		h1.textContent = "Gasolineras en " + ((town) ? (prettyName(town) + ", ") : ("la ")) + "provincia de " + prettyName(province);
+	if (!place) {
 		place = new SearchLocations();
 		var	center = bounds.getCenter();
 		place.add("la posición del marcador azul", [center.lat(),center.lng()]);	// el centro de los resultados
@@ -554,20 +547,22 @@ addEvent(window,"load", function() {
 		gasoleData = {"_data": {}};
 		var pathArray = decodeArray(window.location.pathname.split("/"));
 		var option = pathArray[1]; // gasolineras, resultados, ficha
+		var h1 = document.getElementById("title");
 		if (option == "gasolineras") {
-			province  = pathArray[2];
+			var province  = pathArray[2];
 			if (pathArray[3]) {		// si hay ciudad
-				town = pathArray[3];
+				var town = pathArray[3];
 				gasoleData._data[province] = {};
 				gasoleData._data[province][town] = this.info[province][town];
-			} else 
-				gasoleData._data[province] = this.info[province];
+			} else gasoleData._data[province] = this.info[province];
+			h1.textContent = "Gasolineras en " + ((town) ? (prettyName(town) + ", ") : ("la ")) + "provincia de " + prettyName(province);
 		} else if (option == "resultados") {
 			place = new SearchLocations();
-				place.add(pathArray[2], [parseFloat(pathArray[3]),parseFloat(pathArray[4])]);
+			place.add(decodeURIComponent(pathArray[2]), [parseFloat(pathArray[3]),parseFloat(pathArray[4])]);
 			place.radius = parseFloat(pathArray[5]);
 			gasoleData._data = this.nearData(place);
 			gasoleData._near = place;
+			h1.textContent = "Gasolineras cerca de: " + place.name();
 		}
 		stats = new GasoleStats(gasoleData._data).stats;
 		computeWeights(stats);
