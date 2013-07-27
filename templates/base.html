@@ -76,11 +76,14 @@
 			<div class="m_desc news"><div class="sprt arrow a_news"></div>Noticias de actualidad sobre gasolinas, y el mundo de los combustibles en general.</div></li>
 
 		<li class="menu search">
-			<div class="item">Buscador
-			<form action="javascript:geoCode()">
-			<input type="submit" id="search" value="" class="sprt search_icon"></input>
-			<input type="text" id="address" name="address" placeholder="Ej.: Gran Vía 25, Madrid" />
-			</form>
+			<div class="item">
+				<div class="sprt search_icon"></div>
+				<form id="search-form">
+					<div id="current-loc" class="sprt search_gps"></div>
+					<input type="search" id="address" name="address" placeholder="Ej.: Gran Vía 25, Madrid" />
+				</form>
+			
+			
 			</div>
 			<div id="search-box">
 				<div class="sprt arrow a_search"></div>
@@ -89,8 +92,8 @@
 					<ol id="results-list"></ol>
 				</div>
 				<div id="search-options">
-					<div class="my-slider" min="1" max="10" step=".5" id="search-d" value="2"></div>
-					<div id="current-loc"><span class="sprt search_gps"></span> <span>Usar mi posición actual</span></div>
+					<div class="my-slider" id="search-d"></div>
+					<div class="button">Buscar</div>
 				</div><!-- search-options -->
 			</div>
 		</li>
@@ -117,62 +120,62 @@
 	<p>Datos obtenidos del <a href="http://geoportal.mityc.es/hidrocarburos/eess/">Geoportal de Hidrocarburos</a> del Ministerio de Industria, Energía y Turismo de España.</p>
 </div>
 
-<div class="footer_section" style="width: 730px;float: right;">
+<div class="footer_section all_provinces">
 	<h2>Listado de todas las provincias</h2>
 
-<ul id="allprovs">
-	<li class="col1"><a title="Todas las gasolineras de Álava" href="/gasolineras/Álava">Álava</a></li>
-	<li class="col1"><a title="Todas las gasolineras de Albacete" href="/gasolineras/Albacete">Albacete</a></li>
-	<li class="col1"><a title="Todas las gasolineras de Alicante" href="/gasolineras/Alicante">Alicante</a></li>
-	<li class="col1"><a title="Todas las gasolineras de Almería" href="/gasolineras/Almería">Almería</a></li>
-	<li class="col1"><a title="Todas las gasolineras de Asturias" href="/gasolineras/Asturias">Asturias</a></li>
-	<li class="col1"><a title="Todas las gasolineras de Ávila" href="/gasolineras/Ávila">Ávila</a></li>
-	<li class="col1"><a title="Todas las gasolineras de Badajoz" href="/gasolineras/Badajoz">Badajoz</a></li>
-	<li class="col1"><a title="Todas las gasolineras de Illes Balears" href="/gasolineras/Balears_(Illes)">Balears (Illes)</a></li>
-	<li class="col1"><a title="Todas las gasolineras de Barcelona" href="/gasolineras/Barcelona">Barcelona</a></li>
-	<li class="col2 top"><a title="Todas las gasolineras de Burgos" href="/gasolineras/Burgos">Burgos</a></li>
-	<li class="col2"><a title="Todas las gasolineras de Cáceres" href="/gasolineras/Cáceres">Cáceres</a></li>
-	<li class="col2"><a title="Todas las gasolineras de Cádiz" href="/gasolineras/Cádiz">Cádiz</a></li>
-	<li class="col2"><a title="Todas las gasolineras de Cantabria" href="/gasolineras/Cantabria">Cantabria</a></li>
-	<li class="col2"><a title="Todas las gasolineras de Castelló" href="/gasolineras/Castellón_|_Castelló">Castellón / Castelló</a></li>
-	<li class="col2"><a title="Todas las gasolineras de Ceuta" href="/gasolineras/Ceuta">Ceuta</a></li>
-	<li class="col2"><a title="Todas las gasolineras de Ciudad Real" href="/gasolineras/Ciudad_Real">Ciudad Real</a></li>
-	<li class="col2"><a title="Todas las gasolineras de Córdoba" href="/gasolineras/Córdoba">Córdoba</a></li>
-	<li class="col2"><a title="Todas las gasolineras de A Coruña" href="/gasolineras/Coruña_(A)">Coruña (A)</a></li>
-	<li class="col3 top"><a title="Todas las gasolineras de Cuenca" href="/gasolineras/Cuenca">Cuenca</a></li>
-	<li class="col3"><a title="Todas las gasolineras de Girona" href="/gasolineras/Girona">Girona</a></li>
-	<li class="col3"><a title="Todas las gasolineras de Granada" href="/gasolineras/Granada">Granada</a></li>
-	<li class="col3"><a title="Todas las gasolineras de Guadalajara" href="/gasolineras/Guadalajara">Guadalajara</a></li>
-	<li class="col3"><a title="Todas las gasolineras de Guipúzcoa" href="/gasolineras/Guipúzcoa">Guipúzcoa</a></li>
-	<li class="col3"><a title="Todas las gasolineras de Huelva" href="/gasolineras/Huelva">Huelva</a></li>
-	<li class="col3"><a title="Todas las gasolineras de Huesca" href="/gasolineras/Huesca">Huesca</a></li>
-	<li class="col3"><a title="Todas las gasolineras de Jaén" href="/gasolineras/Jaén">Jaén</a></li>
-	<li class="col3"><a title="Todas las gasolineras de León" href="/gasolineras/León">León</a></li>
-	<li class="col4 top"><a title="Todas las gasolineras de Lleida" href="/gasolineras/Lleida">Lleida</a></li>
-	<li class="col4"><a title="Todas las gasolineras de Lugo" href="/gasolineras/Lugo">Lugo</a></li>
-	<li class="col4"><a title="Todas las gasolineras de Madrid" href="/gasolineras/Madrid">Madrid</a></li>
-	<li class="col4"><a title="Todas las gasolineras de Málaga" href="/gasolineras/Málaga">Málaga</a></li>
-	<li class="col4"><a title="Todas las gasolineras de Melilla" href="/gasolineras/Melilla">Melilla</a></li>
-	<li class="col4"><a title="Todas las gasolineras de Murcia" href="/gasolineras/Murcia">Murcia</a></li>
-	<li class="col4"><a title="Todas las gasolineras de Navarra" href="/gasolineras/Navarra">Navarra</a></li>
-	<li class="col4"><a title="Todas las gasolineras de Ourense" href="/gasolineras/Ourense">Ourense</a></li>
-	<li class="col4"><a title="Todas las gasolineras de Palencia" href="/gasolineras/Palencia">Palencia</a></li>
-	<li class="col5 top"><a title="Todas las gasolineras de Las Palmas" href="/gasolineras/Palmas_(Las)">Palmas (Las)</a></li>
-	<li class="col5"><a title="Todas las gasolineras de Pontevedra" href="/gasolineras/Pontevedra">Pontevedra</a></li>
-	<li class="col5"><a title="Todas las gasolineras de La Rioja" href="/gasolineras/Rioja_(La)">Rioja (La)</a></li>
-	<li class="col5"><a title="Todas las gasolineras de Salamanca" href="/gasolineras/Salamanca">Salamanca</a></li>
-	<li class="col5"><a title="Todas las gasolineras de Santa Cruz De Tenerife" href="/gasolineras/Santa_Cruz_De_Tenerife">Santa Cruz De Tenerife</a></li>
-	<li class="col5"><a title="Todas las gasolineras de Segovia" href="/gasolineras/Segovia">Segovia</a></li>
-	<li class="col5"><a title="Todas las gasolineras de Sevilla" href="/gasolineras/Sevilla">Sevilla</a></li>
-	<li class="col5"><a title="Todas las gasolineras de Soria" href="/gasolineras/Soria">Soria</a></li>
-	<li class="col5"><a title="Todas las gasolineras de Tarragona" href="/gasolineras/Tarragona">Tarragona</a></li>
-	<li class="col6 top"><a title="Todas las gasolineras de Teruel" href="/gasolineras/Teruel">Teruel</a></li>
-	<li class="col6"><a title="Todas las gasolineras de Toledo" href="/gasolineras/Toledo">Toledo</a></li>
-	<li class="col6"><a title="Todas las gasolineras de València" href="/gasolineras/Valencia_|_València">Valencia / València</a></li>
-	<li class="col6"><a title="Todas las gasolineras de Valladolid" href="/gasolineras/Valladolid">Valladolid</a></li>
-	<li class="col6"><a title="Todas las gasolineras de Vizcaya" href="/gasolineras/Vizcaya">Vizcaya</a></li>
-	<li class="col6"><a title="Todas las gasolineras de Zamora" href="/gasolineras/Zamora">Zamora</a></li>
-	<li class="col6"><a title="Todas las gasolineras de Zaragoza" href="/gasolineras/Zaragoza">Zaragoza</a></li>
+<ul>
+	<li class="c1"><a title="Todas las gasolineras de Álava" href="/gasolineras/Álava">Álava</a></li>
+	<li class="c1"><a title="Todas las gasolineras de Albacete" href="/gasolineras/Albacete">Albacete</a></li>
+	<li class="c1"><a title="Todas las gasolineras de Alicante" href="/gasolineras/Alicante">Alicante</a></li>
+	<li class="c1"><a title="Todas las gasolineras de Almería" href="/gasolineras/Almería">Almería</a></li>
+	<li class="c1"><a title="Todas las gasolineras de Asturias" href="/gasolineras/Asturias">Asturias</a></li>
+	<li class="c1"><a title="Todas las gasolineras de Ávila" href="/gasolineras/Ávila">Ávila</a></li>
+	<li class="c1"><a title="Todas las gasolineras de Badajoz" href="/gasolineras/Badajoz">Badajoz</a></li>
+	<li class="c1"><a title="Todas las gasolineras de Illes Balears" href="/gasolineras/Balears_(Illes)">Balears (Illes)</a></li>
+	<li class="c1"><a title="Todas las gasolineras de Barcelona" href="/gasolineras/Barcelona">Barcelona</a></li>
+	<li class="c2 top"><a title="Todas las gasolineras de Burgos" href="/gasolineras/Burgos">Burgos</a></li>
+	<li class="c2"><a title="Todas las gasolineras de Cáceres" href="/gasolineras/Cáceres">Cáceres</a></li>
+	<li class="c2"><a title="Todas las gasolineras de Cádiz" href="/gasolineras/Cádiz">Cádiz</a></li>
+	<li class="c2"><a title="Todas las gasolineras de Cantabria" href="/gasolineras/Cantabria">Cantabria</a></li>
+	<li class="c2"><a title="Todas las gasolineras de Castelló" href="/gasolineras/Castellón_|_Castelló">Castellón / Castelló</a></li>
+	<li class="c2"><a title="Todas las gasolineras de Ceuta" href="/gasolineras/Ceuta">Ceuta</a></li>
+	<li class="c2"><a title="Todas las gasolineras de Ciudad Real" href="/gasolineras/Ciudad_Real">Ciudad Real</a></li>
+	<li class="c2"><a title="Todas las gasolineras de Córdoba" href="/gasolineras/Córdoba">Córdoba</a></li>
+	<li class="c2"><a title="Todas las gasolineras de A Coruña" href="/gasolineras/Coruña_(A)">Coruña (A)</a></li>
+	<li class="c3 top"><a title="Todas las gasolineras de Cuenca" href="/gasolineras/Cuenca">Cuenca</a></li>
+	<li class="c3"><a title="Todas las gasolineras de Girona" href="/gasolineras/Girona">Girona</a></li>
+	<li class="c3"><a title="Todas las gasolineras de Granada" href="/gasolineras/Granada">Granada</a></li>
+	<li class="c3"><a title="Todas las gasolineras de Guadalajara" href="/gasolineras/Guadalajara">Guadalajara</a></li>
+	<li class="c3"><a title="Todas las gasolineras de Guipúzcoa" href="/gasolineras/Guipúzcoa">Guipúzcoa</a></li>
+	<li class="c3"><a title="Todas las gasolineras de Huelva" href="/gasolineras/Huelva">Huelva</a></li>
+	<li class="c3"><a title="Todas las gasolineras de Huesca" href="/gasolineras/Huesca">Huesca</a></li>
+	<li class="c3"><a title="Todas las gasolineras de Jaén" href="/gasolineras/Jaén">Jaén</a></li>
+	<li class="c3"><a title="Todas las gasolineras de León" href="/gasolineras/León">León</a></li>
+	<li class="c4 top"><a title="Todas las gasolineras de Lleida" href="/gasolineras/Lleida">Lleida</a></li>
+	<li class="c4"><a title="Todas las gasolineras de Lugo" href="/gasolineras/Lugo">Lugo</a></li>
+	<li class="c4"><a title="Todas las gasolineras de Madrid" href="/gasolineras/Madrid">Madrid</a></li>
+	<li class="c4"><a title="Todas las gasolineras de Málaga" href="/gasolineras/Málaga">Málaga</a></li>
+	<li class="c4"><a title="Todas las gasolineras de Melilla" href="/gasolineras/Melilla">Melilla</a></li>
+	<li class="c4"><a title="Todas las gasolineras de Murcia" href="/gasolineras/Murcia">Murcia</a></li>
+	<li class="c4"><a title="Todas las gasolineras de Navarra" href="/gasolineras/Navarra">Navarra</a></li>
+	<li class="c4"><a title="Todas las gasolineras de Ourense" href="/gasolineras/Ourense">Ourense</a></li>
+	<li class="c4"><a title="Todas las gasolineras de Palencia" href="/gasolineras/Palencia">Palencia</a></li>
+	<li class="c5 top"><a title="Todas las gasolineras de Las Palmas" href="/gasolineras/Palmas_(Las)">Palmas (Las)</a></li>
+	<li class="c5"><a title="Todas las gasolineras de Pontevedra" href="/gasolineras/Pontevedra">Pontevedra</a></li>
+	<li class="c5"><a title="Todas las gasolineras de La Rioja" href="/gasolineras/Rioja_(La)">Rioja (La)</a></li>
+	<li class="c5"><a title="Todas las gasolineras de Salamanca" href="/gasolineras/Salamanca">Salamanca</a></li>
+	<li class="c5"><a title="Todas las gasolineras de Santa Cruz De Tenerife" href="/gasolineras/Santa_Cruz_De_Tenerife">Santa Cruz De Tenerife</a></li>
+	<li class="c5"><a title="Todas las gasolineras de Segovia" href="/gasolineras/Segovia">Segovia</a></li>
+	<li class="c5"><a title="Todas las gasolineras de Sevilla" href="/gasolineras/Sevilla">Sevilla</a></li>
+	<li class="c5"><a title="Todas las gasolineras de Soria" href="/gasolineras/Soria">Soria</a></li>
+	<li class="c5"><a title="Todas las gasolineras de Tarragona" href="/gasolineras/Tarragona">Tarragona</a></li>
+	<li class="c6 top"><a title="Todas las gasolineras de Teruel" href="/gasolineras/Teruel">Teruel</a></li>
+	<li class="c6"><a title="Todas las gasolineras de Toledo" href="/gasolineras/Toledo">Toledo</a></li>
+	<li class="c6"><a title="Todas las gasolineras de València" href="/gasolineras/Valencia_|_València">Valencia / València</a></li>
+	<li class="c6"><a title="Todas las gasolineras de Valladolid" href="/gasolineras/Valladolid">Valladolid</a></li>
+	<li class="c6"><a title="Todas las gasolineras de Vizcaya" href="/gasolineras/Vizcaya">Vizcaya</a></li>
+	<li class="c6"><a title="Todas las gasolineras de Zamora" href="/gasolineras/Zamora">Zamora</a></li>
+	<li class="c6"><a title="Todas las gasolineras de Zaragoza" href="/gasolineras/Zaragoza">Zaragoza</a></li>
 
 </ul>
 
