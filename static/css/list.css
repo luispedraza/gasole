@@ -595,6 +595,7 @@ th.off, td.off,tr.r_off, tr.f_off {
 #table {
 	margin-right: 10px;
 	width: 100%;
+	height: 460px;
 }
 #table table {
 	table-layout: fixed;

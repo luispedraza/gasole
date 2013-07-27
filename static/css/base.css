@@ -174,18 +174,40 @@ footer {
 footer ul {
 	list-style: none;
 	padding: 0;
-	-moz-column-count:6; /* Firefox */
-	-webkit-column-count:6; /* Safari and Chrome */
+/*	-moz-column-count:6;
+	-webkit-column-count:6;
 	column-count:6;
-	-moz-column-gap:10px; /* Firefox */
-	-webkit-column-gap:10px; /* Safari and Chrome */
+	-moz-column-gap:10px; 
+	-webkit-column-gap:10px;
 	column-gap:10px;
-	-moz-column-rule:1px outset #fff; /* Firefox */
-	-webkit-column-rule:1px outset #fff; /* Safari and Chrome */
-	column-rule:1px outset #fff;
+	-moz-column-rule:1px outset #fff;
+	-webkit-column-rule:1px outset #fff;
+	column-rule:1px outset #fff;*/
 }
 footer li {
-	margin-bottom: .1em;
+	height: 15px;
+	width: 115px;
+}
+footer li.col1 {
+	margin-left: 0;
+}
+footer li.col2 {
+	margin-left: 120px;
+}
+footer li.col3 {
+	margin-left: 240px;	
+}
+footer li.col4 {
+	margin-left: 360px;
+}
+footer li.col5 {
+	margin-left: 480px;
+}
+footer li.col6 {
+	margin-left: 600px;
+}
+footer li.top {
+	margin-top: -135px;
 }
 footer a {
 	text-decoration: none;
