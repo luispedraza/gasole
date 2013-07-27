@@ -206,7 +206,7 @@
 	clear: both;
 }
 #chart.button {
-	padding: 20px 0;
+	padding: 10px 0 20px 0;
 	height: 20px;
 	text-align: center;
 }
@@ -261,6 +261,7 @@
 }
 #user-link {
 	margin-bottom: 10px;
+	font-size: 1.2em;
 }
 #comments .section {
 	margin-top: 20px;
@@ -277,7 +278,9 @@
 	width: 400px;
 	float: right;
 }
-
+#no-comments {
+	color: #aaa;
+}
 #comments input[type=text], #comments input[type=email] {
 	width: 190px;
 	height: 20px;
@@ -403,17 +406,21 @@ div.warning {
 }
 .button {
 	color: #fff;
-	background-color: #333;
+	background-color: #3399CC;
+	box-shadow: 0 0 0 1px #3786AD;
+	border: 0;
+	border-top: 1px solid #98C0D4;
 	border-radius: 3px;
 	cursor: pointer;
-	border: none;
 	padding: 3px;
 }
 .button:hover {
-	background-color: #555;
+	opacity: .8;
 }
 .button:active {
-	background-color: #000;
+	background-color: #3682a8;
+	box-shadow: 0 0 0 1px #376175;
+	border: 1px solid #3C718A;
 }
 
 #recaptcha_image {

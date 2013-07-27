@@ -192,7 +192,7 @@ function drawMarkers() {
 				icon.imageDiv.className = "logo "+(logo || "otra");
 				var marker = new OpenLayers.Marker(lonlat, icon);
 				marker.url = encodeName(p)+"/"+encodeName(t)+"/"+encodeName(s);
-				marker.events.register("click", marker, function() {window.location = "/ficha/"+this.url;});
+				marker.events.register("click", marker, function() {window.open("/ficha/"+this.url)});
 				markersLayer.addMarker(marker);
 			}
 		}
@@ -785,8 +785,9 @@ function Circles(spread) {
 			chart.select("#"+id).remove();
 		}
 		function provinceClick(circle) { /* Ciudades de una provincia */
-			var circle = d3.select(circle);
-			var d = circle.data()[0];
+			var circle = d3.select(circle),
+				d = circle.data()[0],
+				spreadLabel = document.getElementById("spread-label");
 			if (parseInt(circle.attr("r"))==RZOOM) {
 				chart.attr("class", "chart");
 				x.domain([xMin,xMax]);
@@ -796,8 +797,10 @@ function Circles(spread) {
 				circles.transition().duration(500).ease("bounce").attr("r",function(d) {return d.r});
 				hideTooltip("pinfo");
 				mainLegend();
+				spreadLabel.style.display = "inline";
 				return;
 			}
+			spreadLabel.style.display = "none";
 			chart.attr("class", "chart white");
 			var color = d.c;
 			var colorDark = d3.rgb(color).darker().toString();
@@ -895,6 +898,8 @@ function Brands(spread) {
 		var div = d3.select("#brands");
 		var provinces = theStats.provinces;
 		var brands = stats.brands;
+
+
 		var data = [];
 		var pMin = 1000, pMax = 0;		// Precios máximo y mínimo
 		var psum = 0;
@@ -915,6 +920,9 @@ function Brands(spread) {
 		var pMu = psum/data.length;
 		var provincesDomain = Object.keys(provinces);
 		var brandsDomain = Object.keys(brands);
+			brandsDomain.sort();
+		var otras = brandsDomain.indexOf("otras");
+		if (otras>=0) {brandsDomain.splice(otras,1);brandsDomain.push("otras");}
 		var priceColor = new PriceColorPicker();
 		// ajuste del ALTO del gráfico:
 		var divHeight = Math.max(400,provincesDomain.length*30+70);
@@ -922,10 +930,8 @@ function Brands(spread) {
 		divWidth = parseInt(div.style("width").split("px")[0]);
 		
 		var margin = {top: 40, right: 30, bottom: 30, left: 170},
-
 			width = divWidth - margin.left - margin.right,
 			height = divHeight - margin.top - margin.bottom;
-
 		var y = d3.scale.ordinal()
 			.domain(provincesDomain)
 			.rangePoints([0,height]);
@@ -934,12 +940,11 @@ function Brands(spread) {
 			.rangePoints([0,width]);
 		var xAxis = d3.svg.axis()
 			.scale(x)
-			.orient("top");
-			
+			.orient("top")
+			.tickFormat(function(d) { return d.toUpperCase()});
 		var yAxis = d3.svg.axis()
 			.scale(y)
 			.orient("left");
-
 		var chart = div.select(".chart");
 		if (chart[0][0]==null) {
 			chart = div.append("svg")

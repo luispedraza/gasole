@@ -352,11 +352,12 @@ body {
 }
 .panel input {
 	width: 100%;
-	font-size: 14px;
-	padding: 1px;
+	font-size: 12px;
+	padding: 4px;
 	border-radius: 5px;
 	float: right;
 	outline: none;
+	border: 0;
 }
 .panel input:hover + .tooltip {
 	opacity: 1;

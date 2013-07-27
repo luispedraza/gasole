@@ -161,6 +161,12 @@ h1 {
 .description p:first-child {
   margin-top: 0;
 }
+.description p:first-child:first-letter {
+    font-size: 250%;
+    float: left;
+    margin: 10px 4px 0 0;
+    font-weight: bold;
+}
 .description li {
     margin-top: 5px;
     border-radius: 5px;
@@ -493,6 +499,9 @@ li.on .layer-name:before {
   width: 10px;
   height: 12px;
   margin-right: 5px;
+}
+#raphael .legend .color + div {
+  text-indent: 10px;
 }
 #raphael .legend .colorpad {
     width: 10px;
