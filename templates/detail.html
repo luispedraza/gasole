@@ -129,7 +129,7 @@
 			<a class="logout" href="/logout"></a>
 			<img class="avatar" src="{{user.avatar_url}}">
 			<p><a id="user-link" href="{{user.link}}"><strong>{{user.name}}</strong></a></p>
-			<p>Identificado con tu perfil de {{service}}</p>
+			<p>Identificado con tu perfil de {{user.auth_ids[0].split(":")[0]}}</p>
 		</div>
 		{% else %}
 		<div id="username" class="clearer">

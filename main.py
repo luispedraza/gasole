@@ -41,6 +41,7 @@ class MainHandler(BaseAuthHandler):
             title = u"GasOle.net: Gasolina barata en España.",
             styles =['/css/home.css'],
             scripts=get_js('home.js',DEBUG),
+            user=self.get_logged_user(),
             content=jinja_env.get_template("home.html").render(
                 map=jinja_env.get_template("spain.svg").render()))
 
@@ -129,6 +130,7 @@ class List(BaseAuthHandler):
             title = title,
             styles=["/css/list.css"],
             scripts=get_js('list.js',DEBUG),
+            user=self.get_logged_user(),
             content=jinja_env.get_template("list.html").render())
 
 class Detail(BaseAuthHandler):
@@ -145,9 +147,6 @@ class Detail(BaseAuthHandler):
             if sdata:
                 edit_station = {k: getattr(sdata,k) or "" for k in sdata.properties()}
         user = self.get_logged_user()
-        service = None
-        if user:
-            service=user.auth_ids[0].split(":")[0]
         self.render("base.html",
             title = title,
             styles=['/css/detail.css'],
@@ -156,8 +155,7 @@ class Detail(BaseAuthHandler):
             content=jinja_env.get_template("detail.html").render(
                 title=title,
                 edit_station=edit_station,
-                user=user,
-                service=service
+                user=user
                 ))
 
 # class Gzip(BaseHandler):
@@ -299,12 +297,13 @@ class SearchResults(BaseAuthHandler):
             title = title,
             styles=["/css/list.css"],
             scripts=[GOOGLE_MAPS_API]+get_js('list.js',DEBUG),
+            user=self.get_logged_user(),
             content=jinja_env.get_template("list.html").render())
 
 class Info(BaseAuthHandler):
     def get(self, section):
         content_html = ""
-        scripts = ""
+        scripts=get_js('info.js',DEBUG)
         styles = ["/css/info.css"]
         if section=="combustibles":
             content_html="info_combustibles.html"
@@ -312,12 +311,12 @@ class Info(BaseAuthHandler):
             content_html="info_tarjetas.html"
         elif section=="noticias":
             content_html="info_noticias.html"
-            scripts=get_js('noticias.js',DEBUG)
             styles = ["/css/noticias.css"]
         self.render("base.html",
             content=jinja_env.get_template(content_html).render(),
             scripts=scripts,
-            styles=styles)
+            styles=styles,
+            user=self.get_logged_user())
 
 def handle_404(request, response, exception):
     #http://webapp-improved.appspot.com/guide/exceptions.html

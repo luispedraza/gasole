@@ -111,7 +111,7 @@ class BaseAuthHandler(BaseHandler, SimpleAuthHandler):
 
 	def _on_signin(self, data, auth_info, provider, redirect=True):
 		auth_id = '%s:%s' % (provider, data['id'])
-		logging.info(auth_id)
+		# logging.info(auth_id)
 		user = self.auth.store.user_model.get_by_auth_id(auth_id)
 		_attrs = self._to_user_model_attrs(data, self.USER_ATTRS[provider])
 		if user:

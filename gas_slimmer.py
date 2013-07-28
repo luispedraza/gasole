@@ -45,8 +45,8 @@ MEDIA_JS = {
 		'extern':	['google_maps_api_v3.js'],
 		'api':		[OPENLAYERS_API]
 		},
-	'noticias.js': {
-		'src':		['search.js', 'utils.js'],
+	'info.js': {
+		'src':		['utils.js','search.js'],
 		'libs': 	[],
 		'extern':	['google_maps_api_v3.js'],
 		'api':		[]
