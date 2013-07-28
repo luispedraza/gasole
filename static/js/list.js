@@ -11,9 +11,9 @@ var	gasoleData,		// datos de la api
 	stats = null;
 // marcadores de gasolineras
 var MARKER_IMG = {
-	max: new google.maps.MarkerImage("/img/sprt.png", new google.maps.Size(25, 25, "px", "px"), new google.maps.Point(2,390), null, null),
-	min: new google.maps.MarkerImage("/img/sprt.png", new google.maps.Size(25, 25, "px", "px"), new google.maps.Point(2,336), null, null),
-	mu: new google.maps.MarkerImage("/img/sprt.png", new google.maps.Size(25, 25, "px", "px"), new google.maps.Point(2,444), null, null)
+	max: new google.maps.MarkerImage("/img/sprt.png", new google.maps.Size(25, 25, "px", "px"), new google.maps.Point(29,519), null, null),
+	min: new google.maps.MarkerImage("/img/sprt.png", new google.maps.Size(25, 25, "px", "px"), new google.maps.Point(2,519), null, null),
+	mu: new google.maps.MarkerImage("/img/sprt.png", new google.maps.Size(25, 25, "px", "px"), new google.maps.Point(2,546), null, null)
 }
 
 // Pesos para colores de gasolinera

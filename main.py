@@ -309,6 +309,7 @@ class SearchResults(BaseAuthHandler):
 
 class Info(BaseAuthHandler):
     def get(self, section):
+        logging.info(section)
         title=""
         desc=""
         content=""
@@ -334,7 +335,7 @@ class Info(BaseAuthHandler):
             styles = ["/css/acercade.css"]
             canonical+="acercade"
             title=u"Información acerca de GasOle.net"
-            desc=u"Condiciones de uso de esta página y agradecimientos"
+            desc=u"Condiciones de uso de esta página, política de privacidad y agradecimientos"
         self.render("base.html",
             content=content,
             scripts=scripts,
@@ -402,7 +403,7 @@ app = webapp2.WSGIApplication([
     ('/api/gasole', Api),
     # ('/geo/(.+)/(.+)/(.+)/(.+)/?', GeoApi),
     ('/resultados/(.+)/(.+)/(.+)/(.+)/?', SearchResults),
-    ('/info/(noticias|tarjetas|combustibles)/?', Info),
+    ('/info/(noticias|acercade|combustibles)/?', Info),
     webapp2.Route(r'/api/c/<p>/<t>/<s>', handler=CommentsApi, name='comments-api'), # comentarios
     webapp2.Route(r'/api/h/<p>/<t>/<s>', handler=HistoryApi, name='history-api'),   # históricos
     webapp2.Route(r'/api/s/<p>/<t>/<s>', handler=StationApi, name='station-api'),   # actualización de info

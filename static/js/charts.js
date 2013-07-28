@@ -739,10 +739,10 @@ function Circles(spread) {
 				circles.transition().duration(500).ease("bounce").attr("r",function(d) {return d.r});
 				hideTooltip("pinfo");
 				mainLegend();
-				spreadLabel.style.display = "inline";
+				spreadLabel.style.opacity = 1;
 				return;
 			}
-			spreadLabel.style.display = "none";
+			spreadLabel.style.opacity = 0;
 			chart.attr("class", "chart white");
 			var color = d.c;
 			var colorDark = d3.rgb(color).darker().toString();

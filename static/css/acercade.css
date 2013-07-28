@@ -1,0 +1,60 @@
+body {
+  background-color: #006633;
+}
+#menu {
+	position: fixed;
+	top: 200px;	
+	background-color: #339933;
+	width: 320px;
+	font-size: 1.1em;
+}
+#menu li a {
+	display: block;
+	background-color: #fff;
+	color: #006633;
+	cursor: pointer;
+	margin: 20px;
+	padding: 5px;
+	text-decoration: none;
+}
+#menu li:hover {
+	font-weight: bold;
+}
+#text {
+	margin-left: 350px;
+	width: 500px;
+}
+#thanks li {
+	width: 600px;
+	color: #fff;
+	margin-bottom: 3px;
+	position: relative;
+	height: 25px;
+}
+#thanks .name {
+	position: absolute;
+	right: 300px;
+	text-align: right;
+	display: inline-block;
+	padding-right: 10px;
+	background-color: #339933;
+	padding: 5px;
+	border-radius: 5px;
+}
+#thanks .link {
+	position: absolute;
+	left: 305px;
+}
+#thanks a {
+	text-decoration: none;
+	text-align: left;
+	display: inline-block;
+	padding-left: 10px;
+	color: #fff;
+	background-color: #006633;
+	padding: 5px;
+	border-radius: 5px;
+}
+#thanks a:hover {
+	opacity: .7;
+}
