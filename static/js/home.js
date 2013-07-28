@@ -2,6 +2,7 @@
 	addEvent(w,"load", function() {
 		initProvLinks("province");	// lista de provincias
 		var gasole = new Gasole(function () {
+			console.log(this);
 			var stats = this.stats.stats,
 				type,data;
 			for (var o in stats) {

@@ -38,11 +38,14 @@ def get_points(s):
 class MainHandler(BaseAuthHandler):
     def get(self):
         self.render("base.html", 
-            title = u"GasOle.net: Gasolina barata en España.",
+            title = u"GasOle.net: el precio de la gasolina en España.",
             styles =['/css/home.css'],
             scripts=get_js('home.js',DEBUG),
             user=self.get_logged_user(),
-            content="home.html")
+            content="home.html",
+            og={"title": u"GasOle.net",
+                "desc": u"Aquí encontrarás la gasolina más barata de España y las gasolineras mejor valoradas.",
+                "url": u"http://www.gasole.net"})
 
 class AdminHandler(BaseHandler):
     def get(self):
