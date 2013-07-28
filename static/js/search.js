@@ -1,4 +1,15 @@
 (function(w) {
+	function loadMapsAPI(callback) {
+		// carga dinámica de la api, para el buscador, en páginas sin mapa
+		if (!window.google || !window.google.maps) {
+			var script = document.createElement("script");
+			script.type = "text/javascript";
+			script.src = "http://maps.googleapis.com/maps/api/js?key=AIzaSyD5XZNFlQsyWtYDeKual-OcqmP_5pgwbds&sensor=false&callback="+callback;
+			document.body.appendChild(script);
+			return true;
+		}
+		return false;
+	}
 	var searchDistance = null;
 	/* Va a por los resultados de búsqueda */
 	function loadLocation(l) {
@@ -13,40 +24,40 @@
 		img.src = "/img/search-loader.gif";
 		div.appendChild(img);
 	}
+	/* Busca la posición actual del usuario */
+	window.loadCurrentPosition = function() {
+		showLoader();
+		navigator.geolocation.getCurrentPosition(showPosition, showError);
+		function showPosition(pos) {
+			var geocoder = new google.maps.Geocoder();
+			var latlng = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
+			geocoder.geocode({'latLng': latlng}, showResult);
+		}
+		function showError(e) {
+			switch(e.code) {
+				case e.PERMISSION_DENIED:
+					console.log("User denied the request for Geolocation.");
+					break;
+				case e.POSITION_UNAVAILABLE:
+					console.log("Location information is unavailable.");
+					break;
+				case e.TIMEOUT:
+					console.log("The request to get user location timed out.");
+					break;
+				case e.UNKNOWN_ERROR:
+					console.log("An unknown error occurred.");
+					break;
+			}
+		}
+	}
 	/* Inicializa funciones de geolocalización del navegador */
 	function initGeoloc() {
 		/* Obtiene la posición del navegador */
-		function loadCurrentPosition() {
-			showLoader();
-			navigator.geolocation.getCurrentPosition(showPosition, showError);
-			function showPosition(pos) {
-				var geocoder = new google.maps.Geocoder();
-				var latlng = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
-				geocoder.geocode({'latLng': latlng}, showResult);
-			}
-			function showError(e) {
-				switch(e.code) {
-					case e.PERMISSION_DENIED:
-						console.log("User denied the request for Geolocation.");
-						break;
-					case e.POSITION_UNAVAILABLE:
-						console.log("Location information is unavailable.");
-						break;
-					case e.TIMEOUT:
-						console.log("The request to get user location timed out.");
-						break;
-					case e.UNKNOWN_ERROR:
-						console.log("An unknown error occurred.");
-						break;
-				}
-			}
-		}
 		var loc = document.getElementById("current-loc");
-		if (!navigator.geolocation) {
-			loc.style.display = "none";
-		} else {
-			addEvent(loc,"click", loadCurrentPosition);
-		}
+		if (!navigator.geolocation) loc.style.display = "none";
+		else addEvent(loc,"click", function() {
+			if (!loadMapsAPI("loadCurrentPosition")) loadCurrentPosition();
+		});
 	}
 	/* Muestra los resultados de geolocalización */
 	function showResult(r,s) {
@@ -84,7 +95,7 @@
 		titleDiv.innerHTML = "No se ha podido encontrar el lugar. Inténtalo de nuevo";
 	}
 	/* Codifica una dirección, obteniendo lat y lon */
-	function geoCode() {
+	window.geoCode = function() {
 		var l = document.getElementById("address").value;
 		if (!l) return;
 		var thePath = window.location.pathname.split("/");
@@ -151,8 +162,9 @@
 				menuSearch.className="menu search";
 			})
 		})
-		document.getElementById("search-form").onsubmit=geoCode;
-		document.getElementById("search-b").onclick=geoCode;
+		function searchLocation() {if (!loadMapsAPI("geoCode")) geoCode(); return false;};
+		document.getElementById("search-form").onsubmit=searchLocation;
+		document.getElementById("search-b").onclick=searchLocation;
 		lockScroll("results-list");
 		searchDistance = new Slider("search-d");
 		initGeoloc();

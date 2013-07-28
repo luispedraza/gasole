@@ -18,6 +18,7 @@
 	float: left;
 }
 #social {
+	z-index: 200;
 	width: 48%;
 	height: 60px;
 	float: right;

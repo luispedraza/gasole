@@ -258,20 +258,23 @@ function getApiData(option, callback, reload) {
 	var key = option+"*"+getKey();
 	var ts = new Date().getTime();
 	if (checkLocalStorage()) {
-		if (localStorage.hasOwnProperty(key)) {
-			localData = JSON.parse(localStorage[key]);
+		var localData = localStorage[key];
+		if (localData) {
+			localData = JSON.parse(localData);
 			if (((ts-localData.ts)>LS_EXPIRE) || reload)
 				localStorage.removeItem(key);
 			else {callback(localData.data); return;};
 		}
 	}
 	var req = new XMLHttpRequest();
-	req.onload = function(r) {
-		var info = JSON.parse(this.responseText);
-		if (checkLocalStorage())
-			localStorage.setItem(key, JSON.stringify(
-				{"ts": ts, "data": info}));
-		callback(info);
+	req.onreadystatechange = function(r) {
+		if ((this.readyState==4)&&(this.status==200)) {
+			var info = JSON.parse(this.responseText);
+			if (checkLocalStorage())
+				localStorage.setItem(key, JSON.stringify(
+					{"ts": ts, "data": info}));
+			callback(info);
+		}
 	};
 	var url = "api/";
 	if 		(option=="history") 	url+="h";
@@ -566,32 +569,39 @@ function Gasole(callback) {
 	this.info = null; 		// datos de la api
 	this.date = null;		// fecha de actualización
 	this.type = "1";
-	var storedData = localStorage["gasole"];	// datos guardados
-	if (!storedData || ((new Date().getTime()-parseInt(JSON.parse(storedData).ts))>LS_EXPIRE)) {
+	var storedData = null;
+	if (checkLocalStorage()) {
+		storedData = localStorage["gasole"];	// datos guardados
+		if (storedData) storedData=JSON.parse(storedData);
+	}
+	if (!storedData || ((new Date().getTime()-parseInt(storedData.ts))>LS_EXPIRE)) {
 		// buscar nuevos datos
 		var req = new XMLHttpRequest();
 		req.gasole = this;
-		req.onload = function() {
-			var date = null;
-			var newdata = JSON.parse(this.responseText);
-			if (newdata._meta) {		// compatibilidad api antigua sin _meta
-				date = new Date(newdata._meta.ts);
-				newdata = newdata._data;
-			} else {
-				date = new Date();
+		req.onreadystatechange = function() {
+			if ((this.readyState==4)&&(this.status==200)) {
+				var date = null;
+				var newdata = JSON.parse(this.responseText);
+				if (newdata._meta) {		// compatibilidad api antigua sin _meta
+					date = new Date(newdata._meta.ts);
+					newdata = newdata._data;
+				} else {
+					date = new Date();
+				}
+				this.gasole.init(newdata,date);
+				if (checkLocalStorage()) {
+					var data2store = {	ts: date.getTime(),
+									data: newdata,
+									stats: this.gasole.stats};
+					localStorage.setItem("gasole", JSON.stringify(data2store));
+				}
+				if (this.gasole.callback) this.gasole.callback();
 			}
-			this.gasole.init(newdata,date);
-			var data2store = {	ts: date.getTime(),
-								data: newdata,
-								stats: this.gasole.stats};
-			localStorage.setItem("gasole", JSON.stringify(data2store));
-			if (this.gasole.callback) this.gasole.callback();
 		}
 		req.open("GET", "/api/gasole");
 		req.send();
 	} else {
-		var data = JSON.parse(storedData);
-		this.init(data.data, new Date(data.ts), data.stats);
+		this.init(storedData.data, new Date(storedData.ts), storedData.stats);
 		if (this.callback) this.callback();
 	}
 }

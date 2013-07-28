@@ -133,7 +133,10 @@ class List(BaseAuthHandler):
             styles=["/css/list.css"],
             scripts=get_js('list.js',DEBUG),
             user=self.get_logged_user(),
-            content="list.html")
+            content="list.html",
+            og={"title": u"Todas las "+title,
+                "desc": u"Precios y mapa de todas las gasolineras, en GasOle.net",
+                "url": self.request.get("url")})
 
 class Detail(BaseAuthHandler):
     def get(self, province, town, station):
@@ -148,14 +151,16 @@ class Detail(BaseAuthHandler):
             sdata = GasStation.get(db.Key.from_path('Province', p, 'Town', t, 'GasStation', s))
             if sdata:
                 edit_station = {k: getattr(sdata,k) or "" for k in sdata.properties()}
-        user = self.get_logged_user()
         self.render("base.html",
             title = title,
             styles=['/css/detail.css'],
             scripts=get_js('detail.js',DEBUG),
-            user = user,
+            user = self.get_logged_user(),
             content="detail.html",
-            edit_station=edit_station)
+            edit_station=edit_station,
+            og={"title": title,
+                "desc": u"Echad un ojo a esta gasolinera que he encontrado en GasOle.net",
+                "url": self.request.get("url")})
 
 # class Gzip(BaseHandler):
 #     def get(self, prov, town, station):
@@ -297,25 +302,47 @@ class SearchResults(BaseAuthHandler):
             styles=["/css/list.css"],
             scripts=[GOOGLE_MAPS_API]+get_js('list.js',DEBUG),
             user=self.get_logged_user(),
-            content="list.html")
+            content="list.html",
+            og={"title": title,
+                "desc": u"Resultado de búsqueda de gasolineras en GasOle.net",
+                "url": self.request.get("url")})
 
 class Info(BaseAuthHandler):
     def get(self, section):
-        content = ""
+        title=""
+        desc=""
+        content=""
         scripts=get_js('info.js',DEBUG)
-        styles = ["/css/info.css"]
+        styles=["/css/info.css"]
+        canonical=u"http://info/"
         if section=="combustibles":
             content="info_combustibles.html"
+            canonical+="combustibles"
+            title=u"Información sobre gasolina y otros combustibles en España"
+            desc=u"Aquí encontrarás datos sobre los tipos de combustible a la venta en España y los impuestos que se aplican"
         elif section=="tarjetas":
             content="info_tarjetas.html"
+            canonical+="tarjetas"
         elif section=="noticias":
             content="info_noticias.html"
             styles = ["/css/noticias.css"]
+            canonical+="noticias"
+            title=u"Recortes de prensa sobre gasolinas e hidrocarburos"
+            desc=u"Noticias recopiladas de los principales medios de comunicación sobre el mundo de la gasolina y otros combustibles"
+        elif section=="acercade":
+            content="info_acercade.html"
+            styles = ["/css/acercade.css"]
+            canonical+="acercade"
+            title=u"Información acerca de GasOle.net"
+            desc=u"Condiciones de uso de esta página y agradecimientos"
         self.render("base.html",
             content=content,
             scripts=scripts,
             styles=styles,
-            user=self.get_logged_user())
+            user=self.get_logged_user(),
+            og={"title": title,
+                "desc": desc,
+                "url": canonical})
 
 def handle_404(request, response, exception):
     #http://webapp-improved.appspot.com/guide/exceptions.html
@@ -332,11 +359,14 @@ def handle_500(request, response, exception):
 class Stats(BaseAuthHandler):
     def get(self):
         self.render("base.html",
-            title = u"Gráficos: el precio y la distribución de la gasolina en España.",
+            title = u"Gráficos: el precio de la gasolina y su distribución en España.",
             scripts = get_js('charts.js',DEBUG),
             styles  = ['/css/graficos.css'],
             user=self.get_logged_user(),
-            content = "charts.html")
+            content = "charts.html",
+            og={"title": u"Gráficos de GasOle.net",
+                "desc": u"Gráficos del precio de la gasolina y la densidad de gasolineras en España..",
+                "url": self.request.get("url")})
         
 # class StatsApi(BaseHandler):
 #     def get(self, prov, town):
