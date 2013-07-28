@@ -28,6 +28,8 @@
 	{% for css in styles %}
 		<link rel="stylesheet" type="text/css" href="{{css}}" />
 	{% endfor %}
+
+	<!--[if lte IE 8]><script type="text/javascript" src="/js/_oldIE.js"></script><![endif]-->
 	{% for sc in scripts %}
 		<script type="text/javascript" src="{{sc}}"></script>
 	{% endfor %}

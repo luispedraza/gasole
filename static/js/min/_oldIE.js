@@ -1,3 +1,12 @@
+// thanks to Alex Tatiyants!
+// http://tatiyants.com/how-to-get-ie8-to-support-html5-tags-and-web-fonts/
+document.createElement('header');
+document.createElement('nav');
+document.createElement('section');
+document.createElement('article');
+document.createElement('aside');
+document.createElement('footer');
+
 // thanks to Eli Grey!
 // http://eligrey.com/blog/post/textcontent-in-ie8
 if (Object.defineProperty && Object.getOwnPropertyDescriptor &&
