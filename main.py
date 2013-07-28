@@ -42,8 +42,7 @@ class MainHandler(BaseAuthHandler):
             styles =['/css/home.css'],
             scripts=get_js('home.js',DEBUG),
             user=self.get_logged_user(),
-            content="home.html",
-                map=jinja_env.get_template("spain.svg").render())
+            content="home.html")
 
 class AdminHandler(BaseHandler):
     def get(self):

@@ -13,20 +13,25 @@
 			}
 			document.getElementById("updated").innerHTML = "<sup>*</sup> " + formatUpdate(this.date);
 		});
-		/* Eventos del mapa */
-		for (var p in PROVS) {
-			prov = document.getElementById("P"+PROVS[p]);
-			addEvent(prov,"click", function() {
-				var pname = getProvName(this.id.slice(1));
-				window.location = "/gasolineras/" + encodeName(pname);
-			});
-			addEvent(prov,"mouseover", function() {
-				var pname = getProvName(this.id.slice(1));
-				document.getElementById("prov-current").textContent = pname;
-			});
-			addEvent(prov,"mouseout", function() {
-				document.getElementById("prov-current").textContent = "lista de provincias";
-			});
-		};
+		/* El mapa pintado con Raphael */
+		(function raphaelMap() {
+			paper = Raphael("map");
+			for (p in PROVS) {
+				var prov = paper.path(PATHS[PROVS[p]]).attr({"cursor":"pointer","stroke":"#fff", "stroke-width":0, "fill":"#f00"});
+				prov.pname = p;
+				prov.click(function() {window.location = "/gasolineras/" + encodeName(this.pname)});
+				var hoverIn = function() {
+					this.attr("opacity",.5);
+					document.getElementById("prov-current").textContent = this.pname.replace("Santa", "Sta.");
+				};
+				var hoverOut = function() {
+					this.attr("opacity",1);
+					document.getElementById("prov-current").textContent = "lista de provincias";
+				};
+				prov.hover(hoverIn,hoverOut,prov,prov);
+				prov.node.setAttribute("class", "prov");
+			}
+			paper.setViewBox(-50,0,450,400, true);
+		})();
 	});
 })(window);
