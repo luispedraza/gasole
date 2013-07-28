@@ -42,8 +42,8 @@ class MainHandler(BaseAuthHandler):
             styles =['/css/home.css'],
             scripts=get_js('home.js',DEBUG),
             user=self.get_logged_user(),
-            content=jinja_env.get_template("home.html").render(
-                map=jinja_env.get_template("spain.svg").render()))
+            content="home.html",
+                map=jinja_env.get_template("spain.svg").render())
 
 class AdminHandler(BaseHandler):
     def get(self):
@@ -131,7 +131,7 @@ class List(BaseAuthHandler):
             styles=["/css/list.css"],
             scripts=get_js('list.js',DEBUG),
             user=self.get_logged_user(),
-            content=jinja_env.get_template("list.html").render())
+            content="list.html")
 
 class Detail(BaseAuthHandler):
     def get(self, province, town, station):
@@ -152,11 +152,8 @@ class Detail(BaseAuthHandler):
             styles=['/css/detail.css'],
             scripts=get_js('detail.js',DEBUG),
             user = user,
-            content=jinja_env.get_template("detail.html").render(
-                title=title,
-                edit_station=edit_station,
-                user=user
-                ))
+            content="detail.html",
+            edit_station=edit_station)
 
 # class Gzip(BaseHandler):
 #     def get(self, prov, town, station):
@@ -298,22 +295,22 @@ class SearchResults(BaseAuthHandler):
             styles=["/css/list.css"],
             scripts=[GOOGLE_MAPS_API]+get_js('list.js',DEBUG),
             user=self.get_logged_user(),
-            content=jinja_env.get_template("list.html").render())
+            content="list.html")
 
 class Info(BaseAuthHandler):
     def get(self, section):
-        content_html = ""
+        content = ""
         scripts=get_js('info.js',DEBUG)
         styles = ["/css/info.css"]
         if section=="combustibles":
-            content_html="info_combustibles.html"
+            content="info_combustibles.html"
         elif section=="tarjetas":
-            content_html="info_tarjetas.html"
+            content="info_tarjetas.html"
         elif section=="noticias":
-            content_html="info_noticias.html"
+            content="info_noticias.html"
             styles = ["/css/noticias.css"]
         self.render("base.html",
-            content=jinja_env.get_template(content_html).render(),
+            content=content,
             scripts=scripts,
             styles=styles,
             user=self.get_logged_user())
@@ -336,7 +333,7 @@ class Stats(BaseAuthHandler):
             title = u"Gráficos: el precio y la distribución de la gasolina en España.",
             scripts = get_js('charts.js',DEBUG),
             styles  = ['/css/graficos.css'],
-            content = jinja_env.get_template("charts.html").render())
+            content = "charts.html")
         
 # class StatsApi(BaseHandler):
 #     def get(self, prov, town):
