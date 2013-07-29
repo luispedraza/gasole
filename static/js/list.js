@@ -11,9 +11,9 @@ var	gasoleData,		// datos de la api
 	stats = null;
 // marcadores de gasolineras
 var MARKER_IMG = {
-	max: new google.maps.MarkerImage("/img/sprt.png", new google.maps.Size(25, 25, "px", "px"), new google.maps.Point(29,519), null, null),
-	min: new google.maps.MarkerImage("/img/sprt.png", new google.maps.Size(25, 25, "px", "px"), new google.maps.Point(2,519), null, null),
-	mu: new google.maps.MarkerImage("/img/sprt.png", new google.maps.Size(25, 25, "px", "px"), new google.maps.Point(2,546), null, null)
+	max: new google.maps.MarkerImage("/img/sprt.png", new google.maps.Size(25, 25, "px", "px"), new google.maps.Point(29,539), null, null),
+	min: new google.maps.MarkerImage("/img/sprt.png", new google.maps.Size(25, 25, "px", "px"), new google.maps.Point(2,539), null, null),
+	mu: new google.maps.MarkerImage("/img/sprt.png", new google.maps.Size(25, 25, "px", "px"), new google.maps.Point(2,566), null, null)
 }
 
 // Pesos para colores de gasolinera
@@ -563,6 +563,32 @@ addEvent(window,"load", function() {
 			gasoleData._data = this.nearData(place);
 			gasoleData._near = place;
 			h1.textContent = "Gasolineras cerca de: " + place.name();
+		} else if (option == "ruta") {
+			var directionsRender = new google.maps.DirectionsRenderer({draggable:false});
+			directionsRender.setMap(map);
+			var request = {origin: decodeURIComponent(pathArray[2]),
+				destination: decodeURIComponent(pathArray[3]),
+				travelMode: google.maps.TravelMode.DRIVING,
+				unitSystem: google.maps.UnitSystem.METRIC,
+				avoidHighways: false,
+				avoidTolls: true};
+			var service = new google.maps.DirectionsService(),
+				gasoleObject=this;
+			service.route(request, function(r,s) {
+				if (s==google.maps.DirectionsStatus.OK) {
+					var path = r.routes[0].overview_path
+					directionsRender.setDirections(r);
+					gasoleData._data = gasoleObject.routeData(path);
+					h1.textContent = "Gasolineras en Ruta";
+
+					stats = new GasoleStats(gasoleData._data).stats;
+					computeWeights(stats);
+					processData(gasoleData);
+					// fecha de actualización
+					document.getElementById("updated").textContent = "("+formatUpdate(gasoleObject.date)+")";
+				}
+			});
+			return;
 		}
 		stats = new GasoleStats(gasoleData._data).stats;
 		computeWeights(stats);

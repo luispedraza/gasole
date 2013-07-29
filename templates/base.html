@@ -103,20 +103,28 @@
 
 		<li class="menu search" id="menu-search">
 			<div class="item">
-				<div class="sprt search_icon"></div>
-				<form id="search-form">
-					<div id="current-loc" class="sprt search_gps"></div>
-					<input type="search" id="address" name="address" placeholder="Ej.: Gran Vía 25, Madrid" />
-				</form>
-			
-			
-			</div>
-			<div id="search-box">
-				<div class="sprt arrow a_search"></div>
-				<div id="results">
-					<p id="results-title">Introduce un lugar de búsqueda: población, provincia, dirección, código postal, hotel, aeropuerto…</p>
-					<ol id="results-list"></ol>
+				<div class="place">
+					<div class="sprt search_icon"></div>
+					<form id="search-form">
+						<div id="current-loc" class="sprt search_gps"></div>
+						<input type="search" id="address" name="address" placeholder="Gran Vía 25, Madrid" />
+						<ol id="results-list" class="results"></ol>
+					</form>
 				</div>
+				
+				<div class="place" id="destiny">
+					<div id="route" class="sprt directions"></div>
+					<form id="search-form-dest">
+						<div id="current-loc-dest"></div>
+						<input type="search" id="address-dest" name="address-dest" disabled="disabled" placeholder="Destino del recorrido" />
+						<ol id="results-list-dest" class="results"></ol>
+					</form>
+				</div>
+				<ol id="results-list-dest" class="results"></ol>
+				<div class="helper">
+					Introduce un lugar de búsqueda: población, provincia, dirección, código postal, hotel, aeropuerto… y pulsa la tecla INTRO.
+				</div>
+				
 				<div id="search-options">
 					<div class="my-slider" id="search-d"></div>
 					<div class="button" id="search-b">Buscar</div>

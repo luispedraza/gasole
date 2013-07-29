@@ -10,96 +10,113 @@
 		}
 		return false;
 	}
-	var searchDistance = null;
+	var searchDistance = null,
+		input_search = "origin";	// qué lugar buscamos: origen/destino
+		window.place1 = null,
+		window.place2 = null,
+		is_route = false;
 	/* Va a por los resultados de búsqueda */
-	function loadLocation(l) {
-		window.location=l+"/"+searchDistance.getvalue()
+	function loadResult() {
+		if ((!is_route) && place1)
+			window.location="/resultados/"+place1+"/"+searchDistance.getvalue().toFixed(2);
+		else if (is_route && place1 && place2)
+			window.location="/ruta/"+place1.split("/")[0]+"/"+place2.split("/")[0];
 	}
-	/* Muestra el spinner de carga */
 	function showLoader() {
-		document.getElementById("results-title").textContent = "Buscando…";
-		var div = document.getElementById("results-list");
-		div.innerHTML = "";
-		var img = new Image();
-		img.src = "/img/search-loader.gif";
-		div.appendChild(img);
+		/* Muestra el spinner de carga */
+		document.getElementById("current-loc"+((input_search=="origin")?"":"-dest")).className="loader";
 	}
-	/* Busca la posición actual del usuario */
-	window.loadCurrentPosition = function() {
-		showLoader();
-		navigator.geolocation.getCurrentPosition(showPosition, showError);
-		function showPosition(pos) {
-			var geocoder = new google.maps.Geocoder();
-			var latlng = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
-			geocoder.geocode({'latLng': latlng}, showResult);
-		}
-		function showError(e) {
-			switch(e.code) {
-				case e.PERMISSION_DENIED:
-					console.log("User denied the request for Geolocation.");
-					break;
-				case e.POSITION_UNAVAILABLE:
-					console.log("Location information is unavailable.");
-					break;
-				case e.TIMEOUT:
-					console.log("The request to get user location timed out.");
-					break;
-				case e.UNKNOWN_ERROR:
-					console.log("An unknown error occurred.");
-					break;
-			}
-		}
+	function hideLoader() {
+		/* Oculta el spinner de carga */
+		if (input_search=="origin") document.getElementById("current-loc").className="sprt search_gps";
+		else document.getElementById("current-loc-dest").className="";
 	}
-	/* Inicializa funciones de geolocalización del navegador */
 	function initGeoloc() {
-		/* Obtiene la posición del navegador */
+		window.loadCurrentPosition = function() {
+			/* Busca la posición actual del usuario */
+			function showPosition(pos) {
+				var geocoder = new google.maps.Geocoder();
+				var latlng = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
+				geocoder.geocode({'latLng': latlng}, showList);
+			}
+			function showError(e) {
+				switch(e.code) {
+					case e.PERMISSION_DENIED:
+						console.log("User denied the request for Geolocation.");
+						break;
+					case e.POSITION_UNAVAILABLE:
+						console.log("Location information is unavailable.");
+						break;
+					case e.TIMEOUT:
+						console.log("The request to get user location timed out.");
+						break;
+					case e.UNKNOWN_ERROR:
+						console.log("An unknown error occurred.");
+						break;
+				}
+			}
+			navigator.geolocation.getCurrentPosition(showPosition, showError);
+		}
+		/* Inicializa funciones de geolocalización del navegador */
 		var loc = document.getElementById("current-loc");
 		if (!navigator.geolocation) loc.style.display = "none";
 		else addEvent(loc,"click", function() {
+			showLoader();
 			if (!loadMapsAPI("loadCurrentPosition")) loadCurrentPosition();
 		});
 	}
-	/* Muestra los resultados de geolocalización */
-	function showResult(r,s) {
-		var resultsDiv = document.getElementById("results");
-		resultsDiv.style.display = "block";
-		var resultsList = document.getElementById("results-list"),
-			titleDiv = document.getElementById("results-title");
+	function showList(r,s) {
+		/* Muestra los resultados de geolocalización */
+		hideLoader();
+		var input = document.getElementById("address"+((input_search=="origin") ? "" : "-dest"));
+		var resultsList = document.getElementById("results-list"+((input_search=="origin") ? "" : "-dest"));
 		resultsList.innerHTML = "";
 		if (s == google.maps.GeocoderStatus.OK) {
-			var valid=0, added=0, href;
+			var valid=0, 
+				added=0, 
+				href,
+				addr;
 			for (var i=0; i<r.length; i++) {
-				var rplace = r[i],
-					loc=rplace.geometry.location,
-					addr = rplace.formatted_address,
-					place = encodeURIComponent(addr);
+				var loc = r[i].geometry.location;
+				addr = r[i].formatted_address;
 				if (addr.match(/España$/)) {
-					valid++; added=i;
-					href = "/resultados/"+place+"/"+loc.lat()+"/"+loc.lng();
+					valid++; 
+					added=i,
+					href = encodeURIComponent(addr)+"/"+loc.lat()+"/"+loc.lng();
 					var newLi = document.createElement("li");
-					var newA = document.createElement("a");
-					newA.href = href;
-					newA.textContent = addr;
-					newA.onclick = function() {loadLocation(this.href)};
-					newLi.appendChild(newA);
+					newLi.setAttribute("data-place", href);
+					newLi.textContent = addr;
+					newLi.onclick = function() {
+						var href = this.getAttribute("data-place");
+						if (input_search=="origin") place1=href;
+						else place2=href;
+						input.value = this.textContent;
+						hideResult();
+					};
 					resultsList.appendChild(newLi);
-					// resultsList.innerHTML+="<li><a href='"+href+"'>"+addr+"</a></li>";
 				}
 			}
-			if (valid==1) loadLocation(href);
-	 		else if (valid > 1) {
-	 			titleDiv.textContent = "Encontrados "+valid+ " lugares:";
-	 			return;	
-	 		} 
+			if (valid==1) {
+				if (input_search=="origin") place1=href;
+				else place2=href;
+				input.value = addr;
+				hideResult();
+			}
+			return;
 		}
-		titleDiv.innerHTML = "No se ha podido encontrar el lugar. Inténtalo de nuevo";
+		resultsList.innerHTML = "<li>No se ha podido encontrar el lugar. Inténtalo de nuevo.</li>";
 	}
-	/* Codifica una dirección, obteniendo lat y lon */
+	function hideResult() {
+		document.getElementById("results-list"+((input_search=="origin") ? "" : "-dest"))
+			.innerHTML="";
+	}
 	window.geoCode = function() {
-		var l = document.getElementById("address").value;
+		/* Codifica una dirección, obteniendo lat y lon */
+		var addr = (input_search=="origin") ? "address" : "address-dest";
+		var l = document.getElementById(addr).value;
 		if (!l) return;
 		var thePath = window.location.pathname.split("/");
-		if ((thePath[1]=="resultados") && (encodeURIComponent(l)==thePath[2])) {
+		if ((input_search=="origin") && (thePath[1]=="resultados") && (encodeURIComponent(l)==thePath[2])) {
 			// Ya estoy en la página de resultados, cambiar radio tal vez
 			thePath[thePath.length-1]=searchDistance.getvalue();
 			window.location=thePath.join("/");
@@ -107,8 +124,9 @@
 		}
 		showLoader();
 		var geocoder = new google.maps.Geocoder();
-		geocoder.geocode({'address': l, 'region': 'es'}, showResult);
-		return false;
+		geocoder.geocode({'address': l, 'region': 'es'}, function(r,s) {
+			showList(r,s);	
+		});
 	}
 	function Slider(div) {
 		this.value = 2,
@@ -162,17 +180,49 @@
 				menuSearch.className="menu search";
 			})
 		})
-		function searchLocation() {if (!loadMapsAPI("geoCode")) geoCode(); return false;};
+		// Selección de ruta
+		function enableRouter(enable) {
+			var _slider = document.getElementById("search-d"),
+				_destinput = document.getElementById("address-dest"),
+				_button = document.getElementById("route");
+			if (enable) {
+				is_route = true;
+				_button.className += " on";
+				_slider.style.display = "none";
+				_destinput.removeAttribute("disabled");
+			} else {
+				is_route = false;
+				_button.className = "sprt directions";
+				_slider.style.display = "block";
+				_destinput.setAttribute("disabled", "disabled");
+			}
+		}
+		addEvent(document.getElementById("route"), "click", function() {
+			var cname=this.className;
+			enableRouter(cname.match(" on")==null);
+		})
+		function searchLocation() {
+			if (!loadMapsAPI("geoCode")) geoCode(); 
+			return false;
+		}
+		document.getElementById("address").onfocus=function() {
+			hideResult(); input_search="origin";
+		};
+		document.getElementById("address-dest").onfocus=function() {
+			hideResult(); input_search="destiny";
+		};
 		document.getElementById("search-form").onsubmit=searchLocation;
-		document.getElementById("search-b").onclick=searchLocation;
-		lockScroll("results-list");
+		document.getElementById("search-form-dest").onsubmit=searchLocation;
+		document.getElementById("search-b").onclick=loadResult;
+		lockScroll("results-list");		
+		lockScroll("results-list-dest");
 		searchDistance = new Slider("search-d");
 		initGeoloc();
 		var thePath = window.location.pathname.split("/");
 		if (thePath[1]=="resultados") {
-			var place = decodeURIComponent(thePath[2]);
-			document.getElementById("address").value = place;
+			document.getElementById("address").value = decodeURIComponent(thePath[2]);
 			searchDistance.updateSlider(parseFloat(thePath[5]));
+			place1=thePath.slice(2,5).join("/");
 		}
 	});
 })(window);

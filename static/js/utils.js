@@ -294,50 +294,66 @@ function distance(a,b,r) {
 	if (dlat<r) {
 		var dlon = Math.abs(a[1]-b[1])*Lon2Km;
 		if (dlon<r) {
-			var dist = Math.sqrt(Math.pow(dlat,2)+Math.pow(dlon,2));
+			var dist = Math.sqrt(dlat*dlat+dlon*dlon);
 			if (dist<r) return dist;
 		}
 	}
-	return null;
+	return false;
 }
 
 // Distancia de un punto a una recta
-function distanceOrto(p, p1,p2) {
-	// if start and end point are on the same x the distance is the difference in X.
-	if (p1.lng()==p2.lng()) return Math.abs(p.lat()-p1.lat());
+// function distanceOrto(p, p1,p2) {
+// 	// if start and end point are on the same x the distance is the difference in X.
+// 	if (p1.lng()==p2.lng()) return Math.abs(p.lat()-p1.lat());
+// 	else {
+// 		var slope = (p2.lat() - p1.lat())/(p2.lng() - p1.lng());
+// 		var intercept = p1.lat()-(slope*p1.lng());
+// 		return Math.abs(slope*p.lng()-p.lat()+intercept)/Math.sqrt(slope*slope+1);
+// 	}
+// }
+
+function distanceOrto(p,a,b,r)  {
+	// http://www.matematicas.unam.mx/gfgf/ga20071/data/lecturas/lectura13a.pdf
+	var u = [b[0]-a[0], b[1]-a[1]],	// vector del segmento
+		norm_u_2 = u[0]*u[0]+u[1]*u[1],
+		ap = [p[0]-a[0],p[1]-a[1]],
+		t = (ap[0]*u[0]+ap[1]+u[1])/norm_u_2;
+	if (t<=0) return distance(p,a,r);
+	else if (t>=1) return distance(p,b,r);
 	else {
-		var slope = (p2.lat() - p1.lat())/(p2.lng() - p1.lng());
-		var intercept = p1.lat()-(slope*p1.lng());
-		return Math.abs(slope*p.lng()-p.lat()+intercept)/Math.sqrt(slope*slope+1);
+		var v = [(a[0]+t*u[0]-p[0])*Lat2Km, (a[1]+t*u[1]-p[1])*Lon2Km],
+			dseg = Math.sqrt(v[0]*v[0] + v[1]*v[1]);
+		// var d = Math.abs((ap[0]*u[1]-ap[1]*u[0]) / Math.sqrt(norm_u_2));
+		return (dseg<r);
 	}
 }
 // Ramer–Douglas–Peucker algorithm
 // http://karthaus.nl/rdp/js/rdp.js
-function properRDP(points,epsilon){
-	if (typeof(epsilon)=="undefined") epsilon = 1*Km2LL;
-	var firstPoint=points[0];
-	var lastPoint=points[points.length-1];
-	if (points.length<3){
-		return points;
-	}
-	var index=-1;
-	var dist=0;
-	for (var i=1;i<points.length-1;i++){
-		var cDist=distanceOrto(points[i],firstPoint,lastPoint);
-		if (cDist>dist){
-			dist=cDist;
-			index=i;
-		}
-	}
-	if (dist>epsilon){
-		var l1=points.slice(0, index+1);
-		var l2=points.slice(index);
-		var r1=properRDP(l1,epsilon);
-		var r2=properRDP(l2,epsilon);
-		// concat r2 to r1 minus the end/startpoint that will be the same
-		 return r1.slice(0,r1.length-1).concat(r2);
-	} else return [firstPoint,lastPoint];
-}
+// function properRDP(points,epsilon){
+// 	if (typeof(epsilon)=="undefined") epsilon = 1*Km2LL;
+// 	var firstPoint=points[0];
+// 	var lastPoint=points[points.length-1];
+// 	if (points.length<3){
+// 		return points;
+// 	}
+// 	var index=-1;
+// 	var dist=0;
+// 	for (var i=1;i<points.length-1;i++){
+// 		var cDist=distanceOrto(points[i],firstPoint,lastPoint);
+// 		if (cDist>dist){
+// 			dist=cDist;
+// 			index=i;
+// 		}
+// 	}
+// 	if (dist>epsilon){
+// 		var l1=points.slice(0, index+1);
+// 		var l2=points.slice(index);
+// 		var r1=properRDP(l1,epsilon);
+// 		var r2=properRDP(l2,epsilon);
+// 		// concat r2 to r1 minus the end/startpoint that will be the same
+// 		 return r1.slice(0,r1.length-1).concat(r2);
+// 	} else return [firstPoint,lastPoint];
+// }
 
 /********************/
 /* EL OBJETO GASOLE */
@@ -518,49 +534,69 @@ function Gasole(callback) {
 		if (sort) return result.sort(function(a,b){return (a[sort]<b[sort]) ? -1 : 1;});
 		return result;
 	}
+	// this.routeData = function(route) {
+	// 	var result = [];
+	// 	var type = this.type;
+	// 	this.stats = new Stats();
+	// 	var dist = Km2LL;
+	// 	// Puntos kilométricos
+	// 	for (var prov in this.info) {
+	// 		var infop = this.info[prov];
+	// 		for (var town in infop) {
+	// 			var infot = infop[town];
+	// 			for (var station in infot) {
+	// 				var st = infot[station];
+	// 				var price = st.o[type];
+	// 				if (price) {
+	// 					var g = st.g;
+	// 					if (g) {
+	// 						var valid = false;
+	// 						var geo = new google.maps.LatLng(g[0],g[1]);
+	// 						for (var wp=0; wp<route.length-1; wp++) {
+	// 							var d0 = distance(g, [route[wp].lat(), route[wp].lng()], dist);
+	// 							if (d0) valid = true;
+	// 							else {
+	// 								var d1 = distance(g, [route[wp+1].lat(), route[wp+1].lng()], dist);
+	// 								if (d1) valid = true;
+	// 								else {
+	// 									var area = new google.maps.LatLngBounds(route[wp],route[wp+1]);
+	// 									if (area.contains(geo)) {
+	// 										var d = distanceOrto(geo,route[wp],route[wp+1]);
+	// 										if (d<dist) valid = true;
+	// 									}
+	// 								}
+	// 							}
+	// 						}
+	// 						if (valid) {
+	// 							result.push({a:station,r:st.r,g:g,p:price,t:town,l:st.l,d:d});
+	// 							this.stats.add(price);
+	// 						}
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// 	return result;
+	// }
 	this.routeData = function(route) {
-		var result = [];
-		var type = this.type;
-		this.stats = new Stats();
-		var dist = Km2LL;
-		// Puntos kilométricos
-
-		for (var prov in this.info) {
-			var infop = this.info[prov];
-			for (var town in infop) {
-				var infot = infop[town];
-				for (var station in infot) {
-					var st = infot[station];
-					var price = st.o[type];
-					if (price) {
-						var g = st.g;
-						if (g) {
-							var valid = false;
-							var geo = new google.maps.LatLng(g[0],g[1]);
-							for (var wp=0; wp<route.length-1; wp++) {
-								var d0 = distance(g, [route[wp].lat(), route[wp].lng()], dist);
-								if (d0) valid = true;
-								else {
-									var d1 = distance(g, [route[wp+1].lat(), route[wp+1].lng()], dist);
-									if (d1) valid = true;
-									else {
-										var area = new google.maps.LatLngBounds(route[wp],route[wp+1]);
-										if (area.contains(geo)) {
-											var d = distanceOrto(geo,route[wp],route[wp+1]);
-											if (d<dist) valid = true;
-										}
-									}
-								}
-							}
-							if (valid) {
-								result.push({a:station,r:st.r,g:g,p:price,t:town,l:st.l,d:d});
-								this.stats.add(price);
-							}
-						}
+		var result = {},
+			dist = 1;
+		gasoleProcess(this.info, function(station,p,t,s) {
+			var g = station.g;
+			if (g) {
+				for (var wp=0,wpl=route.length-1; wp<wpl; wp++) {
+					var p1=route[wp],
+						p2=route[wp+1];
+					if (distanceOrto(g,[p1.lat(),p1.lng()],[p2.lat(),p2.lng()],dist)) {
+						var presult = result[p];
+						if (!presult) presult=result[p]={};
+						var tresult = presult[t];
+						if (!tresult) tresult=presult[t]={};
+						tresult[s] = station;		
 					}
 				}
 			}
-		}
+		});
 		return result;
 	}
 
@@ -716,6 +752,12 @@ function breadCrumb(id, label) {
 		if (pathArray[1]=="resultados") {
 			bc.textContent = "Cerca de "+decodeURIComponent(pathArray[2]);
 			bc.href = "#";
+			div.appendChild(bc);
+			return;
+		} else if (pathArray[1]=="ruta") {
+			bc.textContent = "Ruta entre "+decodeURIComponent(pathArray[2]) + " y" + decodeURIComponent(pathArray[3]);
+			bc.href = "#";
+			bc.title = bc.textContent;
 			div.appendChild(bc);
 			return;
 		}

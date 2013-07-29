@@ -95,6 +95,8 @@ header p {
 ul.menu {
 	font-size: 0;
 	background-color: #222;
+	height: 40px;
+	overflow: visible;
 }
 li.menu {
 	float: left;
@@ -109,7 +111,8 @@ li.menu .item {
 	color: #fff;
 	cursor: pointer;
 	padding: 5px;
-	height: 30px;
+	min-height: 30px;
+	max-height: 30px;
 	text-align: left;
 	font-size: 14px;
 	text-decoration: none;
@@ -324,19 +327,38 @@ footer ul a:hover{
 
 /* Formulario de búsqueda */
 .menu.search input[type=search] {
+	font-size: 13px;
 	outline: none;
 	border: none;
 	width: 355px;
 	height: 20px;
 	margin: 5px;
 }
-.menu.search.enabled #search-box {
+.place {
+	min-height: 40px;
+}
+#destiny {
+	margin-top: 5px;
+}
+.menu.search .item {
+	position: absolute;
+	z-index: 200;
+	-webkit-transition: max-height .4s;
+	   -moz-transition: max-height .4s;
+	    -ms-transition: max-height .4s;
+	     -o-transition: max-height .4s;
+	        transition: max-height .4s;
+}
+.menu.search.enabled .item {
 	max-height: 400px;
+	box-shadow: 0 5px 5px 1px rgba(0,0,0,.4);
 }
-.menu.search .sprt.search_icon {
+.sprt.search_icon, .sprt.directions {
 	float: left;
+	border-width: 1px;
+	padding: 1px;
 }
-#current-loc {
+.sprt.search_gps {
 	margin: 5px;
 	cursor: pointer;
 	float: right;
@@ -347,77 +369,76 @@ footer ul a:hover{
 	     -o-transition: opacity .2s;
 	        transition: opacity .2s;
 }
-.menu.search:hover #current-loc {
+.menu.search:hover .sprt.search_gps {
 	opacity: 1;
 }
-.menu.search:hover #current-loc:hover {
+.menu.search:hover .sprt.search_gps:hover {
 	opacity: .8;
 }
-
-#search-box {
-	border-top: none;
-	max-height: 0;
-	position: absolute;
-	left: 0;
-	top: 45px;
-	z-index: 100;
-	background-color: #8b4163;
-	width: 450px;
-	font-size: 14px;
-	overflow: hidden;
-	-webkit-transition: max-height .4s;
-	   -moz-transition: max-height .4s;
-	    -ms-transition: max-height .4s;
-	     -o-transition: max-height .4s;
-	        transition: max-height .4s;
-	color: #fff;
+.loader {
+	background-repeat: no-repeat;
+	width: 20px;
+	height: 20px;
+	margin-top: 8px;
+	float: right;
+	background-image: url('/img/loader.gif');
 }
-#search-form {
-	display: inline-block;
-	margin-left: 10px;
+.menu.search form {
 	width: 395px;
-	height: 30px;
+	margin-left: 5px;
+	display: inline-block;
+	min-height: 30px;
 	border-radius: 5px;
 	background-color: #fff;
 }
-#results, #search-options {
-	margin: 10px;
-}
 #search-options {
+	padding: 10px;
 	font-size: 12px;
 	height: 30px;
 }
-#results-list {
-	max-height: 200px;
+.results {
+	font-size: .9em;
+	z-index: 300;
+	max-height: 180px;
 	overflow-y: auto;
-	padding: 10px;
-	border-bottom: 1px solid #58110E;
+	background-color: #fff;
 }
-#results-list li {
+.results li {
+	cursor: pointer;
 	list-style: none;
-	font-size: 12px;
-	margin-top: 3px;
-}
-#results-list li > a {
-	display: block;
-	border-radius: 3px;
 	padding: 5px;
-	color: #fff;
-	border: 1px solid #fff;
-	text-decoration: none;
+	padding-left: 20px;
+	color: #ccc;
+	border-top: 1px solid #ccc;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
-#results-list li > a:hover {
-	background-color: #fff;
-	color: #8b4163;
+.results li:hover {
+	color: #333;
 }
-#results-list img {
-	margin-left: auto;
-	margin-right: auto;
+.sprt.directions {
+	float: left;
+	border-color: #ccc;
+	cursor: pointer;
+	border-radius: 3px;
+	border-style: solid;
 }
-#search-box .button {
+.sprt.directions:hover {
+	opacity: .7;
+}
+.sprt.directions.on {
+	border-color: #fff;
+	color: #fff;
+	background-color: #58110e;
+}
+#search-form-dest {
+	opacity: .3;
+}
+.on + #search-form-dest {
+	opacity: 1;
+}
+.menu.search .button {
 	width: 100px;
 	height: 16px;
 	float: right;
@@ -428,11 +449,12 @@ footer ul a:hover{
 	box-shadow: 0 0 0 1px rgba(0,0,0,.3);
 	text-align: center;
 	cursor: pointer;
+	float: right;
 }
-#search-box .button:hover {
+.menu.search .button:hover {
 	opacity: .8;
 }
-#search-box .button:active {
+.menu.search .button:active {
 	background-color: rgba(0,0,0,.1);
 	border: 1px solid rgba(0,0,0,.1);
 }
@@ -440,7 +462,7 @@ footer ul a:hover{
 /* my-slider */
 .my-slider {
 	border: 1px solid #fff;
-	width: 300px;
+	width: 250px;
 	height: 25px;
 	background: #8b4163;
 	cursor: pointer;
@@ -449,6 +471,17 @@ footer ul a:hover{
 	background-repeat: repeat-x;
 	float: left;
 	overflow: hidden;
+	margin-left: 25px;
+}
+.middle {
+	padding: 10px;
+	font-size: .9em;
+}
+.helper {
+	margin-left: 28px;
+	padding: 5px;
+	color: #ccc;
+	font-size: .8em;
 }
 .my-slider .bar {
 	background-color: #622D46;
@@ -508,56 +541,56 @@ footer ul a:hover{
 .clock_med {width:20px; height:20px; background-position: -2px -33px}
 .clock_new {width:20px; height:20px; background-position: -24px -33px}
 .clock_old {width:20px; height:20px; background-position: -2px -55px}
-.ic_audio {width:20px; height:20px; background-position: -24px -55px}
-.ic_captcha {width:15px; height:13px; background-position: -46px -55px}
-.ic_content {width:15px; height:13px; background-position: -2px -77px}
-.ic_email {width:15px; height:13px; background-position: -19px -77px}
-.ic_help {width:20px; height:20px; background-position: -36px -77px}
-.ic_image {width:20px; height:20px; background-position: -2px -99px}
-.ic_link {width:15px; height:13px; background-position: -24px -99px}
-.ic_name {width:15px; height:13px; background-position: -41px -99px}
-.ic_points {width:15px; height:13px; background-position: -2px -121px}
-.ic_reload {width:20px; height:20px; background-position: -19px -121px}
-.ic_star {width:15px; height:13px; background-position: -41px -121px}
-.ic_title {width:20px; height:20px; background-position: -2px -143px}
-.layers {width:25px; height:25px; background-position: -24px -143px}
-.locate {width:20px; height:20px; background-position: -2px -170px}
-.logo_fb {width:30px; height:30px; background-position: -24px -170px}
-.logo_fs {width:30px; height:30px; background-position: -2px -202px}
-.logo_gp {width:30px; height:30px; background-position: -2px -234px}
-.logo_tt {width:30px; height:30px; background-position: -2px -266px}
-.m_about {width:25px; height:25px; background-position: -34px -266px}
-.m_cards {width:25px; height:25px; background-position: -2px -298px}
-.m_home {width:25px; height:25px; background-position: -29px -298px}
-.m_info {width:25px; height:25px; background-position: -2px -325px}
-.m_news {width:25px; height:25px; background-position: -29px -325px}
-.m_stats {width:25px; height:25px; background-position: -2px -352px}
-.marker_blue {width:15px; height:15px; background-position: -29px -352px}
-.marker_green {width:15px; height:15px; background-position: -46px -352px}
-.marker_red {width:15px; height:15px; background-position: -2px -379px}
-.p_city {width:20px; height:20px; background-position: -19px -379px}
-.p_distance {width:20px; height:20px; background-position: -41px -379px}
-.p_filter {width:20px; height:20px; background-position: -2px -401px}
-.p_info {width:20px; height:20px; background-position: -24px -401px}
-.p_pump {width:20px; height:20px; background-position: -2px -423px}
-.pag_less {width:30px; height:30px; background-position: -24px -423px}
-.pag_more {width:30px; height:30px; background-position: -2px -455px}
-.pump {width:30px; height:30px; background-position: -2px -487px}
-.pump_b {width:25px; height:25px; background-position: -34px -487px}
-.pump_g {width:25px; height:25px; background-position: -2px -519px}
-.pump_r {width:25px; height:25px; background-position: -29px -519px}
-.pump_y {width:25px; height:25px; background-position: -2px -546px}
-.search_gps {width:20px; height:20px; background-position: -29px -546px}
-.search_icon {width:25px; height:25px; background-position: -2px -573px}
-.sort {width:10px; height:20px; background-position: -29px -573px}
-.sort_down-.sort {width:10px; height:20px; background-position: -41px -573px}
-.sort_up-.sort {width:10px; height:20px; background-position: -41px -573px}
-.star.soff {width:20px; height:20px; background-position: -2px -600px}
-.star.son {width:20px; height:20px; background-position: -24px -600px}
-.star_mini.soff {width:12px; height:12px; background-position: -46px -600px}
-.star_mini.son {width:12px; height:12px; background-position: -2px -622px}
-.the_best {width:35px; height:55px; background-position: -16px -622px}
-
+.directions {width:25px; height:25px; background-position: -24px -55px}
+.ic_audio {width:20px; height:20px; background-position: -2px -82px}
+.ic_captcha {width:15px; height:13px; background-position: -24px -82px}
+.ic_content {width:15px; height:13px; background-position: -41px -82px}
+.ic_email {width:15px; height:13px; background-position: -2px -104px}
+.ic_help {width:20px; height:20px; background-position: -19px -104px}
+.ic_image {width:20px; height:20px; background-position: -41px -104px}
+.ic_link {width:15px; height:13px; background-position: -2px -126px}
+.ic_name {width:15px; height:13px; background-position: -19px -126px}
+.ic_points {width:15px; height:13px; background-position: -36px -126px}
+.ic_reload {width:20px; height:20px; background-position: -2px -141px}
+.ic_star {width:15px; height:13px; background-position: -24px -141px}
+.ic_title {width:20px; height:20px; background-position: -41px -141px}
+.layers {width:25px; height:25px; background-position: -2px -163px}
+.locate {width:20px; height:20px; background-position: -29px -163px}
+.logo_fb {width:30px; height:30px; background-position: -2px -190px}
+.logo_fs {width:30px; height:30px; background-position: -2px -222px}
+.logo_gp {width:30px; height:30px; background-position: -2px -254px}
+.logo_tt {width:30px; height:30px; background-position: -2px -286px}
+.m_about {width:25px; height:25px; background-position: -34px -286px}
+.m_cards {width:25px; height:25px; background-position: -2px -318px}
+.m_home {width:25px; height:25px; background-position: -29px -318px}
+.m_info {width:25px; height:25px; background-position: -2px -345px}
+.m_news {width:25px; height:25px; background-position: -29px -345px}
+.m_stats {width:25px; height:25px; background-position: -2px -372px}
+.marker_blue {width:15px; height:15px; background-position: -29px -372px}
+.marker_green {width:15px; height:15px; background-position: -46px -372px}
+.marker_red {width:15px; height:15px; background-position: -2px -399px}
+.p_city {width:20px; height:20px; background-position: -19px -399px}
+.p_distance {width:20px; height:20px; background-position: -41px -399px}
+.p_filter {width:20px; height:20px; background-position: -2px -421px}
+.p_info {width:20px; height:20px; background-position: -24px -421px}
+.p_pump {width:20px; height:20px; background-position: -2px -443px}
+.pag_less {width:30px; height:30px; background-position: -24px -443px}
+.pag_more {width:30px; height:30px; background-position: -2px -475px}
+.pump {width:30px; height:30px; background-position: -2px -507px}
+.pump_b {width:25px; height:25px; background-position: -34px -507px}
+.pump_g {width:25px; height:25px; background-position: -2px -539px}
+.pump_r {width:25px; height:25px; background-position: -29px -539px}
+.pump_y {width:25px; height:25px; background-position: -2px -566px}
+.search_gps {width:20px; height:20px; background-position: -29px -566px}
+.search_icon {width:25px; height:25px; background-position: -2px -593px}
+.sort {width:10px; height:20px; background-position: -29px -593px}
+.sort_down-.sort {width:10px; height:20px; background-position: -41px -593px}
+.sort_up-.sort {width:10px; height:20px; background-position: -41px -593px}
+.star.soff {width:20px; height:20px; background-position: -2px -620px}
+.star.son {width:20px; height:20px; background-position: -24px -620px}
+.star_mini.soff {width:12px; height:12px; background-position: -46px -620px}
+.star_mini.son {width:12px; height:12px; background-position: -2px -642px}
+.the_best {width:35px; height:55px; background-position: -16px -642px}
 
 /* Sprites logos */
 .logo {width:30px; height:20px; position: absolute; left: 0; overflow:hidden; background-repeat: no-repeat;background-image:url(/img/logos/logos.png);}

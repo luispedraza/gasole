@@ -296,7 +296,8 @@ class HistoryApi(BaseHandler):
 
 class SearchResults(BaseAuthHandler):
     def get(self, place, lat, lon, dist):
-        title = "Gasolineras cerca de " + decode_param(place)
+        place = decode_param(place)
+        title = "Gasolineras cerca de " + place
         self.render("base.html", 
             title = title,
             styles=["/css/list.css"],
@@ -304,7 +305,21 @@ class SearchResults(BaseAuthHandler):
             user=self.get_logged_user(),
             content="list.html",
             og={"title": title,
-                "desc": u"Resultado de búsqueda de gasolineras en GasOle.net",
+                "desc": u"Resultado de búsqueda de gasolineras en GasOle.net, cerca de "+place,
+                "url": self.request.get("url")})
+class SearchRoute(BaseAuthHandler):
+    def get(self, place1, place2):
+        place1 = decode_param(place1)
+        place2 = decode_param(place2)
+        title = "Gasolineras entre " + place1 + " y " + place2
+        self.render("base.html", 
+            title = title,
+            styles=["/css/list.css"],
+            scripts=[GOOGLE_MAPS_API]+get_js('list.js',DEBUG),
+            user=self.get_logged_user(),
+            content="list.html",
+            og={"title": title,
+                "desc": u"Resultado de búsqueda de ruta en GasOle.net, entre "+place1+" y "+place2,
                 "url": self.request.get("url")})
 
 class Info(BaseAuthHandler):
@@ -403,6 +418,7 @@ app = webapp2.WSGIApplication([
     ('/api/gasole', Api),
     # ('/geo/(.+)/(.+)/(.+)/(.+)/?', GeoApi),
     ('/resultados/(.+)/(.+)/(.+)/(.+)/?', SearchResults),
+    ('/ruta/(.+)/(.+)/?', SearchRoute),
     ('/info/(noticias|acercade|combustibles)/?', Info),
     webapp2.Route(r'/api/c/<p>/<t>/<s>', handler=CommentsApi, name='comments-api'), # comentarios
     webapp2.Route(r'/api/h/<p>/<t>/<s>', handler=HistoryApi, name='history-api'),   # históricos
