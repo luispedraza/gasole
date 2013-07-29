@@ -1,5 +1,24 @@
-﻿gasole.net es el sitio donde podrás encontrar gasolina barata en toda España.
+/* TEAM */       
+Owner: Luis Pedraza
+Site: http://www.luispedraza.es
+Twitter: @luispedraza       
+Location: Madrid, Spain.
 
-El sitio es creación de Luis Pedraza:
-- Twitter: @luispedraza
-- about.me/luispedraza
+Developer: Luis Pedraza
+Site: http://www.luispedraza.es
+Twitter: @luispedraza       
+Location: Madrid, Spain.
+
+Designer: Luis Pedraza
+Site: http://www.luispedraza.es
+Twitter: @luispedraza       
+Location: Madrid, Spain.
+
+/* THANKS */
+To: Juanje Gómez
+Twitter: @huahe
+							
+Name: name or url
+
+/* SITE */
+Language: Spanish
