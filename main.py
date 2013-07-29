@@ -44,7 +44,7 @@ class MainHandler(BaseAuthHandler):
             user=self.get_logged_user(),
             content="home.html",
             og={"title": u"GasOle.net",
-                "desc": u"Aquí encontrarás la gasolina más barata de España y las gasolineras mejor valoradas.",
+                "desc": u"La gasolina más barata de España y las gasolineras mejor valoradas.",
                 "url": u"http://www.gasole.net"})
 
 class AdminHandler(BaseHandler):
@@ -57,7 +57,6 @@ class AdminHandler(BaseHandler):
         self.render("admin_main.html",
             log_url = log_url,
             log_text = log_text)
-
 class AdminUpdate(BaseHandler):
     def get(self, method):
         if method and method=="csv":
@@ -86,7 +85,6 @@ class AdminUpdate(BaseHandler):
                 data=data)
         if self.request.get("updatedb"):
                 data2store(data.data)
-
 class AdminSearch(BaseHandler):
     def get(self):
         self.render("admin_search.html",
@@ -135,9 +133,8 @@ class List(BaseAuthHandler):
             user=self.get_logged_user(),
             content="list.html",
             og={"title": u"Todas las "+title,
-                "desc": u"Precios y mapa de todas las gasolineras, en GasOle.net",
-                "url": self.request.get("url")})
-
+                "desc": u"Precios y mapa de todas las gasolineras en GasOle.net",
+                "url": self.request.url})
 class Detail(BaseAuthHandler):
     def get(self, province, town, station):
         # Vista de detalle de una gasolinera
@@ -159,8 +156,8 @@ class Detail(BaseAuthHandler):
             content="detail.html",
             edit_station=edit_station,
             og={"title": title,
-                "desc": u"Echad un ojo a esta gasolinera que he encontrado en GasOle.net",
-                "url": self.request.get("url")})
+                "desc": u"Echad un ojo a esta gasolinera en GasOle.net",
+                "url": self.request.url})
 
 # class Gzip(BaseHandler):
 #     def get(self, prov, town, station):
@@ -184,7 +181,6 @@ class Api(BaseHandler):
         info = getGasole().decode('zlib')
         self.response.headers['Content-Type'] = 'application/json; charset=utf-8'
         self.write(info)
-
 # api de actualización de estaciones
 class StationApi(BaseAuthHandler):
      def post(self,p,t,s):
@@ -211,7 +207,6 @@ class StationApi(BaseAuthHandler):
                 sdata.link = link
             sdata.put()
             self.redirect("/ficha/"+p+"/"+t+"/"+s)
-
 #api de comentarios de una gasolinera
 class CommentsApi(BaseAuthHandler):
     def remove_html_tags(self,s):
@@ -282,7 +277,6 @@ class CommentsApi(BaseAuthHandler):
         result["ERROR"] = errors
         self.response.headers['Content-Type'] = 'application/json; charset=utf-8'
         self.write(json.dumps(result))
-
 #api de históricos de una gasolinera
 class HistoryApi(BaseHandler):
     def get(self,p,t,s):
@@ -305,8 +299,8 @@ class SearchResults(BaseAuthHandler):
             user=self.get_logged_user(),
             content="list.html",
             og={"title": title,
-                "desc": u"Resultado de búsqueda de gasolineras en GasOle.net, cerca de "+place,
-                "url": self.request.get("url")})
+                "desc": u"Búsqueda de gasolineras en GasOle.net, cerca de "+place,
+                "url": self.request.url})
 class SearchRoute(BaseAuthHandler):
     def get(self, place1, place2):
         place1 = decode_param(place1)
@@ -319,9 +313,8 @@ class SearchRoute(BaseAuthHandler):
             user=self.get_logged_user(),
             content="list.html",
             og={"title": title,
-                "desc": u"Resultado de búsqueda de ruta en GasOle.net, entre "+place1+" y "+place2,
-                "url": self.request.get("url")})
-
+                "desc": u"Gasolineras en ruta entre "+place1+" y "+place2,
+                "url": self.request.url})
 class Info(BaseAuthHandler):
     def get(self, section):
         logging.info(section)
@@ -330,7 +323,7 @@ class Info(BaseAuthHandler):
         content=""
         scripts=get_js('info.js',DEBUG)
         styles=["/css/info.css"]
-        canonical=u"http://info/"
+        canonical=u"http://gasole.net/info/"
         if section=="combustibles":
             content="info_combustibles.html"
             canonical+="combustibles"
@@ -359,19 +352,16 @@ class Info(BaseAuthHandler):
             og={"title": title,
                 "desc": desc,
                 "url": canonical})
-
 def handle_404(request, response, exception):
     #http://webapp-improved.appspot.com/guide/exceptions.html
     logging.info(request)
     logging.exception(exception)
     response.set_status(404)
     response.write(jinja_env.get_template("404.html").render())
-    
 def handle_500(request, response, exception):
     logging.exception(exception)
     response.set_status(500)
     response.write(jinja_env.get_template("500.html").render())
-
 class Stats(BaseAuthHandler):
     def get(self):
         self.render("base.html",
@@ -380,9 +370,9 @@ class Stats(BaseAuthHandler):
             styles  = ['/css/graficos.css'],
             user=self.get_logged_user(),
             content = "charts.html",
-            og={"title": u"Gráficos de GasOle.net",
+            og={"title": u"Gráficos de gasolinas en GasOle.net",
                 "desc": u"Gráficos del precio de la gasolina y la densidad de gasolineras en España..",
-                "url": self.request.get("url")})
+                "url": self.request.url})
         
 # class StatsApi(BaseHandler):
 #     def get(self, prov, town):

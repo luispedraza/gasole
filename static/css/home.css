@@ -18,7 +18,6 @@
 	float: left;
 }
 #social {
-	z-index: 200;
 	width: 48%;
 	height: 60px;
 	float: right;
@@ -41,6 +40,9 @@
 #social .addthis_toolbox {
 	height: 60px;
 	float:left;
+}
+.fb_iframe_widget iframe {
+	z-index: 10000;
 }
 .addthis_toolbox > a {
 	display: inline-block !important;
