@@ -17,10 +17,19 @@
 		is_route = false;
 	/* Va a por los resultados de búsqueda */
 	function loadResult() {
-		if ((!is_route) && place1)
-			window.location="/resultados/"+place1+"/"+searchDistance.getvalue().toFixed(2);
-		else if (is_route && place1 && place2)
-			window.location="/ruta/"+place1.split("/")[0]+"/"+place2.split("/")[0];
+		if (!is_route) {
+			if (place1) {
+				window.location="/resultados/"+place1+"/"+searchDistance.getvalue().toFixed(2);
+			} else {
+				window.geoCodeAndGo = function() {geoCode(true);}
+				if (!loadMapsAPI("geoCodeAndGo")) geoCodeAndGo();
+			}
+		}
+		else if (is_route) {
+			if (place1 && place2) {
+				window.location="/ruta/"+place1.split("/")[0]+"/"+place2.split("/")[0];
+			}
+		}	
 	}
 	function showLoader() {
 		/* Muestra el spinner de carga */
@@ -65,7 +74,7 @@
 			if (!loadMapsAPI("loadCurrentPosition")) loadCurrentPosition();
 		});
 	}
-	function showList(r,s) {
+	function showList(r,s,go) {
 		/* Muestra los resultados de geolocalización */
 		hideLoader();
 		var input = document.getElementById("address"+((input_search=="origin") ? "" : "-dest"));
@@ -97,10 +106,12 @@
 				}
 			}
 			if (valid==1) {
+				console.log("solo 1", input_search);
 				if (input_search=="origin") place1=href;
 				else place2=href;
 				input.value = addr;
 				hideResult();
+				if (go) window.location="/resultados/"+href+"/"+searchDistance.getvalue().toFixed(2);
 			}
 			return;
 		}
@@ -110,7 +121,7 @@
 		document.getElementById("results-list"+((input_search=="origin") ? "" : "-dest"))
 			.innerHTML="";
 	}
-	window.geoCode = function() {
+	window.geoCode = function(go) {
 		/* Codifica una dirección, obteniendo lat y lon */
 		var addr = (input_search=="origin") ? "address" : "address-dest";
 		var l = document.getElementById(addr).value;
@@ -125,7 +136,7 @@
 		showLoader();
 		var geocoder = new google.maps.Geocoder();
 		geocoder.geocode({'address': l, 'region': 'es'}, function(r,s) {
-			showList(r,s);	
+			showList(r,s,go);
 		});
 	}
 	function Slider(div) {
@@ -202,7 +213,7 @@
 			enableRouter(cname.match(" on")==null);
 		})
 		function searchLocation() {
-			if (!loadMapsAPI("geoCode")) geoCode(); 
+			if (!loadMapsAPI("geoCode")) geoCode();
 			return false;
 		}
 		document.getElementById("address").onfocus=function() {

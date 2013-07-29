@@ -355,7 +355,7 @@ footer ul a:hover{
 }
 .sprt.search_icon, .sprt.directions {
 	float: left;
-	border-width: 1px;
+	border: 1px solid #8b4163;
 	padding: 1px;
 }
 .sprt.search_gps {
@@ -419,9 +419,8 @@ footer ul a:hover{
 }
 .sprt.directions {
 	float: left;
-	border-color: #ccc;
+	border-color: #fff;
 	cursor: pointer;
-	border-radius: 3px;
 	border-style: solid;
 }
 .sprt.directions:hover {
