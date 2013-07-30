@@ -64,7 +64,7 @@ function newReference(loc) {
 }
 /* Paginación de la tabla */
 function paginateTable(index) {
-	var pagerN = 15,
+	var pagerN = 12,
 		rows = document.getElementById("table-data").getElementsByClassName("r_on"),
 		rlen = rows.length,
 		nores = document.getElementById("no-results"),
