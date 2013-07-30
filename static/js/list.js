@@ -65,7 +65,7 @@ function newReference(loc) {
 }
 /* Paginación de la tabla */
 function paginateTable(index) {
-	var pagerN = 15,
+	var pagerN = 12,
 		//rows = document.getElementById("table-data").getElementsByClassName("r_on"),
 		rows = getAllElementsByClassName(document.getElementById("table-data"),"r_on"), //ie8
 		rlen = rows.length,
@@ -169,6 +169,7 @@ function updateMarkers() {
 /* Ordenación de la tabla */
 function sortTable(cname, reverse) {
 	if (typeof reverse == "undefined") reverse = false;
+	var isfloat = !((cname=="T_LOC")||(cname=="T_ADDR"))
 	var table_data = document.getElementById("table-data");
 	//var	values = table_data.getElementsByClassName(cname);
 	var values = getAllElementsByClassName(table_data,cname); //ie8
@@ -177,7 +178,7 @@ function sortTable(cname, reverse) {
 		value;
 	for (var v=0, vlen=values.length; v<vlen; v++) {
 		value = values[v].textContent;
-		if (value) array.push([parseFloat(value), v]);
+		if (value) array.push([isfloat ? parseFloat(value) : value, v]);
 	}
 	array.sort(function(a,b) {
 		a=a[0];b=b[0];
