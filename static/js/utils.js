@@ -222,11 +222,19 @@ function getLogo(label) {
 }
 
 /* Decodifica un nombre de url a representación humana */
-function decodeName(s) {return decodeURI(s).replace(/_/g, " ").replace(/\|/g, "/");}
+function decodeName(s) {
+	// return decodeURI(s);
+	return decodeURI(s).replace(/_/g, " ").replace(/\|/g, "/");
+}
 /* Decodifica un array de nombres url a nombre legible */
-function decodeArray(a) {for (var n=0; n<a.length; n++) a[n]=decodeName(a[n]); return a;}
+function decodeArray(a) {
+	for (var n=0; n<a.length; n++) a[n]=decodeName(a[n]); return a;
+}
 /* Codifica un nombre para utilizar en una url */
-function encodeName(s) {return s.replace(/\//g, "|").replace(/ /g, "_");}
+function encodeName(s) {
+	// return encodeURI(s);
+	return encodeURI(s.replace(/\//g, "|").replace(/ /g, "_"));
+}
 
 /* Hace que un nombre sea más bonito para representación en pantalla */
 function prettyName(s) {
@@ -750,12 +758,12 @@ function breadCrumb(id, label) {
 		var bc = document.createElement("a");
 		bc.className = "bc";
 		if (pathArray[1]=="resultados") {
-			bc.textContent = "Cerca de "+decodeURIComponent(pathArray[2]);
+			bc.textContent = "Cerca de "+decodeURI(pathArray[2]);
 			bc.href = "#";
 			div.appendChild(bc);
 			return;
 		} else if (pathArray[1]=="ruta") {
-			bc.textContent = "Ruta entre "+decodeURIComponent(pathArray[2]) + " y" + decodeURIComponent(pathArray[3]);
+			bc.textContent = "Ruta entre "+decodeURI(pathArray[2]) + " y" + decodeURI(pathArray[3]);
 			bc.href = "#";
 			bc.title = bc.textContent;
 			div.appendChild(bc);

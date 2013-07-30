@@ -21,6 +21,9 @@ handlers:
 - url: /humans.txt
   static_files: static/txt/humans.txt
   upload: static/txt/humans.txt
+- url: /fsg758a0.txt
+  static_files: static/txt/fsg758a0.txt
+  upload: static/txt/fsg758a0.txt
 - url: /tasks/history
   script: cron_update.app
   login: admin

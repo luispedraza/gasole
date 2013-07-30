@@ -27,7 +27,8 @@ def toc():
     logging.info("Tiempo transcurrido (ms): " + str((time()-TIME)*1000))
 
 def decode_param(s):
-    return s.decode('utf-8').replace("_", " ").replace("|", "/")
+    # return urllib.unquote(s.decode('utf-8'))
+    return urllib.unquote(s.decode('utf-8')).replace("_", " ").replace("|", "/")
 
 def get_points(s):
     try:
