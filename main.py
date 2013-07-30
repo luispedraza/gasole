@@ -58,6 +58,7 @@ class AdminHandler(BaseHandler):
         self.render("admin_main.html",
             log_url = log_url,
             log_text = log_text)
+
 class AdminUpdate(BaseHandler):
     def get(self, method):
         if method and method=="csv":
@@ -86,6 +87,43 @@ class AdminUpdate(BaseHandler):
                 data=data)
         if self.request.get("updatedb"):
                 data2store(data.data)
+
+# class AdminSearch(BaseHandler):
+#     def get(self):
+#         self.render("admin_search.html",
+#             options = FUEL_OPTIONS,
+#             provs = PROVS)
+#     def post(self):
+#         option = self.request.get("option")
+#         prov = self.request.get("prov")
+#         update = self.request.get("updatedb")
+#         data = gas_update_search(prov=prov, option=option)
+#         static_map = ""
+#         if data:
+#             markers = filter(None, [d[-1] for d in data])
+#             static_map = get_static_map(markers[:50])
+#         self.render("admin_search.html",
+#             options = FUEL_OPTIONS,
+#             provs = PROVS,
+#             data = data,
+#             static_map = static_map)
+#         if update:
+#             _geodata = []
+#             data = data.data
+#             for p in data.keys():
+#                 datap = data[p]
+#                 for t in datap.keys():
+#                     datat = datap[t]
+#                     for s in datat.keys():
+#                         datas = datat[s]
+#                         g = datas.get("latlon")
+#                         if g:
+#                             station = GasStation.get(db.Key.from_path('Province', p, 'Town', t, 'GasStation', s))
+#                             if station:
+#                                 station.geopt = db.GeoPt(lat = data[p][t][s]["latlon"][1], lon = data[p][t][s]["latlon"][0])
+#                                 _geodata.append(station)
+#             db.put(_geodata)
+#             logging.info("guardadas %s posiciones" %len(_geodata))
 class AdminSearch(BaseHandler):
     def get(self):
         self.render("admin_search.html",
@@ -106,18 +144,7 @@ class AdminSearch(BaseHandler):
             data = data,
             static_map = static_map)
         if update:
-            _geodata = []
-            data = data.data
-            for p in data.keys():
-                for t in data[p].keys():
-                    for s in data[p][t].keys():
-                        if data[p][t][s].has_key("latlon") and data[p][t][s]["latlon"]:
-                            station = GasStation.get(db.Key.from_path('Province', p, 'Town', t, 'GasStation', s))
-                            if station:
-                                station.geopt = db.GeoPt(lat = data[p][t][s]["latlon"][1], lon = data[p][t][s]["latlon"][0])
-                                _geodata.append(station)
-            db.put(_geodata)
-            logging.info("guardadas %s posiciones" %len(_geodata))
+            update_geopos(data)
 
 # class Data(BaseAuthHandler):
 #     def get(self, option, province):

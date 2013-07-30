@@ -1,13 +1,3 @@
-@font-face {
-    font-family: 'digital-7';
-    src: url('/font/digital-7-webfont.eot');
-    src: url('/font/digital-7-webfont.eot?#iefix') format('embedded-opentype'),
-         url('/font/digital-7-webfont.woff') format('woff'),
-         url('/font/digital-7-webfont.ttf') format('truetype'),
-         url('/font/digital-7-webfont.svg#digital-7regular') format('svg');
-    font-weight: normal;
-    font-style: normal;
-} /* ie8 */
 #control {
 	width: 350px;
 }
@@ -578,7 +568,6 @@ th .sprt.sort {
 	-ms-transform: rotate(180deg);
 	transform: rotate(180deg);
 }
-
 th.off, td.off,tr.r_off, tr.f_off {
 	display: none;
 }

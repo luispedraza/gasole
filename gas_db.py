@@ -185,7 +185,47 @@ def data2store(data):
 	except Exception, e:
 		logging.error("No se ha podido guardar el Gzip")
 		logging.error(str(e))
-	
+
+def update_geopos(data):
+	geoN = 0
+	gasoledata = json.loads(getGasole().decode('zlib'))
+	gasole = None
+	if "_meta" in gasoledata:        # compatibilidad con la api antigua
+		gasole = gasoledata.get("_data")
+	else:
+		gasole = gasoledata
+	data = data.data
+	for p in data.keys():
+		datap = data[p]
+		gasolep = gasole.get(p)
+		logging.info(gasolep)
+		if not gasolep:
+			continue
+		for t in datap.keys():
+			datat = datap[t]
+			gasolet = gasolep.get(t)
+			if not gasolet:
+				continue
+			for s in datat.keys():
+				datas = datat[s]
+				gasoles = gasolet.get(s)
+				if not gasoles:
+					continue
+				g = datas.get("g")
+				if g:
+					geoN+=1
+					gasoles["g"] = [g[1],g[0]]
+	if geoN!=0:
+		try:
+			alldata = json.dumps(gasoledata).encode('zlib')
+			updateDB(dnew=[ApiAllJson(json=alldata)])
+			memcache.set("All", alldata)
+			logging.info("guardadas %s posiciones" %str(geoN))
+		except Exception, e:
+			logging.error("No se ha podido guardar la actualización de posición")
+			logging.error(str(e))
+
+
 # obtenemos información de la base de datos
 # def store2data(option=None, prov_kname=None):
 # 	q = PriceData.all()
