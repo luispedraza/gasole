@@ -155,6 +155,21 @@ function addEvent(el, evnt, func) {
 	}
 }
 
+// ie8
+// getelementsbyclassname 
+// http://stackoverflow.com/questions/9568969/getelementsbyclassname-ie8-object-doesnt-support-this-property-or-method
+function getAllElementsByClassName(obj,cn){
+    if(document.getElementsByClassName) // Returns NodeList here
+        return obj.getElementsByClassName(cn);
+    // IE8-
+    cn = cn.replace(/ *$/, '');
+    if(document.querySelectorAll) // Returns NodeList here
+        return obj.querySelectorAll((' ' + cn).replace(/ +/g, '.'));
+        
+}
+
+
+
 /* Bloqueo de scroll en el body cuando se hace scroll en un elemento */
 function lockScroll(id) {
 	if (typeof id=="string") id = document.getElementById(id);
@@ -215,7 +230,7 @@ function getLogo(label) {
 	if (label) {
 		/* Algunos errores del archivo del Ministerio */
 		label = label.replace(/camspa/i, "campsa");
-		logo = label.match(/\b(abycer|agla|alcampo|andamur|a\.?n\.? energeticos|avia|bonarea|b\.?p\.?|buquerin|campsa|carmoned|carrefour|cepsa|empresoil|eroski|esclatoil|galp|gasolben|iberdoex|leclerc|makro|meroil|norpetrol|petrem|petrocat|petromiralles|petronor|ramell|repostar|repsol|saras|shell|simply|staroil|tamoil|valcarce)\b/i);
+		var logo = label.match(/\b(abycer|agla|alcampo|andamur|a\.?n\.? energeticos|avia|bonarea|b\.?p\.?|buquerin|campsa|carmoned|carrefour|cepsa|empresoil|eroski|esclatoil|galp|gasolben|iberdoex|leclerc|makro|meroil|norpetrol|petrem|petrocat|petromiralles|petronor|ramell|repostar|repsol|saras|shell|simply|staroil|tamoil|valcarce)\b/i);
 		if (logo) return logo[0].replace(/\./g, "").replace(/ /g, "_").toLowerCase();	
 	}
 	return null;

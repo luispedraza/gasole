@@ -104,8 +104,8 @@
 		loader.className = "loader";
 		form.appendChild(loader);
 		// El input de comentarios
-		input.type = "search";
-		input.placeholder = placeholder;
+		input.setAttribute("type", "search");
+		input.setAttribute("placeholder", placeholder);
 		form.appendChild(input);
 		// La lista de resultados
 		ol.className = "results";

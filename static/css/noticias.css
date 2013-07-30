@@ -4,7 +4,16 @@
 
 .tumblr_post {
 	margin-top: 30px;
-	clear: both;
+	/* clear: both; */
+	width: 313px;
+	float:  left;
+	border: 1px solid #ccc;
+	padding:  10px;
+	margin:  0 10px 10px 0;
+	height: 448px;
+	position: relative;
+	/* overflow-y: auto; */
+	overflow: hidden;
 }
 
 .tumblr_post:after {
@@ -17,37 +26,41 @@
 }
 
 .tumblr_link {
-	text-align: right;
+	/* text-align: right; */
 	display: block;
 	font-size: 1.2em;
 	padding: 5px;
 	background-color: #3399CC;
 	color: #fff;
-	padding-left: 250px;
+	/* padding-left: 250px; */
 	text-decoration: none;
 	border-bottom: 5px solid #006699;
 }
 
 .tumblr_description {
-	margin-top: 20px;
 	line-height: 1.2em;
 }
+.tumblr_description p:first-child {
+	margin-top: 10px;
+}
+
 .tumblr_description p {
-	width: 730px;
-	float: right;
+	font-size: 14px;
+
 }
 .tumblr_description p:first-child:first-letter, .image + p:first-letter {
 	font-size: 250%;
     float: left;
-    margin: 10px 4px 0 0;
+    margin: 8px 4px 0 0;
     font-weight: bold;
 }
 .tumblr_description p.image {
-	width: 250px;
-	float: left;
+	margin-top: 0;
+	max-height: 174px;
+	overflow: hidden;
 }
 .tumblr_description p.image img {
-	max-width: 250px !important;
+	width: 312px !important;
 	height: auto !important;
 }
 
@@ -55,12 +68,15 @@
 	color: #006699;
 }
 .tumblr_description .link {
-	text-align: right;
+	bottom: 5px;
+	right: 10px;
+	position: absolute;
+
 }
 .tumblr_description .link a {
 	font-size: .8em;
 	text-decoration: none;
-	background-color: #ccc;
+	background-color: #aaa;
 	color: #fff;
 	padding: 3px;
 }
@@ -70,5 +86,8 @@
 
 /* Publicidad */
 .ads {
-	float: right;
+	clear: both;
+	width: 970px;
+	height: 90px;
+	margin: 10px auto 25px auto;
 }

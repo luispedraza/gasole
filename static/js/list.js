@@ -42,7 +42,8 @@ function newReference(loc) {
 		if (nearest) {
 			infoDiv.innerHTML = "La gasolinera más próxima en línera recta a " + 
 				addr + " se encuentra en " + 
-				nearest.getElementsByClassName("T_ADDR")[0].textContent;
+				//nearest.getElementsByClassName("T_ADDR")[0].textContent; 
+				getAllElementsByClassName(nearest,"T_ADDR")[0].textContent; //ie8
 		} else
 			infoDiv.innerHTML = "No se ha encontrado ninguna gasolinera.";
 		markerCenter.setAnimation(google.maps.Animation.DROP);
@@ -64,8 +65,9 @@ function newReference(loc) {
 }
 /* Paginación de la tabla */
 function paginateTable(index) {
-	var pagerN = 12,
-		rows = document.getElementById("table-data").getElementsByClassName("r_on"),
+	var pagerN = 15,
+		//rows = document.getElementById("table-data").getElementsByClassName("r_on"),
+		rows = getAllElementsByClassName(document.getElementById("table-data"),"r_on"), //ie8
 		rlen = rows.length,
 		nores = document.getElementById("no-results"),
 		pagerDiv = document.getElementById("pager"),
@@ -96,7 +98,9 @@ function paginateTable(index) {
 }
 /* Cálculo de distancias al marcador de referencia markerCenter */
 function calcDistances() {
-	var tds = document.getElementById("table-data").getElementsByClassName("T_DIST");
+	//var tds = document.getElementById("table-data").getElementsByClassName("T_DIST");
+	var tds = getAllElementsByClassName(document.getElementById("table-data"),"T_DIST"); //ie8
+
 	for (var i=0, tdslen=tds.length; i<tdslen; i++) {
 		var latlon = tds[i].getAttribute("data-geo");
 		if (latlon) {
@@ -165,9 +169,11 @@ function updateMarkers() {
 /* Ordenación de la tabla */
 function sortTable(cname, reverse) {
 	if (typeof reverse == "undefined") reverse = false;
-	var table_data = document.getElementById("table-data"),
-		values = table_data.getElementsByClassName(cname),
-		array = [],
+	var table_data = document.getElementById("table-data");
+	//var	values = table_data.getElementsByClassName(cname);
+	var values = getAllElementsByClassName(table_data,cname); //ie8
+
+	var array = [],
 		value;
 	for (var v=0, vlen=values.length; v<vlen; v++) {
 		value = values[v].textContent;
@@ -201,7 +207,8 @@ function filterTypes(filter) {
 			c_off=type + " off",
 			c_on=type + " on",
 			c_na=type,
-			cells=document.getElementById("table").getElementsByClassName(type),
+			//cells=document.getElementById("table").getElementsByClassName(type),
+			cells=getAllElementsByClassName(document.getElementById("table"),type), //ie8
 			cell,
 			disable = (f[1]=="off");
 		for (var c=0, clen=cells.length; c<clen; c++) {
@@ -214,7 +221,8 @@ function filterTypes(filter) {
 	var row;
 	gasoleProcess(gasoleData._data, function(sdata) {
 		row = sdata.row;
-		row.className = row.getElementsByClassName("on").length ? "r_on" : "r_off";
+		//row.className = row.getElementsByClassName("on").length ? "r_on" : "r_off";
+		row.className = getAllElementsByClassName(row,"on").length ? "r_on" : "r_off"; //ie8
 	})	
 }
 /* Filtrado de resultados por contenido de texto */
@@ -275,16 +283,17 @@ function initControl() {
 	var filter = [];
 	for (var f=0; f<filterT.length; f++) {
 		if (stats[filterT[f].className.split(" ")[0].split("_")[1]]) {
-			filter.push(filterT[f].className);
-			addEvent(filterT[f],"click", function() {
-				var cname = this.className.split(" ");
+			var currentFilter = filterT[f];
+			filter.push(currentFilter.className);
+			currentFilter.onclick = function(currentFilter) { return function() { 
+				var cname = currentFilter.className.split(" ");
 				var newCname = cname[0]+" "+((cname[1]=="on") ? "off" : "on");
-				this.className = newCname;
+				currentFilter.className = newCname;
 				filterTypes([newCname]);
 				filterText();
 				paginateTable(0);
 				updateMarkers();
-			})
+			 }}(currentFilter);
 		} else {
 			filter.push(filterT[f].className.replace("on", "off"));
 			filterT[f].className = "disabled";
@@ -361,7 +370,8 @@ function showDetail(marker) {
 /* Tipos de comsbutible seleccionados por el usuario */
 function getSelTypes() {
 	var res = [];
-	var types = document.getElementById("types").getElementsByClassName("on");
+	//var types = document.getElementById("types").getElementsByClassName("on");
+	var types = getAllElementsByClassName(document.getElementById("types"),"on"); //ie8
 	for (var t=0; t<types.length; t++) res.push(parseInt(types[t].className.split(" ")[0].split("_")[1]));
 	return res;
 }
@@ -388,13 +398,26 @@ function processData(info) {
 			divSum.appendChild(tr);
 		}
 	}
+
+	function deleteTableContents(table) {
+		var i;
+		var trs = table.getElementsByTagName("tr");
+		var total = trs.length;		
+		for ( i = 0 ; i < total ; i++ ) {
+			table.removeElement(trs[i]);
+		}
+	}
+
 	function populateTable(data) {
 		/* Rellena la tabla de resultados con la información proporcionada */
 		var table = document.getElementById("table-data"),
 			cities = [],
 			today = new Date(),
 			pdata, tdata, sdata, p_ref, t_ref, t_link, s_tlink;
-		table.innerHTML = "";
+		
+		/* table.innerHTML = "";  IE8 no soporta innerHTML en tablas */
+		deleteTableContents(table);
+
 		for (var p in data) {
 			pdata = data[p];
 			p_ref = encodeName(p);

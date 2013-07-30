@@ -54,7 +54,10 @@
 	<link rel="stylesheet" type="text/css" href="{{css}}" />
 	{% endfor %}
 
-	<!--[if lte IE 8]><script type="text/javascript" src="/js/_oldIE.js"></script><![endif]-->
+	<!--[if lte IE 8]>
+		<script type="text/javascript" src="/js/_oldIE.js"></script>
+		<link rel="stylesheet" type="text/css" href="/css/_oldIE.css" />
+	<![endif]-->
 	{% for sc in scripts %}
 	<script type="text/javascript" src="{{sc}}"></script>
 	{% endfor %}

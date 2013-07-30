@@ -1,7 +1,13 @@
 @font-face {
-  font-family: 'digital-7';
-  src: url('/font/digital-7.ttf');
-}
+    font-family: 'digital-7';
+    src: url('/font/digital-7-webfont.eot');
+    src: url('/font/digital-7-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/font/digital-7-webfont.woff') format('woff'),
+         url('/font/digital-7-webfont.ttf') format('truetype'),
+         url('/font/digital-7-webfont.svg#digital-7regular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+} /* ie8 */
 
 #social {
 	margin-bottom: 10px;

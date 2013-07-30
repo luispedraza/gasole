@@ -1,0 +1,24 @@
+/* home.css */
+.prov {
+	background-color: #f00; /* Problema mapa Raphael con fill en IE8 */
+}
+
+/* list.css */
+#summary {
+	width: 310px; /*IE8*/
+	clear: both; /*IE8*/
+}
+#summary td {
+	width: 45px; /*IE8*/
+}
+#updated {
+	float: none; /*IE8*/
+	text-align: right; /*IE8*/	
+}
+#detail {
+	filter: alpha(opacity=0); /* IE8 */
+}
+#distance-info {
+	width: 320px; /*IE8*/
+}
+th.T_ADDR {width: 260px;} /*IE8 */

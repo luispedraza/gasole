@@ -29,7 +29,6 @@
 					document.getElementById("prov-current").textContent = "lista de provincias";
 				};
 				prov.hover(hoverIn,hoverOut,prov,prov);
-				prov.node.setAttribute("class", "prov");
 			}
 			paper.setViewBox(-50,0,450,400, true);
 		})();
