@@ -11,10 +11,8 @@
 		return false;
 	}
 	var searchDistance = null,
-		input_search = "origin";	// qué lugar buscamos: origen/destino
-		window.place1 = null,
-		window.place2 = null,
-		is_route = false;
+		place1 = null,
+		place2 = null;
 	/* Va a por los resultados de búsqueda */
 	function loadResult() {
 		if (!is_route) {
@@ -138,6 +136,10 @@
 		geocoder.geocode({'address': l, 'region': 'es'}, function(r,s) {
 			showList(r,s,go);
 		});
+	}
+	function SearchInput(idInput, idList) {
+		this.input = document.getElementById(idInput);
+		this.list = dicument.getElementById(idList);
 	}
 	function Slider(div) {
 		this.value = 2,

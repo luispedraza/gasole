@@ -219,10 +219,11 @@ function fillComments(comments) {
 	}
 	function fillStars(div,p) {
 		/* rellena una valoración basada en la puntuación */
-		div.innerHTML = "<p>"+POINTS[--p]+"</p>";
+		div.innerHTML = "<p itemprop='summary'>"+POINTS[p-1]+"</p>";
 		div.className = "c_points";
 		for (var s=0; s<5; s++) 
-			div.innerHTML+="<div class='sprt star_mini s"+((s<=p) ? "on" : "off")+"'></div>";
+			div.innerHTML+="<div class='sprt star_mini s"+((s<p) ? "on" : "off")+"'></div>";
+		div.innerHTML+="<span style='display:none' itemprop='rating'>"+p+"</span>"
 	}
 	document.getElementById("no-comments").style.display="none";
 	var commentsDiv = document.getElementById("old_comments"),
@@ -243,6 +244,9 @@ function fillComments(comments) {
 		var newComment = document.createElement("div");
 			newComment.className = "c_comment";
 			newComment.id = "comment-"+id;
+			// Google snippets
+			newComment.setAttribute("itemscope","");
+			newComment.setAttribute("itemtype","http://data-vocabulary.org/Review");
 		var newCAvatar = document.createElement("img");
 			newCAvatar.className = "c_avatar";
 			newCAvatar.src = comment.avatar;
@@ -257,21 +261,17 @@ function fillComments(comments) {
 		}
 		var newCName = document.createElement("div");
 			newCName.className = "c_name";
-			newCName.innerHTML = link ? ("<a href='"+link+"' rel='external nofollow'>"+name+"</a>") : name;
+			newCName.innerHTML = link ? ("<a href='"+link+"' rel='external nofollow'><span itemprop='reviewer'>"+ name+"</span></a>") : name;
 			newComment.appendChild(newCName);
-		var newCDate = document.createElement("div");
+		var newCDate = document.createElement("div"),
+			cDate = new Date(comment.date).toLocaleDateString();
 			newCDate.className = "c_date";
-			newCDate.textContent = new Date(comment.date).toLocaleDateString();
+			newCDate.innerHTML = "<time itemprop='dtreviewed' datetime='"+cDate+"'>"+cDate+"</time>";
 			newComment.appendChild(newCDate);
-		if (title) {
-			var newCTitle = document.createElement("div");
-				newCTitle.className = "c_title";
-				newCTitle.textContent = title;
-				newComment.appendChild(newCTitle);	
-		}
 		var newCContent = document.createElement("div");
 			newCContent.className = "c_content";
 			newCContent.innerHTML = comment.content.replace(/\n/g, "<br>");
+			newCContent.setAttribute("itemprop","description");
 			newComment.appendChild(newCContent);
 		var newCReply = document.createElement("div");
 			newCReply.textContent = "responder…";
