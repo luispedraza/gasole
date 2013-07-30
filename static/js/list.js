@@ -376,12 +376,22 @@ function getSelTypes() {
 	for (var t=0; t<types.length; t++) res.push(parseInt(types[t].className.split(" ")[0].split("_")[1]));
 	return res;
 }
+// Borra elementos de una tabla (compatibilidad IE8)
+function deleteTableContents(table) {
+	var i;
+	var trs = table.getElementsByTagName("tr");
+	var total = trs.length;		
+	for ( i = total-1 ; i >= 0 ; i-- ) {
+		table.removeChild(trs[i]);
+	}
+}
+
 // Procesamiento de los datos, construcción de la tabla
 function processData(info) {
 	function populateInfo() {
 		/* Tabla resumen informativo */
-		var divInfo = document.getElementById("info");
 		var divSum = document.getElementById("summary-b");
+		deleteTableContents(divSum);
 		for (var t in stats) {
 			var data = stats[t];
 			var tr = document.createElement("tr");
@@ -400,15 +410,6 @@ function processData(info) {
 		}
 	}
 
-	function deleteTableContents(table) {
-		var i;
-		var trs = table.getElementsByTagName("tr");
-		var total = trs.length;		
-		for ( i = 0 ; i < total ; i++ ) {
-			table.removeElement(trs[i]);
-		}
-	}
-
 	function populateTable(data) {
 		/* Rellena la tabla de resultados con la información proporcionada */
 		var table = document.getElementById("table-data"),
@@ -416,9 +417,8 @@ function processData(info) {
 			today = new Date(),
 			pdata, tdata, sdata, p_ref, t_ref, t_link, s_tlink;
 		
-		/* table.innerHTML = "";  IE8 no soporta innerHTML en tablas */
+		// table.innerHTML = "";  //  IE8 no soporta innerHTML en tablas 
 		deleteTableContents(table);
-
 		for (var p in data) {
 			pdata = data[p];
 			p_ref = encodeName(p);
@@ -589,6 +589,15 @@ addEvent(window,"load", function() {
 			h1.textContent = "Gasolineras cerca de: " + place.name();
 		} else if (option == "ruta") {
 			var directionsRender = new google.maps.DirectionsRenderer({draggable:false});
+			function loadRoute(path) {
+				gasoleData._data = gasoleObject.routeData(path);
+				h1.textContent = "Gasolineras en Ruta";
+				stats = new GasoleStats(gasoleData._data).stats;
+				computeWeights(stats);
+				processData(gasoleData);
+				// fecha de actualización
+				document.getElementById("updated").textContent = "("+formatUpdate(gasoleObject.date)+")";
+			}
 			directionsRender.setMap(map);
 			var request = {origin: decodeURIComponent(pathArray[2]),
 				destination: decodeURIComponent(pathArray[3]),
@@ -600,16 +609,11 @@ addEvent(window,"load", function() {
 				gasoleObject=this;
 			service.route(request, function(r,s) {
 				if (s==google.maps.DirectionsStatus.OK) {
-					var path = r.routes[0].overview_path
 					directionsRender.setDirections(r);
-					gasoleData._data = gasoleObject.routeData(path);
-					h1.textContent = "Gasolineras en Ruta";
-
-					stats = new GasoleStats(gasoleData._data).stats;
-					computeWeights(stats);
-					processData(gasoleData);
-					// fecha de actualización
-					document.getElementById("updated").textContent = "("+formatUpdate(gasoleObject.date)+")";
+					loadRoute(r.routes[0].overview_path);
+					// google.maps.event.addListener(directionsRender, 'directions_changed', function() {
+					//     loadRoute(this.directions.routes[0].overview_path);
+					// });
 				}
 			});
 			return;

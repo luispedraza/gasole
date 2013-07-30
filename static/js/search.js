@@ -120,7 +120,6 @@
 		input.onsearch = function() {
 			THAT.clearList();
 			THAT.href=null;
-			console.log("tetas")
 		};
 		THAT.enable(en);
 	}
