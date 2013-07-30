@@ -146,6 +146,7 @@ li.menu.search .item {
 	border-color: #58110e;
 	width: 440px;
 	overflow: hidden;
+	z-index: 500;
 }
 .m_desc {
 	background-color: #f7f7cf;
@@ -330,7 +331,7 @@ footer ul a:hover{
 	font-size: 13px;
 	outline: none;
 	border: none;
-	width: 355px;
+	width: 345px;
 	height: 20px;
 	margin: 5px;
 }
@@ -339,6 +340,7 @@ footer ul a:hover{
 }
 #destiny {
 	margin-top: 5px;
+	position: relative;
 }
 .menu.search .item {
 	position: absolute;
@@ -357,6 +359,7 @@ footer ul a:hover{
 	float: left;
 	border: 1px solid #8b4163;
 	padding: 1px;
+	margin-right: 5px;
 }
 .sprt.search_gps {
 	margin: 5px;
@@ -376,20 +379,24 @@ footer ul a:hover{
 	opacity: .8;
 }
 .loader {
+	border: 3px solid #fff;
+	background-color: #fff;
 	background-repeat: no-repeat;
 	width: 20px;
 	height: 20px;
-	margin-top: 8px;
-	float: right;
+	margin-top: 4px;
+	position: absolute;
+	right: 0;
 	background-image: url('/img/loader.gif');
+	display: none;
 }
 .menu.search form {
-	width: 395px;
-	margin-left: 5px;
+	width: 390px;
 	display: inline-block;
 	min-height: 30px;
 	border-radius: 5px;
 	background-color: #fff;
+	position: relative;
 }
 #search-options {
 	padding: 10px;
@@ -432,10 +439,10 @@ footer ul a:hover{
 	background-color: #58110e;
 }
 #search-form-dest {
-	opacity: .3;
+	visibility: hidden;
 }
 .on + #search-form-dest {
-	opacity: 1;
+	visibility: visible;
 }
 .menu.search .button {
 	width: 100px;
@@ -477,9 +484,11 @@ footer ul a:hover{
 	font-size: .9em;
 }
 .helper {
-	margin-left: 28px;
+	position: absolute;
 	padding: 5px;
-	color: #ccc;
+	width: 390px;
+	left: 30px;
+	color: #ddd;
 	font-size: .8em;
 }
 .my-slider .bar {

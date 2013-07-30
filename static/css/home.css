@@ -42,7 +42,7 @@
 	float:left;
 }
 .fb_iframe_widget iframe {
-	z-index: 10000;
+	z-index: 200;
 }
 .addthis_toolbox > a {
 	display: inline-block !important;

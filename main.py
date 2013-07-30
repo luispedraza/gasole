@@ -157,7 +157,7 @@ class Detail(BaseAuthHandler):
             content="detail.html",
             edit_station=edit_station,
             og={"title": title,
-                "desc": u"Echad un ojo a esta gasolinera en GasOle.net",
+                "desc": u"Precios, datos históricos y opiniones de la gasolinera en GasOle.net",
                 "url": self.request.url})
 
 # class Gzip(BaseHandler):

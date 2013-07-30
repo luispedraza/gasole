@@ -1,146 +1,133 @@
 (function(w) {
-	function loadMapsAPI(callback) {
+	function mapsAPI(callback) {
 		// carga dinámica de la api, para el buscador, en páginas sin mapa
 		if (!window.google || !window.google.maps) {
+			// Función que llama la api de google maps al cargarse, o que se ejecuta si ya está cargada
+			window._geoCallback = callback;
 			var script = document.createElement("script");
 			script.type = "text/javascript";
-			script.src = "http://maps.googleapis.com/maps/api/js?key=AIzaSyD5XZNFlQsyWtYDeKual-OcqmP_5pgwbds&sensor=false&callback="+callback;
+			script.src = "http://maps.googleapis.com/maps/api/js?key=AIzaSyD5XZNFlQsyWtYDeKual-OcqmP_5pgwbds&sensor=false&callback=_geoCallback";
 			document.body.appendChild(script);
-			return true;
 		}
-		return false;
+		else callback();
+	}
+	function SearchPlace(form,placeholder,geo,en) {
+		var THAT = this;
+		THAT.href = null;
+		var loader = THAT.loader = document.createElement("div"),
+			input = THAT.input = document.createElement("input"),
+			ol = THAT.list = document.createElement("ol");
+		THAT.enable = function(en) {
+			if (en) THAT.input.removeAttribute("disabled");
+			else THAT.input.setAttribute("disabled","");
+		}
+		THAT.getPlace = function() {return THAT.href;}
+		THAT.geoCode = function() {
+			/* Codifica una dirección, obteniendo lat y lon */
+			var l = THAT.input.value;
+			if (!l) return;
+			THAT.showLoader(true);
+			var geocoder = new google.maps.Geocoder();
+			geocoder.geocode({'address': l, 'region': 'es'}, function(r,s) {
+				THAT.showList(r,s);
+			});
+		}
+		THAT.showLoader = function(show) {
+			loader.style.display = show ? "block" : "none";
+		}
+		THAT.init = function(url) {
+			THAT.href = url;
+			THAT.input.value = decodeURIComponent(url.split("/")[0]);
+		}
+		THAT.clearList = function() {ol.innerHTML=""};
+		THAT.showList = function(r,s) {
+			/* Muestra los resultados de geolocalización */
+			THAT.showLoader(false);
+			THAT.clearList();
+			if (s == google.maps.GeocoderStatus.OK) {
+				function selectItem(li) {
+					THAT.href = li.getAttribute("data-place");
+					input.value = li.textContent;
+					THAT.clearList();
+				}
+				var valid=0, 
+					added=0,
+					addr,
+					newLi;
+				for (var i=0; i<r.length; i++) {
+					var loc = r[i].geometry.location;
+					addr = r[i].formatted_address;
+					if (addr.match(/España$/)) {
+						valid++,
+						added=i;
+						var newLi = document.createElement("li");
+						newLi.setAttribute("data-place", encodeURIComponent(addr)+"/"+loc.lat()+"/"+loc.lng());
+						newLi.textContent = addr;
+						newLi.onclick = function() {selectItem(this)};
+						ol.appendChild(newLi);
+					}
+				}
+				if (valid==1) {selectItem(newLi)};	// sólo 1 resultado válido
+				if (valid>0) return;
+			}
+			ol.innerHTML = "<li>No se ha podido encontrar el lugar. Inténtalo de nuevo.</li>";
+		}
+		// Clase de buscador de LUGAR
+		form = document.getElementById(form);
+		if (geo && (navigator.geolocation!=undefined)) {
+			THAT.loadCurrentPosition = function() {
+				/* Busca la posición actual del usuario */
+				function positionOK(pos) {
+					var geocoder = new google.maps.Geocoder();
+					var latlng = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
+					geocoder.geocode({'latLng': latlng}, THAT.showList);
+				}
+				function positionError(e) {
+					switch(e.code) {
+						case e.PERMISSION_DENIED: console.log("No has permitido que obtengamos tu posición."); break;
+						case e.POSITION_UNAVAILABLE: console.log("No es posible obtener tu posición acual."); break;
+						case e.TIMEOUT: console.log("Se ha agotado el tiempo de espera."); break;
+						case e.UNKNOWN_ERROR: console.log("Ha ocurrido un error desconocido."); break;
+					}
+				}
+				navigator.geolocation.getCurrentPosition(positionOK, positionError);
+			}
+			var geoDiv = document.createElement("div");
+			geoDiv.className = "sprt search_gps";
+			geoDiv.onclick = function() {
+				THAT.showLoader(true);
+				mapsAPI(THAT.loadCurrentPosition);
+			};
+			form.appendChild(geoDiv);
+		}
+		// El spinner de carga
+		loader.className = "loader";
+		form.appendChild(loader);
+		// El input de comentarios
+		input.type = "search";
+		input.placeholder = placeholder;
+		form.appendChild(input);
+		// La lista de resultados
+		ol.className = "results";
+		lockScroll(ol);
+		form.appendChild(ol);
+		// El envío del formulario
+		form.onsubmit = function() {
+			mapsAPI(THAT.geoCode);	// cuando se pula enter en el formulario
+			return false;	
+		}
+		input.onblur = function() { if (THAT.href==null) mapsAPI(THAT.geoCode);};
+		input.onsearch = function() {
+			THAT.clearList();
+			THAT.href=null;
+			console.log("tetas")
+		};
+		THAT.enable(en);
 	}
 	var searchDistance = null,
 		place1 = null,
 		place2 = null;
-	/* Va a por los resultados de búsqueda */
-	function loadResult() {
-		if (!is_route) {
-			if (place1) {
-				window.location="/resultados/"+place1+"/"+searchDistance.getvalue().toFixed(2);
-			} else {
-				window.geoCodeAndGo = function() {geoCode(true);}
-				if (!loadMapsAPI("geoCodeAndGo")) geoCodeAndGo();
-			}
-		}
-		else if (is_route) {
-			if (place1 && place2) {
-				window.location="/ruta/"+place1.split("/")[0]+"/"+place2.split("/")[0];
-			}
-		}	
-	}
-	function showLoader() {
-		/* Muestra el spinner de carga */
-		document.getElementById("current-loc"+((input_search=="origin")?"":"-dest")).className="loader";
-	}
-	function hideLoader() {
-		/* Oculta el spinner de carga */
-		if (input_search=="origin") document.getElementById("current-loc").className="sprt search_gps";
-		else document.getElementById("current-loc-dest").className="";
-	}
-	function initGeoloc() {
-		window.loadCurrentPosition = function() {
-			/* Busca la posición actual del usuario */
-			function showPosition(pos) {
-				var geocoder = new google.maps.Geocoder();
-				var latlng = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
-				geocoder.geocode({'latLng': latlng}, showList);
-			}
-			function showError(e) {
-				switch(e.code) {
-					case e.PERMISSION_DENIED:
-						console.log("User denied the request for Geolocation.");
-						break;
-					case e.POSITION_UNAVAILABLE:
-						console.log("Location information is unavailable.");
-						break;
-					case e.TIMEOUT:
-						console.log("The request to get user location timed out.");
-						break;
-					case e.UNKNOWN_ERROR:
-						console.log("An unknown error occurred.");
-						break;
-				}
-			}
-			navigator.geolocation.getCurrentPosition(showPosition, showError);
-		}
-		/* Inicializa funciones de geolocalización del navegador */
-		var loc = document.getElementById("current-loc");
-		if (!navigator.geolocation) loc.style.display = "none";
-		else addEvent(loc,"click", function() {
-			showLoader();
-			if (!loadMapsAPI("loadCurrentPosition")) loadCurrentPosition();
-		});
-	}
-	function showList(r,s,go) {
-		/* Muestra los resultados de geolocalización */
-		hideLoader();
-		var input = document.getElementById("address"+((input_search=="origin") ? "" : "-dest"));
-		var resultsList = document.getElementById("results-list"+((input_search=="origin") ? "" : "-dest"));
-		resultsList.innerHTML = "";
-		if (s == google.maps.GeocoderStatus.OK) {
-			var valid=0, 
-				added=0, 
-				href,
-				addr;
-			for (var i=0; i<r.length; i++) {
-				var loc = r[i].geometry.location;
-				addr = r[i].formatted_address;
-				if (addr.match(/España$/)) {
-					valid++; 
-					added=i,
-					href = encodeURIComponent(addr)+"/"+loc.lat()+"/"+loc.lng();
-					var newLi = document.createElement("li");
-					newLi.setAttribute("data-place", href);
-					newLi.textContent = addr;
-					newLi.onclick = function() {
-						var href = this.getAttribute("data-place");
-						if (input_search=="origin") place1=href;
-						else place2=href;
-						input.value = this.textContent;
-						hideResult();
-					};
-					resultsList.appendChild(newLi);
-				}
-			}
-			if (valid==1) {
-				console.log("solo 1", input_search);
-				if (input_search=="origin") place1=href;
-				else place2=href;
-				input.value = addr;
-				hideResult();
-				if (go) window.location="/resultados/"+href+"/"+searchDistance.getvalue().toFixed(2);
-			}
-			return;
-		}
-		resultsList.innerHTML = "<li>No se ha podido encontrar el lugar. Inténtalo de nuevo.</li>";
-	}
-	function hideResult() {
-		document.getElementById("results-list"+((input_search=="origin") ? "" : "-dest"))
-			.innerHTML="";
-	}
-	window.geoCode = function(go) {
-		/* Codifica una dirección, obteniendo lat y lon */
-		var addr = (input_search=="origin") ? "address" : "address-dest";
-		var l = document.getElementById(addr).value;
-		if (!l) return;
-		var thePath = window.location.pathname.split("/");
-		if ((input_search=="origin") && (thePath[1]=="resultados") && (encodeURIComponent(l)==thePath[2])) {
-			// Ya estoy en la página de resultados, cambiar radio tal vez
-			thePath[thePath.length-1]=searchDistance.getvalue();
-			window.location=thePath.join("/");
-			return;
-		}
-		showLoader();
-		var geocoder = new google.maps.Geocoder();
-		geocoder.geocode({'address': l, 'region': 'es'}, function(r,s) {
-			showList(r,s,go);
-		});
-	}
-	function SearchInput(idInput, idList) {
-		this.input = document.getElementById(idInput);
-		this.list = dicument.getElementById(idList);
-	}
+
 	function Slider(div) {
 		this.value = 2,
 		this.max = 20,
@@ -183,59 +170,46 @@
 		addEvent(padDiv,"mouseout", function(e) {
 			slider.updateSlider(slider.value);
 		})
+		this.enable = function(en) {sliderDiv.style.display = en ? "block" : "none"};
 	}
 	addEvent(w,"load", function() {
-		var menuSearch = document.getElementById("menu-search");
-		addEvent(menuSearch,"click", function(e) {
-			stopEvent(e);
-			this.className="menu search enabled";
-			addEvent(document, "click", function() {
-				menuSearch.className="menu search";
-			})
-		})
-		// Selección de ruta
-		function enableRouter(enable) {
-			var _slider = document.getElementById("search-d"),
-				_destinput = document.getElementById("address-dest"),
-				_button = document.getElementById("route");
-			if (enable) {
-				is_route = true;
-				_button.className += " on";
-				_slider.style.display = "none";
-				_destinput.removeAttribute("disabled");
-			} else {
-				is_route = false;
-				_button.className = "sprt directions";
-				_slider.style.display = "block";
-				_destinput.setAttribute("disabled", "disabled");
+		function searchLocation() {
+			var p1 = place1.getPlace();
+			if (p1) {
+				window.location="/resultados/"+p1+"/"+sliderDist.getvalue().toFixed(1);
 			}
 		}
-		addEvent(document.getElementById("route"), "click", function() {
-			var cname=this.className;
-			enableRouter(cname.match(" on")==null);
-		})
-		function searchLocation() {
-			if (!loadMapsAPI("geoCode")) geoCode();
-			return false;
+		function searchRoute() {
+			var p1 = place1.getPlace(),
+				p2 = place2.getPlace();
+			if ((p1!=null) && (p2!=null)) {
+				window.location="/ruta/"+p1.split("/")[0]+"/"+p2.split("/")[0];
+			}
 		}
-		document.getElementById("address").onfocus=function() {
-			hideResult(); input_search="origin";
-		};
-		document.getElementById("address-dest").onfocus=function() {
-			hideResult(); input_search="destiny";
-		};
-		document.getElementById("search-form").onsubmit=searchLocation;
-		document.getElementById("search-form-dest").onsubmit=searchLocation;
-		document.getElementById("search-b").onclick=loadResult;
-		lockScroll("results-list");		
-		lockScroll("results-list-dest");
-		searchDistance = new Slider("search-d");
-		initGeoloc();
+		sliderDist = new Slider("search-d");
+		place1 = new SearchPlace("search-form","Gran Vía 35, Madrid -o- Aeropuerto -o- Hotel Palace",true,true),
+		place2 = new SearchPlace("search-form-dest","Barcelona",false,false);
+		var menuSearch = document.getElementById("menu-search"),
+			buttonSearch = document.getElementById("search-b");
+		addEvent(menuSearch,"click", function(e) {
+			stopEvent(e);
+			// Se despliega el formulario
+			this.className="menu search enabled";
+			addEvent(document, "click", function() { menuSearch.className="menu search";})
+		})
+		addEvent(document.getElementById("route"), "click", function() {
+			var route = (this.className.match(" on")==null);
+			sliderDist.enable(!route);
+			place2.enable(route);
+			this.className = "sprt directions" + (route ? " on" : "");
+			buttonSearch.onclick = route ? searchRoute : searchLocation;
+		})
+
 		var thePath = window.location.pathname.split("/");
 		if (thePath[1]=="resultados") {
-			document.getElementById("address").value = decodeURIComponent(thePath[2]);
-			searchDistance.updateSlider(parseFloat(thePath[5]));
-			place1=thePath.slice(2,5).join("/");
+			place1.init(thePath.slice(2,5).join("/"));
+			sliderDist.updateSlider(parseFloat(thePath[5]));
 		}
+		buttonSearch.onclick = searchLocation;
 	});
 })(window);
