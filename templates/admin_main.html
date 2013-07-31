@@ -7,7 +7,9 @@
 </head>
 
 <body>
-<a href="{{log_url}}">{{log_text}}</a>
+<a class="login" href="{{log_url}}">{{log_text}}</a>
+
+{% if log_text=="Logout" %}
 
 <h2>Opciones disponibles:</h2>
 <ul>
@@ -16,6 +18,6 @@
 <li><a href="/stats">Stats</li>
 <li><a href="/map">Map</li>
 </ul>
-
+{% endif %}
 
 </body>
