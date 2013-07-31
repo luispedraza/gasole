@@ -16,7 +16,7 @@ from gas_slimmer import *
 from time import time
 import datetime
 
-from gas_stats import *
+# from gas_stats import *
 
 TIME=0
 def tic():
@@ -38,6 +38,10 @@ def get_points(s):
 
 class MainHandler(BaseAuthHandler):
     def get(self):
+        if "_escaped_fragment_" in self.request.arguments():
+            # logging.info(compute_stats(json.loads(getGasole().decode('zlib')).get("_data")))
+            self.redirect("/static_html/home.html")
+            return
         self.render("base.html", 
             title = u"GasOle.net: el precio de la gasolina en España.",
             styles =['/css/home.css'],
@@ -62,7 +66,7 @@ class AdminHandler(BaseHandler):
 class AdminUpdate(BaseHandler):
     def get(self, method):
         if not users.is_current_user_admin():
-            self.request.redirect("/")
+            self.redirect("/")
             return
         if method and method=="csv":
             self.render("admin_update_csv.html",
@@ -77,7 +81,7 @@ class AdminUpdate(BaseHandler):
 
     def post(self, method):
         if not users.is_current_user_admin():
-            self.request.redirect("/")
+            self.redirect("/")
             return
     	option = self.request.get("option")
         data = None
@@ -133,14 +137,14 @@ class AdminUpdate(BaseHandler):
 class AdminSearch(BaseHandler):
     def get(self):
         if not users.is_current_user_admin():
-            self.request.redirect("/")
+            self.redirect("/")
             return
         self.render("admin_search.html",
             options = FUEL_OPTIONS,
             provs = PROVS)
     def post(self):
         if not users.is_current_user_admin():
-            self.request.redirect("/")
+            self.redirect("/")
             return
         option = self.request.get("option")
         prov = self.request.get("prov")
@@ -437,7 +441,7 @@ app_config = {
     }
 
 app = webapp2.WSGIApplication([
-    ('/', MainHandler),
+    ('/?', MainHandler),
     ('/admin/?', AdminHandler),
     ('/admin/update/?(\w+)?', AdminUpdate),
     ('/admin/search/?', AdminSearch),

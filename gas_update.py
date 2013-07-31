@@ -305,4 +305,60 @@ def gas_update_search(option="1", prov="01"):
 			for rpc in rpcs:
 				rpc.wait()
 			return result
-	
+
+
+#estadisticas para resultados de un tipo de combustible
+class Stats:
+	def __init__(self):
+		self.n = 0
+		self.max = self.min = self.mu = self.range = None
+		self.smin = [] # estaciones con precio mínimo
+		self.smax = [] # estaciones con precio máximo
+	def range(self):
+		if self.range==None:
+			self.range=self.max-self.min
+		return self.range
+	def add(self, p, s, g=None):
+		if self.mu:
+			if p>self.max:
+				self.max=p
+				self.smax=[s]
+			elif p==self.max:
+				self.smax.append(s)
+			elif p<self.min:
+				self.min=p
+				self.smin=[s]
+			elif p==self.min:
+				self.smin.append(s)
+			self.mu = (self.mu*self.n+p)/(self.n+1)
+			self.n+=1
+		else:
+			self.max = self.min = self.mu = p
+			self.smin = [s]
+			self.smax = [s]
+			self.n = 1
+
+# Estadisticas de todos los datos de un objeto gasole
+def compute_stats(data):
+	stats = {}			# estadisticas globales
+	provinces = {}		# estadisticas provinciales
+	for p in data:
+		logging.info(p)
+		datap = data[p]
+		statp = provinces[p] = {}
+		for t in datap:
+			datat = datap[t]
+			for s in datat:
+				datas = datat[s]
+				options = datas.get("o")
+				for o in options:
+					p = datas["o"][o]
+					_p = stats.setdefault(o,Stats())
+					_g = statp.setdefault(o,Stats())
+					_p.add(p,[p,t,s])
+					_g.add(p,[p,t,s])
+	memcache.set("global_stats", stats)
+	memcache.set("province_stats", provinces)
+	return stats, provinces
+
+

@@ -34,7 +34,7 @@ handlers:
   static_files: favicon.ico
   upload: favicon\.ico
 - url: /css
-  static_dir: static/css
+  static_dir: static/css/
 - url: /js/my_js_files
   static_dir: static/js/
 - url: /js/my_js_libs
@@ -45,8 +45,13 @@ handlers:
   static_dir: static/img
 - url: /font
   static_dir: static/font
+- url: /static_html
+  static_dir: static/html/
+  
 - url: .*
   script: main.app
+
+
 
 libraries:
 - name: webapp2
