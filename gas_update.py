@@ -214,6 +214,8 @@ def gas_update_xls(option="1"):
 			tables = page.xpath("body/table")
 			if tables:	# si encuentra tablas en el resultado
 				rows = tables[0].findall("tr")
+				if len(rows)<5:
+					return None
 				for tr in rows[3:]:
 					row_data = [td.text for td in tr.getchildren()]
 					if row_data[7] == "P":	# guardo sólo gaslineras de venta público

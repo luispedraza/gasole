@@ -61,6 +61,9 @@ class AdminHandler(BaseHandler):
 
 class AdminUpdate(BaseHandler):
     def get(self, method):
+        if not users.is_current_user_admin():
+            self.request.redirect("/")
+            return
         if method and method=="csv":
             self.render("admin_update_csv.html",
             	options=FUEL_OPTIONS,
@@ -73,6 +76,9 @@ class AdminUpdate(BaseHandler):
             self.redirect("/")
 
     def post(self, method):
+        if not users.is_current_user_admin():
+            self.request.redirect("/")
+            return
     	option = self.request.get("option")
         data = None
         if method and method=="csv":
@@ -126,10 +132,16 @@ class AdminUpdate(BaseHandler):
 #             logging.info("guardadas %s posiciones" %len(_geodata))
 class AdminSearch(BaseHandler):
     def get(self):
+        if not users.is_current_user_admin():
+            self.request.redirect("/")
+            return
         self.render("admin_search.html",
             options = FUEL_OPTIONS,
             provs = PROVS)
     def post(self):
+        if not users.is_current_user_admin():
+            self.request.redirect("/")
+            return
         option = self.request.get("option")
         prov = self.request.get("prov")
         update = self.request.get("updatedb")
@@ -209,6 +221,7 @@ class Api(BaseHandler):
         info = getGasole().decode('zlib')
         self.response.headers['Content-Type'] = 'application/json; charset=utf-8'
         self.write(info)
+
 # api de actualización de estaciones
 class StationApi(BaseAuthHandler):
      def post(self,p,t,s):
