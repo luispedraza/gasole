@@ -610,18 +610,19 @@ function Gasole(callback) {
 /* Rellena dígitos de información numérica 
 para conseguir el efecto de tablero de precios */
 function fillPriceDigits(div, price) {
-	div.innerHTML = "";
-	var digits = price.toFixed(3);
-	for (var d=0; d<digits.length; d++){
-		var digitBack = document.createElement("div");
-		digitBack.className = "back";
-		(digits[d]==".") ? (digitBack.className += " point") : (digitBack.textContent = 8);
-		var digitDiv = document.createElement("div"); 
-		digitDiv.className = "digit"; 
-		digitDiv.textContent = digits[d];
-		digitBack.appendChild(digitDiv);
-		div.appendChild(digitBack);
-	}
+	div.innerHTML = price.toFixed(3);
+	// div.innerHTML = "";
+	// var digits = price.toFixed(3);
+	// for (var d=0; d<digits.length; d++){
+	// 	var digitBack = document.createElement("div");
+	// 	digitBack.className = "back";
+	// 	(digits[d]==".") ? (digitBack.className += " point") : (digitBack.textContent = 8);
+	// 	var digitDiv = document.createElement("div"); 
+	// 	digitDiv.className = "digit"; 
+	// 	digitDiv.textContent = digits[d];
+	// 	digitBack.appendChild(digitDiv);
+	// 	div.appendChild(digitBack);
+	// }
 }
 
 /* Función para procesar datos de gasole, que ejecuta
