@@ -219,7 +219,7 @@ function fillComments(comments) {
 	}
 	function fillStars(div,p) {
 		/* rellena una valoración basada en la puntuación */
-		div.innerHTML = "<p itemprop='summary'>"+POINTS[p-1]+"</p>";
+		div.innerHTML = "<p itemprop='summary'>"+POINTS[p-1]+ " ["+p+"/5] " + "</p>";
 		div.className = "c_points";
 		for (var s=0; s<5; s++) 
 			div.innerHTML+="<div class='sprt star_mini s"+((s<p) ? "on" : "off")+"'></div>";
