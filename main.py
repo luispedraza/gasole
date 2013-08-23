@@ -16,8 +16,6 @@ from gas_slimmer import *
 from time import time
 import datetime
 
-# from gas_stats import *
-
 TIME=0
 def tic():
     global TIME 
@@ -42,131 +40,18 @@ class MainHandler(BaseAuthHandler):
             # logging.info(compute_stats(json.loads(getGasole().decode('zlib')).get("_data")))
             self.redirect("/static_html/home.html")
             return
-        self.render("base.html", 
+        self.render("base.html",
             title = u"GasOle.net: el precio de la gasolina en España.",
             styles =['/css/home.css'],
             scripts=get_js('home.js',DEBUG),
             user=self.get_logged_user(),
             content="home.html",
+            show_ads = not DEBUG,
             og={"title": u"GasOle.net",
                 "desc": u"La gasolina más barata de España y las gasolineras mejor valoradas.",
                 "url": u"http://www.gasole.net"})
 
-class AdminHandler(BaseHandler):
-    def get(self):
-        log_url = users.create_login_url(self.request.uri)
-        log_text = 'Login'
-        if self.user:
-            log_url = users.create_logout_url(self.request.uri)
-            log_text = 'Logout'
-        self.render("admin_main.html",
-            log_url = log_url,
-            log_text = log_text)
-
-class AdminUpdate(BaseHandler):
-    def get(self, method):
-        if not users.is_current_user_admin():
-            self.redirect("/")
-            return
-        if method and method=="csv":
-            self.render("admin_update_csv.html",
-            	options=FUEL_OPTIONS,
-                csv_data=None)
-        elif not method or method=="xls":
-            self.render("admin_update_xls.html",
-                options=FUEL_OPTIONS,
-                xls_data=None)
-        else:
-            self.redirect("/")
-
-    def post(self, method):
-        if not users.is_current_user_admin():
-            self.redirect("/")
-            return
-    	option = self.request.get("option")
-        data = None
-        if method and method=="csv":
-            data = gas_update_csv(option)
-            self.render("admin_update_csv.html",
-                options=FUEL_OPTIONS,
-                data=data)
-        elif not method or method=="xls":
-            data = gas_update_xls(option)
-            self.render("admin_update_xls.html",
-                options=FUEL_OPTIONS,
-                data=data)
-        if self.request.get("updatedb"):
-                data2store(data.data)
-
-# class AdminSearch(BaseHandler):
-#     def get(self):
-#         self.render("admin_search.html",
-#             options = FUEL_OPTIONS,
-#             provs = PROVS)
-#     def post(self):
-#         option = self.request.get("option")
-#         prov = self.request.get("prov")
-#         update = self.request.get("updatedb")
-#         data = gas_update_search(prov=prov, option=option)
-#         static_map = ""
-#         if data:
-#             markers = filter(None, [d[-1] for d in data])
-#             static_map = get_static_map(markers[:50])
-#         self.render("admin_search.html",
-#             options = FUEL_OPTIONS,
-#             provs = PROVS,
-#             data = data,
-#             static_map = static_map)
-#         if update:
-#             _geodata = []
-#             data = data.data
-#             for p in data.keys():
-#                 datap = data[p]
-#                 for t in datap.keys():
-#                     datat = datap[t]
-#                     for s in datat.keys():
-#                         datas = datat[s]
-#                         g = datas.get("latlon")
-#                         if g:
-#                             station = GasStation.get(db.Key.from_path('Province', p, 'Town', t, 'GasStation', s))
-#                             if station:
-#                                 station.geopt = db.GeoPt(lat = data[p][t][s]["latlon"][1], lon = data[p][t][s]["latlon"][0])
-#                                 _geodata.append(station)
-#             db.put(_geodata)
-#             logging.info("guardadas %s posiciones" %len(_geodata))
-class AdminSearch(BaseHandler):
-    def get(self):
-        if not users.is_current_user_admin():
-            self.redirect("/")
-            return
-        self.render("admin_search.html",
-            options = FUEL_OPTIONS,
-            provs = PROVS)
-    def post(self):
-        if not users.is_current_user_admin():
-            self.redirect("/")
-            return
-        option = self.request.get("option")
-        prov = self.request.get("prov")
-        update = self.request.get("updatedb")
-        data = gas_update_search(prov=prov, option=option)
-        static_map = ""
-        if data:
-            markers = filter(None, [d[-1] for d in data])
-            static_map = get_static_map(markers[:50])
-        self.render("admin_search.html",
-            options = FUEL_OPTIONS,
-            provs = PROVS,
-            data = data,
-            static_map = static_map)
-        if update:
-            update_geopos(data)
-
-# class Data(BaseAuthHandler):
-#     def get(self, option, province):
-#         data = get_means(option)
-#         self.render_json(data)
-
+# lista de resultados: Provincia, Ciudad o Búsqueda
 class List(BaseAuthHandler):
     def get(self, province, city):
         title = "Gasolineras en " + (decode_param(city)+ ", " if city else "la ") + "provincia de " + decode_param(province)
@@ -176,9 +61,12 @@ class List(BaseAuthHandler):
             scripts=get_js('list.js',DEBUG),
             user=self.get_logged_user(),
             content="list.html",
+            show_ads = not DEBUG,
             og={"title": u"Todas las "+title,
                 "desc": u"Precios y mapa de todas las gasolineras en GasOle.net",
                 "url": self.request.url})
+
+# Detalle de una gasolinera
 class Detail(BaseAuthHandler):
     def get(self, province, town, station):
         # Vista de detalle de una gasolinera
@@ -199,6 +87,7 @@ class Detail(BaseAuthHandler):
             user = self.get_logged_user(),
             content="detail.html",
             edit_station=edit_station,
+            show_ads = not DEBUG,
             og={"title": title,
                 "desc": u"Precios, datos históricos y opiniones de la gasolinera en GasOle.net",
                 "url": self.request.url})
@@ -252,6 +141,7 @@ class StationApi(BaseAuthHandler):
                 sdata.link = link
             sdata.put()
             self.redirect("/ficha/"+p+"/"+t+"/"+s)
+
 #api de comentarios de una gasolinera
 class CommentsApi(BaseAuthHandler):
     def remove_html_tags(self,s):
@@ -322,7 +212,8 @@ class CommentsApi(BaseAuthHandler):
         result["ERROR"] = errors
         self.response.headers['Content-Type'] = 'application/json; charset=utf-8'
         self.write(json.dumps(result))
-#api de históricos de una gasolinera
+
+# API de históricos de una gasolinera
 class HistoryApi(BaseHandler):
     def get(self,p,t,s):
         self.response.headers['Content-Type'] = 'application/json; charset=utf-8'
@@ -346,6 +237,7 @@ class SearchResults(BaseAuthHandler):
             og={"title": title,
                 "desc": u"Búsqueda de gasolineras en GasOle.net, cerca de "+place,
                 "url": self.request.url})
+
 class SearchRoute(BaseAuthHandler):
     def get(self, place1, place2):
         place1 = decode_param(place1)
@@ -360,6 +252,7 @@ class SearchRoute(BaseAuthHandler):
             og={"title": title,
                 "desc": u"Gasolineras en ruta entre "+place1+" y "+place2,
                 "url": self.request.url})
+
 class Info(BaseAuthHandler):
     def get(self, section):
         logging.info(section)
@@ -397,16 +290,19 @@ class Info(BaseAuthHandler):
             og={"title": title,
                 "desc": desc,
                 "url": canonical})
+
 def handle_404(request, response, exception):
     #http://webapp-improved.appspot.com/guide/exceptions.html
     logging.info(request)
     logging.exception(exception)
     response.set_status(404)
     response.write(jinja_env.get_template("404.html").render())
+
 def handle_500(request, response, exception):
     logging.exception(exception)
     response.set_status(500)
     response.write(jinja_env.get_template("500.html").render())
+
 class Stats(BaseAuthHandler):
     def get(self):
         self.render("base.html",
@@ -442,9 +338,6 @@ app_config = {
 
 app = webapp2.WSGIApplication([
     ('/?', MainHandler),
-    ('/admin/?', AdminHandler),
-    ('/admin/update/?(\w+)?', AdminUpdate),
-    ('/admin/search/?', AdminSearch),
     ('/graficos/?', Stats),
     # ('/stats/?([^ \/]+)?/?([^ \/]+)?/?', StatsApi),
     # ('/data/(\w+)/(\w+)', Data),

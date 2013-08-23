@@ -38,6 +38,7 @@
 
 
 	<div id="ads-detail">
+		{% if show_ads %}
 		<script type="text/javascript"><!--
 		google_ad_client = "ca-pub-9285487390483271";
 		/* gasole detail */
@@ -49,6 +50,7 @@
 		<script type="text/javascript"
 		src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 		</script>
+		{% endif %}
 	</div>
 </div>
 
@@ -69,6 +71,7 @@
 	</div>
 	<div id="detail-info">
 		<div id="ads-top">
+			{% if show_ads %}
 			<script type="text/javascript"><!--
 			google_ad_client = "ca-pub-9285487390483271";
 			/* gasole top */
@@ -80,6 +83,7 @@
 			<script type="text/javascript"
 			src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 			</script>
+			{% endif %}
 		</div>
 		<div id="map"></div>
 		<div id="chart" class="button"><div class="sprt m_stats"></div>&nbsp;Mostrar Gráfico Histórico de Precios</div>

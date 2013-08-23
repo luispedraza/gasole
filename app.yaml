@@ -48,6 +48,8 @@ handlers:
 - url: /static_html
   static_dir: static/html/
   
+- url: /admin
+  script: gas_admin.app
 - url: .*
   script: main.app
 
