@@ -442,9 +442,11 @@ function processData(info) {
 						td_town.appendChild(a_town);
 						tr.appendChild(td_town);
 					var td_s = document.createElement("td");
+						var brand = getLogo(label) || label;
+						if (brand) brand = brand.toUpperCase();
 						var a_s = document.createElement("a");
 						a_s.href = s_link + encodeName(s);
-						a_s.textContent = toTitle(s);
+						a_s.textContent = brand + ": " + toTitle(s);
 						a_s.title = "Ficha de la gasolinera "+label+" en " + t + ", " + a_s.textContent;
 						td_s.className = "T_ADDR";
 						td_s.setAttribute("label", label);
