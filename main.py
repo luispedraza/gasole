@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
     
 from gasole_base import *
-from gas_update import *
-from gas_maps import *
 from gas_db import *
 from google.appengine.api import users
 from recaptcha import *
